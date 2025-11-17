@@ -8,8 +8,14 @@ import 'package:googleapis_auth/auth_io.dart' as auth_io;
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-// ADD THIS IMPORT
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// 
+// --- THIS IS THE FIX ---
+// Import the package using the 'package:' prefix, not a relative path.
+//
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // [!code focus]
+//
+// --- END OF FIX ---
+//
 
 // Local Import
 import 'package:core_data/core_data.dart';
@@ -61,9 +67,6 @@ class AuthRepository {
           ),
         );
       } else if (Platform.isWindows) {
-        //
-        // --- THIS IS THE SECURE SOLUTION ---
-        //
         // Load secrets from the environment
         final clientId = dotenv.env['GOOGLE_WINDOWS_CLIENT_ID'];
         final clientSecret = dotenv.env['GOOGLE_WINDOWS_CLIENT_SECRET'];
@@ -73,9 +76,6 @@ class AuthRepository {
             clientSecret == null || clientSecret.isEmpty) {
           throw 'Windows Client ID/Secret not found in .env file. Please check apps/.env';
         }
-        //
-        // --- END OF SECURE SOLUTION ---
-        //
 
         final id = auth.ClientId(clientId, clientSecret);
 
@@ -137,9 +137,6 @@ class AuthRepository {
             await _secureStorage.read(key: _windowsRefreshTokenKey);
         if (refreshToken == null) return null;
 
-        //
-        // --- THIS IS THE SECURE SOLUTION ---
-        //
         // Load secrets from the environment
         final clientId = dotenv.env['GOOGLE_WINDOWS_CLIENT_ID'];
         final clientSecret = dotenv.env['GOOGLE_WINDOWS_CLIENT_SECRET'];
@@ -149,9 +146,6 @@ class AuthRepository {
             clientSecret == null || clientSecret.isEmpty) {
           throw 'Windows Client ID/Secret not found in .env file. Please check apps/.env';
         }
-        //
-        // --- END OF SECURE SOLUTION ---
-        //
 
         final id = auth.ClientId(clientId, clientSecret);
 

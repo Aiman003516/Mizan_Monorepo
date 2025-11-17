@@ -1,39 +1,64 @@
+// In: mizan_monorepo/app_main/apps/android/app/build.gradle.kts
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id("dev.flutter.flutter-gradle-plugin")
+    id("dev.flutter.flutter-plugin-loader")
+    // DO NOT APPLY google-services here. Move it to the end.
+    // id("com.google.gms.google-services") 
 }
+
+fun localProperties(): java.util.Properties {
+    val properties = java.util.Properties()
+    val localPropertiesFile = project.rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        properties.load(java.io.FileInputStream(localPropertiesFile))
+    }
+    return properties
+}
+
+val flutterRoot: String by project
+val flutterVersionCode: String? by project
+val flutterVersionName: String? by project
+
+// === FIX STEP 1: Add this line ===
+// Load .env file for build-time variables
+project.ext.set("flutter.dotenv", ".env")
+
+// === FIX STEP 2: Apply flutter.gradle AFTER .env line ===
+apply(from = "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle")
 
 android {
     namespace = "com.example.mizan.mizan"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 34 // flutter.compileSdkVersion
+    ndkVersion = "26.1.10909125" // flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = "1.8"
+    }
+
+    sourceSets {
+        getByName("main") {
+            java.srcDirs("src/main/kotlin", "src/main/java")
+        }
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.mizan.mizan"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdk = 21 // flutter.minSdkVersion
+        targetSdk = 34 // flutter.targetSdkVersion
+        versionCode = (flutterVersionCode ?: "1").toInt()
+        versionName = flutterVersionName ?: "1.0"
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            isSigningReady = true
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -42,3 +67,8 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {}
+
+// === FIX STEP 3: Apply google-services at the VERY END ===
+apply(plugin = "com.google.gms.google-services")
