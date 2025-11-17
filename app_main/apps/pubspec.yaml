@@ -1,0 +1,71 @@
+# This is your application's pubspec.yaml.
+# It MUST be inside the 'app_mizan' folder.
+name: mizan
+description: "The main Mizan Flutter application."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  flutter_riverpod: ^2.6.1
+  shared_preferences: ^2.5.3
+
+  #
+  # --- Local Modular Packages ---
+  #
+  core_database:
+    path: ../packages/core/core_database
+  core_data:
+    path: ../packages/core/core_data
+  core_l10n:
+    path: ../packages/core/core_l10n
+  shared_ui:
+    path: ../packages/shared/shared_ui
+  shared_services:
+    path: ../packages/shared/shared_services
+  feature_accounts:
+    path: ../packages/features/feature_accounts
+  feature_auth:
+    path: ../packages/features/feature_auth
+  feature_dashboard:
+    path: ../packages/features/feature_dashboard
+  feature_products:
+    path: ../packages/features/feature_products
+  feature_reports:
+    path: ../packages/features/feature_reports
+  feature_settings:
+    path: ../packages/features/feature_settings
+  feature_sync:
+    path: ../packages/features/feature_sync
+  feature_transactions:
+    path: ../packages/features/feature_transactions
+  flutter_dotenv: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+
+ 
+
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/fonts/
+    - assets/audio/
+
+  fonts:
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/Amiri-Regular.ttf
+        - asset: assets/fonts/Amiri-Bold.ttf
+          weight: 700

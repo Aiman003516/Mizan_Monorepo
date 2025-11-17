@@ -1,0 +1,25 @@
+name: mizan_monorepo_workspace
+
+# This is the correct key for defining your packages.
+# Melos will now find all your packages.
+packages:
+  - app_mizan
+  - packages/core/*
+  - packages/shared/*
+  - packages/features/*
+
+# 'scripts:' must be at the root of the file.
+scripts:
+  # This 'get' script is an alias for 'melos bootstrap'.
+  # You can run it with 'melos run get'.
+  get:
+    run: melos bootstrap
+    description: >
+      Bootstrap the monorepo by running "flutter pub get" in all packages
+      and linking them together.
+
+  # This is your 'clean' script.
+  # You can run it with 'melos run clean'.
+  clean:
+    run: melos exec -- "flutter clean"
+    description: Clean all package build artifacts.

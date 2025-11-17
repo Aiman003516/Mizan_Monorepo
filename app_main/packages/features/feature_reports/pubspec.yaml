@@ -1,0 +1,45 @@
+name: feature_reports
+description: Manages all financial reports and data exporting.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  drift: ^2.29.0
+  equatable: ^2.0.7
+  collection: ^1.19.1
+  async: ^2.11.0 # For StreamZip
+  intl: ^0.20.2
+  
+  # PDF & Excel Dependencies
+  pdf: ^3.11.3
+  printing: ^5.14.2
+  excel: ^4.0.6
+  url_launcher: ^6.3.2
+
+  # Local Dependencies
+  core_database:
+    path: ../../core/core_database
+  core_l10n:
+    path: ../../core/core_l10n
+  core_data: 
+    path: ../../core/core_data 
+  
+  # Feature Dependencies
+  feature_accounts:
+    path: ../feature_accounts
+  feature_transactions: # ADDED
+    path: ../feature_transactions
+  
+  # Shared Dependencies
+  shared_services:
+    path: ../../shared/shared_services
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

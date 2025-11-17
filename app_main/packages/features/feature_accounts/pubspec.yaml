@@ -1,0 +1,30 @@
+name: feature_accounts
+description: Manages accounts, classifications, and account-related UI.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  drift: ^2.29.0
+  collection: ^1.19.1 # Dependency for filtered_accounts_list_page.dart
+  
+  # Local Dependencies
+  core_database:
+    path: ../../core/core_database
+  core_l10n:
+    path: ../../core/core_l10n
+
+  # Feature Dependencies
+  # We will create these soon. This is expected to show an error for now.
+  feature_reports:
+    path: ../feature_reports
+  feature_transactions:
+    path: ../feature_transactions
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

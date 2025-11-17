@@ -1,0 +1,25 @@
+name: shared_services
+description: Shared services like image picking.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+
+  # Image Picking
+  image_picker: ^1.1.2
+  file_picker: ^8.0.6
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  uuid: ^4.5.1
+
+  # Local Dependencies
+  # (No longer depends on core_l10n, core_database, or features)
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

@@ -1,0 +1,522 @@
+{
+  "@@locale": "en",
+  "settings": "Settings",
+  "accountTypeAsset": "Asset",
+  "accountTypeLiability": "Liability",
+  "accountTypeEquity": "Equity",
+  "accountTypeRevenue": "Revenue",
+  "accountTypeExpense": "Expense",
+  "mainDashboard": "Main Dashboard",
+  "newSalePOS": "New Sale / POS",
+  "reports": "Reports",
+  "management": "Management",
+  "accounts": "Accounts",
+  "products": "Products",
+  "categories": "Categories",
+  "totalAmountsReport": "Total Amounts Report",
+  "monthlyAmountsReport": "Monthly Amounts Report",
+  "accountActivity": "Account Activity",
+  "manageAccounts": "Manage Accounts",
+  "manageProducts": "Manage Products",
+  "manageCategories": "Manage Categories",
+  "general": "General",
+  "clients": "Clients",
+  "suppliers": "Suppliers",
+  "language": "Language",
+  "chooseLanguage": "Choose Language",
+  "english": "English",
+  "arabic": "العربية",
+  "noAccountsYet": "No accounts yet. \nAdd one!",
+  "noResultsFound": "No results found for \"{query}\".",
+  "@noResultsFound": {
+    "placeholders": {
+      "query": {
+        "type": "String",
+        "example": "Cash"
+      }
+    }
+  },
+  "type": "Type:",
+  "balance": "Balance:",
+  "phone": "Phone:",
+  "errorLoadingAccounts": "Error loading accounts:",
+  "errorLoadingBalances": "Error loading balances:",
+  "addNewAccount": "Add New Account",
+  "editAccount": "Edit Account",
+  "accountNameHint": "Account Name (e.g., \"Cash\", \"Customer A\")",
+  "pleaseEnterName": "Please enter a name",
+  "accountType": "Account Type",
+  "classificationOptional": "Classification (Optional)",
+  "errorLoadingClassifications": "Error loading classifications:",
+  "phoneNumberOptional": "Phone Number (Optional)",
+  "initialBalance": "Initial Balance",
+  "pleaseEnterBalance": "Please enter a balance (0 is okay)",
+  "pleaseEnterValidNumber": "Please enter a valid number",
+  "failedToSaveAccount": "Failed to save account:",
+  "addAccount": "Add Account",
+  "noAccountsClassified": "No accounts classified as \"{classification}\" yet.\nAdd one in the Accounts section.",
+  "@noAccountsClassified": {
+    "placeholders": {
+      "classification": {
+        "type": "String",
+        "example": "Clients"
+      }
+    }
+  },
+  "exportToPDF": "Export to PDF",
+  "export": "Export",
+  "exportToExcel": "Export to Excel",
+  "excelExportSuccess": "Excel export successfully generated.",
+  "accountBalances": "Account Balances - {classification}",
+  "@accountBalances": {
+    "placeholders": {
+      "classification": {
+        "type": "String",
+        "example": "Clients"
+      }
+    }
+  },
+  "errorLoadingSummaries": "Error loading summaries:",
+  "addNewTransaction": "Add New Transaction",
+  "signIn": "Sign In",
+  "welcomeToMizan": "Welcome to Mizan",
+  "signInToSync": "Sign in to sync your data",
+  "signInWithGoogle": "Sign in with Google",
+  "offlineUnavailable": "Offline: Sync is unavailable",
+  "online": "Online",
+  "syncData": "Sync Data",
+  "syncNotImplemented": "Sync not implemented yet.",
+  "signOut": "Sign Out",
+  "search": "Search...",
+  "openNavigationMenu": "Open navigation menu",
+  "mizan": "Mizan",
+  "mizanDashboard": "Mizan Dashboard",
+  "mizanUser": "Mizan User",
+  "notSignedIn": "Not Signed In",
+  "offlineMode": "Offline Mode",
+  "syncDisabled": "Sync is disabled",
+  "totalAmountsSummary": "Total Amounts (Summary)",
+  "monthlyAmountsSummary": "Monthly Amounts (Summary)",
+  "accountActivityLedger": "Account Activity / Ledger",
+  "dataSafetyWarning": "Data Safety Warning",
+  "dataSafetyMessage": "Your data is currently stored only on this device.\nTo prevent data loss, please sign in to enable cloud backup.",
+  "ok": "OK",
+  "addNewProduct": "Add New Product",
+  "editProduct": "Edit Product",
+  "pleaseSelectCategory": "Please select a category",
+  "failedToSaveProduct": "Failed to save product:",
+  "selectCategory": "Select a Category",
+  "errorLoadingCategories": "Error loading categories:",
+  "productName": "Product Name",
+  "price": "Price",
+  "pleaseEnterPrice": "Please enter a price",
+  "noProductsSaved": "No products saved.\nTap \"+\" to add one.",
+  "priceLabel": "Price:",
+  "newCategory": "New Category",
+  "categoryName": "Category Name",
+  "cancel": "Cancel",
+  "save": "Save",
+  "editCategory": "Edit Category",
+  "noCategoriesYet": "No categories yet.\nAdd one!",
+  "addCategory": "Add Category",
+  "noProductsYet": "No products yet.\nAdd one!",
+  "error": "Error:",
+  "all": "All",
+  "posSales": "POS Sales",
+  "noTransactionEntries": "No transaction entries recorded for this filter.",
+  "date": "Date",
+  "account": "Account",
+  "description": "Description",
+  "debit": "Debit",
+  "credit": "Credit",
+  "currency": "Currency",
+  "monthlyAmounts": "Monthly Amounts - {classification}",
+  "@monthlyAmounts": {
+    "placeholders": {
+      "classification": {
+        "type": "String",
+        "example": "Clients"
+      }
+    }
+  },
+  "noMonthlyTotals": "No monthly totals to display for this filter.",
+  "month": "Month",
+  "currencyLabel": "Currency:",
+  "totalAmounts": "Total Amounts - {classification}",
+  "@totalAmounts": {
+    "placeholders": {
+      "classification": {
+        "type": "String",
+        "example": "Clients"
+      }
+    }
+  },
+  "noTotals": "No totals to display for this filter.",
+  "name": "Name",
+  "totalClassifications": "Total Classifications",
+  "noClassificationTotals": "No classification totals to display.",
+  "classification": "Classification",
+  "total": "Total",
+  "upgradeToPro": "Upgrade to Pro",
+  "unlockMizanPro": "Unlock Mizan Pro",
+  "proPrice": "Get the \nfull version for a one-time payment of",
+  "proFeatures": "This includes unlimited access to all features, cloud sync, and future updates.",
+  "purchaseFullVersion": "Purchase Full Version",
+  "couldNotOpenPurchasePage": "Could not open purchase page.",
+  "companyProfile": "Personal & Company Data",
+  "companyProfileReportHint": "This information may be used on printed reports and invoices.",
+  "companyName": "Company Name",
+  "pleaseEnterCompanyName": "Please enter a company name",
+  "yourName": "Your Name",
+  "companyAddress": "Company Address",
+  "taxID": "Tax ID / VAT Number",
+  "saveProfile": "Save Profile",
+  "profileSavedSuccess": "Profile saved successfully.",
+  "failedToSaveProfile": "Failed to save profile:",
+  "currencyOptions": "Currency Options",
+  "noCurrenciesFound": "No currencies \nfound. Tap \"+\" to add one.",
+  "codeLabel": "Code:",
+  "addNewCurrency": "Add New Currency",
+  "currencyCodeHint": "Code (e.g., \"EUR\")",
+  "currencyCodeHelper": "Short, unique code (3-5 letters)",
+  "pleaseEnterCode": "Please enter a code",
+  "codeTooLong": "Code is too long",
+  "currencyNameHint": "Name (e.g., \"Euro\")",
+  "pleaseEnterCurrencyName": "Please enter a name",
+  "currencySymbolHint": "Symbol (e.g., \"€\")",
+  "failedToSave": "Failed to save:",
+  "securityOptions": "Security Options",
+  "requirePasscode": "Require Passcode on Entry",
+  "toggleSecurity": "Toggle additional security layer",
+  "passcodeRemoved": "Passcode removed.",
+  "setChangePasscode": "Set/Change Passcode",
+  "notSet": "Not set",
+  "useBiometrics": "Use Biometrics to Unlock",
+  "useBiometricsHint": "Use fingerprint, face, or iris",
+  "setPasscode": "Set Passcode",
+  "setPasscodeHint": "Create a 4-digit PIN for your app.\nThis will be required on entry.",
+  "newPin": "New 4-Digit PIN",
+  "pleaseEnterPin": "Please enter a PIN",
+  "pinMustBe4Digits": "PIN must be 4 digits",
+  "confirmPin": "Confirm 4-Digit PIN",
+  "pinsDoNotMatch": "PINs do not match",
+  "savePasscode": "Save Passcode",
+  "passcodeSetSuccess": "Passcode set successfully.",
+  "failedToSavePasscode": "Failed to save passcode:",
+  "dataAndSync": "Data & Sync",
+  "backupNow": "Backup Data Now",
+  "backupHint": "Uploads your local data to Google Drive.",
+  "restoreFromBackup": "Restore from Backup",
+  "restoreWarning": "CRITICAL: This will overwrite ALL current data in the app with the data from your backup file. This action cannot be undone. Are you sure?",
+  "buyFullVersion": "Buy The Full Version",
+  "restoreBackupTitle": "Restore From File?",
+  "restoreBackupMessage": "This will overwrite all current data with the data from your selected backup file.\n\nTHIS CANNOT BE UNDONE.",
+  "restore": "Restore",
+  "restoreSuccess": "Restore successful! Please restart Mizan to load the new data.",
+  "restoreFailed": "Restore failed. Your original data is safe. Error: {error}",
+  "@restoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "File is corrupt"
+      }
+    }
+  },
+  "featureNotImplemented": "Feature not yet implemented.",
+  "chooseTheme": "Choose Theme",
+  "light": "Light",
+  "dark": "Dark",
+  "systemDefault": "System Default",
+  "selectAccount": "Select Account",
+  "unknownAccount": "Unknown Account",
+  "pleaseSelectCurrency": "Please select a currency.",
+  "pleaseEnterAccountName": "Please enter or select an account name.",
+  "criticalAccountError": "Critical Error: Default accounts (like Inventory) are missing.",
+  "transactionSaved": "Transaction saved successfully.",
+  "forAccount": "For {accountName}",
+  "@forAccount": {
+    "placeholders": {
+      "accountName": {
+        "type": "String",
+        "example": "Cash"
+      }
+    }
+  },
+  "loading": "Loading...",
+  "accountName": "Account Name",
+  "pleaseEnterOrSelectAccount": "Please enter or select an account",
+  "amount": "Amount",
+  "pleaseEnterAmount": "Please enter an amount",
+  "invalidAmount": "Invalid amount",
+  "exchangeRate": "Exchange Rate (1 {currencyCode} = ? {defaultCurrency})",
+  "@exchangeRate": {
+    "placeholders": {
+      "currencyCode": {
+        "type": "String",
+        "example": "USD"
+      },
+      "defaultCurrency": {
+        "type": "String",
+        "example": "Local"
+      }
+    }
+  },
+  "pleaseEnterRate": "Please enter a rate",
+  "invalidRate": "Invalid rate",
+  "addAttachment": "Add Attachment",
+  "details": "Details",
+  "couldNotLoadCurrencies": "Could not load currencies",
+  "paymentCredit": "Payment (Credit)",
+  "chargeDebit": "Charge (Debit)",
+  "noHistory": "No history for this account.",
+  "errorLoadingHistory": "Error loading history:",
+  "pleaseAddCategory": "Please add a category first.",
+  "noProductsInCategory": "No products in this category.",
+  "quantity": "Qty:",
+  "clear": "Clear",
+  "printReceipt": "Print Receipt",
+  "zeroTotalError": "Cannot process sale with zero total.",
+  "criticalSetupError": "CRITICAL SETUP ERROR: Accounts were not created on startup.\nTry reinstalling.",
+  "posSale": "POS Sale #{timestamp}",
+  "@posSale": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String",
+        "example": "1678886400"
+      }
+    }
+  },
+  "saleRecorded": "Sale of {total} recorded.",
+  "@saleRecorded": {
+    "placeholders": {
+      "total": {
+        "type": "String",
+        "example": "125.50"
+      }
+    }
+  },
+  "transactionFailed": "Transaction failed:",
+  "noTransactionsYet": "No transactions yet.\nAdd one!",
+  "companyNameLegacy": "Company Name",
+  "yourNameLegacy": "Your Name",
+  "companyAddressLegacy": "Company Address",
+  "taxIDLegacy": "Tax ID / VAT Number",
+  "securityOptionsLegacy": "Security Options",
+  "scanBarcode": "Scan Barcode",
+  "productNotFound": "Product not found for barcode: {barcode}",
+  "@productNotFound": {
+    "placeholders": {
+      "barcode": {
+        "type": "String",
+        "example": "123456789"
+      }
+    }
+  },
+  "scanProductBarcode": "Scan Product Barcode",
+  "barcodeOptional": "Barcode (Optional)",
+  "orderDetails": "Order Details",
+  "cart": "Cart",
+  "items": "Item(s)",
+  "clearOrder": "Clear Order",
+  "printAndSave": "Print & Save",
+  "orderHistory": "Order History",
+  "noSalesYet": "No POS sales have been recorded yet.",
+  "returnFor": "Return for",
+  "returnSuccess": "Order returned successfully.",
+  "returnFailed": "Failed to process return",
+  "confirmReturn": "Return this Order?",
+  "confirmReturnMessage": "This will create a new, opposite transaction to reverse this sale. This cannot be undone.",
+  "returnOrder": "Return Order",
+  "noItemsInSale": "No items found for this sale (likely a direct journal entry).",
+  "done": "Done",
+  "year": "Year",
+  "local": "Local",
+  "exchangeRateShort": "Rate",
+  "uploadImage": "Upload Image",
+  "changeImage": "Change Image",
+  "removeImage": "Remove",
+  "pickFromGallery": "Pick From Gallery",
+  "takePhoto": "Take Photo",
+  "change": "Change",
+  "remove": "Remove",
+  "manageReturn": "Manage Return",
+  "orderFullyReturned": "This order has been fully returned.",
+  "purchased": "Purchased",
+  "returned": "Returned",
+  "returnQuantity": "Return Quantity",
+  "totalRefund": "Total Refund",
+  "processReturn": "Process Return",
+  "noItemsSelected": "No items selected for return.",
+  "partialReturnFor": "Partial Return for Order {transactionId}",
+  "@partialReturnFor": {
+    "description": "Description for a partial return transaction",
+    "placeholders": {
+      "transactionId": {
+        "type": "String"
+      }
+    }
+  },
+  "orderReturned": "This order has been returned.",
+  "noLineItemsSaved": "No line items were saved for this order.",
+  "fieldRequired": "field Required",
+  "selectPaymentMethod": "select Payment Method",
+  "backupAndRestore": "Backup & Restore",
+  "upgradeToMizanPro": "Upgrade to Mizan Pro",
+  "mizanProDescription": "Enable automatic cloud sync, multi-device access, and user roles. Learn more...",
+  "createLocalBackupTitle": "Create Local Backup?",
+  "createLocalBackupMessage": "This will save a copy of your database to a location you choose (e.g., Downloads, Google Drive).",
+  "yes": "Yes",
+  "newPurchase": "New Purchase / Bill",
+  "purchaseScreenTitle": "New Purchase / Bill",
+  "pay": "Pay",
+  "profitAndLoss": "Profit & Loss",
+  "revenue": "Revenue",
+  "totalRevenue": "Total Revenue",
+  "expenses": "Expenses",
+  "totalExpenses": "Total Expenses",
+  "netIncome": "Net Income",
+  "balanceSheet": "Balance Sheet",
+  "asOf": "As of",
+  "assets": "Assets",
+  "totalAssets": "Total Assets",
+  "liabilities": "Liabilities",
+  "totalLiabilities": "Total Liabilities",
+  "equity": "Equity",
+  "totalEquity": "Total Equity",
+  "totalLiabilitiesAndEquity": "Total Liabilities & Equity",
+  "trialBalance": "Trial Balance",
+  "debit": "Debit",
+  "credit": "Credit",
+  "total": "Total",
+  "selectSupplier": "Select a Supplier",
+  "makePayment": "Make Payment",
+"payFromAccount": "Pay From Account",
+"payToAccount": "Pay To Account",
+"pleaseEnterValidAmount": "Please enter a valid amount greater than zero",
+  "supplier": "Supplier",
+  "pleaseSelectSupplier": "Please select a supplier",
+  "profitAndLossReport": "Profit & Loss Statement",
+  "balanceSheetReport": "Balance Sheet",
+  "trialBalanceReport": "Trial Balance",
+  "addProduct": "Add Product",
+  "product": "Product",
+  "quantityShort": "Qty",
+  "cost": "Cost",
+  "totalCost": "Total Cost",
+  "costPerItem": "Cost per item",
+  "totalPayable": "total Payable",
+  "pleaseEnterCost": "Please enter a cost",
+  "pleaseEnterQuantity": "Please enter a quantity",
+  "purchaseSaved": "Purchase saved successfully.",
+  "failedToSavePurchase": "Failed to save purchase: {error}",
+  "@failedToSavePurchase": {
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Database connection lost"
+      }
+    }
+  },
+  "purchaseFrom": "Purchase from {supplierName}",
+  "@purchaseFrom": {
+    "placeholders": {
+      "supplierName": {
+        "type": "String",
+        "example": "Global Imports"
+      }
+    }
+  },
+  "createLocalBackupPrompt": "This will create a local backup file (mizan.db) in a folder you choose. You can use this file to restore your data on this or another device.",
+  "backup": "Backup",
+  "backupSuccessful": "Backup successful! File saved to: {path}",
+  "@backupSuccessful": {
+    "placeholders": {
+      "path": {
+        "type": "String",
+        "example": "/Downloads/mizan_backup.db"
+      }
+    }
+  },
+  "backupFailed": "Backup failed: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Permission denied"
+      }
+    }
+  },
+  "restoreSuccessful": "Restore Successful",
+  "restoreSuccessMessage": "Your data has been restored. Please restart the app now.",
+  "learnMore": "Learn More",
+  "dashboard": "Dashboard",
+  "newSale": "New Sale",
+  "totalRevenue": "Total Revenue",
+  "totalExpenses": "Total Expenses",
+  "totalReceivable": "Total Receivable",
+  "currencyFormat": "{value}",
+  "@currencyFormat": {
+    "description": "Formats a number as a currency value",
+    "placeholders": {
+      "value": {
+        "type": "double",
+        "format": "currency",
+        "symbol": ""
+      }
+    }
+  },
+  "saveSuccessPrintFailed": "Save success, but print failed: {error}",
+  "@saveSuccessPrintFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorLoadingPaymentMethods": "Error loading payment methods: {error}",
+  "@errorLoadingPaymentMethods": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "atPrice": "@ {price}",
+  "@atPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "10.99"
+      }
+    }
+  },
+  "dbFileNotFound": "Database file not found.",
+  "noBackupFound": "No backup file found on Google Drive.",
+  "mizanAccounting": "Mizan Accounting",
+  "generatedOn": "Generated on: {date}",
+  "@generatedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "11/10/2025"
+      }
+    }
+  },
+  "totalLocal": "Total (Local)",
+  "couldNotLaunch": "Could not launch {url}",
+  "@couldNotLaunch": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "webNotSupported": "Web platform is not supported",
+  "signInCancelled": "Sign-in cancelled by user.",
+  "updateWindowsClientId": "Please update the Windows Client ID in auth_repository.dart",
+  "updateWindowsClientIdSecret": "Please update Windows Client ID/Secret in auth_repository.dart",
+  "authFailed": "Authentication failed. Unable to get HTTP client.",
+  "criticalInventoryError": "Critical Error: Inventory or COGS accounts not found.",
+  "drLabel": "Dr:",
+  "crLabel": "Cr:"
+}

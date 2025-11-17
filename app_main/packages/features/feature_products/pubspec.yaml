@@ -1,0 +1,32 @@
+name: feature_products
+description: Manages products, categories, and inventory logic.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  drift: ^2.29.0
+  image_picker: ^1.1.2 # For ImageSource
+  
+  # Local Dependencies
+  core_database:
+    path: ../../core/core_database
+  core_l10n:
+    path: ../../core/core_l10n
+  shared_ui:
+    path: ../../shared/shared_ui
+  shared_services:
+    path: ../../shared/shared_services
+  
+  # Feature Dependencies
+  # We will create these soon. This error is expected.
+  feature_dashboard:
+    path: ../feature_dashboard
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

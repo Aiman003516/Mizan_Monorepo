@@ -1,0 +1,21 @@
+name: core_l10n
+description: Core localization package for Mizan.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2 # Match your app's version
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+
+  generate: true

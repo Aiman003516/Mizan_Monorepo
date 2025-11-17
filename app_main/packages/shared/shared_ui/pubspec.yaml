@@ -1,0 +1,18 @@
+name: shared_ui
+description: Shared UI widgets for the Mizan monorepo.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Local Dependencies
+  core_l10n:
+    path: ../../core/core_l10n
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

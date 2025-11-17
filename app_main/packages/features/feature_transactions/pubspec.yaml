@@ -1,0 +1,42 @@
+name: feature_transactions
+description: Manages POS, journal entries, purchases, returns, and all transaction logic.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  drift: ^2.29.0
+  uuid: ^4.5.1
+  intl: ^0.20.2
+  equatable: ^2.0.7
+  audioplayers: ^6.0.0
+  mobile_scanner: ^5.2.3
+  printing: ^5.14.2
+  
+  # Local Dependencies
+  core_database:
+    path: ../../core/core_database
+  core_data:
+    path: ../../core/core_data
+  core_l10n:
+    path: ../../core/core_l10n
+  shared_services:
+    path: ../../shared/shared_services
+
+  # Feature Dependencies
+  feature_accounts:
+    path: ../feature_accounts
+  feature_products:
+    path: ../feature_products
+  
+  # This is required for TransactionDetail
+  feature_reports:
+    path: ../feature_reports
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

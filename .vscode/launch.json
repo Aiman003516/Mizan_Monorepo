@@ -1,0 +1,59 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        // --- 1. FLEXIBLE CONFIGURATIONS ---
+        // These are your primary, flexible options.
+        // They will launch on WHATEVER device you have selected in the VS Code UI.
+        {
+            "name": "apps",
+            "cwd": "app_main\\apps",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "apps (profile mode)",
+            "cwd": "app_main\\apps",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "apps (release mode)",
+            "cwd": "app_main\\apps",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+
+        // --- 2. DEVICE-SPECIFIC CONFIGURATIONS ---
+        // These are the new, hard-coded configs needed for your compound setup.
+        // They will be launched *by* the compound configuration below.
+        {
+            "name": "Launch Android (Specific)",
+            "cwd": "app_main\\apps", // <-- The critical monorepo path
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "2b556000781c7ece" // Your specific Android device ID
+        },
+        {
+            "name": "Launch Windows (Specific)",
+            "cwd": "app_main\\apps", // <-- The critical monorepo path
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "windows" // The specific "windows" device ID
+        }
+    ],
+
+    // --- 3. COMPOUND CONFIGURATION ---
+    // This groups the two "Specific" configs above into a single launch target
+    "compounds": [
+        {
+            "name": "Launch Android & Windows", // <-- This is the new option you will see!
+            "configurations": [
+                "Launch Android (Specific)", // <-- Must match the name above
+                "Launch Windows (Specific)"  // <-- Must match the name above
+            ]
+        }
+    ]
+}

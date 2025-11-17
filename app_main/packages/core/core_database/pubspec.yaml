@@ -1,0 +1,20 @@
+name: core_database
+description: Core database schema and connection logic for Mizan.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  drift: ^2.29.0
+  sqlite3_flutter_libs: ^0.5.40
+  sqlite3: ^2.9.3
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  uuid: ^4.5.1
+
+dev_dependencies:
+  drift_dev: ^2.29.0
+  build_runner: ^2.10.1

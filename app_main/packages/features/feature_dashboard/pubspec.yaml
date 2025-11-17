@@ -1,0 +1,42 @@
+name: feature_dashboard
+description: The main dashboard, scaffold, and navigation hub for the app.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  file_picker: ^8.0.6
+  intl: ^0.20.2
+  url_launcher: ^6.3.2
+  
+  # Local Dependencies
+  core_database:
+    path: ../../core/core_database
+  core_data:
+    path: ../../core/core_data
+  core_l10n:
+    path: ../../core/core_l10n
+  
+  # Feature Dependencies
+  feature_accounts:
+    path: ../feature_accounts
+  feature_auth:
+    path: ../feature_auth
+  feature_products:
+    path: ../feature_products
+  feature_reports:
+    path: ../feature_reports
+  feature_settings:
+    path: ../feature_settings
+  feature_sync:
+    path: ../feature_sync
+  feature_transactions:
+    path: ../feature_transactions
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

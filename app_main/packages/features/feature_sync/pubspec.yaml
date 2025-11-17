@@ -1,0 +1,26 @@
+name: feature_sync
+description: Manages data backup and restore logic with Google Drive.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  googleapis: 15.0.0
+  path: ^1.9.1
+  path_provider: ^2.1.5
+
+  # Local Dependencies
+  core_database:
+    path: ../../core/core_database
+  
+  # Feature Dependencies
+  feature_auth:
+    path: ../feature_auth
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

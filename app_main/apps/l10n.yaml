@@ -1,0 +1,10 @@
+# This file tells the Flutter i18n tool where to find translations.
+
+# 1. Directory where your .arb files will live
+arb-dir: ../packages/core/core_l10n/lib/src
+
+# 2. The "template" file that defines all translation keys
+template-arb-file: app_en.arb
+
+# 3. The name of the generated Dart class
+output-class: AppLocalizations

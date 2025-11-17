@@ -1,0 +1,522 @@
+{
+  "@@locale": "ar",
+  "settings": "الإعدادات",
+  "accountTypeAsset": "أصول",
+  "accountTypeLiability": "التزامات",
+  "accountTypeEquity": "حقوق ملكية",
+  "accountTypeRevenue": "إيرادات",
+  "accountTypeExpense": "مصروفات",
+  "mainDashboard": "لوحة التحكم الرئيسية",
+  "newSalePOS": "نقطة بيع / عملية جديدة",
+  "reports": "التقارير",
+  "management": "الإدارة",
+  "accounts": "الحسابات",
+  "products": "المنتجات",
+  "categories": "التصنيفات",
+  "totalAmountsReport": "تقرير الإجماليات",
+  "monthlyAmountsReport": "تقرير الإجماليات الشهرية",
+  "accountActivity": "حركة كشف حساب",
+  "manageAccounts": "إدارة الحسابات",
+  "manageProducts": "إدارة المنتجات",
+  "manageCategories": "إدارة الأصناف",
+  "general": "عام",
+  "clients": "العملاء",
+  "suppliers": "الموردون",
+  "language": "اللغة",
+  "chooseLanguage": "اختر اللغة",
+  "english": "English",
+  "arabic": "العربية",
+  "noAccountsYet": "لا توجد حسابات بعد. أضف واحد!",
+  "noResultsFound": "لا توجد نتائج بحث عن \"{query}\".",
+  "@noResultsFound": {
+    "placeholders": {
+      "query": {
+        "type": "String",
+        "example": "الصندوق"
+      }
+    }
+  },
+  "type": "النوع:",
+  "balance": "الرصيد:",
+  "phone": "الهاتف:",
+  "errorLoadingAccounts": "خطأ في تحميل الحسابات:",
+  "errorLoadingBalances": "خطأ في تحميل الأرصدة:",
+  "addNewAccount": "إضافة حساب جديد",
+  "editAccount": "تعديل الحساب",
+  "accountNameHint": "اسم الحساب (مثال: \"الصندوق\"، \"العميل أ\")",
+  "pleaseEnterName": "الرجاء \nإدخال اسم",
+  "accountType": "نوع الحساب",
+  "classificationOptional": "التصنيف (اختياري)",
+  "errorLoadingClassifications": "خطأ في تحميل التصنيفات:",
+  "phoneNumberOptional": "رقم الهاتف (اختياري)",
+  "initialBalance": "الرصيد الافتتاحي",
+  "pleaseEnterBalance": "الرجاء إدخال رصيد (0 مقبول)",
+  "pleaseEnterValidNumber": "الرجاء إدخال رقم صالح",
+  "failedToSaveAccount": "فشل حفظ الحساب:",
+  "addAccount": "إضافة حساب",
+  "noAccountsClassified": "لا توجد حسابات مصنفة كـ \"{classification}\" بعد.\nأضف واحداً في قسم الحسابات.",
+  "@noAccountsClassified": {
+    "placeholders": {
+      "classification": {
+        "type": "String",
+        "example": "العملاء"
+      }
+    }
+  },
+  "exportToPDF": "تصدير إلى PDF",
+  "export": "تصدير",
+  "exportToExcel": "تصدير إلى Excel",
+  "excelExportSuccess": "تم إنشاء ملف Excel بنجاح.",
+  "accountBalances": "أرصدة الحسابات - {classification}",
+  "@accountBalances": {
+    "placeholders": {
+      "classification": {
+        "type": "String",
+        "example": "العملاء"
+      }
+    }
+  },
+  "errorLoadingSummaries": "خطأ في تحميل الملخصات:",
+  "addNewTransaction": "إضافة عملية جديدة",
+  "signIn": "تسجيل الدخول",
+  "welcomeToMizan": "أهلاً بك في ميزان",
+  "signInToSync": "سجل الدخول لمزامنة بياناتك",
+  "signInWithGoogle": "تسجيل الدخول عبر جوجل",
+  "offlineUnavailable": "غير متصل: المزامنة غير متاحة",
+  "online": "متصل",
+  "syncData": "مزامنة البيانات",
+  "syncNotImplemented": "المزامنة لم تنفذ بعد.",
+  "signOut": "تسجيل الخروج",
+  "search": "بحث...",
+  "openNavigationMenu": "فتح قائمة التنقل",
+  "mizan": "ميزان",
+  "mizanDashboard": "لوحة تحكم ميزان",
+  "mizanUser": "مستخدم ميزان",
+  "notSignedIn": "لم يتم تسجيل \nالدخول",
+  "offlineMode": "وضع عدم الاتصال",
+  "syncDisabled": "المزامنة معطلة",
+  "totalAmountsSummary": "ملخص الإجماليات",
+  "monthlyAmountsSummary": "ملخص الإجماليات الشهرية",
+  "accountActivityLedger": "كشف حساب ",
+  "dataSafetyWarning": "تحذير أمان البيانات",
+  "dataSafetyMessage": "بياناتك مخزنة حالياً على هذا الجهاز فقط.\nلمنع فقدان البيانات، يرجى تسجيل الدخول لتمكين النسخ الاحتياطي السحابي.",
+  "ok": "موافق",
+  "addNewProduct": "إضافة منتج جديد",
+  "editProduct": "تعديل المنتج",
+  "pleaseSelectCategory": "الرجاء اختيار صنف",
+  "failedToSaveProduct": "فشل حفظ المنتج:",
+  "selectCategory": "اختر صنف",
+  "errorLoadingCategories": "خطأ في تحميل الأصناف:",
+  "productName": "اسم المنتج",
+  "price": "السعر",
+  "pleaseEnterPrice": "الرجاء إدخال سعر",
+  "noProductsSaved": "لا توجد منتجات محفوظة.\nانقر \"+\" لإضافة واحد.",
+  "priceLabel": "السعر:",
+  "newCategory": "صنف جديد",
+  "categoryName": "اسم الصنف",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "editCategory": "تعديل الصنف",
+  "noCategoriesYet": "لا توجد أصناف بعد.\nأضف واحد!",
+  "addCategory": "إضافة صنف",
+  "noProductsYet": "لا توجد منتجات بعد.\nأضف واحد!",
+  "error": "خطأ:",
+  "all": "الكل",
+  "posSales": "مبيعات نقاط البيع",
+  "noTransactionEntries": "لا توجد قيود مسجلة لهذا الفلتر.",
+  "date": "التاريخ",
+  "account": "الحساب",
+  "description": "الوصف",
+  "debit": "مدين",
+  "credit": "دائن",
+  "currency": "العملة",
+  "monthlyAmounts": "الإجماليات الشهرية - {classification}",
+  "@monthlyAmounts": {
+    "placeholders": {
+      "classification": {
+        "type": "String",
+        "example": "العملاء"
+      }
+    }
+  },
+  "noMonthlyTotals": "لا توجد إجماليات شهرية لعرضها لهذا الفلتر.",
+  "month": "الشهر",
+  "currencyLabel": "العملة:",
+  "totalAmounts": "الإجماليات - {classification}",
+  "@totalAmounts": {
+    "placeholders": {
+      "classification": {
+        "type": "String",
+        "example": "العملاء"
+      }
+    }
+  },
+  "noTotals": "لا توجد إجماليات لعرضها لهذا الفلتر.",
+  "name": "الاسم",
+  "totalClassifications": "إجمالي التصنيفات",
+  "noClassificationTotals": "لا توجد إجماليات تصنيفات لعرضها.",
+  "classification": "التصنيف",
+  "total": "المجموع",
+  "upgradeToPro": "الترقية إلى Pro",
+  "unlockMizanPro": "افتح ميزان Pro",
+  "proPrice": "احصل على النسخة الكاملة مقابل \nدفعة لمرة واحدة",
+  "proFeatures": "يشمل ذلك وصولاً غير محدود لجميع الميزات، والمزامنة السحابية، والتحديثات المستقبلية.",
+  "purchaseFullVersion": "شراء النسخة الكاملة",
+  "couldNotOpenPurchasePage": "تعذر فتح صفحة الشراء.",
+  "companyProfile": "البيانات الشخصية والشركة",
+  "companyProfileReportHint": "هذه المعلومات قد تستخدم في التقارير والفواتير المطبوعة.",
+  "companyName": "الاسم التجاري",
+  "pleaseEnterCompanyName": "الرجاء إدخال اسم الشركة",
+  "yourName": "اسمك",
+  "companyAddress": "عنوان الشركة",
+  "taxID": "الرقم الضريبي",
+  "saveProfile": "حفظ الملف الشخصي",
+  "profileSavedSuccess": "تم حفظ الملف الشخصي بنجاح.",
+  "failedToSaveProfile": "فشل حفظ الملف الشخصي:",
+  "currencyOptions": "خيارات العملة",
+  "noCurrenciesFound": "لا توجد عملات.\nانقر \"+\" لإضافة واحدة.",
+  "codeLabel": "الرمز:",
+  "addNewCurrency": "إضافة عملة جديدة",
+  "currencyCodeHint": "الرمز (مثل \"USD\")",
+  "currencyCodeHelper": "رمز فريد قصير (3-5 أحرف)",
+  "pleaseEnterCode": "الرجاء إدخال رمز",
+  "codeTooLong": "الرمز طويل جداً",
+  "currencyNameHint": "الاسم (مثل \"دولار أمريكي\")",
+  "pleaseEnterCurrencyName": "الرجاء إدخال اسم",
+  "currencySymbolHint": "الرمز",
+  "failedToSave": "فشل الحفظ:",
+  "securityOptions": "خيارات الأمان",
+  "requirePasscode": "طلب رمز الدخول عند الفتح",
+  "toggleSecurity": "تفعيل طبقة أمان إضافية",
+  "passcodeRemoved": "تمت إزالة رمز الدخول.",
+  "setChangePasscode": "تعيين/تغيير رمز الدخول",
+  "notSet": "غير معين",
+  "useBiometrics": "استخدام البصمة لفتح القفل",
+  "useBiometricsHint": "استخدام بصمة الإصبع، الوجه، أو قزحية \nالعين",
+  "setPasscode": "تعيين رمز الدخول",
+  "setPasscodeHint": "أنشئ رمز PIN من 4 أرقام لتطبيقك.\nسيكون مطلوباً عند الدخول.",
+  "newPin": "رمز PIN جديد (4 أرقام)",
+  "pleaseEnterPin": "الرجاء إدخال رمز PIN",
+  "pinMustBe4Digits": "يجب أن يتكون الرمز من 4 أرقام",
+  "confirmPin": "تأكيد رمز PIN",
+  "pinsDoNotMatch": "الرمزان غير متطابقان",
+  "savePasscode": "حفظ رمز الدخول",
+  "passcodeSetSuccess": "تم تعيين رمز الدخول بنجاح.",
+  "failedToSavePasscode": "فشل حفظ رمز الدخول:",
+  "dataAndSync": "البيانات والمزامنة",
+  "backupNow": "نسخ احتياطي للبيانات الآن",
+  "backupHint": "يرفع بياناتك المحلية إلى Google Drive.",
+  "restoreFromBackup": "استعادة من نسخة احتياطية",
+  "restoreWarning": "تحذير خطير: سيؤدي هذا إلى الكتابة فوق جميع البيانات الحالية في التطبيق بالبيانات من ملف النسخ الاحتياطي الخاص بك. لا يمكن التراجع عن هذا الإجراء. هل أنت متأكد؟",
+  "buyFullVersion": "شراء النسخة الكاملة",
+  "restoreBackupTitle": "استعادة من ملف؟",
+  "restoreBackupMessage": "سيؤدي هذا إلى الكتابة فوق جميع بياناتك المحلية بالبيانات من ملف النسخ الاحتياطي الذي اخترته.\n\nلا يمكن التراجع عن هذا الإجراء.",
+  "restore": "استعادة",
+  "restoreSuccess": "تمت الاستعادة بنجاح! يرجى إعادة تشغيل ميزان لتحميل البيانات الجديدة.",
+  "restoreFailed": "فشلت الاستعادة. بياناتك الأصلية آمنة. خطأ: {error}",
+  "@restoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "الملف تالف"
+      }
+    }
+  },
+  "featureNotImplemented": "الميزة لم تنفذ بعد.",
+  "chooseTheme": "اختر المظهر",
+  "light": "فاتح",
+  "dark": "داكن",
+  "systemDefault": "افتراضي النظام",
+  "selectAccount": "اختر حساب",
+  "unknownAccount": "حساب غير معروف",
+  "pleaseSelectCurrency": "الرجاء اختيار عملة.",
+  "pleaseEnterAccountName": "الرجاء إدخال أو اختيار اسم حساب.",
+  "criticalAccountError": "خطأ فادح: الحسابات الافتراضية (مثل المخزون) مفقودة.",
+  "transactionSaved": "تم حفظ العملية بنجاح.",
+  "forAccount": "لـ {accountName}",
+  "@forAccount": {
+    "placeholders": {
+      "accountName": {
+        "type": "String",
+        "example": "الصندوق"
+      }
+    }
+  },
+  "loading": "جار التحميل...",
+  "accountName": "اسم الحساب",
+  "pleaseEnterOrSelectAccount": "الرجاء إدخال أو اختيار حساب",
+  "amount": "المبلغ",
+  "profitAndLoss": "الأرباح والخسائر",
+  "revenue": "الإيرادات",
+  "totalRevenue": "إجمالي الإيرادات",
+  "expenses": "المصروفات",
+  "totalExpenses": "إجمالي المصروفات",
+  "netIncome": "صافي الدخل",
+  "balanceSheet": "الميزانية العمومية",
+  "asOf": "كما في",
+  "assets": "الأصول",
+  "totalAssets": "إجمالي الأصول",
+  "liabilities": "الالتزامات",
+  "trialBalance": "ميزان المراجعة",
+  "debit": "مدين",
+  "credit": "دائن",
+  "total": "الإجمالي",
+  "totalLiabilities": "إجمالي الالتزامات",
+  "equity": "حقوق الملكية",
+  "totalEquity": "إجمالي حقوق الملكية",
+  "totalLiabilitiesAndEquity": "إجمالي الالتزامات وحقوق الملكية",
+  "pleaseEnterAmount": "الرجاء إدخال مبلغ",
+  "invalidAmount": "مبلغ غير صالح",
+  "exchangeRate": "سعر الصرف (1 {currencyCode} = ؟ {defaultCurrency})",
+  "@exchangeRate": {
+    "placeholders": {
+      "currencyCode": {
+        "type": "String",
+        "example": "USD"
+      },
+      "defaultCurrency": {
+        "type": "String",
+        "example": "محلي"
+      }
+    }
+  },
+  "pleaseEnterRate": "الرجاء إدخال سعر صرف",
+  "invalidRate": "سعر صرف غير صالح",
+  "addAttachment": "إضافة مرفق",
+  "details": "التفاصيل",
+  "couldNotLoadCurrencies": "تعذر تحميل العملات",
+  "paymentCredit": "دفعة (دائن)",
+  "chargeDebit": "عليه (مدين)",
+  "noHistory": "لا يوجد سجل عمليات لهذا الحساب.",
+  "errorLoadingHistory": "خطأ في تحميل السجل:",
+  "pleaseAddCategory": "الرجاء إضافة صنف أولاً.",
+  "noProductsInCategory": "لا توجد منتجات في هذا الصنف.",
+  "quantity": "الكمية:",
+  "clear": "مسح",
+  "printReceipt": "طباعة إيصال",
+  "zeroTotalError": "لا يمكن معالجة عملية بيع بإجمالي صفر.",
+  "criticalSetupError": "خطأ فادح في الإعداد: لم يتم إنشاء الحسابات عند بدء التشغيل.\nحاول إعادة التثبيت.",
+  "posSale": "بيع نقطة بيع #{timestamp}",
+  "@posSale": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String",
+        "example": "1678886400"
+      }
+    }
+  },
+  "saleRecorded": "تم تسجيل عملية بيع بمبلغ {total}.",
+  "@saleRecorded": {
+    "placeholders": {
+      "total": {
+        "type": "String",
+        "example": "125.50"
+      }
+    }
+  },
+  "transactionFailed": "فشلت العملية:",
+  "noTransactionsYet": "لا توجد عمليات بعد.\nأضف واحدة!",
+  "companyNameLegacy": "الاسم التجاري",
+  "yourNameLegacy": "اسمك",
+  "companyAddressLegacy": "العنوان",
+  "taxIDLegacy": "الرقم الضريبي",
+  "securityOptionsLegacy": "خيارات الأمان",
+  "scanBarcode": "مسح الباركود",
+  "productNotFound": "المنتج غير موجود للباركود: {barcode}",
+  "@productNotFound": {
+    "placeholders": {
+      "barcode": {
+        "type": "String",
+        "example": "123456789"
+      }
+    }
+  },
+  "scanProductBarcode": "مسح باركود المنتج",
+  "barcodeOptional": "الباركود (اختياري)",
+  "orderDetails": "تفاصيل الطلب",
+  "cart": "السلة",
+  "items": "عنصر (عناصر)",
+  "clearOrder": "مسح الطلب",
+  "printAndSave": "طباعة وحفظ",
+  "orderHistory": "سجل الطلبات",
+  "noSalesYet": "لم يتم تسجيل أي مبيعات نقاط بيع بعد.",
+  "returnFor": "إرجاع للطلب",
+  "returnSuccess": "تم إرجاع الطلب بنجاح.",
+  "returnFailed": "فشل معالجة الإرجاع",
+  "confirmReturn": "إرجاع هذا الطلب؟",
+  "confirmReturnMessage": "سيؤدي هذا إلى إنشاء معاملة جديدة معاكسة لإلغاء هذا البيع. لا يمكن التراجع عن هذا الإجراء.",
+  "returnOrder": "إرجاع الطلب",
+  "noItemsInSale": "لم يتم العثور على أصناف في هذا البيع (ربما قيد يومية مباشر).",
+  "done": "تم",
+  "year": "السنة",
+  "local": "محلي",
+  "exchangeRateShort": "السعر",
+  "uploadImage": "تحميل صورة",
+  "changeImage": "تغيير الصورة",
+  "removeImage": "إزالة",
+  "pickFromGallery": "اختر من المعرض",
+  "takePhoto": "التقط صورة",
+  "change": "تغيير",
+  "remove": "إزالة",
+  "manageReturn": "إدارة الإرجاع",
+  "orderFullyReturned": "تم إرجاع هذا الطلب بالكامل.",
+  "purchased": "المشترى",
+  "returned": "مُرجع",
+  "returnQuantity": "كمية الإرجاع",
+  "totalRefund": "إجمالي المبلغ المسترد",
+  "processReturn": "تنفيذ الإرجاع",
+  "noItemsSelected": "لم يتم تحديد أي أصناف للإرجاع.",
+  "partialReturnFor": "إرجاع جزئي للطلب {transactionId}",
+  "@partialReturnFor": {
+    "description": "وصف لعملية إرجاع جزئي",
+    "placeholders": {
+      "transactionId": {
+        "type": "String"
+      }
+    }
+  },
+  "orderReturned": "تم إرجاع هذا الطلب.",
+  "makePayment": "إجراء دفعة",
+"payFromAccount": "الدفع من حساب",
+"payToAccount": "الدفع إلى حساب",
+"pleaseEnterValidAmount": "الرجاء إدخال مبلغ صحيح أكبر من صفر",
+  "pay": "ادفع",
+  "noLineItemsSaved": "لم يتم حفظ أصناف لهذا الطلب.",
+  "fieldRequired": "الحقل مطلوب",
+  "selectPaymentMethod": "اختر طريقة الدفع",
+  "backupAndRestore": "النسخ الاحتياطي والاستعادة",
+  "profitAndLossReport": "قائمة الدخل",
+  "balanceSheetReport": "الميزانية العمومية",
+  "trialBalanceReport": "ميزان المراجعة",
+  "upgradeToMizanPro": "الترقية إلى ميزان برو",
+  "mizanProDescription": "تفعيل المزامنة السحابية، والوصول متعدد الأجهزة، وأدوار المستخدمين. اعرف المزيد...",
+  "createLocalBackupTitle": "إنشاء نسخة احتياطية محلية؟",
+  "createLocalBackupMessage": "سيؤدي هذا إلى حفظ نسخة من قاعدة بياناتك في موقع تختاره (مثل التنزيلات، جوجل درايف).",
+  "yes": "نعم",
+  "newPurchase": "فاتورة مشتريات جديدة",
+  "purchaseScreenTitle": "فاتورة شراء جديدة",
+  "selectSupplier": "اختر المورد",
+  "supplier": "المورد",
+  "pleaseSelectSupplier": "الرجاء اختيار مورد.",
+  "addProduct": "أضف منتج",
+  "product": "المنتج",
+  "quantityShort": "الكمية",
+  "cost": "التكلفة",
+  "totalCost": "التكلفة الإجمالية",
+  "costPerItem": "التكلفة",
+  "totalPayable": "مجموع المدفوع",
+  "pleaseEnterCost": "الرجاء إدخال التكلفة",
+  "pleaseEnterQuantity": "الرجاء إدخال الكمية",
+  "purchaseSaved": "تم حفظ فاتورة الشراء بنجاح.",
+  "failedToSavePurchase": "فشل حفظ فاتورة الشراء: {error}",
+  "@failedToSavePurchase": {
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "فقد الاتصال بقاعدة البيانات"
+      }
+    }
+  },
+  "purchaseFrom": "شراء من {supplierName}",
+  "@purchaseFrom": {
+    "placeholders": {
+      "supplierName": {
+        "type": "String",
+        "example": "المورد العالمي"
+      }
+    }
+  },
+  "createLocalBackupPrompt": "سيؤدي هذا إلى إنشاء ملف نسخ احتياطي محلي (mizan.db) في مجلد تختاره. يمكنك استخدام هذا الملف لاستعادة بياناتك على هذا الجهاز أو جهاز آخر.",
+  "backup": "نسخ احتياطي",
+  "backupSuccessful": "نجح النسخ الاحتياطي! تم حفظ الملف في: {path}",
+  "@backupSuccessful": {
+    "placeholders": {
+      "path": {
+        "type": "String",
+        "example": "/Downloads/mizan_backup.db"
+      }
+    }
+  },
+  "backupFailed": "فشل النسخ الاحتياطي: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "الأذن مرفوض"
+      }
+    }
+  },
+  "restoreSuccessful": "نجحت الاستعادة",
+  "restoreSuccessMessage": "تمت استعادة بياناتك. يرجى إعادة تشغيل التطبيق الآن.",
+  "learnMore": "اعرف المزيد",
+  "dashboard": "لوحة التحكم",
+  "newSale": "عملية بيع جديدة",
+  "totalRevenue": "إجمالي الإيرادات",
+  "totalExpenses": "إجمالي المصروفات",
+  "totalReceivable": "إجمالي المستحقات",
+  "currencyFormat": "{value}",
+  "@currencyFormat": {
+    "description": "Formats a number as a currency value",
+    "placeholders": {
+      "value": {
+        "type": "double",
+        "format": "currency",
+        "symbol": ""
+      }
+    }
+  },
+  "saveSuccessPrintFailed": "نجح الحفظ، لكن فشلت الطباعة: {error}",
+  "@saveSuccessPrintFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorLoadingPaymentMethods": "خطأ في تحميل طرق الدفع: {error}",
+  "@errorLoadingPaymentMethods": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "atPrice": "@ {price}",
+  "@atPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "10.99"
+      }
+    }
+  },
+  "dbFileNotFound": "ملف قاعدة البيانات غير موجود.",
+  "noBackupFound": "لم يتم العثور على ملف نسخ احتياطي على Google Drive.",
+  "mizanAccounting": "ميزان للمحاسبة",
+  "generatedOn": "تم إنشاؤه في: {date}",
+  "@generatedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "10/11/2025"
+      }
+    }
+  },
+  "totalLocal": "الإجمالي (محلي)",
+  "couldNotLaunch": "تعذر فتح {url}",
+  "@couldNotLaunch": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "webNotSupported": "منصة الويب غير مدعومة",
+  "signInCancelled": "تم إلغاء تسجيل الدخول من قبل المستخدم.",
+  "updateWindowsClientId": "يرجى تحديث Client ID الخاص بويندوز في auth_repository.dart",
+  "updateWindowsClientIdSecret": "يرجى تحديث Client ID/Secret الخاص بويندوز في auth_repository.dart",
+  "authFailed": "فشلت المصادقة. تعذر الحصول على عميل HTTP.",
+  "criticalInventoryError": "خطأ فادح: حسابات المخزون أو تكلفة البضاعة المباعة غير موجودة.",
+  "drLabel": "مدين:",
+  "crLabel": "دائن:"
+}
