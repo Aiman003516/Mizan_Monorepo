@@ -6,7 +6,7 @@
 *.iml
 
 # VS Code
-.vscode/
+.vscode/launch.json
 
 #==================================================
 # Melos & Dart
@@ -31,14 +31,7 @@ build/
 **/*.g.dart
 **/*.freezed.dart
 
-#==================================================
-# Secrets (ADD THIS SECTION)
-#==================================================
-# Never commit environment variables or secrets
-*.env
-.env
-
-#==================================================
+=====================
 # Flutter (General)
 #==================================================
 # Generated localization files

@@ -1,9 +1,11 @@
+// FILE: packages/features/feature_products/lib/src/data/accounts_repository.dart
+
 import 'package:core_database/core_database.dart';
 import 'package:drift/drift.dart';
-import 'package:feature_products/feature_products.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// FIX: Import the local database provider
+import 'package:feature_products/src/data/database_provider.dart';
 
-// 1. Create a provider for the repository
 final accountsRepositoryProvider = Provider<AccountsRepository>((ref) {
   final db = ref.watch(databaseProvider);
   return AccountsRepository(db);
@@ -16,7 +18,6 @@ class AccountsRepository {
   /// Watches all accounts, ordered by name.
   Stream<List<Account>> watchAccounts() {
     return (_db.select(_db.accounts)
-    // --- THIS IS THE CORRECTED LINE ---
       ..orderBy([(t) => OrderingTerm.asc(t.name)]))
         .watch();
   }
@@ -27,20 +28,22 @@ class AccountsRepository {
     required String type,
     double initialBalance = 0.0,
   }) {
+    // FIX: Convert Double (Dollars) to Int (Cents) for the database
+    final int balanceCents = (initialBalance * 100).round();
+
     final companion = AccountsCompanion.insert(
       name: name,
       type: type,
-      initialBalance: initialBalance,
+      initialBalance: balanceCents, // Pass Int
     );
     return _db.into(_db.accounts).insert(companion);
   }
 
   /// Updates an existing account.
-Future<void> updateAccount(Account account) {
-
-        return _db.update(_db.accounts).replace(
-            account.toCompanion(false).copyWith(lastUpdated: Value(DateTime.now())));
-      }
+  Future<void> updateAccount(Account account) {
+    return _db.update(_db.accounts).replace(
+        account.toCompanion(false).copyWith(lastUpdated: Value(DateTime.now())));
+  }
 
   /// Deletes an account.
   Future<void> deleteAccount(String id) {

@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 
-/// The placeholder database provider for this feature.
+// REFACTOR: Instead of defining a new abstract provider, we simply
+// point to the central Core Database provider.
+// This allows this feature to "plug in" automatically.
 final databaseProvider = Provider<AppDatabase>((ref) {
-  throw UnimplementedError('databaseProvider must be overridden in main.dart');
+  return ref.watch(appDatabaseProvider);
 });

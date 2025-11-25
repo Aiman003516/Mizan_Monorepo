@@ -1,13 +1,19 @@
+// FILE: packages/features/feature_transactions/lib/src/presentation/purchase_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+import 'package:drift/drift.dart' as d;
+
+// Core Imports
 import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
+
+// Feature Imports
+import 'package:feature_products/src/data/database_provider.dart';
 import 'package:feature_accounts/feature_accounts.dart';
-import 'package:core_database/src/initial_constants.dart';
-import 'package:feature_products/feature_products.dart' hide databaseProvider;
-import 'package:feature_transactions/src/data/transactions_repository.dart';
-import 'package:drift/drift.dart' as d;
-import 'package:uuid/uuid.dart';
+import 'package:feature_products/feature_products.dart' hide accountsRepositoryProvider;
+// FIX: Un-hide databaseProvider so we can use it!
 
 const _uuid = Uuid();
 
@@ -83,7 +89,7 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
     final navigator = Navigator.of(context);
 
     if (_formKey.currentState!.validate() && _items.isNotEmpty) {
-      final db = ref.read(databaseProvider);
+      final db = ref.read(databaseProvider); // Now valid because we imported it
       final productsRepo = ref.read(productsRepositoryProvider);
       final accountsRepo = ref.read(accountsRepositoryProvider);
 
@@ -101,6 +107,9 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
       for (final item in _items) {
         totalCost += item.cost * item.quantity;
       }
+      
+      // FIX: Convert Double Total to Cents (Int)
+      final int totalCostCents = (totalCost * 100).round();
 
       try {
         await db.transaction(() async {
@@ -116,20 +125,20 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
           await db.into(db.transactionEntries).insert(TransactionEntriesCompanion.insert(
             transactionId: newTransactionId,
             accountId: inventoryAccountId,
-            amount: totalCost,
+            amount: totalCostCents, // Pass Int
           ));
 
           await db.into(db.transactionEntries).insert(TransactionEntriesCompanion.insert(
             transactionId: newTransactionId,
             accountId: supplier.id,
-            amount: -totalCost,
+            amount: -totalCostCents, // Pass Int
           ));
 
           for (final item in _items) {
             await productsRepo.addStockToProduct(
               productId: item.product.id,
               quantityPurchased: item.quantity,
-              costPerItem: item.cost,
+              costPerItem: item.cost, 
             );
           }
         });

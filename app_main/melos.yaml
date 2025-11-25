@@ -1,25 +1,27 @@
-name: mizan_monorepo_workspace
+name: mizan_monorepo
+repository: https://github.com/your_org/mizan_monorepo
 
-# This is the correct key for defining your packages.
-# Melos will now find all your packages.
 packages:
-  - app_mizan
-  - packages/core/*
-  - packages/shared/*
-  - packages/features/*
+  - apps/**
+  - packages/**
 
-# 'scripts:' must be at the root of the file.
+# CRITICAL FIX: Ensure pubspec_overrides are used for local linking
+command:
+  bootstrap:
+    usePubspecOverrides: true
+    runPubGetInParallel: false # Safer for initial setup
+
 scripts:
-  # This 'get' script is an alias for 'melos bootstrap'.
-  # You can run it with 'melos run get'.
-  get:
-    run: melos bootstrap
-    description: >
-      Bootstrap the monorepo by running "flutter pub get" in all packages
-      and linking them together.
+  postbootstrap:
+    run: dart pub global activate flutter_gen
+    description: Activate code generators after bootstrap.
 
-  # This is your 'clean' script.
-  # You can run it with 'melos run clean'.
-  clean:
-    run: melos exec -- "flutter clean"
-    description: Clean all package build artifacts.
+  build:all:
+    run: |
+      melos exec -c 1 -- \
+        "flutter pub run build_runner build --delete-conflicting-outputs"
+    description: Run build_runner in all packages.
+
+  test:all:
+    run: melos exec -- flutter test
+    description: Run all tests.

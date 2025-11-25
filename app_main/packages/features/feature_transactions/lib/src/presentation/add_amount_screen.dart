@@ -1,3 +1,5 @@
+// FILE: packages/features/feature_transactions/lib/src/presentation/add_amount_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,13 +9,10 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:core_database/core_database.dart';
 import 'package:core_data/core_data.dart';
 import 'package:feature_accounts/feature_accounts.dart';
-import 'package:feature_reports/feature_reports.dart' hide databaseProvider;
+import 'package:feature_reports/feature_reports.dart';
 import 'package:feature_transactions/src/data/transactions_repository.dart';
 import 'package:feature_transactions/src/data/database_provider.dart' hide databaseProvider;
 
-// REMOVED: import 'package:feature_settings/feature_settings.dart';
-
-// FIX: Create a local provider to break dependency on feature_settings
 final _currenciesStreamProvider = StreamProvider<List<Currency>>((ref) {
   final db = ref.watch(databaseProvider);
   return (db.select(db.currencies)
@@ -21,12 +20,9 @@ final _currenciesStreamProvider = StreamProvider<List<Currency>>((ref) {
       .watch();
 });
 
-// Provider to fetch the name of the account being edited
 final _accountNameProvider =
     FutureProvider.autoDispose.family<String, String>((ref, accountId) async {
-  // This provider MUST be overridden in main.dart to provide a real l10n object
   final l10n = ref.watch(appLocalizationsProvider);
-
   final db = ref.watch(databaseProvider);
   final account = await (db.select(db.accounts)
         ..where((tbl) => tbl.id.equals(accountId)))
@@ -34,7 +30,6 @@ final _accountNameProvider =
   return account?.name ?? l10n.unknownAccount;
 });
 
-// Placeholder provider. This MUST be overridden in main.dart
 final appLocalizationsProvider = Provider<AppLocalizations>((ref) {
   throw UnimplementedError('appLocalizationsProvider must be overridden');
 });
@@ -138,11 +133,12 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
           final classificationId = await accountsRepo.getClassificationIdByName(
               widget.classificationName ?? kClassificationGeneral);
 
+          // FIX: initialBalance expects INT (0), not Double (0.0)
           final newAccountCompanion = AccountsCompanion.insert(
             name: accountName,
             type: 'asset',
             classificationId: d.Value(classificationId),
-            initialBalance: 0.0,
+            initialBalance: 0, // Int
           );
           final newAccount =
               await db.into(db.accounts).insertReturning(newAccountCompanion);
@@ -161,23 +157,25 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
         return;
       }
 
-      final amount = double.tryParse(_amountController.text) ?? 0.0;
-      final transactionAmount = _isCredit ? -amount : amount;
-      final description = _detailsController.text;
+      // FIX: Calculate Cents
+      final amountDouble = double.tryParse(_amountController.text) ?? 0.0;
+      final signedAmountDouble = _isCredit ? -amountDouble : amountDouble;
+      final int amountCents = (signedAmountDouble * 100).round();
 
+      final description = _detailsController.text;
       final currencyCode = _selectedCurrency!;
       final currencyRate = double.tryParse(_rateController.text) ?? 1.0;
 
       final entries = [
         TransactionEntriesCompanion.insert(
           accountId: targetAccountId,
-          amount: transactionAmount,
+          amount: amountCents, // Pass Int
           transactionId: 'TEMP',
           currencyRate: d.Value(currencyRate),
         ),
         TransactionEntriesCompanion.insert(
           accountId: equityAccountId,
-          amount: -transactionAmount,
+          amount: -amountCents, // Pass Int
           transactionId: 'TEMP',
           currencyRate: d.Value(currencyRate),
         ),
@@ -219,19 +217,11 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
     final accountNameAsync =
         ref.watch(_accountNameProvider(widget.accountId ?? ''));
 
-    //
-    // 💡--- THIS IS THE FIX (Part 1) ---
-    // We watch the public provider from feature_reports.
     final historyAsync = ref.watch(generalLedgerStreamProvider);
-    //
-    //
-
     final allAccountsAsync = ref.watch(allAccountsStreamProvider);
 
-    final currenciesAsync =
-        ref.watch(_currenciesStreamProvider); // FIX: Use local provider
-    final defaultCurrency =
-        ref.watch(defaultCurrencyProvider); // FIX: Use provider from core_data
+    final currenciesAsync = ref.watch(_currenciesStreamProvider);
+    final defaultCurrency = ref.watch(defaultCurrencyProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -462,14 +452,9 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
             Expanded(
               child: historyAsync.when(
                 data: (allHistory) {
-                  //
-                  // 💡--- THIS IS THE FIX (Part 2) ---
-                  // We filter the full list to get only items for this account.
                   final history = allHistory
                       .where((detail) => detail.accountId == widget.accountId)
                       .toList();
-                  //
-                  //
 
                   if (history.isEmpty) {
                     return Center(child: Text(l10n.noHistory));
@@ -478,6 +463,8 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                     itemCount: history.length,
                     itemBuilder: (context, index) {
                       final detail = history[index];
+                      // NOTE: entryAmount is already converted to Double by the View Model/Service
+                      // so we can display it directly.
                       final isDebit = detail.entryAmount > 0;
                       return ListTile(
                         dense: true,

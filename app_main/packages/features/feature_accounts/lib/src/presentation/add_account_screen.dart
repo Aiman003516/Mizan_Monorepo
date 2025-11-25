@@ -1,3 +1,5 @@
+// FILE: packages/features/feature_accounts/lib/src/presentation/add_account_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,7 +42,11 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
     if (widget.accountToEdit != null) {
       final account = widget.accountToEdit!;
       _nameController.text = account.name;
-      _initialBalanceController.text = account.initialBalance.toStringAsFixed(2);
+      
+      // FIX: Convert stored Int (Cents) to Double String for display
+      // 1050 -> 10.50
+      _initialBalanceController.text = (account.initialBalance / 100.0).toStringAsFixed(2);
+      
       _phoneNumberController.text = account.phoneNumber ?? '';
       _selectedAccountType = account.type;
       if (account.classificationId != null) {
@@ -67,7 +73,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       setState(() { _isLoading = true; });
       try {
         final name = _nameController.text;
-        final initialBalance =
+        final initialBalanceDouble =
             double.tryParse(_initialBalanceController.text) ?? 0.0;
         final phoneNumber = _phoneNumberController.text.isNotEmpty
             ? _phoneNumberController.text
@@ -75,18 +81,22 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         final classificationId = _selectedClassification?.id;
 
         if (widget.accountToEdit == null) {
+          // Create handles conversion inside the repository
           await ref.read(accountsRepositoryProvider).createAccount(
             name: name,
             type: _selectedAccountType,
-            initialBalance: initialBalance,
+            initialBalance: initialBalanceDouble,
             phoneNumber: phoneNumber,
             classificationId: classificationId,
           );
         } else {
+          // FIX: Convert Double to Int (Cents) for copyWith
+          final int balanceCents = (initialBalanceDouble * 100).round();
+
           final updatedAccount = widget.accountToEdit!.copyWith(
             name: name,
             type: _selectedAccountType,
-            initialBalance: initialBalance,
+            initialBalance: balanceCents, // Pass Int
             phoneNumber: d.Value(phoneNumber),
             classificationId: d.Value(classificationId),
           );

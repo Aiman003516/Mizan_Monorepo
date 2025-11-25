@@ -1,9 +1,15 @@
+// FILE: packages/features/feature_transactions/lib/src/presentation/make_payment_screen.dart
+
 import 'package:drift/drift.dart' as d;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
+// Core Imports
 import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
+
+// Feature Imports
 import 'package:feature_accounts/feature_accounts.dart';
 import 'package:feature_transactions/src/data/transactions_repository.dart';
 
@@ -32,8 +38,6 @@ class _MakePaymentScreenState extends ConsumerState<MakePaymentScreen> {
   void initState() {
     super.initState();
     _amountController.text = widget.amountOwed.toStringAsFixed(2);
-    // We can't get l10n here, so we use a non-l10n string.
-    // A better fix would be to pass l10n in or load it async.
     _descriptionController.text = 'Payment to ${widget.supplierAccount.name}';
   }
 
@@ -75,24 +79,28 @@ class _MakePaymentScreenState extends ConsumerState<MakePaymentScreen> {
       ));
       return;
     }
+    
+    // FIX: Convert Double to Cents (Int)
+    final int amountCents = (paymentAmount * 100).round();
 
     final entries = <TransactionEntriesCompanion>[
       TransactionEntriesCompanion.insert(
         accountId: widget.supplierAccount.id,
-        amount: paymentAmount,
-        transactionId: '', // Will be replaced by repo
+        amount: amountCents, // Pass Int
+        transactionId: 'TEMP',
+        currencyRate: const d.Value(1.0),
       ),
       TransactionEntriesCompanion.insert(
         accountId: _selectedPaymentAccount!.id,
-        amount: -paymentAmount,
-        transactionId: '', // Will be replaced by repo
+        amount: -amountCents, // Pass Int
+        transactionId: 'TEMP',
+        currencyRate: const d.Value(1.0),
       ),
     ];
 
     try {
-      // If description is still the default, replace with l10n version
       if (_descriptionController.text == 'Payment to ${widget.supplierAccount.name}') {
-         _descriptionController.text = l10n.purchaseFrom(widget.supplierAccount.name); // This is a bit of a guess, but better
+         _descriptionController.text = l10n.purchaseFrom(widget.supplierAccount.name); 
       }
 
       await ref.read(transactionsRepositoryProvider).createJournalTransaction(

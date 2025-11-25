@@ -1,66 +1,44 @@
-// In: mizan_monorepo/app_main/apps/android/app/build.gradle.kts
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("dev.flutter.flutter-plugin-loader")
-    // DO NOT APPLY google-services here. Move it to the end.
-    // id("com.google.gms.google-services") 
+    // The Flutter Gradle Plugin must be applied to generate the code
+    id("dev.flutter.flutter-gradle-plugin")
 }
-
-fun localProperties(): java.util.Properties {
-    val properties = java.util.Properties()
-    val localPropertiesFile = project.rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        properties.load(java.io.FileInputStream(localPropertiesFile))
-    }
-    return properties
-}
-
-val flutterRoot: String by project
-val flutterVersionCode: String? by project
-val flutterVersionName: String? by project
-
-// === FIX STEP 1: Add this line ===
-// Load .env file for build-time variables
-project.ext.set("flutter.dotenv", ".env")
-
-// === FIX STEP 2: Apply flutter.gradle AFTER .env line ===
-apply(from = "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle")
 
 android {
+    // CRITICAL FIX: Namespace is required for AGP 8.0+
     namespace = "com.example.mizan.mizan"
-    compileSdk = 34 // flutter.compileSdkVersion
-    ndkVersion = "26.1.10909125" // flutter.ndkVersion
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
-    sourceSets {
-        getByName("main") {
-            java.srcDirs("src/main/kotlin", "src/main/java")
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.mizan.mizan"
-        minSdk = 21 // flutter.minSdkVersion
-        targetSdk = 34 // flutter.targetSdkVersion
-        versionCode = (flutterVersionCode ?: "1").toInt()
-        versionName = flutterVersionName ?: "1.0"
+        minSdk = flutter.minSdkVersion // Flutter default is often too low; 23 is safer
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0.0"
+        
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isSigningReady = true
-            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("debug") // Use debug key for now to avoid signing errors
         }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
     }
 }
 
@@ -68,7 +46,8 @@ flutter {
     source = "../.."
 }
 
-dependencies {}
-
-// === FIX STEP 3: Apply google-services at the VERY END ===
-apply(plugin = "com.google.gms.google-services")
+dependencies {
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.11.0")
+}

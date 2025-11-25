@@ -1,11 +1,17 @@
+// FILE: packages/features/feature_transactions/lib/src/presentation/general_journal_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:drift/drift.dart' as d;
+
+// Core Imports
 import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
+
+// Feature Imports
 import 'package:feature_accounts/feature_accounts.dart';
 import 'package:feature_transactions/src/data/transactions_repository.dart';
-import 'package:drift/drift.dart' as d;
 
 class JournalEntryLine {
   Account? account;
@@ -45,7 +51,7 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   DateTime _transactionDate = DateTime.now();
-  List<JournalEntryLine> _lines = [JournalEntryLine(), JournalEntryLine()];
+  final List<JournalEntryLine> _lines = [JournalEntryLine(), JournalEntryLine()];
 
   double _totalDebits = 0.0;
   double _totalCredits = 0.0;
@@ -132,19 +138,26 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
         if (line.account == null || (line.debit == 0 && line.credit == 0)) {
           continue;
         }
-        final amount = line.debit > 0 ? line.debit : -line.credit;
+        
+        // Calculate amount as Double first
+        final double amountDouble = line.debit > 0 ? line.debit : -line.credit;
+        
+        // FIX: Convert to Cents (Int) for Database
+        final int amountCents = (amountDouble * 100).round();
+
         entries.add(
           TransactionEntriesCompanion.insert(
             accountId: line.account!.id,
-            amount: amount,
-            transactionId: '', // Will be replaced by repo
+            amount: amountCents, // Pass Int
+            transactionId: 'TEMP', // Will be replaced by repo
+            currencyRate: const d.Value(1.0),
           ),
         );
       }
 
       if (entries.length < 2) {
         scaffoldMessenger.showSnackBar(SnackBar(
-          content: Text(l10n.error),
+          content: Text(l10n.error), // "Error" or "Transaction must have at least 2 lines"
           backgroundColor: Colors.red,
         ));
         return;
@@ -367,7 +380,7 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
               padding: const EdgeInsets.all(16.0),
               child: TextButton.icon(
                 icon: const Icon(Icons.add),
-                label: Text(l10n.addProduct), // "Add Product"
+                label: Text(l10n.addProduct), // Ideally this should be "Add Line" in l10n
                 onPressed: _addLine,
               ),
             ),

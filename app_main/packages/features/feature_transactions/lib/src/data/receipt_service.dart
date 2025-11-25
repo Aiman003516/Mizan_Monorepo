@@ -1,3 +1,5 @@
+// FILE: packages/features/feature_transactions/lib/src/data/receipt_service.dart
+
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,9 +7,9 @@ import 'package:intl/intl.dart';
 
 // UPDATED Local Imports
 import 'package:core_l10n/app_localizations.dart';
-import 'package:core_data/core_data.dart'; // FIX: Import core_data
+import 'package:core_data/core_data.dart'; 
 import 'package:feature_transactions/src/presentation/pos_receipt_provider.dart';
-// REMOVED: import 'package:feature_settings/feature_settings.dart'; 
+import 'package:shared_ui/shared_ui.dart'; // FIX: Import Formatter
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -39,8 +41,9 @@ class ReceiptService {
   }
 
   Future<Uint8List> generatePosReceipt({
-    required PosReceiptState receipt,
-    required CompanyProfileData profile, // This class now comes from core_data
+    required List<PosReceiptItem> items, // Changed to receive items list directly
+    required double total, // Changed to receive total directly
+    required CompanyProfileData profile, 
     required AppLocalizations l10n,
   }) async {
     final pdf = pw.Document();
@@ -67,9 +70,9 @@ class ReceiptService {
               pw.Divider(thickness: 1, height: 8 * PdfPageFormat.mm),
               pw.Text(dateFormat.format(now)),
               pw.SizedBox(height: 4 * PdfPageFormat.mm),
-              _buildItemsTable(receipt, l10n, isRtl: isRtl),
+              _buildItemsTable(items, l10n, isRtl: isRtl),
               pw.Divider(thickness: 1, height: 4 * PdfPageFormat.mm),
-              _buildTotals(receipt, l10n, isRtl: isRtl),
+              _buildTotals(total, l10n, isRtl: isRtl),
               pw.SizedBox(height: 8 * PdfPageFormat.mm),
               pw.Center(child: pw.Text('*** ${l10n.ok} ***')),
             ],
@@ -122,7 +125,7 @@ class ReceiptService {
     );
   }
 
-  pw.Widget _buildItemsTable(PosReceiptState receipt, AppLocalizations l10n,
+  pw.Widget _buildItemsTable(List<PosReceiptItem> items, AppLocalizations l10n,
       {required bool isRtl}) {
     final alignLeft = isRtl ? pw.TextAlign.right : pw.TextAlign.left;
     final alignRight = isRtl ? pw.TextAlign.left : pw.TextAlign.right;
@@ -154,8 +157,10 @@ class ReceiptService {
             pw.Divider(thickness: 1, height: 2 * PdfPageFormat.mm),
           ],
         ),
-        ...receipt.items.map((item) {
-          final itemTotal = item.product.price * item.quantity;
+        ...items.map((item) {
+          // FIX: Calculate Total using Cents Logic
+          final int totalCents = (item.product.price * item.quantity).round();
+          
           return pw.TableRow(
             children: [
               pw.Padding(
@@ -167,7 +172,8 @@ class ReceiptService {
                       children: [
                         pw.Text(item.product.name, textAlign: alignLeft),
                         pw.Text(
-                          l10n.atPrice(item.product.price.toStringAsFixed(2)), // USE L10N
+                          // FIX: Format Unit Price (Int)
+                          l10n.atPrice(CurrencyFormatter.formatCentsToCurrency(item.product.price)),
                           style: const pw.TextStyle(
                               fontSize: 9, color: PdfColors.grey700),
                         ),
@@ -177,7 +183,8 @@ class ReceiptService {
                 textAlign: alignRight,
               ),
               pw.Text(
-                itemTotal.toStringAsFixed(2),
+                // FIX: Format Item Total (Int)
+                CurrencyFormatter.formatCentsToCurrency(totalCents),
                 textAlign: alignRight,
               ),
             ],
@@ -187,7 +194,7 @@ class ReceiptService {
     );
   }
 
-  pw.Widget _buildTotals(PosReceiptState receipt, AppLocalizations l10n,
+  pw.Widget _buildTotals(double total, AppLocalizations l10n,
       {required bool isRtl}) {
     return pw.Column(
       children: [
@@ -199,7 +206,8 @@ class ReceiptService {
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
             ),
             pw.Text(
-              receipt.total.toStringAsFixed(2),
+              // Total is already Double Dollars (passed from UI)
+              total.toStringAsFixed(2),
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 14),
             ),
           ],

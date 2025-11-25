@@ -3,3 +3,6 @@ export 'src/preferences_repository.dart';
 export 'src/secure_storage_provider.dart';
 export 'src/company_profile_data.dart';
 export 'src/company_profile_controller.dart';
+export 'package:core_database/core_database.dart';
+export 'src/env_config.dart';
+export 'src/bootstrap.dart';

@@ -22,3 +22,6 @@ export 'src/presentation/purchase_screen.dart';
 export 'src/presentation/return_items_screen.dart';
 export 'src/presentation/transactions_list_provider.dart';
 export 'src/presentation/transactions_list_screen.dart';
+export 'src/presentation/adjusting_entries_screen.dart'; // ⭐️ NEW: Phase 2.1
+export 'src/presentation/period_end_wizard_screen.dart';
+export 'src/presentation/bank_reconciliation_screen.dart';

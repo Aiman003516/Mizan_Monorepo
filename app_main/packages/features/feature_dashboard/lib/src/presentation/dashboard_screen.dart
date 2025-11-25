@@ -8,13 +8,18 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:core_database/core_database.dart';
 import 'package:feature_dashboard/src/presentation/dashboard_card.dart';
 import 'package:feature_dashboard/src/presentation/dashboard_providers.dart';
+
+// Feature Imports (For Navigation)
 import 'package:feature_transactions/feature_transactions.dart';
+import 'package:feature_products/feature_products.dart'; // ⭐️ Added for Products Hub
+import 'package:feature_reports/feature_reports.dart';   // ⭐️ Added for Reports
 
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
 // This provider must be overridden in app_mizan
+// (Kept from your code to ensure backup logic works as currently wired)
 final databaseProvider = Provider<AppDatabase>((ref) {
   throw UnimplementedError('databaseProvider must be overridden');
 });
@@ -60,6 +65,7 @@ class DashboardScreen extends ConsumerWidget {
       final destinationPath =
           p.join(outputDirectory, 'mizan_backup_$timestamp.db');
 
+      // Close DB before copy to ensure data integrity
       await ref.read(databaseProvider).close();
       await sourceFile.copy(destinationPath);
 
@@ -77,7 +83,7 @@ class DashboardScreen extends ConsumerWidget {
         ),
       );
     }
-    // The LazyDatabase will automatically re-open on the next query
+    // Note: The AppDatabase (via LazyDatabase) will automatically re-open on the next query.
   }
 
   @override
@@ -102,6 +108,7 @@ class DashboardScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
+          // --- TRANSACTION ACTIONS ---
           DashboardCard(
             title: l10n.newSale,
             icon: Icons.point_of_sale,
@@ -133,6 +140,18 @@ class DashboardScreen extends ConsumerWidget {
               );
             },
           ),
+          
+          // --- MANAGEMENT ACTIONS ---
+          DashboardCard(
+            title: l10n.products, // Ensure this exists in l10n or use "Products"
+            icon: Icons.inventory,
+            color: Colors.amber.shade700,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (ctx) => const ProductsHubScreen()),
+              );
+            },
+          ),
           DashboardCard(
             title: l10n.orderHistory,
             icon: Icons.history,
@@ -143,7 +162,37 @@ class DashboardScreen extends ConsumerWidget {
               );
             },
           ),
-          const SizedBox(height: 16),
+          DashboardCard(
+            title: l10n.reports, // Ensure this exists in l10n or use "Reports"
+            icon: Icons.bar_chart,
+            color: Colors.teal,
+            onTap: () {
+              Navigator.of(context).push(
+                // Navigating to Trial Balance as the main report for now
+                MaterialPageRoute(builder: (ctx) => const TrialBalanceScreen()),
+              );
+            },
+          ),
+
+          // ⭐️ NEW: ACCOUNTING / ADJUSTMENTS BUTTON ⭐️
+          DashboardCard(
+            title: "Accounting", // TODO: Add to l10n
+            icon: Icons.tune,
+            color: Colors.blueGrey,
+            onTap: () {
+              Navigator.of(context).push(
+                // Leads to the "Airlock" screen we just built
+                MaterialPageRoute(builder: (ctx) => const AdjustingEntriesScreen()),
+              );
+            },
+          ),
+
+          const SizedBox(height: 24),
+          
+          // --- FINANCIAL SUMMARY ---
+          Text(l10n.quickActions, style: Theme.of(context).textTheme.titleMedium), // Using "Quick Actions" label as section header
+          const SizedBox(height: 8),
+
           Row(
             children: [
               Expanded(

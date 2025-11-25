@@ -12,6 +12,9 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   shared_preferences: ^2.5.3
 
+  core_database:
+    path: ../core_database
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

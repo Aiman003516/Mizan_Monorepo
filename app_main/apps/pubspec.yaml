@@ -46,7 +46,6 @@ dependencies:
     path: ../packages/features/feature_sync
   feature_transactions:
     path: ../packages/features/feature_transactions
-  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -56,13 +55,12 @@ dev_dependencies:
 flutter:
 
  
-
+  generate: true
   uses-material-design: true
   assets:
     - assets/images/
     - assets/fonts/
     - assets/audio/
-    - .env
 
   fonts:
     - family: Amiri

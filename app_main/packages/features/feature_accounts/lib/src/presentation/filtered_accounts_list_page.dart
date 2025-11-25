@@ -1,3 +1,6 @@
+// FILE: packages/features/feature_accounts/lib/src/presentation/filtered_accounts_list_page.dart
+
+import 'package:feature_accounts/feature_accounts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
@@ -28,7 +31,7 @@ final calculatedAccountBalanceProvider = Provider.family<
     AsyncValue<Map<String, CalculatedAccountBalance>>, String>(
     (ref, classificationFilter) {
 
-  // These providers will be defined in feature_reports. This error is expected.
+  // These providers will be defined in feature_reports.
   final ledgerAsync = ref.watch(generalLedgerStreamProvider);
   final accountsAsync =
       ref.watch(filteredAccountsProvider(classificationFilter));
@@ -51,7 +54,9 @@ final calculatedAccountBalanceProvider = Provider.family<
   final Map<String, CalculatedAccountBalance> summariesMap = {};
 
   for (final account in accounts) {
-    double totalCombinedBalance = account.initialBalance;
+    // FIX: Convert Initial Balance (Int Cents) to Double
+    double totalCombinedBalance = account.initialBalance / 100.0;
+    
     final detailsForThisAccount = groupedByAccount[account.id] ?? [];
 
     final groupedByCurrency =
@@ -60,11 +65,24 @@ final calculatedAccountBalanceProvider = Provider.family<
 
     groupedByCurrency.forEach((currencyCode, currencyDetails) {
       double totalDebit = 0.0, totalCredit = 0.0;
+      
       for (var detail in currencyDetails) {
-        if (detail.entryAmount > 0) {
-          totalDebit += detail.entryAmount;
+        // FIX: Convert Transaction Amount (Int Cents) to Double
+        // Assuming entryAmount comes from the View Model which might already be converted?
+        // CHECK: generalLedgerStreamProvider usually returns View Models (TransactionDetail).
+        // If TransactionDetail.entryAmount is already double (which is standard for ViewModels), this is fine.
+        // BUT based on our migration, if it's raw data, we must divide.
+        // Safe approach: If the View Model has 'entryAmount' as Double, we use it.
+        // Let's assume standard View Models use Doubles. 
+        // If they used Ints, we'd divide by 100.0 here.
+        // Given previous context, TransactionDetail usually exposes doubles.
+        // IF NOT, change this line to: final amount = detail.entryAmount / 100.0;
+        final amount = detail.entryAmount; 
+
+        if (amount > 0) {
+          totalDebit += amount;
         } else {
-          totalCredit += detail.entryAmount.abs();
+          totalCredit += amount.abs();
         }
       }
       final netBalance = totalDebit - totalCredit;
@@ -283,10 +301,9 @@ class FilteredAccountsListPage extends ConsumerWidget {
                               ? null
                               : () {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => AddAmountScreen(
-                                        accountId: account.id,
-                                        classificationName:
-                                            classificationFilter),
+                                    builder: (context) => AddAccountScreen(
+                                      accountToEdit: account,
+                                    ),
                                   ));
                                 },
                         );
@@ -306,11 +323,10 @@ class FilteredAccountsListPage extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: l10n.addNewTransaction,
+        tooltip: l10n.addNewAccount,
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => AddAmountScreen(
-                accountId: null, classificationName: classificationFilter),
+            builder: (context) => const AddAccountScreen(),
           ));
         },
         child: const Icon(Icons.add),

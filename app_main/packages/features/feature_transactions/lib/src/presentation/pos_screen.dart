@@ -1,36 +1,36 @@
-import 'dart:typed_data';
+// FILE: packages/features/feature_transactions/lib/src/presentation/pos_screen.dart
+
+import 'dart:io' show Platform;
+import 'package:feature_accounts/feature_accounts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' as d;
+import 'package:audioplayers/audioplayers.dart';
+import 'package:printing/printing.dart';
+
+// Core Imports
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_database/core_database.dart';
-import 'package:core_data/core_data.dart'; // FIX: Import core_data
-import 'package:feature_products/feature_products.dart';
+import 'package:core_data/core_data.dart';
+
+// Shared Imports
+import 'package:shared_ui/shared_ui.dart'; // Formatter
+
+// Feature Imports
+// FIX: Hide databaseProvider from feature_products to avoid conflict
+import 'package:feature_products/feature_products.dart' hide databaseProvider, accountsRepositoryProvider;
+
+// Local Feature Imports
 import 'package:feature_transactions/src/data/transactions_repository.dart';
-import 'package:feature_transactions/src/presentation/pos_receipt_provider.dart';
-//
-// 💡--- FIX #2 (REMOVED) ---
-// Removed illegal 'src' import. The constants are exported by core_database.dart.
-// REMOVED: import 'package:core_database/src/initial_constants.dart' as c;
-//
+import 'package:feature_transactions/src/data/database_provider.dart'; // Explicit Local DB Provider
 import 'package:feature_transactions/src/data/receipt_service.dart';
-import 'package:printing/printing.dart';
+import 'package:feature_transactions/src/presentation/pos_receipt_provider.dart';
 import 'package:feature_transactions/src/presentation/barcode_scanner_screen.dart';
-import 'dart:io' show Platform;
-import 'package:audioplayers/audioplayers.dart';
-import 'package:feature_accounts/feature_accounts.dart'
-    hide databaseProvider; // FIX: Import feature_accounts
 
-// REMOVED: feature_settings and feature_dashboard imports
-
+// Local Provider for Payment Methods
 final paymentMethodsProvider = StreamProvider<List<PaymentMethod>>((ref) {
   final db = ref.watch(databaseProvider);
-  //
-  // 💡--- FIX #1 (APPLIED) ---
-  // Replaced the undefined method with the correct Drift query.
   return (db.select(db.paymentMethods)).watch();
-  //
-  //
 });
 
 class PosScreen extends ConsumerStatefulWidget {
@@ -79,7 +79,7 @@ class _PosScreenState extends ConsumerState<PosScreen> {
         .findProductByBarcode(barcode);
 
     if (product != null) {
-      ref.read(posReceiptProvider.notifier).addProduct(product);
+      ref.read(posReceiptProvider.notifier).addItem(product);
       _audioPlayer.play(_beepSound);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +98,7 @@ class _PosScreenState extends ConsumerState<PosScreen> {
   }
 
   void _showOrderDetailsDialog(BuildContext context) {
-    // FIX: Read profile data here
+    // This reads the current state of the provider (CompanyProfileData)
     final profileData = ref.read(companyProfileProvider);
 
     showModalBottomSheet(
@@ -113,9 +113,11 @@ class _PosScreenState extends ConsumerState<PosScreen> {
             return _OrderDetailsDialog(
               scrollController: scrollController,
               onSaveAndPrint: (PaymentMethod selectedMethod) async {
-                // FIX: Pass profile data
+                // Pass the data down
                 final result = await _saveAndPrintOrder(
                     context, selectedMethod, profileData);
+                
+                // If successful, close the dialog
                 if (result == true && context.mounted) {
                   Navigator.of(context).pop();
                 }
@@ -127,17 +129,18 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     );
   }
 
+  /// Returns TRUE if transaction succeeded, FALSE otherwise.
   Future<bool> _saveAndPrintOrder(
     BuildContext context,
     PaymentMethod paymentMethod,
-    CompanyProfileData profileData, // FIX: Accept profile data
+    CompanyProfileData profileData,
   ) async {
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
 
-    final currentReceiptState = ref.read(posReceiptProvider);
-    final totalAmount = currentReceiptState.total;
-    final cartItems = currentReceiptState.items;
+    final items = ref.read(posReceiptProvider);
+    // posTotalAmountProvider returns Double (Dollars)
+    final totalAmount = ref.read(posTotalAmountProvider);
 
     if (totalAmount <= 0) {
       messenger.showSnackBar(
@@ -147,13 +150,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     }
 
     final accountsRepo = ref.read(accountsRepositoryProvider);
-    //
-    // 💡--- FIX #3 (APPLIED) ---
-    // Use the constant directly (no 'c.' prefix).
     final salesAccountId =
         await accountsRepo.getAccountIdByName(kSalesRevenueAccountName);
-    //
-    //
+    
     final paymentAccountId = paymentMethod.accountId;
 
     if (salesAccountId == null) {
@@ -164,17 +163,20 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     }
 
     const currencyRate = 1.0;
+    
+    // Convert Double Total (Dollars) to Cents (Int) for DB
+    final int totalCents = (totalAmount * 100).round();
 
     final entries = [
       TransactionEntriesCompanion.insert(
         accountId: paymentAccountId,
-        amount: totalAmount,
+        amount: totalCents, // Int
         transactionId: 'TEMP',
         currencyRate: const d.Value(currencyRate),
       ),
       TransactionEntriesCompanion.insert(
         accountId: salesAccountId,
-        amount: -totalAmount,
+        amount: -totalCents, // Int
         transactionId: 'TEMP',
         currencyRate: const d.Value(currencyRate),
       ),
@@ -193,15 +195,16 @@ class _PosScreenState extends ConsumerState<PosScreen> {
               relatedTransactionId: const d.Value(null),
             ),
             entries: entries,
-            items: cartItems,
-            totalAmount: totalAmount,
+            items: items,
+            totalAmount: totalAmount, // Double passed to update Order table
           );
 
+      // --- PRINTING LOGIC ---
       try {
-        // FIX: Use passed-in profileData
         final pdfData =
             await ref.read(receiptServiceProvider).generatePosReceipt(
-                  receipt: currentReceiptState,
+                  items: items,
+                  total: totalAmount,
                   profile: profileData,
                   l10n: l10n,
                 );
@@ -218,7 +221,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
         );
       }
 
+      // Clear cart only on success
       ref.read(posReceiptProvider.notifier).clear();
+      
       messenger.showSnackBar(
         SnackBar(
           content: Text(l10n.saleRecorded(totalAmount.toStringAsFixed(2))),
@@ -238,7 +243,6 @@ class _PosScreenState extends ConsumerState<PosScreen> {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Platform.isWindows) {
-        // Only auto-focus on desktop
         _refocusBarcodeScanner();
       }
     });
@@ -248,7 +252,6 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWideScreen = constraints.maxWidth > 700;
-        final bool isMobile = Platform.isAndroid || Platform.isIOS;
 
         if (isWideScreen) {
           return Row(
@@ -310,6 +313,8 @@ class _PosScreenState extends ConsumerState<PosScreen> {
   }
 }
 
+// ... ProductSelectionPanel and ReceiptPanel remain unchanged ...
+// They are purely presentation components.
 class ProductSelectionPanel extends ConsumerWidget {
   final double bottomPadding;
   const ProductSelectionPanel({super.key, this.bottomPadding = 0});
@@ -317,7 +322,7 @@ class ProductSelectionPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final categoriesAsync = ref.watch(categoriesStreamProvider);
+    final categoriesAsync = ref.watch(categoriesStreamProvider); 
 
     return categoriesAsync.when(
       data: (categories) {
@@ -347,7 +352,7 @@ class _CategoryProductList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final productsAsync = ref.watch(productsStreamProvider(category.id));
+    final productsAsync = ref.watch(productsByCategoryStreamProvider(category.id));
 
     return ExpansionTile(
       title: Text(category.name, style: Theme.of(context).textTheme.titleLarge),
@@ -366,10 +371,10 @@ class _CategoryProductList extends ConsumerWidget {
                 final product = products[index];
                 return ListTile(
                   title: Text(product.name),
-                  subtitle: Text(product.price.toStringAsFixed(2)),
+                  subtitle: Text(CurrencyFormatter.formatCentsToCurrency(product.price)),
                   trailing: const Icon(Icons.add_shopping_cart),
                   onTap: () {
-                    ref.read(posReceiptProvider.notifier).addProduct(product);
+                    ref.read(posReceiptProvider.notifier).addItem(product);
                   },
                 );
               },
@@ -442,9 +447,10 @@ class _CartSummaryPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final receiptState = ref.watch(posReceiptProvider);
-    final itemCount = receiptState.items.length;
-    final total = receiptState.total;
+    final items = ref.watch(posReceiptProvider);
+    final total = ref.watch(posTotalAmountProvider);
+    
+    final itemCount = items.length;
 
     if (itemCount == 0 && isFab) {
       return const SizedBox.shrink();
@@ -501,6 +507,7 @@ class _CartSummaryPanel extends ConsumerWidget {
   }
 }
 
+// ⭐️ UPDATED: Concurrency Lock Implementation ⭐️
 class _OrderDetailsDialog extends ConsumerStatefulWidget {
   final ScrollController scrollController;
   final Future<void> Function(PaymentMethod) onSaveAndPrint;
@@ -517,13 +524,15 @@ class _OrderDetailsDialog extends ConsumerStatefulWidget {
 
 class _OrderDetailsDialogState extends ConsumerState<_OrderDetailsDialog> {
   String? _selectedPaymentMethodId;
+  
+  // 🔒 THE MUTEX: Prevents double taps
+  bool _isProcessing = false;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final receiptState = ref.watch(posReceiptProvider);
-    final receiptItems = receiptState.items;
-    final total = receiptState.total;
+    final receiptItems = ref.watch(posReceiptProvider);
+    final total = ref.watch(posTotalAmountProvider);
 
     final paymentMethodsAsync = ref.watch(paymentMethodsProvider);
 
@@ -538,7 +547,8 @@ class _OrderDetailsDialogState extends ConsumerState<_OrderDetailsDialog> {
                   style: Theme.of(context).textTheme.headlineSmall),
               IconButton(
                 icon: const Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(),
+                // Disable close while processing to be safe
+                onPressed: _isProcessing ? null : () => Navigator.of(context).pop(),
               ),
             ],
           ),
@@ -554,10 +564,11 @@ class _OrderDetailsDialogState extends ConsumerState<_OrderDetailsDialog> {
                       return ListTile(
                         title: Text(item.product.name),
                         subtitle: Text(
-                            '${l10n.quantity} ${item.quantity} @ ${item.product.price.toStringAsFixed(2)}'),
+                            '${l10n.quantity} ${item.quantity} @ ${CurrencyFormatter.formatCentsToCurrency(item.product.price)}'),
                         trailing: Text(
-                          (item.product.price * item.quantity)
-                              .toStringAsFixed(2),
+                          CurrencyFormatter.formatCentsToCurrency(
+                             (item.product.price * item.quantity).round()
+                          ),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       );
@@ -591,7 +602,6 @@ class _OrderDetailsDialogState extends ConsumerState<_OrderDetailsDialog> {
                 );
               }
 
-              // Auto-select first method if not already selected
               if (_selectedPaymentMethodId == null &&
                   paymentMethods.isNotEmpty) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -607,6 +617,14 @@ class _OrderDetailsDialogState extends ConsumerState<_OrderDetailsDialog> {
                 value: _selectedPaymentMethodId,
                 hint: Text(l10n.selectPaymentMethod),
                 isExpanded: true,
+                // Disable dropdown while processing
+                onChanged: _isProcessing 
+                    ? null 
+                    : (value) {
+                        setState(() {
+                          _selectedPaymentMethodId = value;
+                        });
+                      },
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.payment),
@@ -617,11 +635,6 @@ class _OrderDetailsDialogState extends ConsumerState<_OrderDetailsDialog> {
                     child: Text(method.name),
                   );
                 }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPaymentMethodId = value;
-                  });
-                },
                 validator: (value) =>
                     value == null ? l10n.fieldRequired : null,
               );
@@ -640,29 +653,60 @@ class _OrderDetailsDialogState extends ConsumerState<_OrderDetailsDialog> {
                   style: TextButton.styleFrom(
                     foregroundColor: Theme.of(context).colorScheme.error,
                   ),
-                  onPressed: () {
-                    ref.read(posReceiptProvider.notifier).clear();
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: (_isProcessing) 
+                    ? null 
+                    : () {
+                        ref.read(posReceiptProvider.notifier).clear();
+                        Navigator.of(context).pop();
+                      },
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 flex: 2,
                 child: FilledButton.icon(
-                  icon: const Icon(Icons.print),
-                  label: Text(l10n.printAndSave),
+                  icon: _isProcessing 
+                      ? const SizedBox(
+                          width: 20, 
+                          height: 20, 
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2, 
+                            color: Colors.white
+                          )
+                        ) 
+                      : const Icon(Icons.print),
+                  label: Text(_isProcessing ? l10n.saving : l10n.printAndSave),
+                  // 🔒 LOCK: Button is disabled if processing
                   onPressed: (receiptItems.isEmpty ||
-                          _selectedPaymentMethodId == null)
+                          _selectedPaymentMethodId == null ||
+                          _isProcessing)
                       ? null
                       : () async {
-                          final methods =
-                              await ref.read(paymentMethodsProvider.future);
-                          final selectedMethod = methods.firstWhere(
-                            (m) => m.id == _selectedPaymentMethodId,
-                            orElse: () => methods.first,
-                          );
-                          await widget.onSaveAndPrint(selectedMethod);
+                          // 1. ENGAGE LOCK
+                          setState(() {
+                            _isProcessing = true;
+                          });
+
+                          try {
+                            final methods =
+                                await ref.read(paymentMethodsProvider.future);
+                            final selectedMethod = methods.firstWhere(
+                              (m) => m.id == _selectedPaymentMethodId,
+                              orElse: () => methods.first,
+                            );
+                            
+                            // 2. EXECUTE TRANSACTION
+                            await widget.onSaveAndPrint(selectedMethod);
+                          } finally {
+                            // 3. RELEASE LOCK (If widget is still alive)
+                            // Note: If success, the dialog closes, so this might not run.
+                            // That is fine. If failure, this re-enables the button.
+                            if (mounted) {
+                              setState(() {
+                                _isProcessing = false;
+                              });
+                            }
+                          }
                         },
                 ),
               ),

@@ -19,10 +19,59 @@ abstract class MizanTable extends Table {
   DateTimeColumn get lastUpdated =>
       dateTime().clientDefault(() => DateTime.now())();
 
-@override
-  Set<Column> get primaryKey => {id};      
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
+// --- PHASE 2 TABLES ---
+@DataClassName('AdjustingEntryTask')
+class AdjustingEntryTasks extends MizanTable {
+  DateTimeColumn get adjustmentDate => dateTime()();
+  TextColumn get description => text()();
+  TextColumn get taskType => text()();
+  TextColumn get status => text().withDefault(const Constant('pending'))();
+  TextColumn get proposedEntryJson => text()();
+  TextColumn get journalEntryId =>
+      text().nullable().references(Transactions, #id, onDelete: KeyAction.setNull)();
+}
+
+// --- PHASE 3 TABLES ---
+@DataClassName('BankReconciliation')
+class BankReconciliations extends MizanTable {
+  TextColumn get accountId => text().references(Accounts, #id, onDelete: KeyAction.cascade)();
+  DateTimeColumn get statementDate => dateTime()();
+  IntColumn get statementEndingBalance => integer()();
+  TextColumn get status => text().withDefault(const Constant('draft'))();
+}
+
+@DataClassName('ReconciledTransaction')
+class ReconciledTransactions extends MizanTable {
+  TextColumn get reconciliationId => 
+      text().references(BankReconciliations, #id, onDelete: KeyAction.cascade)();
+  TextColumn get transactionId => 
+      text().references(Transactions, #id, onDelete: KeyAction.cascade)();
+}
+
+// ⭐️ NEW TABLE: INVENTORY LAYERS (The "Isolated Ledger")
+@DataClassName('InventoryCostLayer')
+class InventoryCostLayers extends MizanTable {
+  // Which product does this layer belong to?
+  TextColumn get productId => text().references(Products, #id, onDelete: KeyAction.cascade)();
+  
+  // When did we buy this batch? (Crucial for FIFO)
+  DateTimeColumn get purchaseDate => dateTime()();
+  
+  // How many did we buy originally?
+  RealColumn get quantityPurchased => real()();
+  
+  // How many are LEFT in this specific batch? (This decreases as we sell)
+  RealColumn get quantityRemaining => real()();
+  
+  // What was the cost PER UNIT for this specific batch? (In Cents)
+  IntColumn get costPerUnit => integer()(); 
+}
+
+// --- CORE TABLES ---
 @DataClassName('Classification')
 class Classifications extends MizanTable {
   TextColumn get name => text().unique()();
@@ -37,20 +86,20 @@ class Categories extends MizanTable {
 @DataClassName('Product')
 class Products extends MizanTable {
   TextColumn get name => text()();
-  RealColumn get price => real()();
+  IntColumn get price => integer()(); // Cents
   TextColumn get categoryId =>
       text().references(Categories, #id, onDelete: KeyAction.restrict)();
   TextColumn get barcode => text().nullable().unique()();
   TextColumn get imagePath => text().nullable()();
   RealColumn get quantityOnHand => real().withDefault(const Constant(0.0))();
-  RealColumn get averageCost => real().withDefault(const Constant(0.0))();
+  IntColumn get averageCost => integer().withDefault(const Constant(0))(); // Cents
 }
 
 @DataClassName('Account')
 class Accounts extends MizanTable {
   TextColumn get name => text()();
   TextColumn get type => text()();
-  RealColumn get initialBalance => real()();
+  IntColumn get initialBalance => integer()(); // Cents
   TextColumn get phoneNumber => text().nullable()();
   TextColumn get classificationId =>
       text().nullable().references(Classifications, #id, onDelete: KeyAction.setNull)();
@@ -64,6 +113,7 @@ class Transactions extends MizanTable {
   TextColumn get currencyCode => text().withDefault(const Constant('Local'))();
   TextColumn get relatedTransactionId =>
       text().nullable().references(Transactions, #id, onDelete: KeyAction.setNull)();
+  BoolColumn get isAdjustment => boolean().withDefault(const Constant(false))();
 }
 
 @DataClassName('TransactionEntry')
@@ -72,7 +122,7 @@ class TransactionEntries extends MizanTable {
       text().references(Transactions, #id, onDelete: KeyAction.cascade)();
   TextColumn get accountId =>
       text().references(Accounts, #id, onDelete: KeyAction.restrict)();
-  RealColumn get amount => real()();
+  IntColumn get amount => integer()(); // Cents
   RealColumn get currencyRate => real().withDefault(const Constant(1.0))();
 }
 
@@ -94,7 +144,7 @@ class PaymentMethods extends MizanTable {
 class Orders extends MizanTable {
   TextColumn get transactionId =>
       text().unique().references(Transactions, #id, onDelete: KeyAction.cascade)();
-  RealColumn get totalAmount => real()();
+  IntColumn get totalAmount => integer()(); // Cents
 }
 
 @DataClassName('OrderItem')
@@ -105,7 +155,7 @@ class OrderItems extends MizanTable {
       text().references(Products, #id, onDelete: KeyAction.restrict)();
   TextColumn get productName => text()();
   RealColumn get quantity => real()();
-  RealColumn get priceAtSale => real()();
+  IntColumn get priceAtSale => integer()(); // Cents
   RealColumn get quantityReturned =>
       real().withDefault(const Constant(0.0))();
 }
@@ -121,12 +171,17 @@ class OrderItems extends MizanTable {
   PaymentMethods,
   Orders,
   OrderItems,
+  AdjustingEntryTasks,
+  BankReconciliations,
+  ReconciledTransactions,
+  InventoryCostLayers, // ⭐️ Registered New Table
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  // ⭐️ BUMPED VERSION: 16 -> 17
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 17;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -138,74 +193,44 @@ class AppDatabase extends _$AppDatabase {
       await _createInitialPaymentMethods();
     },
     onUpgrade: (Migrator m, int from, int to) async {
-      for (var targetVersion = from + 1; targetVersion <= to; targetVersion++) {
-        switch (targetVersion) {
-          case 3:
-            await m.addColumn(accounts, accounts.phoneNumber);
-            break;
-          case 4:
-            await m.createTable(classifications);
-            await m.addColumn(accounts, accounts.classificationId);
-            await _createInitialClassifications();
-            break;
-          case 5:
-            await m.addColumn(transactions, transactions.currencyCode);
-            await m.addColumn(transactionEntries, transactionEntries.currencyRate);
-            break;
-          case 6:
-            await m.createTable(currencies);
-            await _createInitialCurrencies();
-            break;
-          case 7:
-            await m.addColumn(products, products.barcode);
-            break;
-          case 8:
-            await m.addColumn(transactions, transactions.relatedTransactionId);
-            break;
-          case 9:
-            await m.addColumn(categories, categories.imagePath);
-            await m.addColumn(products, products.imagePath);
-            break;
-          case 10:
-            await m.createTable(paymentMethods);
-            await _createInitialPaymentMethods();
-            break;
-          case 11:
-            await m.createTable(orders);
-            await m.createTable(orderItems);
-            break;
-          case 12:
-            await m.addColumn(orderItems, orderItems.quantityReturned);
-            break;
-          case 13:
-            await m.addColumn(products, products.quantityOnHand);
-            await m.addColumn(products, products.averageCost);
-            break;
-        }
+      if (from < 15) {
+        await m.createTable(adjustingEntryTasks);
+        await m.addColumn(transactions, transactions.isAdjustment);
       }
+      if (from < 16) {
+        await m.createTable(bankReconciliations);
+        await m.createTable(reconciledTransactions);
+      }
+      if (from < 17) {
+        // Phase 3.2 Migration
+        await m.createTable(inventoryCostLayers);
+      }
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
     },
   );
 
   Future<void> _createInitialAccounts() async {
     final now = DateTime.now();
     await into(accounts).insert(AccountsCompanion.insert(
-      name: kCashAccountName, type: 'asset', initialBalance: 0.0,
+      name: kCashAccountName, type: 'asset', initialBalance: 0,
       createdAt: Value(now), lastUpdated: Value(now), phoneNumber: const Value(null),
     ));
     await into(accounts).insert(AccountsCompanion.insert(
-      name: kSalesRevenueAccountName, type: 'revenue', initialBalance: 0.0,
+      name: kSalesRevenueAccountName, type: 'revenue', initialBalance: 0,
       createdAt: Value(now), lastUpdated: Value(now), phoneNumber: const Value(null),
     ));
     await into(accounts).insert(AccountsCompanion.insert(
-      name: kEquityAccountName, type: 'equity', initialBalance: 0.0,
+      name: kEquityAccountName, type: 'equity', initialBalance: 0,
       createdAt: Value(now), lastUpdated: Value(now), phoneNumber: const Value(null),
     ));
     await into(accounts).insert(AccountsCompanion.insert(
-      name: kInventoryAccountName, type: 'asset', initialBalance: 0.0,
+      name: kInventoryAccountName, type: 'asset', initialBalance: 0,
       createdAt: Value(now), lastUpdated: Value(now), phoneNumber: const Value(null),
     ));
     await into(accounts).insert(AccountsCompanion.insert(
-      name: kCogsAccountName, type: 'expense', initialBalance: 0.0,
+      name: kCogsAccountName, type: 'expense', initialBalance: 0,
       createdAt: Value(now), lastUpdated: Value(now), phoneNumber: const Value(null),
     ));
   }
@@ -263,11 +288,6 @@ class AppDatabase extends _$AppDatabase {
           ));
     }
   }
-
-  // ALL PUBLIC HELPER/BUSINESS LOGIC METHODS HAVE BEEN REMOVED
-  // (e.g., getAccountIdByName, updateProduct, createPosSale, etc.)
-  // They will be added to feature-specific repositories.
-
 }
 
 LazyDatabase _openConnection() {

@@ -1,25 +1,18 @@
-// lib/src/core/data/preferences_repository.dart
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:core_data/src/secure_storage_provider.dart'; // UPDATED import
+import 'package:core_data/src/secure_storage_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Provider for SharedPreferences.
-/// This MUST be overridden in main.dart
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('SharedPreferences must be overridden in main.dart');
 });
 
-/// Provider for the new repository
 final preferencesRepositoryProvider = Provider<PreferencesRepository>((ref) {
   final sharedPrefs = ref.watch(sharedPreferencesProvider);
   final secureStorage = ref.watch(flutterSecureStorageProvider);
   return PreferencesRepository(sharedPrefs, secureStorage);
 });
 
-/// A repository for managing all user-configurable settings.
-/// It abstracts whether a setting is stored securely or in plain preferences.
 class PreferencesRepository {
   PreferencesRepository(this._prefs, this._secureStorage);
 
@@ -27,7 +20,6 @@ class PreferencesRepository {
   final FlutterSecureStorage _secureStorage;
 
   // --- Keys ---
-  // Non-sensitive
   static const _kThemeMode = 'theme_mode';
   static const _kLocale = 'locale_code';
   static const _kPasscodeEnabled = 'passcode_enabled';
@@ -37,11 +29,12 @@ class PreferencesRepository {
   static const _kUserName = 'user_name';
   static const _kCompanyAddress = 'company_address';
   static const _kTaxID = 'tax_id';
-
-  // ⭐️ 1. ADD NEW KEY FOR DEFAULT CURRENCY
   static const _kDefaultCurrency = 'default_currency_code';
+  static const _kPeriodLockDate = 'period_lock_date';
+  
+  // ⭐️ NEW KEY: Costing Method
+  static const _kInventoryCostingMethod = 'inventory_costing_method';
 
-  // Sensitive
   static const _kPasscodePin = 'passcode_pin';
 
   // --- Theme ---
@@ -74,7 +67,6 @@ class PreferencesRepository {
 
   // --- Sync Warning ---
   bool hasSeenSyncWarning() => _prefs.getBool(_kHasSeenSyncWarning) ?? false;
-
   Future<void> setHasSeenSyncWarning(bool value) async =>
       await _prefs.setBool(_kHasSeenSyncWarning, value);
 
@@ -95,13 +87,27 @@ class PreferencesRepository {
   Future<void> setTaxID(String taxId) async =>
       await _prefs.setString(_kTaxID, taxId);
 
-  // ⭐️ 2. --- ADD DEFAULT CURRENCY METHODS --- ⭐️
-
-  /// Gets the user's preferred default currency code.
-  /// Defaults to "Local" for backward compatibility.
+  // --- Default Currency ---
   String getDefaultCurrencyCode() => _prefs.getString(_kDefaultCurrency) ?? 'Local';
-
-  /// Sets the user's preferred default currency code.
   Future<void> setDefaultCurrencyCode(String code) async =>
       await _prefs.setString(_kDefaultCurrency, code);
+
+  // --- Period Locking ---
+  DateTime? getPeriodLockDate() {
+    final str = _prefs.getString(_kPeriodLockDate);
+    if (str == null) return null;
+    return DateTime.tryParse(str);
+  }
+  Future<void> setPeriodLockDate(DateTime date) async {
+    await _prefs.setString(_kPeriodLockDate, date.toIso8601String());
+  }
+
+  // ⭐️ NEW METHODS: Inventory Costing ⭐️
+  
+  /// Returns 'fifo' (default) or 'weighted_average'
+  String getInventoryCostingMethod() => _prefs.getString(_kInventoryCostingMethod) ?? 'fifo';
+
+  Future<void> setInventoryCostingMethod(String method) async {
+    await _prefs.setString(_kInventoryCostingMethod, method);
+  }
 }

@@ -8,16 +8,7 @@ import 'package:googleapis_auth/auth_io.dart' as auth_io;
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-// 
-// --- THIS IS THE FIX ---
-// Import the package using the 'package:' prefix, not a relative path.
-//
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // [!code focus]
-//
-// --- END OF FIX ---
-//
-
-// Local Import
+// ⭐️ CORRECT IMPORT for EnvConfig
 import 'package:core_data/core_data.dart';
 
 const _scopes = ['https://www.googleapis.com/auth/drive.appdata'];
@@ -67,14 +58,13 @@ class AuthRepository {
           ),
         );
       } else if (Platform.isWindows) {
-        // Load secrets from the environment
-        final clientId = dotenv.env['GOOGLE_WINDOWS_CLIENT_ID'];
-        final clientSecret = dotenv.env['GOOGLE_WINDOWS_CLIENT_SECRET'];
+        // ⭐️ NEW: Load secrets from EnvConfig (Compile-Time)
+        final clientId = EnvConfig.googleWindowsClientId;
+        final clientSecret = EnvConfig.googleWindowsClientSecret;
 
-        // Check that secrets were loaded correctly
-        if (clientId == null || clientId.isEmpty || 
-            clientSecret == null || clientSecret.isEmpty) {
-          throw 'Windows Client ID/Secret not found in .env file. Please check apps/.env';
+        // ⭐️ NEW: Check using static helper
+        if (!EnvConfig.hasGoogleKeys) {
+          throw 'Windows Client ID/Secret not found. Please check your launch.json configuration.';
         }
 
         final id = auth.ClientId(clientId, clientSecret);
@@ -137,14 +127,12 @@ class AuthRepository {
             await _secureStorage.read(key: _windowsRefreshTokenKey);
         if (refreshToken == null) return null;
 
-        // Load secrets from the environment
-        final clientId = dotenv.env['GOOGLE_WINDOWS_CLIENT_ID'];
-        final clientSecret = dotenv.env['GOOGLE_WINDOWS_CLIENT_SECRET'];
+        // ⭐️ NEW: Load secrets from EnvConfig
+        final clientId = EnvConfig.googleWindowsClientId;
+        final clientSecret = EnvConfig.googleWindowsClientSecret;
 
-        // Check that secrets were loaded correctly
-        if (clientId == null || clientId.isEmpty || 
-            clientSecret == null || clientSecret.isEmpty) {
-          throw 'Windows Client ID/Secret not found in .env file. Please check apps/.env';
+        if (!EnvConfig.hasGoogleKeys) {
+           throw 'Windows Client ID/Secret not found. Please check your launch.json configuration.';
         }
 
         final id = auth.ClientId(clientId, clientSecret);

@@ -1,74 +1,80 @@
-import 'package:flutter/material.dart';
+// FILE: packages/features/feature_transactions/lib/src/presentation/pos_receipt_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
-import 'package:equatable/equatable.dart';
+import 'package:shared_ui/shared_ui.dart'; // Import the formatter
 
-@immutable
-class PosReceiptItem extends Equatable {
-  const PosReceiptItem({required this.product, required this.quantity});
-
+class PosReceiptItem {
   final Product product;
-  final int quantity;
+  final double quantity;
 
-  PosReceiptItem copyWith({Product? product, int? quantity}) {
+  PosReceiptItem({required this.product, required this.quantity});
+
+  // NEW LOGIC: product.price is now INT (Cents).
+  // Total must be calculated as (Cents * Quantity) / 100.0
+  double get totalAmount {
+    return (product.price * quantity) / 100.0;
+  }
+
+  PosReceiptItem copyWith({Product? product, double? quantity}) {
     return PosReceiptItem(
       product: product ?? this.product,
       quantity: quantity ?? this.quantity,
     );
   }
-
-  @override
-  List<Object?> get props => [product, quantity];
 }
 
-@immutable
-class PosReceiptState extends Equatable {
-  const PosReceiptState({this.items = const []});
+class PosReceiptNotifier extends StateNotifier<List<PosReceiptItem>> {
+  PosReceiptNotifier() : super([]);
 
-  final List<PosReceiptItem> items;
-
-  double get total {
-    return items.fold(
-      0.0,
-      (sum, item) => sum + (item.product.price * item.quantity),
-    );
-  }
-
-  @override
-  List<Object?> get props => [items];
-}
-
-class PosReceiptNotifier extends Notifier<PosReceiptState> {
-  @override
-  PosReceiptState build() {
-    return const PosReceiptState();
-  }
-
-  void addProduct(Product product) {
-    final currentState = state;
-    final existingItemIndex = currentState.items.indexWhere(
-      (item) => item.product.id == product.id,
-    );
-
-    if (existingItemIndex != -1) {
-      final updatedItems = List<PosReceiptItem>.from(currentState.items);
-      final existingItem = updatedItems[existingItemIndex];
-      updatedItems[existingItemIndex] = existingItem.copyWith(
-        quantity: existingItem.quantity + 1,
-      );
-      state = PosReceiptState(items: updatedItems);
+  void addItem(Product product) {
+    // Check if product exists
+    final index = state.indexWhere((item) => item.product.id == product.id);
+    if (index != -1) {
+      // Update quantity
+      final oldItem = state[index];
+      final newItem = oldItem.copyWith(quantity: oldItem.quantity + 1);
+      state = [
+        ...state.sublist(0, index),
+        newItem,
+        ...state.sublist(index + 1),
+      ];
     } else {
-      final newItem = PosReceiptItem(product: product, quantity: 1);
-      state = PosReceiptState(items: [...currentState.items, newItem]);
+      // Add new
+      state = [...state, PosReceiptItem(product: product, quantity: 1)];
     }
   }
 
+  void updateQuantity(String productId, double newQuantity) {
+    state = [
+      for (final item in state)
+        if (item.product.id == productId)
+          item.copyWith(quantity: newQuantity)
+        else
+          item
+    ];
+  }
+
+  void removeItem(String productId) {
+    state = state.where((item) => item.product.id != productId).toList();
+  }
+
   void clear() {
-    state = const PosReceiptState();
+    state = [];
+  }
+
+  // Get Total Sale Amount (in Dollars/Double)
+  double get totalSaleAmount {
+    return state.fold(0.0, (sum, item) => sum + item.totalAmount);
   }
 }
 
 final posReceiptProvider =
-    NotifierProvider<PosReceiptNotifier, PosReceiptState>(
-  PosReceiptNotifier.new,
-);
+    StateNotifierProvider<PosReceiptNotifier, List<PosReceiptItem>>((ref) {
+  return PosReceiptNotifier();
+});
+
+// Helper to get the total amount easily in the UI
+final posTotalAmountProvider = Provider<double>((ref) {
+  final items = ref.watch(posReceiptProvider);
+  return items.fold(0.0, (sum, item) => sum + item.totalAmount);
+});

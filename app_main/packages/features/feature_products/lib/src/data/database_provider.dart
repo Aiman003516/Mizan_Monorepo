@@ -1,8 +1,7 @@
-// packages/features/feature_products/lib/src/data/database_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 
-/// The placeholder database provider for this feature.
+// REFACTOR: Redirect to the central Core Database provider
 final databaseProvider = Provider<AppDatabase>((ref) {
-  throw UnimplementedError('databaseProvider must be overridden in main.dart');
+  return ref.watch(appDatabaseProvider);
 });

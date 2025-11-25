@@ -1,8 +1,10 @@
+// FILE: packages/features/feature_accounts/lib/src/data/classifications_repository.dart
+
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
-// UPDATED import to relative package
-import 'package:feature_accounts/src/data/accounts_repository.dart'; 
+// FIX: Import the provider from the correct file
+import 'package:feature_accounts/src/data/database_provider.dart';
 
 final classificationsRepositoryProvider = Provider<ClassificationsRepository>((ref) {
   final db = ref.watch(databaseProvider);
@@ -28,7 +30,6 @@ class ClassificationsRepository {
     return _db.into(_db.classifications).insert(companion);
   }
 
-  // Logic moved from database.dart
   Future<void> updateClassification(Classification classification) {
     return _db.update(_db.classifications).replace(
         classification.toCompanion(false).copyWith(lastUpdated: Value(DateTime.now())));
