@@ -210,12 +210,10 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     ref.listen(syncControllerProvider, (previous, next) {
       if (next.isLoading) return;
       if (next.hasError) {
-        final e = next.error;
-        final errorMessage = e is String ? e : e.toString();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(l10n.backupFailed(errorMessage)),
+              content: Text(l10n.backupFailed),
               backgroundColor: Colors.red,
             ),
           );

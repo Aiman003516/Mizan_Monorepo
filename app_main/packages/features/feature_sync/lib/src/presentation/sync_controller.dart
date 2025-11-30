@@ -14,29 +14,29 @@ class SyncController extends StateNotifier<AsyncValue<void>> {
 
   Future<void> runBackup() async {
     state = const AsyncLoading();
-    _ref.read(syncStatusProvider.notifier).state = SyncStatus.inProgress;
+    // Service handles setting 'backupInProgress' and 'backupSuccess'
+    // We just handle the AsyncValue state here.
 
     try {
       await _syncService.backupDatabase();
       state = const AsyncData(null);
-      _ref.read(syncStatusProvider.notifier).state = SyncStatus.success;
+      // ✂️ REMOVED: Redundant state setting
     } catch (e, st) {
       state = AsyncError(e, st);
-      _ref.read(syncStatusProvider.notifier).state = SyncStatus.error;
+      // Service handles setting 'error' status for the UI snackbar
     }
   }
 
   Future<void> runRestore() async {
     state = const AsyncLoading();
-    _ref.read(syncStatusProvider.notifier).state = SyncStatus.inProgress;
+    // Service handles setting 'restoreInProgress' and 'restoreSuccess'
 
     try {
       await _syncService.restoreDatabase();
       state = const AsyncData(null);
-      _ref.read(syncStatusProvider.notifier).state = SyncStatus.success;
+      // ✂️ REMOVED: Redundant state setting (This fixes the double message)
     } catch (e, st) {
       state = AsyncError(e, st);
-      _ref.read(syncStatusProvider.notifier).state = SyncStatus.error;
     }
   }
 }

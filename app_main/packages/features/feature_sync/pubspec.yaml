@@ -16,6 +16,14 @@ dependencies:
   # Local Dependencies
   core_database:
     path: ../../core/core_database
+
+# --- Architecture Modules ---
+  core_data:
+    path: ../../core/core_data
+    
+  # --- Cloud Capabilities ---
+  cloud_firestore: ^5.0.0  # <--- NEW: The Sync Engine needs this
+  firebase_auth: ^5.0.0    # <--- NEW: To know WHO is syncing    
   
   # Feature Dependencies
   feature_auth:

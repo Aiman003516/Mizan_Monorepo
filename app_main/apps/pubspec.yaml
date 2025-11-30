@@ -1,5 +1,3 @@
-# This is your application's pubspec.yaml.
-# It MUST be inside the 'app_mizan' folder.
 name: mizan
 description: "The main Mizan Flutter application."
 publish_to: 'none'
@@ -16,10 +14,12 @@ dependencies:
 
   flutter_riverpod: ^2.6.1
   shared_preferences: ^2.5.3
+  flutter_svg: ^2.0.10
+  
+  # --- NEW: Required for Firebase.initializeApp() in main.dart ---
+  firebase_core: ^3.6.0
 
-  #
   # --- Local Modular Packages ---
-  #
   core_database:
     path: ../packages/core/core_database
   core_data:
@@ -51,10 +51,35 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  # ⚡ UPGRADE: We need 0.14.2+ for the 'inset' feature
+  flutter_launcher_icons: ^0.14.2
+
+# 🖼️ VISUAL ENGINEERING: THE "VIRTUAL PADDING" STRATEGY
+flutter_launcher_icons:
+  android: "launcher_icon"
+  
+  # 1. LEGACY (Android 7 and below)
+  # Uses the full sharp image. Old phones don't crop as aggressively.
+  image_path: "assets/images/mizan_full.png"
+  
+  # 2. ADAPTIVE (Android 8+)
+  adaptive_icon_background: "#FFFFFF"
+  
+  # We use the FULL SHARP image here too:
+  adaptive_icon_foreground: "assets/images/mizan_full.png"
+  
+  # 🔒 THE MAGIC FIX:
+  # This tells the build system to add 25% padding around the logo.
+  # It shrinks the logo VISUALLY into the Safe Zone, but keeps the PIXELS sharp.
+  # If it is still too big, increase this to 30 or 35.
+  adaptive_icon_foreground_inset: 25
+  
+  windows:
+    generate: true
+    image_path: "assets/images/mizan_full.png"
+    icon_size: 48
 
 flutter:
-
- 
   generate: true
   uses-material-design: true
   assets:

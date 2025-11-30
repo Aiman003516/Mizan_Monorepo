@@ -5,24 +5,23 @@ import 'package:feature_accounts/feature_accounts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' as d;
-import 'package:audioplayers/audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart'; // 🔊 Core Audio Package
 import 'package:printing/printing.dart';
 
 // Core Imports
 import 'package:core_l10n/app_localizations.dart';
-import 'package:core_database/core_database.dart';
 import 'package:core_data/core_data.dart';
 
 // Shared Imports
-import 'package:shared_ui/shared_ui.dart'; // Formatter
+import 'package:shared_ui/shared_ui.dart';
 
 // Feature Imports
 // FIX: Hide databaseProvider from feature_products to avoid conflict
-import 'package:feature_products/feature_products.dart' hide databaseProvider, accountsRepositoryProvider;
+import 'package:feature_products/feature_products.dart' hide accountsRepositoryProvider;
 
 // Local Feature Imports
 import 'package:feature_transactions/src/data/transactions_repository.dart';
-import 'package:feature_transactions/src/data/database_provider.dart'; // Explicit Local DB Provider
+import 'package:feature_transactions/src/data/database_provider.dart';
 import 'package:feature_transactions/src/data/receipt_service.dart';
 import 'package:feature_transactions/src/presentation/pos_receipt_provider.dart';
 import 'package:feature_transactions/src/presentation/barcode_scanner_screen.dart';
@@ -44,14 +43,49 @@ class _PosScreenState extends ConsumerState<PosScreen> {
   final _barcodeController = TextEditingController();
   final _barcodeFocusNode = FocusNode();
 
+  // 🔊 AUDIO ENGINE
   late final AudioPlayer _audioPlayer;
-  final _beepSound = AssetSource('audio/beep.mp3');
+  // Note: AssetSource automatically looks in 'assets/'. 
+  // Ensure 'assets/audio/beep.mp3' is declared in pubspec.yaml
+  final _beepSound = AssetSource('audio/beep.mp3'); 
 
   @override
   void initState() {
     super.initState();
+    _initAudioEngine();
+  }
+
+  /// 🔊 SENSORY LAYER IMPLEMENTATION
+  Future<void> _initAudioEngine() async {
     _audioPlayer = AudioPlayer();
-    _audioPlayer.setReleaseMode(ReleaseMode.stop);
+
+
+    final AudioContext audioContext = AudioContext(
+      android: const AudioContextAndroid(
+        isSpeakerphoneOn: false,
+        stayAwake: false,
+        contentType: AndroidContentType.sonification,
+        usageType: AndroidUsageType.assistanceSonification,
+        audioFocus: AndroidAudioFocus.gainTransientMayDuck, // <--- KEY: Ducking
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.ambient, // Mix with other audio
+      ),
+    );
+    
+    await _audioPlayer.setAudioContext(audioContext);
+
+    // 2. Windows Hot-Load (The "Zero Latency" Fix)
+    // We set the mode to 'stop' so it resets instantly after playing.
+    await _audioPlayer.setReleaseMode(ReleaseMode.stop);
+    
+    // CRITICAL: We load the file into memory NOW, before the user scans.
+    // This eliminates the "Cold Start" lag on Windows.
+    try {
+      await _audioPlayer.setSource(_beepSound);
+    } catch (e) {
+      debugPrint("⚠️ Audio Preload Failed: $e");
+    }
   }
 
   @override
@@ -80,7 +114,12 @@ class _PosScreenState extends ConsumerState<PosScreen> {
 
     if (product != null) {
       ref.read(posReceiptProvider.notifier).addItem(product);
-      _audioPlayer.play(_beepSound);
+      
+      // 🔊 INSTANT PLAYBACK
+      // Because we used setSource() in initState, the OS audio driver is awake 
+      // and the file is in RAM. resume() is the fastest trigger.
+      _audioPlayer.resume(); 
+
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.productNotFound(barcode))),
@@ -96,6 +135,11 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       ),
     ));
   }
+
+  // ... [REMAINING UI CODE IS UNCHANGED] ...
+  // (Keep _showOrderDetailsDialog, _saveAndPrintOrder, build, ProductSelectionPanel, 
+  // ReceiptPanel, _CartSummaryPanel, and _OrderDetailsDialog exactly as they were 
+  // in the previous version)
 
   void _showOrderDetailsDialog(BuildContext context) {
     // This reads the current state of the provider (CompanyProfileData)
@@ -313,8 +357,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
   }
 }
 
-// ... ProductSelectionPanel and ReceiptPanel remain unchanged ...
-// They are purely presentation components.
+// ... Helper classes (ProductSelectionPanel, etc.) remain as they were in the previous successful file content ...
+// Including them here for completeness if you paste the whole file.
+
 class ProductSelectionPanel extends ConsumerWidget {
   final double bottomPadding;
   const ProductSelectionPanel({super.key, this.bottomPadding = 0});
@@ -507,7 +552,6 @@ class _CartSummaryPanel extends ConsumerWidget {
   }
 }
 
-// ⭐️ UPDATED: Concurrency Lock Implementation ⭐️
 class _OrderDetailsDialog extends ConsumerStatefulWidget {
   final ScrollController scrollController;
   final Future<void> Function(PaymentMethod) onSaveAndPrint;
@@ -699,8 +743,6 @@ class _OrderDetailsDialogState extends ConsumerState<_OrderDetailsDialog> {
                             await widget.onSaveAndPrint(selectedMethod);
                           } finally {
                             // 3. RELEASE LOCK (If widget is still alive)
-                            // Note: If success, the dialog closes, so this might not run.
-                            // That is fine. If failure, this re-enables the button.
                             if (mounted) {
                               setState(() {
                                 _isProcessing = false;

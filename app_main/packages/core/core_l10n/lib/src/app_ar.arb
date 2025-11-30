@@ -431,24 +431,8 @@
   },
   "createLocalBackupPrompt": "سيؤدي هذا إلى إنشاء ملف نسخ احتياطي محلي (mizan.db) في مجلد تختاره. يمكنك استخدام هذا الملف لاستعادة بياناتك على هذا الجهاز أو جهاز آخر.",
   "backup": "نسخ احتياطي",
-  "backupSuccessful": "نجح النسخ الاحتياطي! تم حفظ الملف في: {path}",
-  "@backupSuccessful": {
-    "placeholders": {
-      "path": {
-        "type": "String",
-        "example": "/Downloads/mizan_backup.db"
-      }
-    }
-  },
-  "backupFailed": "فشل النسخ الاحتياطي: {error}",
-  "@backupFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "الأذن مرفوض"
-      }
-    }
-  },
+  "backupSuccessful": "تم النسخ الاحتياطي",
+  "backupFailed": "فشل النسخ الاحتياطي",
   "restoreSuccessful": "نجحت الاستعادة",
   "restoreSuccessMessage": "تمت استعادة بياناتك. يرجى إعادة تشغيل التطبيق الآن.",
   "learnMore": "اعرف المزيد",

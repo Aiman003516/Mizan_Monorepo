@@ -11,6 +11,9 @@ dependencies:
   flutter_riverpod: ^2.6.1
   flutter_secure_storage: ^9.2.4
   shared_preferences: ^2.5.3
+  firebase_core: ^3.0.0
+  firebase_auth: ^5.0.0
+  cloud_firestore: ^5.0.0
 
   core_database:
     path: ../core_database

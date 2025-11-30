@@ -6,3 +6,5 @@ export 'src/company_profile_controller.dart';
 export 'package:core_database/core_database.dart';
 export 'src/env_config.dart';
 export 'src/bootstrap.dart';
+export 'src/firebase_options_selector.dart';
+export 'src/models/rbac_models.dart';

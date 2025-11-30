@@ -2,14 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// UPDATED Local Imports
+// Local Imports
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_data/core_data.dart';
 import 'package:feature_settings/src/presentation/company_profile_screen.dart';
 import 'package:feature_settings/src/presentation/security_settings_screen.dart';
 import 'package:feature_settings/src/presentation/currency_settings_screen.dart';
 
-// We will create this package soon. This error is expected.
+// Import Sync Feature
 import 'package:feature_sync/feature_sync.dart'; 
 
 import 'package:url_launcher/url_launcher.dart';
@@ -20,9 +20,10 @@ class SettingsScreen extends ConsumerWidget {
   Future<void> _showRestoreDialog(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
 
-    // This provider will be defined in feature_sync. This error is expected.
-    final syncStatus = ref.read(syncStatusProvider); 
-    if (syncStatus == SyncStatus.inProgress) return;
+    final syncStatus = ref.read(syncStatusProvider);
+    
+    if (syncStatus == SyncStatus.backupInProgress || 
+        syncStatus == SyncStatus.restoreInProgress) return;
 
     final didConfirm = await showDialog<bool>(
       context: context,
@@ -46,7 +47,6 @@ class SettingsScreen extends ConsumerWidget {
     );
 
     if (didConfirm == true) {
-      // This provider will be defined in feature_sync. This error is expected.
       await ref.read(syncControllerProvider.notifier).runRestore();
     }
   }
@@ -115,7 +115,8 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           RadioListTile<Locale?>(
             title: Text(l10n.english),
-            value: const Locale('en'),
+            // ⚡ FIX: Removed 'const' because some environments flag it as invalid with nullable generics
+            value: Locale('en'), 
             groupValue: currentLocale,
             onChanged: (locale) {
               ref.read(localeControllerProvider.notifier).setLocale(locale);
@@ -124,7 +125,8 @@ class SettingsScreen extends ConsumerWidget {
           ),
           RadioListTile<Locale?>(
             title: Text(l10n.arabic),
-            value: const Locale('ar'),
+            // ⚡ FIX: Removed 'const'
+            value: Locale('ar'), 
             groupValue: currentLocale,
             onChanged: (locale) {
               ref.read(localeControllerProvider.notifier).setLocale(locale);
@@ -140,30 +142,43 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
-    // This provider will be defined in feature_sync. This error is expected.
-    final syncState = ref.watch(syncControllerProvider);
-    final isSyncing = syncState.isLoading;
+    final syncStatus = ref.watch(syncStatusProvider);
+    final isBackingUp = syncStatus == SyncStatus.backupInProgress;
+    final isRestoring = syncStatus == SyncStatus.restoreInProgress;
+    final isBusy = isBackingUp || isRestoring; 
 
-    ref.listen(syncControllerProvider, (previous, next) {
-      if (next.isLoading) return;
-      if (next.hasError) {
-        final e = next.error;
-        final errorMessage = e is String ? e : e.toString();
+    // 👂 LISTENER 1: Success Messages
+    ref.listen<SyncStatus>(syncStatusProvider, (previous, next) {
+      if (next == SyncStatus.backupSuccess) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.backupFailed(errorMessage)),
-              backgroundColor: Colors.red,
+            // ⚡ FIX: Removed 'const' here because l10n.backupSuccessful is a runtime variable
+            SnackBar( 
+              content: Text(l10n.backupSuccessful), 
+              backgroundColor: Colors.green,
             ),
           );
         }
-      }
-      if (!next.hasError && (previous?.isLoading ?? false)) {
+      } else if (next == SyncStatus.restoreSuccess) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.restoreSuccessful),
               backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+    });
+
+    // 👂 LISTENER 2: Error Messages
+    ref.listen(syncControllerProvider, (previous, next) {
+      if (next.hasError && !next.isLoading) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.backupFailed),
+              backgroundColor: Colors.red,
             ),
           );
         }
@@ -221,7 +236,7 @@ class SettingsScreen extends ConsumerWidget {
               Text(l10n.dataAndSync, style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
         ListTile(
-          leading: isSyncing
+          leading: isBackingUp
               ? const SizedBox(
                   width: 24,
                   height: 24,
@@ -229,12 +244,12 @@ class SettingsScreen extends ConsumerWidget {
               : const Icon(Icons.sync),
           title: Text(l10n.backupNow),
           subtitle: Text(l10n.backupHint),
-          onTap: isSyncing
+          onTap: isBusy
               ? null
               : () => ref.read(syncControllerProvider.notifier).runBackup(),
         ),
         ListTile(
-          leading: isSyncing
+          leading: isRestoring
               ? const SizedBox(
                   width: 24,
                   height: 24,
@@ -243,7 +258,7 @@ class SettingsScreen extends ConsumerWidget {
           title: Text(l10n.restoreFromBackup,
               style: const TextStyle(color: Colors.redAccent)),
           subtitle: Text(l10n.restoreWarning),
-          onTap: isSyncing ? null : () => _showRestoreDialog(context, ref),
+          onTap: isBusy ? null : () => _showRestoreDialog(context, ref),
         ),
         const Divider(),
         Card(

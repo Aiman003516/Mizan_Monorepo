@@ -71,14 +71,14 @@ class DashboardScreen extends ConsumerWidget {
 
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text(l10n.backupSuccessful(destinationPath)),
+          content: Text(l10n.backupSuccessful),
           backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text(l10n.backupFailed(e.toString())),
+          content: Text(l10n.backupFailed),
           backgroundColor: Colors.red,
         ),
       );

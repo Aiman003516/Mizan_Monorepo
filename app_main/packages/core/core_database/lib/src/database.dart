@@ -12,12 +12,23 @@ part 'database.g.dart';
 
 const Uuid _uuid = Uuid();
 
+// 🧬 THE SCHEMA DNA
 abstract class MizanTable extends Table {
   TextColumn get id => text().clientDefault(() => _uuid.v4())();
   DateTimeColumn get createdAt =>
       dateTime().clientDefault(() => DateTime.now())();
+  
+  // This serves as the "last_modified" for the Sync Engine
   DateTimeColumn get lastUpdated =>
       dateTime().clientDefault(() => DateTime.now())();
+
+  // --- ☁️ SAAS TRANSFORMATION MARKERS ---
+  
+  // 1. The Tenant ID (Nullable for Free Tier)
+  TextColumn get tenantId => text().nullable()();
+
+  // 2. The Soft Delete Flag
+  BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -55,20 +66,11 @@ class ReconciledTransactions extends MizanTable {
 // ⭐️ NEW TABLE: INVENTORY LAYERS (The "Isolated Ledger")
 @DataClassName('InventoryCostLayer')
 class InventoryCostLayers extends MizanTable {
-  // Which product does this layer belong to?
   TextColumn get productId => text().references(Products, #id, onDelete: KeyAction.cascade)();
-  
-  // When did we buy this batch? (Crucial for FIFO)
   DateTimeColumn get purchaseDate => dateTime()();
-  
-  // How many did we buy originally?
   RealColumn get quantityPurchased => real()();
-  
-  // How many are LEFT in this specific batch? (This decreases as we sell)
   RealColumn get quantityRemaining => real()();
-  
-  // What was the cost PER UNIT for this specific batch? (In Cents)
-  IntColumn get costPerUnit => integer()(); 
+  IntColumn get costPerUnit => integer()(); // Cents
 }
 
 // --- CORE TABLES ---
@@ -174,19 +176,20 @@ class OrderItems extends MizanTable {
   AdjustingEntryTasks,
   BankReconciliations,
   ReconciledTransactions,
-  InventoryCostLayers, // ⭐️ Registered New Table
+  InventoryCostLayers,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  // ⭐️ BUMPED VERSION: 16 -> 17
+  // ⭐️ BUMPED VERSION: 17 -> 18
   @override
-  int get schemaVersion => 17;
+  int get schemaVersion => 18;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (Migrator m) async {
       await m.createAll();
+      // 🛡️ IDEMPOTENT SEEDING: Safe to run multiple times
       await _createInitialAccounts();
       await _createInitialClassifications();
       await _createInitialCurrencies();
@@ -202,8 +205,31 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(reconciledTransactions);
       }
       if (from < 17) {
-        // Phase 3.2 Migration
         await m.createTable(inventoryCostLayers);
+      }
+      
+      // 🚀 PHASE 2: SAAS MIGRATION (Version 18)
+      if (from < 18) {
+        // We cast these to MizanTable so we can access tenantId/isDeleted
+        final tables = [
+           categories, products, classifications, accounts, 
+           transactions, transactionEntries, currencies, paymentMethods, 
+           orders, orderItems, adjustingEntryTasks, 
+           bankReconciliations, reconciledTransactions, inventoryCostLayers
+        ];
+
+        for (final table in tables) {
+           // 🛡️ THE SAFETY CAST
+           await m.addColumn(
+             table as TableInfo<Table, dynamic>, 
+             table.tenantId as GeneratedColumn<Object>
+           );
+           
+           await m.addColumn(
+             table as TableInfo<Table, dynamic>, 
+             table.isDeleted as GeneratedColumn<Object>
+           );
+        }
       }
     },
     beforeOpen: (details) async {
@@ -213,6 +239,12 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> _createInitialAccounts() async {
     final now = DateTime.now();
+    
+    // 🛡️ CHECK BEFORE INSERT: Avoid duplicating accounts
+    // Since 'name' is not unique in the DB schema, we manually check.
+    final existing = await (select(accounts)..where((t) => t.name.equals(kCashAccountName))).get();
+    if (existing.isNotEmpty) return;
+
     await into(accounts).insert(AccountsCompanion.insert(
       name: kCashAccountName, type: 'asset', initialBalance: 0,
       createdAt: Value(now), lastUpdated: Value(now), phoneNumber: const Value(null),
@@ -237,40 +269,46 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> _createInitialClassifications() async {
     final now = DateTime.now();
+    // 🛡️ INSERT OR IGNORE: Skips if 'name' (Unique) already exists
     await into(classifications).insert(ClassificationsCompanion.insert(
       name: kClassificationClients, createdAt: Value(now), lastUpdated: Value(now),
-    ));
+    ), mode: InsertMode.insertOrIgnore);
+    
     await into(classifications).insert(ClassificationsCompanion.insert(
       name: kClassificationSuppliers, createdAt: Value(now), lastUpdated: Value(now),
-    ));
+    ), mode: InsertMode.insertOrIgnore);
+    
     await into(classifications).insert(ClassificationsCompanion.insert(
       name: kClassificationGeneral, createdAt: Value(now), lastUpdated: Value(now),
-    ));
+    ), mode: InsertMode.insertOrIgnore);
   }
   
   Future<void> _createInitialCurrencies() async {
     final now = DateTime.now();
+    // 🛡️ INSERT OR IGNORE: Skips if 'code' (Unique) already exists
     await into(currencies).insert(CurrenciesCompanion.insert(
       code: 'Local',
       name: 'Local Currency',
       symbol: const Value(null),
       createdAt: Value(now),
       lastUpdated: Value(now),
-    ));
+    ), mode: InsertMode.insertOrIgnore);
+    
     await into(currencies).insert(CurrenciesCompanion.insert(
       code: 'USD',
       name: 'US Dollar',
       symbol: const Value('\$'),
       createdAt: Value(now),
       lastUpdated: Value(now),
-    ));
+    ), mode: InsertMode.insertOrIgnore);
+    
     await into(currencies).insert(CurrenciesCompanion.insert(
       code: 'SAR',
       name: 'Saudi Riyal',
       symbol: const Value('﷼'),
       createdAt: Value(now),
       lastUpdated: Value(now),
-    ));
+    ), mode: InsertMode.insertOrIgnore);
   }
 
   Future<void> _createInitialPaymentMethods() async {
@@ -280,12 +318,13 @@ class AppDatabase extends _$AppDatabase {
 
     if (cashAccount != null) {
       final now = DateTime.now();
+      // 🛡️ INSERT OR IGNORE: Skips if 'name' (Unique) already exists
       await into(paymentMethods).insert(PaymentMethodsCompanion.insert( 
             name: 'Cash',
             accountId: cashAccount.id,
             createdAt: Value(now),
             lastUpdated: Value(now),
-          ));
+          ), mode: InsertMode.insertOrIgnore);
     }
   }
 }

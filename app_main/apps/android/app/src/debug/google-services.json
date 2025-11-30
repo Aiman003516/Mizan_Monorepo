@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "727794500558",
+    "project_id": "mizan-dev",
+    "storage_bucket": "mizan-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:727794500558:android:7e959d920745e50515619f",
+        "android_client_info": {
+          "package_name": "com.example.mizan.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "727794500558-bddeukauact3t9970ji4rqvcki1lvl05.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mizan.dev",
+            "certificate_hash": "6cade1d0b377c3e65483e9cb11acc9b3aa19eda2"
+          }
+        },
+        {
+          "client_id": "727794500558-f1fqbee2nmq9agop5n3kch0algm3ffc3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mizan.dev",
+            "certificate_hash": "c209e8df707ae88a71814b7b69c4bd48a35198b4"
+          }
+        },
+        {
+          "client_id": "727794500558-1u69plnkgvem4a8bduk23iavrfo3ijj6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1lx2N7A3bTvA1Nal3bTXBdvjcxra0GKQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "727794500558-1u69plnkgvem4a8bduk23iavrfo3ijj6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

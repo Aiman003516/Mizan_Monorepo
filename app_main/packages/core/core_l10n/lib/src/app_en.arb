@@ -431,24 +431,8 @@
   },
   "createLocalBackupPrompt": "This will create a local backup file (mizan.db) in a folder you choose. You can use this file to restore your data on this or another device.",
   "backup": "Backup",
-  "backupSuccessful": "Backup successful! File saved to: {path}",
-  "@backupSuccessful": {
-    "placeholders": {
-      "path": {
-        "type": "String",
-        "example": "/Downloads/mizan_backup.db"
-      }
-    }
-  },
-  "backupFailed": "Backup failed: {error}",
-  "@backupFailed": {
-    "placeholders": {
-      "error": {
-        "type": "String",
-        "example": "Permission denied"
-      }
-    }
-  },
+  "backupSuccessful": "Backup successful",
+  "backupFailed": "Backup failed",
   "restoreSuccessful": "Restore Successful",
   "restoreSuccessMessage": "Your data has been restored. Please restart the app now.",
   "learnMore": "Learn More",

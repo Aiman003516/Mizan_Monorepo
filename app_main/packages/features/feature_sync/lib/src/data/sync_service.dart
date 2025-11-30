@@ -2,23 +2,25 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 
-// UPDATED Local Imports
 import 'package:core_database/core_database.dart';
 import 'package:feature_auth/feature_auth.dart';
 
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-// This provider must be overridden in app_mizan
-final databaseProvider = Provider<AppDatabase>((ref) {
-  throw UnimplementedError('databaseProvider must be overridden');
-});
-
 final syncServiceProvider = Provider<SyncService>((ref) {
   return SyncService(ref);
 });
 
-enum SyncStatus { idle, inProgress, success, error }
+// ⚡ FIX: Split the states so Backup and Restore don't confuse each other
+enum SyncStatus { 
+  idle, 
+  backupInProgress, 
+  restoreInProgress, 
+  backupSuccess, 
+  restoreSuccess, 
+  error 
+}
 
 final syncStatusProvider = StateProvider<SyncStatus>((ref) => SyncStatus.idle);
 
@@ -42,24 +44,29 @@ class SyncService {
   }
 
   Future<void> backupDatabase() async {
-    _ref.read(syncStatusProvider.notifier).state = SyncStatus.inProgress;
-    final db = _ref.read(databaseProvider);
-    final driveApi = await _getDriveApi();
-
-    File? dbFile;
+    // ⚡ SET SPECIFIC STATE
+    _ref.read(syncStatusProvider.notifier).state = SyncStatus.backupInProgress;
+    
+    final db = _ref.read(appDatabaseProvider);
+    
+    // Reset state after a delay or on error, but we handle success explicitly
     File? backupFile;
 
     try {
-      dbFile = await _getDbFile();
-      if (!await dbFile.exists()) {
-        throw Exception('Database file not found.');
+      final driveApi = await _getDriveApi(); // Moved inside try to catch auth errors
+      
+      final tempDir = await getTemporaryDirectory();
+      final backupPath = p.join(tempDir.path, _backupFileName);
+      backupFile = File(backupPath);
+
+      if (await backupFile.exists()) {
+        await backupFile.delete();
       }
 
-      await db.close();
+      // Safe Backup
+      await db.customStatement('VACUUM INTO ?', [backupPath]);
 
-      final tempDir = await getTemporaryDirectory();
-      backupFile = await dbFile.copy(p.join(tempDir.path, _backupFileName));
-
+      // --- Upload ---
       final response = await driveApi.files.list(
         spaces: 'appDataFolder',
         q: "name='$_backupFileName'",
@@ -84,33 +91,42 @@ class SyncService {
         );
       }
 
-      _ref.read(syncStatusProvider.notifier).state = SyncStatus.success;
+      // ⚡ SPECIFIC SUCCESS
+      _ref.read(syncStatusProvider.notifier).state = SyncStatus.backupSuccess;
 
     } catch (e) {
+      print("Backup Error: $e");
       _ref.read(syncStatusProvider.notifier).state = SyncStatus.error;
       rethrow;
     } finally {
-      // This will re-open the connection
-      _ref.refresh(databaseProvider); 
-
       try {
         if (backupFile != null && await backupFile.exists()) {
           await backupFile.delete();
         }
       } catch (e) {
-        print('Error cleaning up backup file: $e');
+        print('Error cleaning up: $e');
       }
+      
+      // Auto-reset state after 2 seconds so the success message disappears/resets
+      Future.delayed(const Duration(seconds: 2), () {
+        if (_ref.read(syncStatusProvider) == SyncStatus.backupSuccess) {
+          _ref.read(syncStatusProvider.notifier).state = SyncStatus.idle;
+        }
+      });
     }
   }
 
   Future<void> restoreDatabase() async {
-    _ref.read(syncStatusProvider.notifier).state = SyncStatus.inProgress;
-    final db = _ref.read(databaseProvider);
-    final driveApi = await _getDriveApi();
-
+    // ⚡ SET SPECIFIC STATE
+    _ref.read(syncStatusProvider.notifier).state = SyncStatus.restoreInProgress;
+    
+    final db = _ref.read(appDatabaseProvider);
+    
     File? dbFile;
 
     try {
+      final driveApi = await _getDriveApi(); // Auth check inside try block
+
       final response = await driveApi.files.list(
         spaces: 'appDataFolder',
         q: "name='$_backupFileName'",
@@ -124,6 +140,7 @@ class SyncService {
       final fileId = response.files!.first.id!;
       dbFile = await _getDbFile();
 
+      // For Restore, we must close the DB
       await db.close();
 
       final media = await driveApi.files.get(
@@ -135,13 +152,23 @@ class SyncService {
       await media.stream.pipe(fileSink);
       await fileSink.close();
 
-      _ref.read(syncStatusProvider.notifier).state = SyncStatus.success;
+      // ⚡ SPECIFIC SUCCESS
+      _ref.read(syncStatusProvider.notifier).state = SyncStatus.restoreSuccess;
 
     } catch (e) {
+      print("Restore Error: $e");
       _ref.read(syncStatusProvider.notifier).state = SyncStatus.error;
       rethrow;
     } finally {
-      _ref.refresh(databaseProvider);
+      // Resurrection
+      _ref.refresh(appDatabaseProvider);
+      
+      // Auto-reset state
+      Future.delayed(const Duration(seconds: 2), () {
+        if (_ref.read(syncStatusProvider) == SyncStatus.restoreSuccess) {
+          _ref.read(syncStatusProvider.notifier).state = SyncStatus.idle;
+        }
+      });
     }
   }
 }

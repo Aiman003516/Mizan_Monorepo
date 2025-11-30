@@ -1,5 +1,3 @@
-// FILE: packages/features/feature_accounts/lib/src/presentation/add_account_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,11 +48,13 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       _phoneNumberController.text = account.phoneNumber ?? '';
       _selectedAccountType = account.type;
       if (account.classificationId != null) {
+        // 🛠️ FIX APPLIED HERE: Added missing isDeleted parameter
         _selectedClassification = Classification(
           id: account.classificationId!,
           name: 'Loading...', 
           createdAt: DateTime.now(),
           lastUpdated: DateTime.now(),
+          isDeleted: false, // <--- The Missing Argument
         );
       }
     }

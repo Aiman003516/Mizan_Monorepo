@@ -4,17 +4,19 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 import 'package:core_database/src/initial_constants.dart' as c;
-// FIX: Import the provider from its source, do not redefine it
 import 'package:feature_accounts/src/data/database_provider.dart';
 
 final accountsRepositoryProvider = Provider<AccountsRepository>((ref) {
   final db = ref.watch(databaseProvider);
-  return AccountsRepository(db);
+  // 🛡️ TEMP FIX: Hardcode Tenant ID for Phase 3 Testing
+  return AccountsRepository(db, tenantId: 'test_tenant_123');
 });
 
 class AccountsRepository {
-  AccountsRepository(this._db);
   final AppDatabase _db;
+  final String? tenantId; // 🌍 The Scope Context
+
+  AccountsRepository(this._db, {this.tenantId});
 
   Stream<List<Account>> watchAllAccounts() {
     return (_db.select(_db.accounts)
@@ -36,26 +38,33 @@ class AccountsRepository {
   Future<void> createAccount({
     required String name,
     required String type,
-    double initialBalance = 0.0, // Kept as double for API consistency
+    double initialBalance = 0.0,
     String? phoneNumber,
     String? classificationId,
   }) {
-    // FIX: Convert Double (Dollars) to Int (Cents)
     final int balanceCents = (initialBalance * 100).round();
 
     final companion = AccountsCompanion.insert(
       name: name,
       type: type,
-      initialBalance: balanceCents, // Pass Int
+      initialBalance: balanceCents,
       phoneNumber: Value(phoneNumber),
       classificationId: Value(classificationId),
+      // 🚀 INJECT TENANT ID
+      tenantId: Value(tenantId),
     );
     return _db.into(_db.accounts).insert(companion);
   }
 
   Future<void> updateAccount(Account account) {
+    // 🚀 PRESERVE TENANT ID ON UPDATE
+    // When updating, we usually keep the existing tenantId, 
+    // but ensuring it matches the current scope is safer.
     return _db.update(_db.accounts).replace(
-        account.toCompanion(false).copyWith(lastUpdated: Value(DateTime.now())));
+        account.toCompanion(false).copyWith(
+          lastUpdated: Value(DateTime.now()),
+          tenantId: Value(tenantId), // Ensure ownership stays correct
+        ));
   }
 
   Future<void> deleteAccount(String id) {
@@ -83,16 +92,13 @@ class AccountsRepository {
     return account?.id;
   }
 
-  // FIX: Use SQL Aggregation (selectOnly) for performance
   Future<double> getAccountBalance(String accountId) async {
-    // 1. Get Initial Balance (Int)
     final account = await (_db.select(_db.accounts)
           ..where((tbl) => tbl.id.equals(accountId)))
         .getSingleOrNull();
 
     final int initialBalanceCents = account?.initialBalance ?? 0;
 
-    // 2. Sum Transactions (SQL SUM)
     final entries = _db.transactionEntries;
     final amountSum = entries.amount.sum();
 
@@ -101,11 +107,9 @@ class AccountsRepository {
       ..addColumns([amountSum]))
       .getSingleOrNull();
 
-    // 3. Calculate Total
     final int transactionTotalCents = result?.read(amountSum) ?? 0;
     final int totalCents = initialBalanceCents + transactionTotalCents;
 
-    // 4. Convert to Double for UI
     return totalCents / 100.0;
   }
 }

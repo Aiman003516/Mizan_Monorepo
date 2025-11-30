@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 // --- Core Packages ---
 import 'package:core_l10n/app_localizations.dart';
-import 'package:core_data/core_data.dart'; // Exports Bootstrap, Preferences, EnvConfig
+import 'package:core_data/core_data.dart'; // Exports Bootstrap, Preferences, EnvConfig, MizanFirebaseConfig
 
 // --- Feature Packages ---
 import 'package:feature_dashboard/feature_dashboard.dart';
+// 🚀 NEW: Import Sync Feature to access the service
+import 'package:feature_sync/feature_sync.dart';
 
 // --- Feature Aliases (For Context-Aware Overrides) ---
 import 'package:feature_transactions/feature_transactions.dart' as transactions_ui;
@@ -16,18 +19,20 @@ import 'package:feature_transactions/feature_transactions.dart' as transactions_
 import 'src/app_localizations_provider.dart' as app_l10n;
 
 Future<void> main() async {
-  // 1. Run the Bootstrap System
-  // This single line handles:
-  // - WidgetsBinding.ensureInitialized()
-  // - initializing SharedPreferences
-  // - initializing the Database
-  // - creating the list of secure Provider Overrides
-  // Note: Secrets are now injected via --dart-define (EnvConfig), not .env
+  // 1. Initialize Bindings Explicitly
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 2. Ignite the Cloud Engine (The Logic Switch)
+  // Checks EnvConfig.appEnv and picks Dev/Prod keys automatically.
+  await Firebase.initializeApp(
+    options: MizanFirebaseConfig.currentPlatform,
+  );
+
+  // 3. Run the Bootstrap System (Local Engine)
   final overrides = await Bootstrap.init();
 
   runApp(
     ProviderScope(
-      // We simply pass the pre-calculated overrides from Bootstrap
       overrides: overrides,
       child: const MyApp(),
     ),
@@ -39,9 +44,13 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // These providers are now safely initialized by Bootstrap
     final themeMode = ref.watch(themeControllerProvider);
     final locale = ref.watch(localeControllerProvider);
+
+    // 🚀 IGNITION SEQUENCE
+    // We watch the Cloud Sync Service here to ensure it stays alive
+    // as long as the app is running. This triggers the 'startSync()' logic.
+    final _ = ref.watch(cloudSyncServiceProvider);
 
     return MaterialApp(
       title: 'Mizan',
@@ -78,8 +87,6 @@ class MyApp extends ConsumerWidget {
           return ProviderScope(
             overrides: [
               // Context-Aware Override
-              // This MUST stay here because it requires the 'context' 
-              // which is only available inside the Builder.
               transactions_ui.appLocalizationsProvider.overrideWith(
                 (ref) => ref.watch(app_l10n.contextualAppLocalizationsProvider(context)),
               ),

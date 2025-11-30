@@ -26,7 +26,10 @@ final transactionsRepositoryProvider = Provider<TransactionsRepository>((ref) {
   final db = ref.watch(databaseProvider);
   final accountsRepo = ref.watch(accountsRepositoryProvider);
   final prefsRepo = ref.watch(preferencesRepositoryProvider);
-  return TransactionsRepository(db, accountsRepo, const Uuid(), prefsRepo);
+  
+  // 🛡️ TEMP FIX: Hardcode Tenant ID to match CloudSyncService
+  // In Phase 4, we will read this from the AuthRepository.
+  return TransactionsRepository(db, accountsRepo, const Uuid(), prefsRepo, tenantId: 'test_tenant_123');
 });
 
 final orderForTransactionProvider =
@@ -42,12 +45,14 @@ final orderItemsStreamProvider =
 });
 
 class TransactionsRepository {
-  TransactionsRepository(this._db, this._accountsRepo, this._uuid, this._prefsRepo);
+  // Added optional tenantId parameter
+  TransactionsRepository(this._db, this._accountsRepo, this._uuid, this._prefsRepo, {this.tenantId});
 
   final AppDatabase _db;
   final AccountsRepository _accountsRepo;
   final Uuid _uuid;
   final PreferencesRepository _prefsRepo;
+  final String? tenantId; // 🌍 The Scope Context
 
   /// 🔒 THE GUARD CLAUSE
   void _enforcePeriodLock(DateTime date) {
@@ -102,13 +107,9 @@ class TransactionsRepository {
 
   // --- 🏭 THE COSTING ENGINE (Phase 3.2) ---
 
-  /// Calculates COGS based on FIFO or Weighted-Average.
-  /// ⚠️ SIDE EFFECT: This method PHYSICALLY CONSUMES (updates) the inventory layers in the DB.
-  /// It returns the total Cost in Cents for the [quantitySold].
   Future<int> _calculateCOGSAndConsumeLayers(String productId, double quantitySold) async {
-    final method = _prefsRepo.getInventoryCostingMethod(); // 'fifo' or 'weighted_average'
+    final method = _prefsRepo.getInventoryCostingMethod(); 
     
-    // 1. Get available layers (Oldest First)
     final layers = await (_db.select(_db.inventoryCostLayers)
           ..where((l) => l.productId.equals(productId) & l.quantityRemaining.isBiggerThanValue(0))
           ..orderBy([(l) => d.OrderingTerm.asc(l.purchaseDate)]))
@@ -117,7 +118,6 @@ class TransactionsRepository {
     double totalCostAccumulator = 0;
     double qtyToSettle = quantitySold;
 
-    // W-A Pre-Calculation: If Weighted Average, we need the global average of ALL layers first.
     int waCostPerUnit = 0;
     if (method == 'weighted_average') {
       double totalValue = 0;
@@ -131,36 +131,29 @@ class TransactionsRepository {
       }
     }
 
-    // 2. Consume Layers Loop
     for (var layer in layers) {
       if (qtyToSettle <= 0) break;
 
       double qtyFromThisLayer = 0;
       if (layer.quantityRemaining >= qtyToSettle) {
-        qtyFromThisLayer = qtyToSettle; // Take all we need
+        qtyFromThisLayer = qtyToSettle;
       } else {
-        qtyFromThisLayer = layer.quantityRemaining; // Take all that's left
+        qtyFromThisLayer = layer.quantityRemaining;
       }
 
-      // Determine Cost for this chunk
       int unitCostUsed = (method == 'weighted_average') ? waCostPerUnit : layer.costPerUnit;
       
       totalCostAccumulator += (qtyFromThisLayer * unitCostUsed);
 
-      // Update the Layer (Physically reduce quantity)
-      // Note: Even in W-A, we consume layers FIFO to track "aging", 
-      // but we use the W-A cost for the financial calculation.
       await (_db.update(_db.inventoryCostLayers)..where((l) => l.id.equals(layer.id)))
           .write(InventoryCostLayersCompanion(
-            quantityRemaining: d.Value(layer.quantityRemaining - qtyFromThisLayer)
+            quantityRemaining: d.Value(layer.quantityRemaining - qtyFromThisLayer),
+            // We don't update tenantId on modification usually, but we could if moving ownership
           ));
 
       qtyToSettle -= qtyFromThisLayer;
     }
 
-    // 3. Handle Negative Stock (Fallback)
-    // If we sold more than we have in layers (e.g., negative inventory), 
-    // we assume the standard average cost from Product table for the remainder.
     if (qtyToSettle > 0) {
       final product = await (_db.select(_db.products)..where((p) => p.id.equals(productId))).getSingle();
       totalCostAccumulator += (qtyToSettle * product.averageCost);
@@ -171,7 +164,7 @@ class TransactionsRepository {
 
   // --- WRITE METHODS ---
 
-  /// ⭐️ UPDATED: POS Sale with Dynamic Costing
+  /// ⭐️ UPDATED: POS Sale with Dynamic Costing + TENANT ID
   Future<void> createPosSale({
     required TransactionsCompanion transactionCompanion,
     required List<TransactionEntriesCompanion> entries,
@@ -196,12 +189,9 @@ class TransactionsRepository {
       int totalCostOfGoodsSoldCents = 0;
 
       for (final item in items) {
-        // ⭐️ NEW LOGIC: Calculate COGS using the Engine
         final int costForThisItem = await _calculateCOGSAndConsumeLayers(item.product.id, item.quantity);
-        
         totalCostOfGoodsSoldCents += costForThisItem;
 
-        // Update Product Quantity (Master Record)
         final product = await (_db.select(_db.products)..where((p) => p.id.equals(item.product.id))).getSingle();
         final newQuantity = product.quantityOnHand - item.quantity;
         
@@ -212,36 +202,40 @@ class TransactionsRepository {
             ));
       }
 
-      // Create Transaction Header
+      // Create Transaction Header (WITH TENANT ID)
       await _db.into(_db.transactions).insert(transactionCompanion.copyWith(
             id: d.Value(newTransactionId),
             createdAt: d.Value(now),
             lastUpdated: d.Value(now),
+            tenantId: d.Value(tenantId), // 👈 INJECTED
           ));
 
-      // Create User Entries (Revenue/Cash)
+      // Create User Entries
       for (final entry in entries) {
         await _db.into(_db.transactionEntries).insert(entry.copyWith(
               transactionId: d.Value(newTransactionId),
               createdAt: d.Value(now),
               lastUpdated: d.Value(now),
+              tenantId: d.Value(tenantId), // 👈 INJECTED
             ));
       }
 
-      // Create COGS Entries (Auto-calculated)
+      // Create COGS Entries
       await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
             transactionId: newTransactionId,
             accountId: cogsAccountId,
-            amount: totalCostOfGoodsSoldCents, // Debit COGS
+            amount: totalCostOfGoodsSoldCents,
             createdAt: d.Value(now),
             lastUpdated: d.Value(now),
+            tenantId: d.Value(tenantId), // 👈 INJECTED
           ));
       await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
             transactionId: newTransactionId,
             accountId: inventoryAccountId,
-            amount: -totalCostOfGoodsSoldCents, // Credit Inventory
+            amount: -totalCostOfGoodsSoldCents,
             createdAt: d.Value(now),
             lastUpdated: d.Value(now),
+            tenantId: d.Value(tenantId), // 👈 INJECTED
           ));
 
       // Create Order Record
@@ -252,6 +246,7 @@ class TransactionsRepository {
             totalAmount: (totalAmount * 100).round(),
             createdAt: d.Value(now),
             lastUpdated: d.Value(now),
+            tenantId: d.Value(tenantId), // 👈 INJECTED
           ));
 
       for (final item in items) {
@@ -263,18 +258,18 @@ class TransactionsRepository {
               priceAtSale: item.product.price,
               createdAt: d.Value(now),
               lastUpdated: d.Value(now),
+              tenantId: d.Value(tenantId), // 👈 INJECTED
             ));
       }
     });
   }
 
-  /// ⭐️ NEW: Create Purchase with Layer Tracking
-  /// Use this instead of createTransaction for inventory purchases.
+  /// ⭐️ NEW: Create Purchase with Layer Tracking + TENANT ID
   Future<void> createPurchaseTransaction({
     required String description,
     required DateTime transactionDate,
-    required List<TransactionEntriesCompanion> entries, // Financials (Debit Inv, Credit Cash)
-    required List<RepoPurchaseItem> items, // ⭐️ RENAMED CLASS USED HERE
+    required List<TransactionEntriesCompanion> entries,
+    required List<RepoPurchaseItem> items,
     String? attachmentPath,
   }) async {
     _enforcePeriodLock(transactionDate);
@@ -283,7 +278,6 @@ class TransactionsRepository {
       final newTransactionId = _uuid.v4();
       final now = DateTime.now();
 
-      // 1. Save Transaction
       await _db.into(_db.transactions).insert(TransactionsCompanion.insert(
         id: d.Value(newTransactionId),
         description: description,
@@ -291,35 +285,31 @@ class TransactionsRepository {
         attachmentPath: d.Value(attachmentPath),
         createdAt: d.Value(now),
         lastUpdated: d.Value(now),
+        tenantId: d.Value(tenantId), // 👈 INJECTED
       ));
 
-      // 2. Save Financial Entries
       for (final entry in entries) {
         await _db.into(_db.transactionEntries).insert(entry.copyWith(
           transactionId: d.Value(newTransactionId),
           createdAt: d.Value(now),
           lastUpdated: d.Value(now),
+          tenantId: d.Value(tenantId), // 👈 INJECTED
         ));
       }
 
-      // 3. Update Inventory Layers & Product Master
       for (final item in items) {
-        // A. Add Layer (The Stack)
         await _db.into(_db.inventoryCostLayers).insert(InventoryCostLayersCompanion.insert(
           productId: item.productId,
           purchaseDate: transactionDate,
           quantityPurchased: item.quantity,
-          quantityRemaining: item.quantity, // Starts full
+          quantityRemaining: item.quantity,
           costPerUnit: item.costPerUnitCents,
           createdAt: d.Value(now),
           lastUpdated: d.Value(now),
+          tenantId: d.Value(tenantId), // 👈 INJECTED
         ));
 
-        // B. Update Product Master (Average Cost & Qty)
-        // We still update Average Cost for fallback purposes, 
-        // calculated as a Weighted Average of the *current* state.
         final product = await (_db.select(_db.products)..where((p) => p.id.equals(item.productId))).getSingle();
-        
         final double oldTotalValue = product.averageCost * product.quantityOnHand;
         final double newPurchaseValue = item.costPerUnitCents * item.quantity;
         final double newTotalQty = product.quantityOnHand + item.quantity;
@@ -339,7 +329,7 @@ class TransactionsRepository {
     });
   }
 
-  // --- GENERIC METHODS (Maintained) ---
+  // --- GENERIC METHODS + TENANT ID ---
 
   Future<void> createTransaction({
     required String description,
@@ -364,6 +354,7 @@ class TransactionsRepository {
         createdAt: d.Value(now),
         lastUpdated: d.Value(now),
         relatedTransactionId: d.Value(relatedTransactionId),
+        tenantId: d.Value(tenantId), // 👈 INJECTED
       ));
 
       for (final entry in entries) {
@@ -371,6 +362,7 @@ class TransactionsRepository {
           transactionId: d.Value(newTransactionId),
           createdAt: d.Value(now),
           lastUpdated: d.Value(now),
+          tenantId: d.Value(tenantId), // 👈 INJECTED
         ));
       }
     });
@@ -394,10 +386,12 @@ class TransactionsRepository {
             id: d.Value(newTransactionId),
             description: description,
             transactionDate: transactionDate,
+            tenantId: d.Value(tenantId), // 👈 INJECTED
           ));
       for (final entry in entries) {
         await _db.into(_db.transactionEntries).insert(entry.copyWith(
               transactionId: d.Value(newTransactionId),
+              tenantId: d.Value(tenantId), // 👈 INJECTED
             ));
       }
     });
@@ -427,6 +421,7 @@ class TransactionsRepository {
             relatedTransactionId: d.Value(originalTransactionId),
             createdAt: d.Value(now),
             lastUpdated: d.Value(now),
+            tenantId: d.Value(tenantId), // 👈 INJECTED
           ));
 
       await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
@@ -436,6 +431,7 @@ class TransactionsRepository {
             currencyRate: const d.Value(1.0),
             createdAt: d.Value(now),
             lastUpdated: d.Value(now),
+            tenantId: d.Value(tenantId), // 👈 INJECTED
           ));
 
       await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
@@ -445,6 +441,7 @@ class TransactionsRepository {
             currencyRate: const d.Value(1.0),
             createdAt: d.Value(now),
             lastUpdated: d.Value(now),
+            tenantId: d.Value(tenantId), // 👈 INJECTED
           ));
 
       for (final entry in itemsToReturn.entries) {
@@ -507,6 +504,7 @@ class TransactionsRepository {
             accountId: accountId,
             amount: closingAmount,
             currencyRate: const d.Value(1.0),
+            tenantId: d.Value(tenantId), // 👈 INJECTED
           ));
           netIncomeAccumulator += closingAmount;
         }
@@ -521,6 +519,7 @@ class TransactionsRepository {
         accountId: retainedEarningsAccountId,
         amount: -netIncomeAccumulator,
         currencyRate: const d.Value(1.0),
+        tenantId: d.Value(tenantId), // 👈 INJECTED
       ));
 
       final newTransactionId = _uuid.v4();
@@ -533,6 +532,7 @@ class TransactionsRepository {
         isAdjustment: const d.Value(true),
         createdAt: d.Value(now),
         lastUpdated: d.Value(now),
+        tenantId: d.Value(tenantId), // 👈 INJECTED
       ));
 
       for (final line in closingLines) {
