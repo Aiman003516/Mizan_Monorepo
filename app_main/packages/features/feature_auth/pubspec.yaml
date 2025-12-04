@@ -22,6 +22,7 @@ dependencies:
     path: ../../core/core_data
   core_l10n:
     path: ../../core/core_l10n
+  firebase_auth: ^5.7.0
 
 dev_dependencies:
   flutter_test:

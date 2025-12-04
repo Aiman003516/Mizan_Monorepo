@@ -19,16 +19,19 @@ import 'package:feature_transactions/feature_transactions.dart' as transactions_
 import 'src/app_localizations_provider.dart' as app_l10n;
 
 Future<void> main() async {
-  // 1. Initialize Bindings Explicitly
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Ignite the Cloud Engine (The Logic Switch)
-  // Checks EnvConfig.appEnv and picks Dev/Prod keys automatically.
+  // 1. Initialize Firebase
   await Firebase.initializeApp(
     options: MizanFirebaseConfig.currentPlatform,
   );
+  
+  // 🔍 THE DNA TEST 🔍
+  // This will tell us exactly which database we are connected to.
+  final projectId = Firebase.app().options.projectId;
+  print("🔥 [DNA TEST] CONNECTED TO PROJECT ID: $projectId");
+  print("🔥 [DNA TEST] Environment Mode: ${EnvConfig.appEnv}");
 
-  // 3. Run the Bootstrap System (Local Engine)
   final overrides = await Bootstrap.init();
 
   runApp(

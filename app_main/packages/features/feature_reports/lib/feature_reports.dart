@@ -14,3 +14,5 @@ export 'src/presentation/profit_and_loss_screen.dart';
 export 'src/presentation/total_amounts_screen.dart';
 export 'src/presentation/total_classifications_screen.dart';
 export 'src/presentation/trial_balance_screen.dart';
+export 'src/data/analytics_repository.dart';
+export 'src/presentation/analytics_dashboard_screen.dart';

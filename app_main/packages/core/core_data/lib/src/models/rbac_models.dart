@@ -88,3 +88,50 @@ class AppRole {
     return permissions.contains(permission);
   }
 }
+
+
+/// 👤 THE STAFF MEMBER
+/// Represents a user who has joined the tenant.
+class StaffMember {
+  final String uid;
+  final String email;
+  final String displayName;
+  final String roleId;
+  final bool isOwner;
+  final String status; // 'active', 'invited', 'suspended'
+  final DateTime? joinedAt;
+
+  const StaffMember({
+    required this.uid,
+    required this.email,
+    required this.displayName,
+    required this.roleId,
+    this.isOwner = false,
+    this.status = 'active',
+    this.joinedAt,
+  });
+
+  factory StaffMember.fromJson(Map<String, dynamic> json) {
+    return StaffMember(
+      uid: json['uid'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      displayName: json['displayName'] as String? ?? 'Unknown',
+      roleId: json['roleId'] as String? ?? 'guest',
+      isOwner: json['isOwner'] as bool? ?? false,
+      status: json['status'] as String? ?? 'active',
+      joinedAt: (json['joinedAt'] as dynamic)?.toDate(), // Handle Firestore Timestamp
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'uid': uid,
+      'email': email,
+      'displayName': displayName,
+      'roleId': roleId,
+      'isOwner': isOwner,
+      'status': status,
+      'joinedAt': joinedAt,
+    };
+  }
+}

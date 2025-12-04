@@ -3,23 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-// UPDATED Local Imports
+// Local Imports
 import 'package:core_l10n/app_localizations.dart';
-import 'package:core_database/core_database.dart';
 import 'package:feature_dashboard/src/presentation/dashboard_card.dart';
 import 'package:feature_dashboard/src/presentation/dashboard_providers.dart';
 
-// Feature Imports (For Navigation)
+// 🛡️ Imports for Security
+import 'package:shared_ui/shared_ui.dart'; // For PermissionGuard
+import 'package:core_data/core_data.dart'; // For AppPermission
+
+// Feature Imports
 import 'package:feature_transactions/feature_transactions.dart';
-import 'package:feature_products/feature_products.dart'; // ⭐️ Added for Products Hub
-import 'package:feature_reports/feature_reports.dart';   // ⭐️ Added for Reports
+import 'package:feature_products/feature_products.dart';
+import 'package:feature_reports/feature_reports.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
-// This provider must be overridden in app_mizan
-// (Kept from your code to ensure backup logic works as currently wired)
 final databaseProvider = Provider<AppDatabase>((ref) {
   throw UnimplementedError('databaseProvider must be overridden');
 });
@@ -53,9 +54,7 @@ class DashboardScreen extends ConsumerWidget {
 
     String? outputDirectory = await FilePicker.platform.getDirectoryPath();
 
-    if (outputDirectory == null) {
-      return;
-    }
+    if (outputDirectory == null) return;
 
     try {
       final dbFolder = await getApplicationDocumentsDirectory();
@@ -65,8 +64,6 @@ class DashboardScreen extends ConsumerWidget {
       final destinationPath =
           p.join(outputDirectory, 'mizan_backup_$timestamp.db');
 
-      // Close DB before copy to ensure data integrity
-      await ref.read(databaseProvider).close();
       await sourceFile.copy(destinationPath);
 
       scaffoldMessenger.showSnackBar(
@@ -83,7 +80,6 @@ class DashboardScreen extends ConsumerWidget {
         ),
       );
     }
-    // Note: The AppDatabase (via LazyDatabase) will automatically re-open on the next query.
   }
 
   @override
@@ -96,7 +92,8 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.dashboard),
+        // ⚡ CHANGED: Title is now explicitly "Main"
+        title: const Text("Main"),
         actions: [
           IconButton(
             tooltip: l10n.backupAndRestore,
@@ -105,136 +102,204 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
+      
+      // ⚡ ADDED: Drawer Menu
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                   Icon(Icons.account_balance_wallet, color: Colors.white, size: 48),
+                   SizedBox(height: 16),
+                   Text(
+                     "Mizan Enterprise",
+                     style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                   ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.dashboard),
+              title: Text(l10n.dashboard), // "Dashboard"
+              onTap: () {
+                // Close drawer (Already on dashboard)
+                Navigator.pop(context);
+              },
+            ),
+            // Add more drawer items here (e.g., Settings, Profile) as needed
+          ],
+        ),
+      ),
+
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
           // --- TRANSACTION ACTIONS ---
-          DashboardCard(
-            title: l10n.newSale,
-            icon: Icons.point_of_sale,
-            color: Colors.green,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (ctx) => const PosScreen()),
-              );
-            },
+          
+          PermissionGuard(
+            permission: AppPermission.performSale,
+            child: DashboardCard(
+              title: l10n.newSale,
+              icon: Icons.point_of_sale,
+              color: Colors.green,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const PosScreen()),
+                );
+              },
+            ),
           ),
-          DashboardCard(
-            title: l10n.newPurchase,
-            icon: Icons.shopping_cart,
-            color: Colors.orange,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (ctx) => const PurchaseScreen()),
-              );
-            },
+
+          PermissionGuard(
+            permission: AppPermission.manageProducts,
+            child: DashboardCard(
+              title: l10n.newPurchase,
+              icon: Icons.shopping_cart,
+              color: Colors.orange,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const PurchaseScreen()),
+                );
+              },
+            ),
           ),
-          DashboardCard(
-            title: l10n.addNewTransaction,
-            icon: Icons.post_add,
-            color: Colors.blue,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (ctx) => const GeneralJournalScreen()),
-              );
-            },
+
+          PermissionGuard(
+            permission: AppPermission.voidTransaction,
+            child: DashboardCard(
+              title: l10n.addNewTransaction,
+              icon: Icons.post_add,
+              color: Colors.blue,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (ctx) => const GeneralJournalScreen()),
+                );
+              },
+            ),
           ),
           
           // --- MANAGEMENT ACTIONS ---
-          DashboardCard(
-            title: l10n.products, // Ensure this exists in l10n or use "Products"
-            icon: Icons.inventory,
-            color: Colors.amber.shade700,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (ctx) => const ProductsHubScreen()),
-              );
-            },
-          ),
-          DashboardCard(
-            title: l10n.orderHistory,
-            icon: Icons.history,
-            color: Colors.purple,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (ctx) => const OrderHistoryScreen()),
-              );
-            },
-          ),
-          DashboardCard(
-            title: l10n.reports, // Ensure this exists in l10n or use "Reports"
-            icon: Icons.bar_chart,
-            color: Colors.teal,
-            onTap: () {
-              Navigator.of(context).push(
-                // Navigating to Trial Balance as the main report for now
-                MaterialPageRoute(builder: (ctx) => const TrialBalanceScreen()),
-              );
-            },
+          
+          PermissionGuard(
+            permission: AppPermission.manageProducts,
+            child: DashboardCard(
+              title: l10n.products, 
+              icon: Icons.inventory,
+              color: Colors.amber.shade700,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const ProductsHubScreen()),
+                );
+              },
+            ),
           ),
 
-          // ⭐️ NEW: ACCOUNTING / ADJUSTMENTS BUTTON ⭐️
-          DashboardCard(
-            title: "Accounting", // TODO: Add to l10n
-            icon: Icons.tune,
-            color: Colors.blueGrey,
-            onTap: () {
-              Navigator.of(context).push(
-                // Leads to the "Airlock" screen we just built
-                MaterialPageRoute(builder: (ctx) => const AdjustingEntriesScreen()),
-              );
-            },
+          PermissionGuard(
+            permission: AppPermission.viewSalesHistory,
+            child: DashboardCard(
+              title: l10n.orderHistory,
+              icon: Icons.history,
+              color: Colors.purple,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const OrderHistoryScreen()),
+                );
+              },
+            ),
+          ),
+
+          PermissionGuard(
+            permission: AppPermission.viewFinancialReports,
+            child: DashboardCard(
+              title: l10n.reports,
+              icon: Icons.bar_chart,
+              color: Colors.teal,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const AnalyticsDashboardScreen()),
+                );
+              },
+            ),
+          ),
+
+          PermissionGuard(
+            permission: AppPermission.viewFinancialReports,
+            child: DashboardCard(
+              title: "Accounting", 
+              icon: Icons.tune,
+              color: Colors.blueGrey,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const AdjustingEntriesScreen()),
+                );
+              },
+            ),
           ),
 
           const SizedBox(height: 24),
           
           // --- FINANCIAL SUMMARY ---
-          Text(l10n.quickActions, style: Theme.of(context).textTheme.titleMedium), // Using "Quick Actions" label as section header
+          Text(l10n.quickActions, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
 
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryCard(
-                  context: context,
-                  title: l10n.totalRevenue,
-                  asyncValue: totalRevenue,
-                  color: Colors.green,
+          PermissionGuard(
+            permission: AppPermission.viewFinancialReports,
+            fallback: const SizedBox.shrink(),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildSummaryCard(
+                        context: context,
+                        title: l10n.totalRevenue,
+                        asyncValue: totalRevenue,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildSummaryCard(
+                        context: context,
+                        title: l10n.totalExpenses,
+                        asyncValue: totalExpenses,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildSummaryCard(
-                  context: context,
-                  title: l10n.totalExpenses,
-                  asyncValue: totalExpenses,
-                  color: Colors.red,
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildSummaryCard(
+                        context: context,
+                        title: l10n.totalReceivable,
+                        asyncValue: totalReceivable,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildSummaryCard(
+                        context: context,
+                        title: l10n.totalPayable,
+                        asyncValue: totalPayable,
+                        color: Colors.orange,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryCard(
-                  context: context,
-                  title: l10n.totalReceivable,
-                  asyncValue: totalReceivable,
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildSummaryCard(
-                  context: context,
-                  title: l10n.totalPayable,
-                  asyncValue: totalPayable,
-                  color: Colors.orange,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

@@ -8,7 +8,9 @@ import 'package:googleapis_auth/auth_io.dart' as auth_io;
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-// ⭐️ CORRECT IMPORT for EnvConfig
+// 1. Add Firebase Auth Import
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:core_data/core_data.dart';
 
 const _scopes = ['https://www.googleapis.com/auth/drive.appdata'];
@@ -38,13 +40,26 @@ class AuthRepository {
 
     try {
       if (Platform.isAndroid) {
+        // A. Trigger Google Sign In
         final user = await _googleSignIn.signIn();
         if (user == null) {
           throw 'Sign-in cancelled by user.';
         }
         _googleUser = user;
-        final authHeaders = await user.authHeaders;
 
+        // B. 🚀 CRITICAL FIX: Sign in to Firebase using Google Credentials
+        final googleAuth = await user.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        
+        // This populates FirebaseAuth.instance.currentUser
+        await FirebaseAuth.instance.signInWithCredential(credential);
+        print("✅ [Auth] Firebase Sign-In Successful: ${FirebaseAuth.instance.currentUser?.uid}");
+
+        // C. Create Drive Client (Existing Logic)
+        final authHeaders = await user.authHeaders;
         _client = auth.authenticatedClient(
           http.Client(),
           auth.AccessCredentials(
@@ -53,16 +68,14 @@ class AuthRepository {
               authHeaders['Authorization']!.substring(7), // Remove 'Bearer '
               DateTime.now().toUtc().add(const Duration(hours: 1)),
             ),
-            null, // google_sign_in handles refreshing
+            null, 
             _scopes,
           ),
         );
       } else if (Platform.isWindows) {
-        // ⭐️ NEW: Load secrets from EnvConfig (Compile-Time)
         final clientId = EnvConfig.googleWindowsClientId;
         final clientSecret = EnvConfig.googleWindowsClientSecret;
 
-        // ⭐️ NEW: Check using static helper
         if (!EnvConfig.hasGoogleKeys) {
           throw 'Windows Client ID/Secret not found. Please check your launch.json configuration.';
         }
@@ -88,6 +101,8 @@ class AuthRepository {
           );
 
           _googleUser = null;
+          // Note: Windows Firebase Auth requires a different flow (Custom Token)
+          // For Phase 4, we focus on Android. Windows syncs via the common DB logic.
           return auth.authenticatedClient(http.Client(), credentials);
         });
       }
@@ -108,8 +123,18 @@ class AuthRepository {
         final user = await _googleSignIn.signInSilently();
         if (user == null) return null;
         _googleUser = user;
-        final authHeaders = await user.authHeaders;
 
+        // 🚀 FIX: Ensure Firebase is also signed in silently
+        if (FirebaseAuth.instance.currentUser == null) {
+           final googleAuth = await user.authentication;
+           final credential = GoogleAuthProvider.credential(
+             accessToken: googleAuth.accessToken,
+             idToken: googleAuth.idToken,
+           );
+           await FirebaseAuth.instance.signInWithCredential(credential);
+        }
+
+        final authHeaders = await user.authHeaders;
         _client = auth.authenticatedClient(
           http.Client(),
           auth.AccessCredentials(
@@ -127,7 +152,6 @@ class AuthRepository {
             await _secureStorage.read(key: _windowsRefreshTokenKey);
         if (refreshToken == null) return null;
 
-        // ⭐️ NEW: Load secrets from EnvConfig
         final clientId = EnvConfig.googleWindowsClientId;
         final clientSecret = EnvConfig.googleWindowsClientSecret;
 
@@ -170,6 +194,7 @@ class AuthRepository {
     try {
       if (Platform.isAndroid) {
         await _googleSignIn.signOut();
+        await FirebaseAuth.instance.signOut(); // 🚀 Sign out of Firebase too
       } else if (Platform.isWindows) {
         await _secureStorage.delete(key: _windowsRefreshTokenKey);
       }

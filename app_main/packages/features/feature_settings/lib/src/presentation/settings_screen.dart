@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'package:feature_settings/feature_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // ⚡ FIXED: Added missing import
+import 'staff/staff_list_screen.dart'; // Add import
 
 // Local Imports
 import 'package:core_l10n/app_localizations.dart';
@@ -8,6 +11,7 @@ import 'package:core_data/core_data.dart';
 import 'package:feature_settings/src/presentation/company_profile_screen.dart';
 import 'package:feature_settings/src/presentation/security_settings_screen.dart';
 import 'package:feature_settings/src/presentation/currency_settings_screen.dart';
+import 'package:feature_settings/src/presentation/roles/roles_list_screen.dart'; // ⚡ NEW: Import Roles Screen
 
 // Import Sync Feature
 import 'package:feature_sync/feature_sync.dart'; 
@@ -22,6 +26,7 @@ class SettingsScreen extends ConsumerWidget {
 
     final syncStatus = ref.read(syncStatusProvider);
     
+    // Prevent double-action
     if (syncStatus == SyncStatus.backupInProgress || 
         syncStatus == SyncStatus.restoreInProgress) return;
 
@@ -59,6 +64,7 @@ class SettingsScreen extends ConsumerWidget {
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
+          // ⚡ FIX: Removed const
           SnackBar(content: Text(l10n.featureNotImplemented)),
         );
       }
@@ -115,7 +121,7 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           RadioListTile<Locale?>(
             title: Text(l10n.english),
-            // ⚡ FIX: Removed 'const' because some environments flag it as invalid with nullable generics
+            // ⚡ FIX: Removed 'const'
             value: Locale('en'), 
             groupValue: currentLocale,
             onChanged: (locale) {
@@ -147,13 +153,13 @@ class SettingsScreen extends ConsumerWidget {
     final isRestoring = syncStatus == SyncStatus.restoreInProgress;
     final isBusy = isBackingUp || isRestoring; 
 
-    // 👂 LISTENER 1: Success Messages
+    // 👂 LISTENER 1: Success Messages (Granular)
     ref.listen<SyncStatus>(syncStatusProvider, (previous, next) {
       if (next == SyncStatus.backupSuccess) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            // ⚡ FIX: Removed 'const' here because l10n.backupSuccessful is a runtime variable
-            SnackBar( 
+            // ⚡ FIX: No 'const', and passed argument "Google Drive"
+            SnackBar(
               content: Text(l10n.backupSuccessful), 
               backgroundColor: Colors.green,
             ),
@@ -162,6 +168,7 @@ class SettingsScreen extends ConsumerWidget {
       } else if (next == SyncStatus.restoreSuccess) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
+            // ⚡ FIX: No 'const'
             SnackBar(
               content: Text(l10n.restoreSuccessful),
               backgroundColor: Colors.green,
@@ -171,11 +178,12 @@ class SettingsScreen extends ConsumerWidget {
       }
     });
 
-    // 👂 LISTENER 2: Error Messages
+    // 👂 LISTENER 2: Error Messages (From Controller)
     ref.listen(syncControllerProvider, (previous, next) {
       if (next.hasError && !next.isLoading) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
+            // ⚡ FIX: No 'const'
             SnackBar(
               content: Text(l10n.backupFailed),
               backgroundColor: Colors.red,
@@ -260,7 +268,128 @@ class SettingsScreen extends ConsumerWidget {
           subtitle: Text(l10n.restoreWarning),
           onTap: isBusy ? null : () => _showRestoreDialog(context, ref),
         ),
+        
         const Divider(),
+
+        // 🛡️ SYSTEM ACTIVATION & ADMIN CONTROLS (Phase 4 Logic)
+        Consumer(
+          builder: (context, ref, _) {
+            final roleAsync = ref.watch(userRoleProvider);
+            
+            return roleAsync.when(
+              data: (role) {
+                // Scenario A: User is already the Owner/Admin
+                // Show a passive "Badge" indicating success AND the Admin Tools.
+                if (role.isSystemAdmin) {
+                  return Column(
+                    children: [
+                      const ListTile(
+                        leading: Icon(Icons.verified, color: Colors.blue),
+                        title: Text("Enterprise License Active"),
+                        subtitle: Text("You are the System Administrator"),
+                      ),
+                      
+                      // 🌟 NEW: Roles Management Button (Only for Admins)
+                      ListTile(
+                        leading: const Icon(Icons.badge, color: Colors.purple),
+                        title: const Text("Manage Roles"),
+                        subtitle: const Text("Define staff permissions"),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const RolesListScreen()),
+                          );
+                        },
+                      ),
+
+
+                      // 🌟 NEW: Billing Management
+                      ListTile(
+                        leading: const Icon(Icons.credit_card, color: Colors.orange),
+                        title: const Text("Manage Subscription"),
+                        subtitle: const Text("View plans & billing"),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SubscriptionScreen()),
+                          );
+                        },
+                      ),
+
+                      ListTile(
+                        leading: const Icon(Icons.group, color: Colors.indigo),
+                        title: const Text("Manage Staff"),
+                        subtitle: const Text("View list & invite members"),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const StaffListScreen()),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                }
+
+                // Scenario B: User is a Guest (New Buyer)
+                // Show the interactive "Activate" button to run the Genesis Script.
+                return ListTile(
+                  leading: const Icon(Icons.rocket_launch, color: Colors.green),
+                  title: const Text("Activate Business License"),
+                  subtitle: const Text("Initialize system & claim ownership"),
+                  onTap: () async {
+                    
+                    // 🔍 DEBUGGING: Check who is logged in
+                    final user = FirebaseAuth.instance.currentUser;
+                    print("🕵️‍♂️ [DEBUG] Current User: ${user?.email ?? 'NULL (Guest)'}");
+                    print("🕵️‍♂️ [DEBUG] UID: ${user?.uid}");
+
+                    if (user == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("⚠️ You are not logged in! Please Sign In first."),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                      return;
+                    }
+
+                    try {
+                      // 👑 RUN THE CLEAN GENESIS
+                      await ref.read(saasSeedingServiceProvider).activateSystemForBuyer();
+                      
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("✅ System Activated! Welcome, Admin."),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("❌ Activation Failed: $e"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                );
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            );
+          },
+        ),
+
+        const SizedBox(height: 16), // Spacing
+
         Card(
           margin: const EdgeInsets.all(16.0),
           child: InkWell(
