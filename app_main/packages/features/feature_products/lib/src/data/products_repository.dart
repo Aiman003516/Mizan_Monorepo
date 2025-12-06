@@ -1,10 +1,9 @@
-// FILE: mizan_monorepo.zip/app_main/packages/features/feature_products/lib/src/data/products_repository.dart
+// FILE: packages/features/feature_products/lib/src/data/products_repository.dart
 
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 import 'database_provider.dart';
-
 
 final productsRepositoryProvider = Provider<ProductsRepository>((ref) {
   final db = ref.watch(databaseProvider);
@@ -39,7 +38,6 @@ class ProductsRepository {
         .getSingleOrNull();
   }
 
-  /// Takes [price] in standard currency units (e.g., 10.50) and stores it as cents (1050)
   Future<void> createProduct({
     required String name,
     required double price,
@@ -55,9 +53,19 @@ class ProductsRepository {
             barcode: Value(barcode),
             imagePath: Value(imagePath),
             quantityOnHand: const Value(0.0),
-            averageCost: const Value(0), // Initial cost is 0 cents
+            averageCost: const Value(0),
           ),
         );
+  }
+
+  /// ✅ NEW: High-Speed Bulk Import
+  /// Uses a transaction batch to insert/update thousands of rows efficiently.
+  Future<void> bulkCreateProducts(List<ProductsCompanion> products) async {
+    await _db.batch((batch) {
+      // insertAllOnConflictUpdate ensures we don't crash if a barcode exists; 
+      // it just updates the existing record.
+      batch.insertAllOnConflictUpdate(_db.products, products);
+    });
   }
 
   Future<void> updateProduct(Product original, {
@@ -70,7 +78,7 @@ class ProductsRepository {
     await _db.update(_db.products).replace(
       original.toCompanion(false).copyWith(
         name: Value(newName),
-        price: Value((newPrice * 100).round()), // Convert to Cents
+        price: Value((newPrice * 100).round()),
         categoryId: Value(newCategoryId),
         barcode: Value(newBarcode),
         imagePath: Value(newImagePath),
@@ -83,19 +91,16 @@ class ProductsRepository {
     await (_db.delete(_db.products)..where((p) => p.id.equals(id))).go();
   }
 
-  /// [costPerItem] should be passed in standard currency (e.g., 5.00 for $5).
   Future<void> addStockToProduct({
     required String productId,
     required double quantityPurchased,
     required double costPerItem,
   }) async {
-
     final product = await (_db.select(_db.products)
           ..where((p) => p.id.equals(productId)))
         .getSingle();
 
     final double oldQty = product.quantityOnHand;
-    // averageCost is now INT (cents). Convert to double for calculation:
     final double oldCostCents = product.averageCost.toDouble(); 
     
     final double newQty = quantityPurchased;
@@ -105,13 +110,12 @@ class ProductsRepository {
 
     double newAverageCostCents = 0.0;
     if (totalQuantity > 0) {
-      // Weighted Average Cost formula
       newAverageCostCents = ((oldQty * oldCostCents) + (newQty * newCostCents)) / totalQuantity;
     }
 
     final companion = product.toCompanion(false).copyWith(
           quantityOnHand: Value(totalQuantity),
-          averageCost: Value(newAverageCostCents.round()), // Store as Int (Cents)
+          averageCost: Value(newAverageCostCents.round()),
           lastUpdated: Value(DateTime.now()),
         );
 

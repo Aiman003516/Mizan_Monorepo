@@ -12,3 +12,6 @@ export 'src/presentation/security_settings_screen.dart';
 export 'src/presentation/set_passcode_screen.dart';
 export 'src/presentation/settings_screen.dart';
 export 'src/presentation/subscription/subscription_screen.dart';
+export 'src/presentation/custom_fields/custom_fields_screen.dart';
+export 'src/presentation/onboarding_screen.dart';
+

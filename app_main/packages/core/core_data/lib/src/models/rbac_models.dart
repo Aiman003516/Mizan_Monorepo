@@ -1,8 +1,58 @@
 // FILE: packages/core/core_data/lib/src/models/rbac_models.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+/// 🛡️ THE APP USER (Enriched Identity)
+/// Combines Firebase Auth (Email/UID) with Firestore Data (Tenant/Role).
+class AppUser {
+  final String uid;
+  final String email;
+  final String? displayName;
+  final String? tenantId; // 👈 CRITICAL: Links user to a specific shop
+  final String role;      // e.g., 'owner', 'manager', 'staff'
+  final bool isPro;       // Lifetime License Flag
+
+  const AppUser({
+    required this.uid,
+    required this.email,
+    this.displayName,
+    this.tenantId,
+    this.role = 'staff',
+    this.isPro = false,
+  });
+
+  /// ⚡ Computed Property: Is this user the Boss?
+  bool get isOwner => role == 'owner';
+
+  /// ⚡ Computed Property: Can they use Cloud features?
+  bool get hasCloudAccess => tenantId != null;
+
+  factory AppUser.fromFirestore(DocumentSnapshot doc, {required String uid, required String email}) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return AppUser(
+      uid: uid,
+      email: email,
+      displayName: data['displayName'] as String?,
+      tenantId: data['tenantId'] as String?,
+      role: data['role'] as String? ?? 'staff',
+      isPro: data['isPro'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'email': email,
+      'displayName': displayName,
+      'tenantId': tenantId,
+      'role': role,
+      'isPro': isPro,
+      'lastLogin': FieldValue.serverTimestamp(),
+    };
+  }
+}
+
 /// 🛡️ THE PERMISSION REGISTRY
 /// This Enum defines every distinct action a user can perform in Mizan.
-/// We store these as Strings in Firestore to allow flexibility.
 enum AppPermission {
   // --- Dashboard & Analytics ---
   viewDashboard,
@@ -26,13 +76,11 @@ enum AppPermission {
 }
 
 /// 🔑 THE ROLE CONTAINER
-/// A Role is simply a named bucket of permissions.
-/// e.g., Name: "Cashier", Permissions: [performSale, viewInventory]
 class AppRole {
   final String id;
   final String name;
   final List<AppPermission> permissions;
-  final bool isSystemAdmin; // If true, bypasses all checks (Owner)
+  final bool isSystemAdmin; 
 
   const AppRole({
     required this.id,
@@ -41,26 +89,23 @@ class AppRole {
     this.isSystemAdmin = false,
   });
 
-  /// Factory to create the "Owner" role (All Powerful)
   factory AppRole.owner() {
     return const AppRole(
       id: 'owner',
       name: 'Owner',
-      permissions: [], // Permissions ignored because isSystemAdmin is true
+      permissions: [],
       isSystemAdmin: true,
     );
   }
 
-  /// Convert from Firestore JSON
   factory AppRole.fromJson(Map<String, dynamic> json, String id) {
     final permsData = json['permissions'] as List<dynamic>? ?? [];
     
-    // Convert Strings back to Enums safely
     final permissions = permsData.map((p) {
       try {
         return AppPermission.values.byName(p as String);
       } catch (e) {
-        return null; // Ignore unknown/deprecated permissions
+        return null; 
       }
     }).whereType<AppPermission>().toList();
 
@@ -72,7 +117,6 @@ class AppRole {
     );
   }
 
-  /// Convert to Firestore JSON
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -81,24 +125,20 @@ class AppRole {
     };
   }
 
-  /// 🛡️ THE CHECKER
-  /// Does this role have the power to do X?
   bool hasPermission(AppPermission permission) {
     if (isSystemAdmin) return true;
     return permissions.contains(permission);
   }
 }
 
-
 /// 👤 THE STAFF MEMBER
-/// Represents a user who has joined the tenant.
 class StaffMember {
   final String uid;
   final String email;
   final String displayName;
   final String roleId;
   final bool isOwner;
-  final String status; // 'active', 'invited', 'suspended'
+  final String status; 
   final DateTime? joinedAt;
 
   const StaffMember({
@@ -119,7 +159,7 @@ class StaffMember {
       roleId: json['roleId'] as String? ?? 'guest',
       isOwner: json['isOwner'] as bool? ?? false,
       status: json['status'] as String? ?? 'active',
-      joinedAt: (json['joinedAt'] as dynamic)?.toDate(), // Handle Firestore Timestamp
+      joinedAt: (json['joinedAt'] as dynamic)?.toDate(), 
     );
   }
 

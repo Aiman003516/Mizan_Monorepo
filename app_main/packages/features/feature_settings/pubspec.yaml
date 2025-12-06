@@ -12,7 +12,8 @@ dependencies:
   drift: ^2.29.0
   local_auth: ^2.3.0
   url_launcher: ^6.3.2
-  share_plus: ^10.0.0  # 👈 ADD THIS
+  share_plus: ^10.0.0
+  firebase_auth: ^5.7.0
   
   # Local Dependencies
   core_database:
@@ -22,11 +23,13 @@ dependencies:
   core_l10n:
     path: ../../core/core_l10n
   
+  # 🟢 FIX: Point to the local folder, not the internet
+  shared_ui: 
+    path: ../../shared/shared_ui
+
   # Feature Dependencies
-  # We will create these soon. This error is expected.
   feature_sync:
     path: ../feature_sync
-  firebase_auth: ^5.7.0
 
 dev_dependencies:
   flutter_test:

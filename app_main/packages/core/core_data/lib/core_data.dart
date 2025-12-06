@@ -13,3 +13,5 @@ export 'src/services/saas_seeding_service.dart';
 export 'src/repositories/roles_repository.dart';
 export 'src/repositories/staff_repository.dart';
 export 'src/models/billing_models.dart';
+export 'src/models/custom_field_model.dart';
+

@@ -3,14 +3,20 @@ description: Manages products, categories, and inventory logic.
 publish_to: 'none'
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.0.0 # Adjusted for broader compatibility
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
   drift: ^2.29.0
-  image_picker: ^1.1.2 # For ImageSource
+  image_picker: ^1.1.2
+  
+  # ✅ NEW: Import Engines
+  csv: ^6.0.0
+  excel: ^4.0.6
+  file_picker: ^8.1.4
+  path: ^1.9.0
   
   # Local Dependencies
   core_database:
@@ -22,8 +28,6 @@ dependencies:
   shared_services:
     path: ../../shared/shared_services
   
-  # Feature Dependencies
-  # We will create these soon. This error is expected.
   feature_dashboard:
     path: ../feature_dashboard
 

@@ -11,4 +11,6 @@ export 'src/presentation/categories_hub_screen.dart';
 export 'src/presentation/products_hub_screen.dart';
 export 'src/presentation/products_list_provider.dart';
 export 'src/presentation/products_list_screen.dart';
+export 'src/presentation/product_import_screen.dart';
+export 'src/data/database_provider.dart';
 

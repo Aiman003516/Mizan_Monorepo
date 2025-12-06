@@ -16,3 +16,7 @@ export 'src/presentation/total_classifications_screen.dart';
 export 'src/presentation/trial_balance_screen.dart';
 export 'src/data/analytics_repository.dart';
 export 'src/presentation/analytics_dashboard_screen.dart';
+export 'src/presentation/dynamic_report_screen.dart';
+export 'src/data/report_templates_repository.dart';
+export 'src/presentation/report_marketplace_screen.dart';
+export 'src/presentation/reports_hub_screen.dart';

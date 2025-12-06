@@ -1,61 +1,129 @@
+// FILE: packages/features/feature_sync/lib/src/data/cloud_sync_service.dart
+
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Order, Transaction;
+import 'package:core_data/core_data.dart';
 import 'package:core_database/core_database.dart';
+import 'package:feature_auth/feature_auth.dart'; // 👈 Import Auth
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
 
-/// 🔄 THE HYBRID SYNC ENGINE (Engine B)
+/// 🔄 THE HYBRID SYNC ENGINE (Engine B - Phase 4.3 Billing Enforcer)
 class CloudSyncService {
   final AppDatabase _localDb;
   final FirebaseFirestore _firestore;
-  final String? _currentTenantId;
+  final PreferencesRepository _prefs;
+  final String? _currentTenantId; // If null, Sync is DISABLED (Free Tier)
 
   StreamSubscription? _outgoingSyncSub;
-  StreamSubscription? _incomingSyncSub;
-
-  DateTime _lastPushTime = DateTime.now().subtract(const Duration(days: 365));
+  final List<StreamSubscription> _incomingSyncSubs = [];
+  Timer? _debounceTimer;
+  bool _isSyncing = false;
 
   CloudSyncService({
     required AppDatabase localDb,
     required FirebaseFirestore firestore,
+    required PreferencesRepository prefs,
     String? tenantId,
   })  : _localDb = localDb,
         _firestore = firestore,
+        _prefs = prefs,
         _currentTenantId = tenantId;
 
+  List<String> get _allSyncableTables => [
+    _localDb.transactions.actualTableName,
+    _localDb.products.actualTableName,
+    _localDb.accounts.actualTableName,
+    _localDb.transactionEntries.actualTableName,
+    _localDb.orders.actualTableName,
+    _localDb.orderItems.actualTableName,
+    _localDb.categories.actualTableName,
+    _localDb.inventoryCostLayers.actualTableName,
+  ];
+
+  /// 🛡️ THE ENFORCER: Only start if we have a valid Tenant ID
   void startSync() {
     if (_currentTenantId == null) {
-      print('⚠️ [CloudSync] Cannot start: No Tenant ID (Free Tier?)');
+      print('🔒 [Billing Enforcer] Cloud Sync Disabled (Free Tier / No Tenant).');
       return;
     }
+    
     print('🚀 [CloudSync] Starting Engine for Tenant: $_currentTenantId');
+    print('🕒 [CloudSync] Last Sync Time: ${_prefs.getLastSyncTime()}'); 
+    
     _startOutgoingSync();
+    _startIncomingSync();
   }
 
   void stopSync() {
     _outgoingSyncSub?.cancel();
-    _incomingSyncSub?.cancel();
+    _debounceTimer?.cancel();
+    for (final sub in _incomingSyncSubs) {
+      sub.cancel();
+    }
+    _incomingSyncSubs.clear();
     print('🛑 [CloudSync] Engine Stopped');
   }
 
-  // --- 📤 OUTBOUND (Local -> Cloud) ---
-  void _startOutgoingSync() {
-    // Watch the Drift Stream. event.table is a String (table name).
-    _outgoingSyncSub = _localDb.tableUpdates().listen((events) async {
-      for (final event in events) {
-        await _handleTableUpdate(event.table);
+  // --- ⚡ STRICT CONSISTENCY (The Blocking Sync) ---
+
+  Future<void> runImmediateSync() async {
+    // 🛡️ ENFORCER CHECK
+    if (_currentTenantId == null) {
+      print('⚠️ [CloudSync] Skipping Immediate Sync (No Tenant ID)');
+      return;
+    }
+
+    if (_isSyncing) {
+      print('⏳ [CloudSync] Sync already in progress.');
+      return;
+    }
+
+    _isSyncing = true; 
+    _debounceTimer?.cancel(); 
+
+    try {
+      print('⚡ [CloudSync] Executing Bundled Sync...');
+      final syncStartTime = DateTime.now();
+      bool anyDataPushed = false;
+
+      for (final table in _allSyncableTables) {
+        final pushed = await _processTable(table, updatePrefs: false);
+        if (pushed) anyDataPushed = true;
       }
+
+      if (anyDataPushed) {
+        await _prefs.setLastSyncTime(syncStartTime);
+        print('💾 [CloudSync] Sync Cycle Complete.');
+      } else {
+        print('✅ [CloudSync] Sync Cycle Verified.');
+      }
+    } catch (e) {
+      print('❌ [CloudSync] Sync Cycle Failed: $e');
+      rethrow; 
+    } finally {
+      _isSyncing = false;
+    }
+  }
+
+  // --- 📤 OUTBOUND (Local -> Cloud) ---
+  
+  void _startOutgoingSync() {
+    _outgoingSyncSub = _localDb.tableUpdates().listen((events) {
+      _debounceTimer?.cancel();
+      _debounceTimer = Timer(const Duration(seconds: 2), () async {
+        print('📦 [CloudSync] Debounce finished. Sending Bundle.');
+        await runImmediateSync();
+      });
     });
   }
 
-  /// Process a specific table change (Matched by Name)
-  Future<void> _handleTableUpdate(String tableName) async {
-    print('🔎 [CloudSync] Detected change in table: $tableName'); // 👈 ADD THIS DEBUG LOG
-    
+  Future<bool> _processTable(String tableName, {required bool updatePrefs}) async {
+    // 🛡️ ENFORCER CHECK
+    if (_currentTenantId == null) return false;
+
     List<Map<String, dynamic>> rowsToPush = [];
 
-    // 🛡️ NAME MATCHING:
-    // Compare String name against actual table names.
     if (tableName == _localDb.transactions.actualTableName) {
       rowsToPush = await _fetchUpdates(_localDb.transactions);
     } else if (tableName == _localDb.products.actualTableName) {
@@ -76,79 +144,156 @@ class CloudSyncService {
 
     if (rowsToPush.isNotEmpty) {
       await _pushToFirestore(tableName, rowsToPush);
-      _lastPushTime = DateTime.now();
+      return true;
     }
+    return false;
   }
 
-  /// 🛡️ THE GENERIC HELPER (FIXED FOR EXTENSIONS)
   Future<List<Map<String, dynamic>>> _fetchUpdates(dynamic table) async {
-    
-    // 1. Runtime Cast: Convert to what Drift needs for select()
     final driftTable = table as ResultSetImplementation<HasResultSet, dynamic>;
 
     final query = _localDb.select(driftTable)
       ..where((tbl) {
-        // 2. Dynamic Access to MizanTable columns
         final mizanTbl = tbl as dynamic;
         final tenantIdVal = _currentTenantId ?? '';
 
-        // 3. 🛠️ THE FIX IS HERE: Explicit Type Casting
-        // We cast the columns back to 'Expression' types.
-        // This allows Dart to "see" the Extension Methods (isBiggerThan, equals).
         final lastUpdatedExpr = mizanTbl.lastUpdated as Expression<DateTime>;
         final tenantIdExpr = mizanTbl.tenantId as Expression<String>;
 
-        // Now we can safely call the extensions
-        return lastUpdatedExpr.isBiggerThan(Variable(_lastPushTime)) &
+        return lastUpdatedExpr.isBiggerThan(Variable(_prefs.getLastSyncTime())) &
                tenantIdExpr.equals(tenantIdVal);
       });
 
     final results = await query.get();
-    
-    // 4. Convert to JSON
     return results.map((row) => (row as dynamic).toJson()).cast<Map<String, dynamic>>().toList();
   }
 
   Future<void> _pushToFirestore(
       String collectionName, List<Map<String, dynamic>> rows) async {
     
-    final batch = _firestore.batch();
+    // 🛡️ ENFORCER CHECK
+    if (_currentTenantId == null) return;
+
+    const int batchSize = 500;
+    int chunks = (rows.length / batchSize).ceil();
+
+    for (int i = 0; i < chunks; i++) {
+      final start = i * batchSize;
+      final end = (start + batchSize < rows.length) ? start + batchSize : rows.length;
+      final chunk = rows.sublist(start, end);
+
+      final batch = _firestore.batch();
+
+      for (final row in chunk) {
+        final docId = row['id'];
+        if (docId == null) continue;
+
+        final docRef = _firestore
+            .collection('tenants')
+            .doc(_currentTenantId)
+            .collection(collectionName)
+            .doc(docId);
+
+        final data = Map<String, dynamic>.from(row);
+        batch.set(docRef, data, SetOptions(merge: true));
+      }
+
+      try {
+        await batch.commit();
+        print('☁️ [CloudSync] Pushed Batch ${i + 1}/$chunks (${chunk.length} items)');
+      } catch (e) {
+        print('❌ [CloudSync] Batch Push Failed: $e');
+        rethrow;
+      }
+    }
+  }
+
+  // --- 📥 INBOUND (Cloud -> Local) ---
+  
+  void _startIncomingSync() {
+    for (final tableName in _allSyncableTables) {
+      _monitorRemoteCollection(tableName);
+    }
+  }
+
+  void _monitorRemoteCollection(String tableName) {
+    // 🛡️ ENFORCER CHECK
+    if (_currentTenantId == null) return;
+
+    final lastSync = _prefs.getLastSyncTime();
     
-    for (final row in rows) {
-      final docId = row['id'];
-      if (docId == null) continue;
+    final stream = _firestore
+        .collection('tenants')
+        .doc(_currentTenantId)
+        .collection(tableName)
+        .where('lastUpdated', isGreaterThan: lastSync.toIso8601String())
+        .snapshots();
 
-      final docRef = _firestore
-          .collection('tenants')
-          .doc(_currentTenantId)
-          .collection(collectionName)
-          .doc(docId);
+    final sub = stream.listen((snapshot) async {
+      if (snapshot.docs.isNotEmpty) {
+        print('📥 [CloudSync] Received ${snapshot.docs.length} updates for $tableName');
+        await _upsertLocal(tableName, snapshot.docs);
+        await _prefs.setLastSyncTime(DateTime.now());
+      }
+    });
 
-      batch.set(docRef, row, SetOptions(merge: true));
-    }
+    _incomingSyncSubs.add(sub);
+  }
 
-    try {
-      await batch.commit();
-      print('☁️ [CloudSync] Pushed ${rows.length} items to $collectionName');
-    } catch (e) {
-      print('❌ [CloudSync] Push Failed: $e');
-    }
+  Future<void> _upsertLocal(String tableName, List<QueryDocumentSnapshot> docs) async {
+    await _localDb.transaction(() async {
+      for (final doc in docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        try {
+          if (tableName == _localDb.transactions.actualTableName) {
+             await _localDb.into(_localDb.transactions).insertOnConflictUpdate(Transaction.fromJson(data));
+          } else if (tableName == _localDb.products.actualTableName) {
+             await _localDb.into(_localDb.products).insertOnConflictUpdate(Product.fromJson(data));
+          } else if (tableName == _localDb.accounts.actualTableName) {
+             await _localDb.into(_localDb.accounts).insertOnConflictUpdate(Account.fromJson(data));
+          } else if (tableName == _localDb.transactionEntries.actualTableName) {
+             await _localDb.into(_localDb.transactionEntries).insertOnConflictUpdate(TransactionEntry.fromJson(data));
+          } else if (tableName == _localDb.orders.actualTableName) {
+             await _localDb.into(_localDb.orders).insertOnConflictUpdate(Order.fromJson(data));
+          } else if (tableName == _localDb.orderItems.actualTableName) {
+             await _localDb.into(_localDb.orderItems).insertOnConflictUpdate(OrderItem.fromJson(data));
+          } else if (tableName == _localDb.categories.actualTableName) {
+             await _localDb.into(_localDb.categories).insertOnConflictUpdate(Category.fromJson(data));
+          } else if (tableName == _localDb.inventoryCostLayers.actualTableName) {
+             await _localDb.into(_localDb.inventoryCostLayers).insertOnConflictUpdate(InventoryCostLayer.fromJson(data));
+          }
+        } catch (e) {
+          print('❌ [CloudSync] Upsert Error for $tableName: $e');
+        }
+      }
+    });
   }
 }
 
+// 💉 REVISED PROVIDER
 final cloudSyncServiceProvider = Provider<CloudSyncService>((ref) {
   final db = ref.watch(appDatabaseProvider); 
   final firestore = FirebaseFirestore.instance;
+  final prefs = ref.watch(preferencesRepositoryProvider);
   
-  // Hardcoded tenant for testing
-  final String? fakeTenantId = "test_tenant_123";
+  // 🛡️ REACTION: Watch the User Stream!
+  // This causes the Provider to re-build (and restart the service) whenever:
+  // 1. User logs in/out
+  // 2. User upgrades to Enterprise (tenantId appears)
+  final userAsync = ref.watch(currentUserStreamProvider);
+  final user = userAsync.value;
+
+  // Determine Tenant ID
+  final String? tenantId = (user?.hasCloudAccess == true) ? user?.tenantId : null;
 
   final service = CloudSyncService(
     localDb: db, 
     firestore: firestore,
-    tenantId: fakeTenantId, 
+    prefs: prefs, 
+    tenantId: tenantId, 
   );
 
+  // Auto-Start (Service internal logic will abort if tenantId is null)
   service.startSync();
 
   ref.onDispose(() {

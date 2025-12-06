@@ -1,3 +1,5 @@
+// FILE: packages/core/core_database/lib/src/database.dart
+
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
@@ -17,17 +19,9 @@ abstract class MizanTable extends Table {
   TextColumn get id => text().clientDefault(() => _uuid.v4())();
   DateTimeColumn get createdAt =>
       dateTime().clientDefault(() => DateTime.now())();
-  
-  // This serves as the "last_modified" for the Sync Engine
   DateTimeColumn get lastUpdated =>
       dateTime().clientDefault(() => DateTime.now())();
-
-  // --- ☁️ SAAS TRANSFORMATION MARKERS ---
-  
-  // 1. The Tenant ID (Nullable for Free Tier)
   TextColumn get tenantId => text().nullable()();
-
-  // 2. The Soft Delete Flag
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
 
   @override
@@ -63,14 +57,25 @@ class ReconciledTransactions extends MizanTable {
       text().references(Transactions, #id, onDelete: KeyAction.cascade)();
 }
 
-// ⭐️ NEW TABLE: INVENTORY LAYERS (The "Isolated Ledger")
+// --- PHASE 3.5: INVENTORY LAYERS ---
 @DataClassName('InventoryCostLayer')
 class InventoryCostLayers extends MizanTable {
   TextColumn get productId => text().references(Products, #id, onDelete: KeyAction.cascade)();
   DateTimeColumn get purchaseDate => dateTime()();
   RealColumn get quantityPurchased => real()();
   RealColumn get quantityRemaining => real()();
-  IntColumn get costPerUnit => integer()(); // Cents
+  IntColumn get costPerUnit => integer()(); 
+}
+
+// --- PHASE 5.3: LOCAL REPORT TEMPLATES (New Table) ---
+@DataClassName('LocalReportTemplate')
+class LocalReportTemplates extends MizanTable {
+  TextColumn get title => text()();
+  TextColumn get description => text()();
+  TextColumn get sqlQuery => text()(); // Raw SQL
+  TextColumn get columnsJson => text()(); // JSON List of Columns
+  TextColumn get parametersJson => text()(); // JSON List of Parameters
+  BoolColumn get isPremium => boolean().withDefault(const Constant(false))();
 }
 
 // --- CORE TABLES ---
@@ -88,23 +93,25 @@ class Categories extends MizanTable {
 @DataClassName('Product')
 class Products extends MizanTable {
   TextColumn get name => text()();
-  IntColumn get price => integer()(); // Cents
+  IntColumn get price => integer()(); 
   TextColumn get categoryId =>
       text().references(Categories, #id, onDelete: KeyAction.restrict)();
   TextColumn get barcode => text().nullable().unique()();
   TextColumn get imagePath => text().nullable()();
   RealColumn get quantityOnHand => real().withDefault(const Constant(0.0))();
-  IntColumn get averageCost => integer().withDefault(const Constant(0))(); // Cents
+  IntColumn get averageCost => integer().withDefault(const Constant(0))(); 
+  TextColumn get customAttributes => text().nullable()(); // Phase 5.1
 }
 
 @DataClassName('Account')
 class Accounts extends MizanTable {
   TextColumn get name => text()();
   TextColumn get type => text()();
-  IntColumn get initialBalance => integer()(); // Cents
+  IntColumn get initialBalance => integer()(); 
   TextColumn get phoneNumber => text().nullable()();
   TextColumn get classificationId =>
       text().nullable().references(Classifications, #id, onDelete: KeyAction.setNull)();
+  TextColumn get customAttributes => text().nullable()(); // Phase 5.1
 }
 
 @DataClassName('Transaction')
@@ -116,6 +123,7 @@ class Transactions extends MizanTable {
   TextColumn get relatedTransactionId =>
       text().nullable().references(Transactions, #id, onDelete: KeyAction.setNull)();
   BoolColumn get isAdjustment => boolean().withDefault(const Constant(false))();
+  TextColumn get customAttributes => text().nullable()(); // Phase 5.1
 }
 
 @DataClassName('TransactionEntry')
@@ -124,7 +132,7 @@ class TransactionEntries extends MizanTable {
       text().references(Transactions, #id, onDelete: KeyAction.cascade)();
   TextColumn get accountId =>
       text().references(Accounts, #id, onDelete: KeyAction.restrict)();
-  IntColumn get amount => integer()(); // Cents
+  IntColumn get amount => integer()(); 
   RealColumn get currencyRate => real().withDefault(const Constant(1.0))();
 }
 
@@ -146,7 +154,7 @@ class PaymentMethods extends MizanTable {
 class Orders extends MizanTable {
   TextColumn get transactionId =>
       text().unique().references(Transactions, #id, onDelete: KeyAction.cascade)();
-  IntColumn get totalAmount => integer()(); // Cents
+  IntColumn get totalAmount => integer()(); 
 }
 
 @DataClassName('OrderItem')
@@ -157,7 +165,7 @@ class OrderItems extends MizanTable {
       text().references(Products, #id, onDelete: KeyAction.restrict)();
   TextColumn get productName => text()();
   RealColumn get quantity => real()();
-  IntColumn get priceAtSale => integer()(); // Cents
+  IntColumn get priceAtSale => integer()(); 
   RealColumn get quantityReturned =>
       real().withDefault(const Constant(0.0))();
 }
@@ -177,25 +185,26 @@ class OrderItems extends MizanTable {
   BankReconciliations,
   ReconciledTransactions,
   InventoryCostLayers,
+  LocalReportTemplates, // 👈 Registered
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  // ⭐️ BUMPED VERSION: 17 -> 18
+  // ⭐️ BUMPED VERSION: 19 -> 20
   @override
-  int get schemaVersion => 18;
+  int get schemaVersion => 20;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (Migrator m) async {
       await m.createAll();
-      // 🛡️ IDEMPOTENT SEEDING: Safe to run multiple times
       await _createInitialAccounts();
       await _createInitialClassifications();
       await _createInitialCurrencies();
       await _createInitialPaymentMethods();
     },
     onUpgrade: (Migrator m, int from, int to) async {
+      // [Previous Migrations]
       if (from < 15) {
         await m.createTable(adjustingEntryTasks);
         await m.addColumn(transactions, transactions.isAdjustment);
@@ -207,29 +216,27 @@ class AppDatabase extends _$AppDatabase {
       if (from < 17) {
         await m.createTable(inventoryCostLayers);
       }
-      
-      // 🚀 PHASE 2: SAAS MIGRATION (Version 18)
       if (from < 18) {
-        // We cast these to MizanTable so we can access tenantId/isDeleted
         final tables = [
            categories, products, classifications, accounts, 
            transactions, transactionEntries, currencies, paymentMethods, 
            orders, orderItems, adjustingEntryTasks, 
            bankReconciliations, reconciledTransactions, inventoryCostLayers
         ];
-
         for (final table in tables) {
-           // 🛡️ THE SAFETY CAST
-           await m.addColumn(
-             table as TableInfo<Table, dynamic>, 
-             table.tenantId as GeneratedColumn<Object>
-           );
-           
-           await m.addColumn(
-             table as TableInfo<Table, dynamic>, 
-             table.isDeleted as GeneratedColumn<Object>
-           );
+           await m.addColumn(table as TableInfo<Table, dynamic>, table.tenantId as GeneratedColumn<Object>);
+           await m.addColumn(table as TableInfo<Table, dynamic>, table.isDeleted as GeneratedColumn<Object>);
         }
+      }
+      if (from < 19) {
+        await m.addColumn(products, products.customAttributes);
+        await m.addColumn(accounts, accounts.customAttributes);
+        await m.addColumn(transactions, transactions.customAttributes);
+      }
+
+      // 🧩 PHASE 5.3 MIGRATION (Version 20)
+      if (from < 20) {
+        await m.createTable(localReportTemplates);
       }
     },
     beforeOpen: (details) async {
@@ -239,9 +246,6 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> _createInitialAccounts() async {
     final now = DateTime.now();
-    
-    // 🛡️ CHECK BEFORE INSERT: Avoid duplicating accounts
-    // Since 'name' is not unique in the DB schema, we manually check.
     final existing = await (select(accounts)..where((t) => t.name.equals(kCashAccountName))).get();
     if (existing.isNotEmpty) return;
 
@@ -269,7 +273,6 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> _createInitialClassifications() async {
     final now = DateTime.now();
-    // 🛡️ INSERT OR IGNORE: Skips if 'name' (Unique) already exists
     await into(classifications).insert(ClassificationsCompanion.insert(
       name: kClassificationClients, createdAt: Value(now), lastUpdated: Value(now),
     ), mode: InsertMode.insertOrIgnore);
@@ -285,29 +288,19 @@ class AppDatabase extends _$AppDatabase {
   
   Future<void> _createInitialCurrencies() async {
     final now = DateTime.now();
-    // 🛡️ INSERT OR IGNORE: Skips if 'code' (Unique) already exists
     await into(currencies).insert(CurrenciesCompanion.insert(
-      code: 'Local',
-      name: 'Local Currency',
-      symbol: const Value(null),
-      createdAt: Value(now),
-      lastUpdated: Value(now),
+      code: 'Local', name: 'Local Currency', symbol: const Value(null),
+      createdAt: Value(now), lastUpdated: Value(now),
     ), mode: InsertMode.insertOrIgnore);
     
     await into(currencies).insert(CurrenciesCompanion.insert(
-      code: 'USD',
-      name: 'US Dollar',
-      symbol: const Value('\$'),
-      createdAt: Value(now),
-      lastUpdated: Value(now),
+      code: 'USD', name: 'US Dollar', symbol: const Value('\$'),
+      createdAt: Value(now), lastUpdated: Value(now),
     ), mode: InsertMode.insertOrIgnore);
     
     await into(currencies).insert(CurrenciesCompanion.insert(
-      code: 'SAR',
-      name: 'Saudi Riyal',
-      symbol: const Value('﷼'),
-      createdAt: Value(now),
-      lastUpdated: Value(now),
+      code: 'SAR', name: 'Saudi Riyal', symbol: const Value('﷼'),
+      createdAt: Value(now), lastUpdated: Value(now),
     ), mode: InsertMode.insertOrIgnore);
   }
 
@@ -318,12 +311,9 @@ class AppDatabase extends _$AppDatabase {
 
     if (cashAccount != null) {
       final now = DateTime.now();
-      // 🛡️ INSERT OR IGNORE: Skips if 'name' (Unique) already exists
       await into(paymentMethods).insert(PaymentMethodsCompanion.insert( 
-            name: 'Cash',
-            accountId: cashAccount.id,
-            createdAt: Value(now),
-            lastUpdated: Value(now),
+            name: 'Cash', accountId: cashAccount.id,
+            createdAt: Value(now), lastUpdated: Value(now),
           ), mode: InsertMode.insertOrIgnore);
     }
   }

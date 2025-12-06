@@ -1,5 +1,3 @@
-// FILE: packages/core/core_data/lib/src/preferences_repository.dart
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:core_data/src/secure_storage_provider.dart';
@@ -21,7 +19,8 @@ class PreferencesRepository {
   final SharedPreferences _prefs;
   final FlutterSecureStorage _secureStorage;
 
-  // --- 🔑 Public Keys (Exposed for Bootstrap) ---
+  // --- 🔑 Keys ---
+  static const keyIsFirstRun = 'is_first_run'; // 🟢 NEW
   static const keyThemeMode = 'theme_mode';
   static const keyLocale = 'locale_code';
   static const keyPasscodeEnabled = 'passcode_enabled';
@@ -32,11 +31,17 @@ class PreferencesRepository {
   static const keyCompanyAddress = 'company_address';
   static const keyTaxID = 'tax_id';
   static const keyDefaultCurrency = 'default_currency_code';
+  static const keyCurrencySymbol = 'currency_symbol'; // 🟢 NEW
   static const keyPeriodLockDate = 'period_lock_date';
   static const keyInventoryCostingMethod = 'inventory_costing_method';
-
-  // Private Secure Keys
+  static const keyLastSyncTimestamp = 'last_sync_timestamp';
   static const _kPasscodePin = 'passcode_pin';
+
+  // --- 🚪 Gatekeeper (First Run) ---
+  bool isFirstRun() => _prefs.getBool(keyIsFirstRun) ?? true;
+  
+  Future<void> completeFirstRun() async =>
+      await _prefs.setBool(keyIsFirstRun, false);
 
   // --- Theme ---
   String getThemeMode() => _prefs.getString(keyThemeMode) ?? 'system';
@@ -47,6 +52,15 @@ class PreferencesRepository {
   String? getLocale() => _prefs.getString(keyLocale);
   Future<void> setLocale(String code) async =>
       await _prefs.setString(keyLocale, code);
+
+  // --- Currency (Enhanced) ---
+  String getDefaultCurrencyCode() => _prefs.getString(keyDefaultCurrency) ?? 'USD';
+  Future<void> setDefaultCurrencyCode(String code) async =>
+      await _prefs.setString(keyDefaultCurrency, code);
+
+  String getCurrencySymbol() => _prefs.getString(keyCurrencySymbol) ?? '\$'; // 🟢 NEW
+  Future<void> setCurrencySymbol(String symbol) async =>
+      await _prefs.setString(keyCurrencySymbol, symbol);
 
   // --- Passcode Enabled ---
   bool isPasscodeEnabled() => _prefs.getBool(keyPasscodeEnabled) ?? false;
@@ -88,11 +102,6 @@ class PreferencesRepository {
   Future<void> setTaxID(String taxId) async =>
       await _prefs.setString(keyTaxID, taxId);
 
-  // --- Default Currency ---
-  String getDefaultCurrencyCode() => _prefs.getString(keyDefaultCurrency) ?? 'Local';
-  Future<void> setDefaultCurrencyCode(String code) async =>
-      await _prefs.setString(keyDefaultCurrency, code);
-
   // --- Period Locking ---
   DateTime? getPeriodLockDate() {
     final str = _prefs.getString(keyPeriodLockDate);
@@ -105,8 +114,18 @@ class PreferencesRepository {
 
   // --- Inventory Costing ---
   String getInventoryCostingMethod() => _prefs.getString(keyInventoryCostingMethod) ?? 'fifo';
-
   Future<void> setInventoryCostingMethod(String method) async {
     await _prefs.setString(keyInventoryCostingMethod, method);
+  }
+
+  // --- ☁️ Sync Engine Methods ---
+  DateTime getLastSyncTime() {
+    final str = _prefs.getString(keyLastSyncTimestamp);
+    if (str == null) return DateTime.fromMillisecondsSinceEpoch(0);
+    return DateTime.parse(str);
+  }
+
+  Future<void> setLastSyncTime(DateTime date) async {
+    await _prefs.setString(keyLastSyncTimestamp, date.toIso8601String());
   }
 }

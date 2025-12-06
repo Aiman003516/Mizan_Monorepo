@@ -10,13 +10,12 @@ dependencies:
     sdk: flutter
   
   # State Management
-  # ⚠️ FIXED: aligned with the rest of the monorepo to avoid conflicts
   flutter_riverpod: ^2.6.1
 
   # Local Dependencies
   core_l10n:
     path: ../../core/core_l10n
-  core_data: # 👈 ADDED THIS
+  core_data:
     path: ../../core/core_data
 
 dev_dependencies:

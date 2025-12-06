@@ -1,17 +1,19 @@
+// FILE: packages/shared/shared_ui/lib/src/widgets/empty_state.dart
+
 import 'package:flutter/material.dart';
 
 class EmptyStateWidget extends StatelessWidget {
-  final String message;
-  final String? buttonLabel;
-  final VoidCallback? onAction;
   final IconData icon;
+  final String title;   // 👈 This was missing or named differently
+  final String message;
+  final Widget? action; // Optional button
 
   const EmptyStateWidget({
     super.key,
+    required this.icon,
+    required this.title,
     required this.message,
-    this.icon = Icons.inbox,
-    this.buttonLabel,
-    this.onAction,
+    this.action,
   });
 
   @override
@@ -22,27 +24,28 @@ class EmptyStateWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 80,
-              color: Colors.grey.shade300,
+            Icon(icon, size: 64, color: Colors.grey.shade400),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.bold,
+                  ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 8),
             Text(
               message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.grey.shade600,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey.shade500,
                   ),
+              textAlign: TextAlign.center,
             ),
-            if (buttonLabel != null && onAction != null) ...[
+            if (action != null) ...[
               const SizedBox(height: 24),
-              OutlinedButton.icon(
-                onPressed: onAction,
-                icon: const Icon(Icons.add),
-                label: Text(buttonLabel!),
-              )
-            ]
+              action!,
+            ],
           ],
         ),
       ),
