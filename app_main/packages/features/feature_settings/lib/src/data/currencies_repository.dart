@@ -2,13 +2,8 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 
-// This provider must be overridden in app_mizan
-final databaseProvider = Provider<AppDatabase>((ref) {
-  throw UnimplementedError('databaseProvider must be overridden');
-});
-
 final currenciesRepositoryProvider = Provider<CurrenciesRepository>((ref) {
-  final db = ref.watch(databaseProvider);
+  final db = ref.watch(appDatabaseProvider);
   return CurrenciesRepository(db);
 });
 
@@ -21,9 +16,9 @@ class CurrenciesRepository {
   final AppDatabase _db;
 
   Stream<List<Currency>> watchCurrencies() {
-    return (_db.select(_db.currencies)
-      ..orderBy([(t) => OrderingTerm.asc(t.code)]))
-        .watch();
+    return (_db.select(
+      _db.currencies,
+    )..orderBy([(t) => OrderingTerm.asc(t.code)])).watch();
   }
 
   Future<void> createCurrency({
@@ -41,8 +36,13 @@ class CurrenciesRepository {
 
   // Logic moved from database.dart
   Future<void> updateCurrency(Currency currency) {
-    return _db.update(_db.currencies).replace(
-        currency.toCompanion(false).copyWith(lastUpdated: Value(DateTime.now())));
+    return _db
+        .update(_db.currencies)
+        .replace(
+          currency
+              .toCompanion(false)
+              .copyWith(lastUpdated: Value(DateTime.now())),
+        );
   }
 
   Future<void> deleteCurrency(String id) {

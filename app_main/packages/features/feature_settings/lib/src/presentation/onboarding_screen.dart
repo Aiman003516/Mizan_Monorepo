@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
+import 'package:feature_settings/src/presentation/onboarding_tutorial_screen.dart';
 
 // We need a provider to trigger the "First Run Completed" action
 // This will just refresh the main app state
@@ -54,12 +55,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   Image.asset(
                     'assets/images/mizan_full.png', // Ensure this exists or use icon
                     height: 60,
-                    errorBuilder: (_, __, ___) => const Icon(Icons.account_balance_wallet, size: 60),
+                    errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.account_balance_wallet, size: 60),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     "Welcome to Mizan",
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const Text("Let's set things up correctly."),
                 ],
@@ -79,7 +83,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         child: _LanguageCard(
                           title: "English",
                           isSelected: locale?.languageCode == 'en',
-                          onTap: () => ref.read(localeControllerProvider.notifier).setLocale(const Locale('en')),
+                          onTap: () => ref
+                              .read(localeControllerProvider.notifier)
+                              .setLocale(const Locale('en')),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -87,7 +93,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         child: _LanguageCard(
                           title: "العربية",
                           isSelected: locale?.languageCode == 'ar',
-                          onTap: () => ref.read(localeControllerProvider.notifier).setLocale(const Locale('ar')),
+                          onTap: () => ref
+                              .read(localeControllerProvider.notifier)
+                              .setLocale(const Locale('ar')),
                         ),
                       ),
                     ],
@@ -99,13 +107,27 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   const SizedBox(height: 16),
                   SegmentedButton<ThemeMode>(
                     segments: const [
-                      ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.wb_sunny), label: Text("Light")),
-                      ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.nightlight_round), label: Text("Dark")),
-                      ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.settings_suggest), label: Text("Auto")),
+                      ButtonSegment(
+                        value: ThemeMode.light,
+                        icon: Icon(Icons.wb_sunny),
+                        label: Text("Light"),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.dark,
+                        icon: Icon(Icons.nightlight_round),
+                        label: Text("Dark"),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.system,
+                        icon: Icon(Icons.settings_suggest),
+                        label: Text("Auto"),
+                      ),
                     ],
                     selected: {themeMode},
                     onSelectionChanged: (newSelection) {
-                      ref.read(themeControllerProvider.notifier).setThemeMode(newSelection.first);
+                      ref
+                          .read(themeControllerProvider.notifier)
+                          .setThemeMode(newSelection.first);
                     },
                   ),
                   const SizedBox(height: 32),
@@ -122,17 +144,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     items: _commonCurrencies.map((c) {
                       return DropdownMenuItem(
                         value: c['code'],
-                        child: Text("${c['code']} - ${c['name']} (${c['symbol']})"),
+                        child: Text(
+                          "${c['code']} - ${c['name']} (${c['symbol']})",
+                        ),
                       );
                     }).toList(),
                     onChanged: (val) {
                       setState(() {
                         _selectedCurrency = val!;
                         _isCustomCurrency = val == 'CUSTOM';
-                        
+
                         // Auto-fill symbol for known currencies
                         if (!_isCustomCurrency) {
-                          final cur = _commonCurrencies.firstWhere((c) => c['code'] == val);
+                          final cur = _commonCurrencies.firstWhere(
+                            (c) => c['code'] == val,
+                          );
                           _customCodeCtrl.text = cur['code']!;
                           _customSymbolCtrl.text = cur['symbol']!;
                         } else {
@@ -142,7 +168,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       });
                     },
                   ),
-                  
+
                   // Custom Currency Fields (Animated)
                   if (_isCustomCurrency) ...[
                     const SizedBox(height: 16),
@@ -184,7 +210,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 height: 56,
                 child: FilledButton(
                   onPressed: () => _completeOnboarding(ref),
-                  child: const Text("Get Started", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    "Get Started",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ),
@@ -199,7 +228,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 8),
-        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -211,13 +243,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
     if (_isCustomCurrency) {
       if (_customCodeCtrl.text.isEmpty || _customSymbolCtrl.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please enter currency details")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please enter currency details")),
+        );
         return;
       }
       finalCode = _customCodeCtrl.text.toUpperCase();
       finalSymbol = _customSymbolCtrl.text;
     } else {
-      final cur = _commonCurrencies.firstWhere((c) => c['code'] == _selectedCurrency);
+      final cur = _commonCurrencies.firstWhere(
+        (c) => c['code'] == _selectedCurrency,
+      );
       finalCode = cur['code']!;
       finalSymbol = cur['symbol']!;
     }
@@ -226,12 +262,27 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final prefs = ref.read(preferencesRepositoryProvider);
     await prefs.setDefaultCurrencyCode(finalCode);
     await prefs.setCurrencySymbol(finalSymbol);
-    
+
     // 3. Mark as Complete
     await prefs.completeFirstRun();
 
-    // 4. Trigger App Rebuild (via main.dart)
-    ref.read(onboardingCompletedProvider.notifier).state = true;
+    // 4. Show feature tutorial, then trigger App Rebuild
+    if (mounted) {
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => OnboardingTutorialScreen(
+            onComplete: () {
+              Navigator.of(context).pop();
+              // Trigger App Rebuild (via main.dart)
+              ref.read(onboardingCompletedProvider.notifier).state = true;
+            },
+          ),
+        ),
+      );
+    } else {
+      // Fallback if widget unmounted
+      ref.read(onboardingCompletedProvider.notifier).state = true;
+    }
   }
 }
 
@@ -240,7 +291,11 @@ class _LanguageCard extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _LanguageCard({required this.title, required this.isSelected, required this.onTap});
+  const _LanguageCard({
+    required this.title,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -251,8 +306,15 @@ class _LanguageCard extends StatelessWidget {
         height: 80,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.surfaceVariant,
-          border: isSelected ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2) : null,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer
+              : Theme.of(context).colorScheme.surfaceVariant,
+          border: isSelected
+              ? Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                )
+              : null,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -260,7 +322,9 @@ class _LanguageCard extends StatelessWidget {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: isSelected ? Theme.of(context).colorScheme.onPrimaryContainer : null,
+            color: isSelected
+                ? Theme.of(context).colorScheme.onPrimaryContainer
+                : null,
           ),
         ),
       ),

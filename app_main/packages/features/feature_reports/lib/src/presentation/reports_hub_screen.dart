@@ -15,6 +15,14 @@ import 'total_classifications_screen.dart';
 import 'account_activity_screen.dart';
 import 'report_marketplace_screen.dart';
 
+// --- ANALYSIS TOOL IMPORTS ---
+import 'tools/cvp_analysis_screen.dart';
+import 'tools/capital_budgeting_screen.dart';
+import 'tools/fraud_detection_screen.dart';
+import 'tools/standard_costing_screen.dart';
+import 'tools/financial_ratios_screen.dart';
+import 'budget_screen.dart';
+
 class ReportsHubScreen extends ConsumerWidget {
   const ReportsHubScreen({super.key});
 
@@ -31,7 +39,9 @@ class ReportsHubScreen extends ConsumerWidget {
             tooltip: "Report Marketplace",
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const ReportMarketplaceScreen()),
+              MaterialPageRoute(
+                builder: (_) => const ReportMarketplaceScreen(),
+              ),
             ),
           ),
         ],
@@ -42,7 +52,11 @@ class ReportsHubScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // SECTION 1: FINANCIAL STATEMENTS
-            _buildSectionHeader(context, "Financial Statements", Icons.account_balance),
+            _buildSectionHeader(
+              context,
+              "Financial Statements",
+              Icons.account_balance,
+            ),
             _buildGrid(context, [
               _ReportCard(
                 title: l10n.profitAndLoss, // String (Correct)
@@ -64,7 +78,7 @@ class ReportsHubScreen extends ConsumerWidget {
               ),
               _ReportCard(
                 // ✅ FIX: Use 'accountActivity' instead of 'generalLedger' (which doesn't exist)
-                title: l10n.accountActivity, 
+                title: l10n.accountActivity,
                 icon: Icons.menu_book,
                 color: Colors.blueGrey,
                 onTap: () => _nav(context, const AccountActivityScreen()),
@@ -78,7 +92,7 @@ class ReportsHubScreen extends ConsumerWidget {
             _buildGrid(context, [
               _ReportCard(
                 // ✅ FIX: Use 'totalAmountsReport' (String) instead of 'totalAmounts' (Function)
-                title: l10n.totalAmountsReport, 
+                title: l10n.totalAmountsReport,
                 icon: Icons.pie_chart,
                 color: Colors.orange,
                 onTap: () => _nav(context, const TotalAmountsScreen()),
@@ -92,7 +106,7 @@ class ReportsHubScreen extends ConsumerWidget {
               ),
               _ReportCard(
                 // ✅ FIX: Use localized string instead of hardcoded
-                title: l10n.totalClassifications, 
+                title: l10n.totalClassifications,
                 icon: Icons.category,
                 color: Colors.amber,
                 onTap: () => _nav(context, const TotalClassificationsScreen()),
@@ -101,8 +115,55 @@ class ReportsHubScreen extends ConsumerWidget {
 
             const SizedBox(height: 24),
 
-            // SECTION 3: UPCOMING (The "Power 10" Placeholders)
-            _buildSectionHeader(context, "Inventory & Operations (Coming Soon)", Icons.inventory_2),
+            // SECTION 3: ANALYSIS TOOLS
+            _buildSectionHeader(context, "Analysis Tools", Icons.analytics),
+            _buildGrid(context, [
+              _ReportCard(
+                title: "CVP Analysis",
+                icon: Icons.trending_up,
+                color: Colors.deepPurple,
+                onTap: () => _nav(context, const CVPAnalysisScreen()),
+              ),
+              _ReportCard(
+                title: "Capital Budgeting",
+                icon: Icons.account_tree,
+                color: Colors.green,
+                onTap: () => _nav(context, const CapitalBudgetingScreen()),
+              ),
+              _ReportCard(
+                title: "Budget Analysis",
+                icon: Icons.account_balance_wallet,
+                color: Colors.teal,
+                onTap: () => _nav(context, const BudgetScreen()),
+              ),
+              _ReportCard(
+                title: "Fraud Detection",
+                icon: Icons.security,
+                color: Colors.red,
+                onTap: () => _nav(context, const FraudDetectionScreen()),
+              ),
+              _ReportCard(
+                title: "Standard Costing",
+                icon: Icons.precision_manufacturing,
+                color: Colors.indigo,
+                onTap: () => _nav(context, const StandardCostingScreen()),
+              ),
+              _ReportCard(
+                title: "Financial Ratios",
+                icon: Icons.pie_chart,
+                color: Colors.cyan,
+                onTap: () => _nav(context, const FinancialRatiosScreen()),
+              ),
+            ]),
+
+            const SizedBox(height: 24),
+
+            // SECTION 4: UPCOMING (The "Power 10" Placeholders)
+            _buildSectionHeader(
+              context,
+              "Inventory & Operations (Coming Soon)",
+              Icons.inventory_2,
+            ),
             _buildGrid(context, [
               _ReportCard(
                 title: "Stock Velocity",
@@ -135,7 +196,11 @@ class ReportsHubScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, IconData icon) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    IconData icon,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0, left: 4),
       child: Row(
@@ -200,7 +265,9 @@ class _ReportCard extends StatelessWidget {
         onTap: isLocked ? null : onTap,
         child: Container(
           decoration: BoxDecoration(
-            border: Border(left: BorderSide(color: isLocked ? Colors.grey : color, width: 4)),
+            border: Border(
+              left: BorderSide(color: isLocked ? Colors.grey : color, width: 4),
+            ),
           ),
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -208,9 +275,9 @@ class _ReportCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Icon(
-                icon, 
-                size: 32, 
-                color: isLocked ? Colors.grey.shade400 : color
+                icon,
+                size: 32,
+                color: isLocked ? Colors.grey.shade400 : color,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -226,8 +293,12 @@ class _ReportCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (isLocked) 
-                    const Icon(Icons.lock_outline, size: 16, color: Colors.grey),
+                  if (isLocked)
+                    const Icon(
+                      Icons.lock_outline,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                 ],
               ),
             ],

@@ -11,7 +11,6 @@ import 'dart:async';
 import 'package:async/async.dart';
 import 'package:drift/drift.dart' as d;
 
-
 /// The placeholder database provider for this feature.
 final databaseProvider = Provider<AppDatabase>((ref) {
   return ref.watch(appDatabaseProvider);
@@ -22,48 +21,62 @@ final reportsServiceProvider = Provider<ReportsService>((ref) {
 });
 
 final totalAmountsSummaryProvider =
-    StreamProvider.family<List<AccountSummary>, TotalAmountsFilter>((ref, filter) {
-  final service = ref.watch(reportsServiceProvider);
-  return service.watchTotalAmountsSummary(filter: filter);
-});
+    StreamProvider.family<List<AccountSummary>, TotalAmountsFilter>((
+      ref,
+      filter,
+    ) {
+      final service = ref.watch(reportsServiceProvider);
+      return service.watchTotalAmountsSummary(filter: filter);
+    });
 
 final monthlyAmountsSummaryProvider =
-    StreamProvider.family<List<MonthlySummary>, TotalAmountsFilter>((ref, filter) {
-  final service = ref.watch(reportsServiceProvider);
-  return service.watchMonthlyAmountsSummary(filter: filter);
-});
+    StreamProvider.family<List<MonthlySummary>, TotalAmountsFilter>((
+      ref,
+      filter,
+    ) {
+      final service = ref.watch(reportsServiceProvider);
+      return service.watchMonthlyAmountsSummary(filter: filter);
+    });
 
 final totalClassificationsSummaryProvider =
     StreamProvider<List<ClassificationSummary>>((ref) {
-  final service = ref.watch(reportsServiceProvider);
-  return service.watchTotalClassificationsSummary();
-});
+      final service = ref.watch(reportsServiceProvider);
+      return service.watchTotalClassificationsSummary();
+    });
 
 final filteredTransactionDetailsProvider =
-    StreamProvider.family<List<TransactionDetail>, TotalAmountsFilter>((ref, filter) {
-  final service = ref.watch(reportsServiceProvider);
-  return service.watchTransactionDetailsFiltered(filter: filter);
-});
+    StreamProvider.family<List<TransactionDetail>, TotalAmountsFilter>((
+      ref,
+      filter,
+    ) {
+      final service = ref.watch(reportsServiceProvider);
+      return service.watchTransactionDetailsFiltered(filter: filter);
+    });
 
-final allAccountSummariesProvider =
-    StreamProvider<Map<String, AccountSummary>>((ref) {
-  final service = ref.watch(reportsServiceProvider);
-  return service.watchAllAccountSummaries().map((summaries) {
-    final localCurrencySummaries =
-        summaries.where((s) => s.currencyCode == 'Local');
-    return {for (var summary in localCurrencySummaries) summary.accountId: summary};
-  });
-});
+final allAccountSummariesProvider = StreamProvider<Map<String, AccountSummary>>(
+  (ref) {
+    final service = ref.watch(reportsServiceProvider);
+    return service.watchAllAccountSummaries().map((summaries) {
+      final localCurrencySummaries = summaries.where(
+        (s) => s.currencyCode == 'Local',
+      );
+      return {
+        for (var summary in localCurrencySummaries) summary.accountId: summary,
+      };
+    });
+  },
+);
 
 // Local class definitions (kept as requested)
 class PnlLine {
   final String accountType;
   final String accountName;
   final double balance;
-  PnlLine(
-      {required this.accountType,
-      required this.accountName,
-      required this.balance});
+  PnlLine({
+    required this.accountType,
+    required this.accountName,
+    required this.balance,
+  });
 }
 
 class PnlData {
@@ -72,29 +85,52 @@ class PnlData {
   final double totalRevenue;
   final double totalExpenses;
   final double netIncome;
+  final AccrualsSummary? accrualsSummary;
   PnlData({
     required this.revenueLines,
     required this.expenseLines,
     required this.totalRevenue,
     required this.totalExpenses,
     required this.netIncome,
+    this.accrualsSummary,
   });
   static PnlData empty() => PnlData(
-      revenueLines: [],
-      expenseLines: [],
-      totalRevenue: 0,
-      totalExpenses: 0,
-      netIncome: 0);
+    revenueLines: [],
+    expenseLines: [],
+    totalRevenue: 0,
+    totalExpenses: 0,
+    netIncome: 0,
+  );
+}
+
+/// Summary of accruals for the Income Statement
+class AccrualsSummary {
+  final int prepaidExpensesTotal;
+  final int accruedExpensesTotal;
+  final int deferredRevenueTotal;
+  final int activeAccrualsCount;
+
+  AccrualsSummary({
+    required this.prepaidExpensesTotal,
+    required this.accruedExpensesTotal,
+    required this.deferredRevenueTotal,
+    required this.activeAccrualsCount,
+  });
+
+  double get prepaidExpensesInDollars => prepaidExpensesTotal / 100.0;
+  double get accruedExpensesInDollars => accruedExpensesTotal / 100.0;
+  double get deferredRevenueInDollars => deferredRevenueTotal / 100.0;
 }
 
 class BalanceSheetLine {
   final String accountType;
   final String accountName;
   final double balance;
-  BalanceSheetLine(
-      {required this.accountType,
-      required this.accountName,
-      required this.balance});
+  BalanceSheetLine({
+    required this.accountType,
+    required this.accountName,
+    required this.balance,
+  });
 }
 
 class BalanceSheetData {
@@ -104,6 +140,7 @@ class BalanceSheetData {
   final double totalAssets;
   final double totalLiabilities;
   final double totalEquity;
+  final FixedAssetsSummary? fixedAssetsSummary;
   BalanceSheetData({
     required this.assetLines,
     required this.liabilityLines,
@@ -111,23 +148,146 @@ class BalanceSheetData {
     required this.totalAssets,
     required this.totalLiabilities,
     required this.totalEquity,
+    this.fixedAssetsSummary,
   });
   double get balanceCheck => totalAssets - (totalLiabilities + totalEquity);
   static BalanceSheetData empty() => BalanceSheetData(
-      assetLines: [],
-      liabilityLines: [],
-      equityLines: [],
-      totalAssets: 0,
-      totalLiabilities: 0,
-      totalEquity: 0);
+    assetLines: [],
+    liabilityLines: [],
+    equityLines: [],
+    totalAssets: 0,
+    totalLiabilities: 0,
+    totalEquity: 0,
+  );
+}
+
+/// Summary of fixed assets for the Balance Sheet
+class FixedAssetsSummary {
+  final int totalAcquisitionCost;
+  final int totalAccumulatedDepreciation;
+  final int netBookValue;
+  final int assetCount;
+  final int activeCount;
+  final int fullyDepreciatedCount;
+
+  FixedAssetsSummary({
+    required this.totalAcquisitionCost,
+    required this.totalAccumulatedDepreciation,
+    required this.netBookValue,
+    required this.assetCount,
+    required this.activeCount,
+    required this.fullyDepreciatedCount,
+  });
+
+  double get acquisitionCostInDollars => totalAcquisitionCost / 100.0;
+  double get depreciationInDollars => totalAccumulatedDepreciation / 100.0;
+  double get netBookValueInDollars => netBookValue / 100.0;
 }
 
 class TrialBalanceLine {
   final String accountName;
   final double debit;
   final double credit;
-  TrialBalanceLine(
-      {required this.accountName, required this.debit, required this.credit});
+  TrialBalanceLine({
+    required this.accountName,
+    required this.debit,
+    required this.credit,
+  });
+}
+
+/// Cash Flow Statement line item
+class CashFlowLine {
+  final String description;
+  final double amount;
+  final String category; // 'operating', 'investing', 'financing'
+
+  CashFlowLine({
+    required this.description,
+    required this.amount,
+    required this.category,
+  });
+}
+
+/// Statement of Cash Flows data (Indirect Method)
+class CashFlowData {
+  final double netIncome;
+
+  // Operating Activities (Indirect Method)
+  final List<CashFlowLine> operatingAdjustments;
+  final double netCashFromOperating;
+
+  // Investing Activities
+  final List<CashFlowLine> investingActivities;
+  final double netCashFromInvesting;
+
+  // Financing Activities
+  final List<CashFlowLine> financingActivities;
+  final double netCashFromFinancing;
+
+  // Summary
+  final double netChangeInCash;
+  final double beginningCash;
+  final double endingCash;
+
+  CashFlowData({
+    required this.netIncome,
+    required this.operatingAdjustments,
+    required this.netCashFromOperating,
+    required this.investingActivities,
+    required this.netCashFromInvesting,
+    required this.financingActivities,
+    required this.netCashFromFinancing,
+    required this.netChangeInCash,
+    required this.beginningCash,
+    required this.endingCash,
+  });
+
+  static CashFlowData empty() => CashFlowData(
+    netIncome: 0,
+    operatingAdjustments: [],
+    netCashFromOperating: 0,
+    investingActivities: [],
+    netCashFromInvesting: 0,
+    financingActivities: [],
+    netCashFromFinancing: 0,
+    netChangeInCash: 0,
+    beginningCash: 0,
+    endingCash: 0,
+  );
+}
+
+/// Financial ratios for dashboard
+class FinancialRatios {
+  final double currentRatio; // Current Assets / Current Liabilities
+  final double quickRatio; // (Cash + Receivables) / Current Liabilities
+  final double debtToEquity; // Total Liabilities / Owner's Equity
+  final double grossProfitMargin; // (Revenue - COGS) / Revenue
+  final double netProfitMargin; // Net Income / Revenue
+  final double returnOnAssets; // Net Income / Total Assets
+  final double workingCapital; // Current Assets - Current Liabilities
+  final double receivablesTurnover; // Revenue / Avg Receivables
+
+  FinancialRatios({
+    required this.currentRatio,
+    required this.quickRatio,
+    required this.debtToEquity,
+    required this.grossProfitMargin,
+    required this.netProfitMargin,
+    required this.returnOnAssets,
+    required this.workingCapital,
+    required this.receivablesTurnover,
+  });
+
+  static FinancialRatios empty() => FinancialRatios(
+    currentRatio: 0,
+    quickRatio: 0,
+    debtToEquity: 0,
+    grossProfitMargin: 0,
+    netProfitMargin: 0,
+    returnOnAssets: 0,
+    workingCapital: 0,
+    receivablesTurnover: 0,
+  );
 }
 
 final pnlDateRangeProvider = StateProvider<DateTimeRange>((ref) {
@@ -160,8 +320,7 @@ class ReportsService {
   final Ref _ref;
 
   AppDatabase get _db => _ref.read(databaseProvider);
-  AccountsRepository get _accountsRepo =>
-      _ref.read(accountsRepositoryProvider);
+  AccountsRepository get _accountsRepo => _ref.read(accountsRepositoryProvider);
 
   Stream<List<TransactionDetail>> watchTransactionDetails() {
     final query = _db.select(_db.transactions).join([
@@ -206,9 +365,12 @@ class ReportsService {
   }
 
   Stream<List<TransactionDetail>> watchTransactionDetailsByTransactionId(
-      String transactionId) {
-    return watchTransactionDetails().map((allDetails) =>
-        allDetails.where((d) => d.transactionId == transactionId).toList());
+    String transactionId,
+  ) {
+    return watchTransactionDetails().map(
+      (allDetails) =>
+          allDetails.where((d) => d.transactionId == transactionId).toList(),
+    );
   }
 
   Future<double> getTotalRevenue() async {
@@ -217,15 +379,15 @@ class ReportsService {
         _db.accounts,
         _db.accounts.id.equalsExp(_db.transactionEntries.accountId),
       ),
-    ])
-      ..where(_db.accounts.type.equals('revenue'));
+    ])..where(_db.accounts.type.equals('revenue'));
     final results = await query.get();
-    
+
     // FIX: Sum in Integers (Cents)
     int totalCents = 0;
     for (final row in results) {
       final entry = row.readTable(_db.transactionEntries);
-      totalCents -= entry.amount; // Revenue is credit (negative), negate to make positive
+      totalCents -=
+          entry.amount; // Revenue is credit (negative), negate to make positive
     }
     // Convert to Double
     return totalCents / 100.0;
@@ -237,10 +399,9 @@ class ReportsService {
         _db.accounts,
         _db.accounts.id.equalsExp(_db.transactionEntries.accountId),
       ),
-    ])
-      ..where(_db.accounts.type.equals('expense'));
+    ])..where(_db.accounts.type.equals('expense'));
     final results = await query.get();
-    
+
     // FIX: Sum in Integers (Cents)
     int totalCents = 0;
     for (final row in results) {
@@ -252,14 +413,15 @@ class ReportsService {
   }
 
   Future<double> getTotalReceivable() async {
-    final classification = await (_db.select(_db.classifications)
-          ..where((tbl) => tbl.name.equals(c.kClassificationClients)))
-        .getSingleOrNull();
+    final classification =
+        await (_db.select(_db.classifications)
+              ..where((tbl) => tbl.name.equals(c.kClassificationClients)))
+            .getSingleOrNull();
     if (classification == null) return 0.0;
-    final clientAccounts = await (_db.select(_db.accounts)
-          ..where((a) => a.classificationId.equals(classification.id)))
-        .get();
-    
+    final clientAccounts = await (_db.select(
+      _db.accounts,
+    )..where((a) => a.classificationId.equals(classification.id))).get();
+
     double totalReceivable = 0.0;
     for (final account in clientAccounts) {
       // getAccountBalance now returns Double, so this is safe
@@ -269,17 +431,18 @@ class ReportsService {
   }
 
   Future<double> getTotalPayable() async {
-    final classification = await (_db.select(_db.classifications)
-          ..where((tbl) => tbl.name.equals(c.kClassificationSuppliers)))
-        .getSingleOrNull();
+    final classification =
+        await (_db.select(_db.classifications)
+              ..where((tbl) => tbl.name.equals(c.kClassificationSuppliers)))
+            .getSingleOrNull();
     if (classification == null) return 0.0;
-    final supplierAccounts = await (_db.select(_db.accounts)
-          ..where((a) => a.classificationId.equals(classification.id)))
-        .get();
-    
+    final supplierAccounts = await (_db.select(
+      _db.accounts,
+    )..where((a) => a.classificationId.equals(classification.id))).get();
+
     double totalPayable = 0.0;
     for (final account in supplierAccounts) {
-       // getAccountBalance now returns Double, so this is safe
+      // getAccountBalance now returns Double, so this is safe
       totalPayable += await _accountsRepo.getAccountBalance(account.id);
     }
     return -totalPayable;
@@ -287,74 +450,92 @@ class ReportsService {
 
   // TransactionDetail uses Double amounts now (converted in watchTransactionDetails),
   // so these downstream methods can calculate in Doubles as expected.
-  Stream<List<AccountSummary>> watchAllAccountSummaries() => watchTransactionDetails().map((details) {
-      final groupedByAccount = groupBy(details, (detail) => detail.accountId);
-      final List<AccountSummary> summaries = [];
-      for (final accountEntry in groupedByAccount.entries) {
-        final accountId = accountEntry.key;
-        final accountDetails = accountEntry.value;
-        final accountName = accountDetails.first.accountName;
-        final groupedByCurrency =
-            groupBy(accountDetails, (detail) => detail.currencyCode);
-        for (final currencyEntry in groupedByCurrency.entries) {
-          final currencyCode = currencyEntry.key;
-          final currencyDetails = currencyEntry.value;
-          double totalDebit = 0.0, totalCredit = 0.0;
-          for (final detail in currencyDetails) {
-            if (detail.entryAmount > 0) {
-              totalDebit += detail.entryAmount;
-            } else {
-              totalCredit += detail.entryAmount.abs();
+  Stream<List<AccountSummary>> watchAllAccountSummaries() =>
+      watchTransactionDetails().map((details) {
+        final groupedByAccount = groupBy(details, (detail) => detail.accountId);
+        final List<AccountSummary> summaries = [];
+        for (final accountEntry in groupedByAccount.entries) {
+          final accountId = accountEntry.key;
+          final accountDetails = accountEntry.value;
+          final accountName = accountDetails.first.accountName;
+          final groupedByCurrency = groupBy(
+            accountDetails,
+            (detail) => detail.currencyCode,
+          );
+          for (final currencyEntry in groupedByCurrency.entries) {
+            final currencyCode = currencyEntry.key;
+            final currencyDetails = currencyEntry.value;
+            double totalDebit = 0.0, totalCredit = 0.0;
+            for (final detail in currencyDetails) {
+              if (detail.entryAmount > 0) {
+                totalDebit += detail.entryAmount;
+              } else {
+                totalCredit += detail.entryAmount.abs();
+              }
             }
+            final netBalance = totalDebit - totalCredit;
+            summaries.add(
+              AccountSummary(
+                accountId: accountId,
+                accountName: accountName,
+                currencyCode: currencyCode,
+                totalDebit: totalDebit,
+                totalCredit: totalCredit,
+                netBalance: netBalance,
+              ),
+            );
           }
-          final netBalance = totalDebit - totalCredit;
-          summaries.add(AccountSummary(
-            accountId: accountId,
-            accountName: accountName,
-            currencyCode: currencyCode,
-            totalDebit: totalDebit,
-            totalCredit: totalCredit,
-            netBalance: netBalance,
-          ));
         }
-      }
-      summaries.sort((a, b) {
-        if (a.accountName != b.accountName)
-          return a.accountName.compareTo(b.accountName);
-        return a.currencyCode.compareTo(b.currencyCode);
+        summaries.sort((a, b) {
+          if (a.accountName != b.accountName)
+            return a.accountName.compareTo(b.accountName);
+          return a.currencyCode.compareTo(b.currencyCode);
+        });
+        return summaries;
       });
-      return summaries;
-    });
 
-  Stream<List<TransactionDetail>> _watchFilteredDetails(String? classificationNameFilter) {
+  Stream<List<TransactionDetail>> _watchFilteredDetails(
+    String? classificationNameFilter,
+  ) {
     final rawStream = watchTransactionDetails();
     if (classificationNameFilter == null) return rawStream;
-    return rawStream.map((details) =>
-        details.where((d) => d.classificationName == classificationNameFilter).toList());
+    return rawStream.map(
+      (details) => details
+          .where((d) => d.classificationName == classificationNameFilter)
+          .toList(),
+    );
   }
 
-  Stream<List<AccountSummary>> watchTotalAmountsSummary({required TotalAmountsFilter filter}) {
+  Stream<List<AccountSummary>> watchTotalAmountsSummary({
+    required TotalAmountsFilter filter,
+  }) {
     return watchTransactionDetails().map((details) {
       final classificationFilteredDetails = details
-          .where((d) =>
-              (d.classificationName ?? c.kClassificationGeneral) ==
-              filter.classificationName)
+          .where(
+            (d) =>
+                (d.classificationName ?? c.kClassificationGeneral) ==
+                filter.classificationName,
+          )
           .toList();
       List<TransactionDetail> finalFilteredDetails;
       switch (filter.reportFilter) {
         case ReportFilter.POS_ONLY:
           finalFilteredDetails = classificationFilteredDetails
-              .where((d) =>
-                  d.accountName == c.kCashAccountName ||
-                  d.accountName == c.kSalesRevenueAccountName)
+              .where(
+                (d) =>
+                    d.accountName == c.kCashAccountName ||
+                    d.accountName == c.kSalesRevenueAccountName,
+              )
               .toList();
           break;
         case ReportFilter.ACCOUNTS_ONLY:
           finalFilteredDetails = classificationFilteredDetails
-              .where((d) =>
-                  d.accountName != c.kCashAccountName &&
-                  d.accountName != c.kSalesRevenueAccountName &&
-                  d.accountName != c.kEquityAccountName)
+              .where(
+                (d) =>
+                    d.accountName != c.kCashAccountName &&
+                    d.accountName != c.kSalesRevenueAccountName &&
+                    d.accountName != c.kEquityAccountName,
+              )
               .toList();
           break;
         case ReportFilter.ALL:
@@ -362,18 +543,24 @@ class ReportsService {
           finalFilteredDetails = classificationFilteredDetails;
           break;
       }
-      finalFilteredDetails.removeWhere((detail) =>
-          detail.accountName == c.kEquityAccountName ||
-          detail.accountName == c.kSalesRevenueAccountName);
-      final groupedByAccount =
-          groupBy(finalFilteredDetails, (detail) => detail.accountName);
+      finalFilteredDetails.removeWhere(
+        (detail) =>
+            detail.accountName == c.kEquityAccountName ||
+            detail.accountName == c.kSalesRevenueAccountName,
+      );
+      final groupedByAccount = groupBy(
+        finalFilteredDetails,
+        (detail) => detail.accountName,
+      );
       final List<AccountSummary> summaries = [];
       for (final accountEntry in groupedByAccount.entries) {
         final accountName = accountEntry.key;
         final accountDetails = accountEntry.value;
         final accountId = accountDetails.first.accountId;
-        final groupedByCurrency =
-            groupBy(accountDetails, (detail) => detail.currencyCode);
+        final groupedByCurrency = groupBy(
+          accountDetails,
+          (detail) => detail.currencyCode,
+        );
         for (final currencyEntry in groupedByCurrency.entries) {
           final currencyCode = currencyEntry.key;
           final currencyDetails = currencyEntry.value;
@@ -386,14 +573,16 @@ class ReportsService {
             }
           }
           final netBalance = totalDebit - totalCredit;
-          summaries.add(AccountSummary(
-            accountId: accountId,
-            accountName: accountName,
-            currencyCode: currencyCode,
-            totalDebit: totalDebit,
-            totalCredit: totalCredit,
-            netBalance: netBalance,
-          ));
+          summaries.add(
+            AccountSummary(
+              accountId: accountId,
+              accountName: accountName,
+              currencyCode: currencyCode,
+              totalDebit: totalDebit,
+              totalCredit: totalCredit,
+              netBalance: netBalance,
+            ),
+          );
         }
       }
       summaries.sort((a, b) {
@@ -405,28 +594,36 @@ class ReportsService {
     });
   }
 
-  Stream<List<MonthlySummary>> watchMonthlyAmountsSummary({required TotalAmountsFilter filter}) {
+  Stream<List<MonthlySummary>> watchMonthlyAmountsSummary({
+    required TotalAmountsFilter filter,
+  }) {
     return watchTransactionDetails().map((details) {
       final classificationFilteredDetails = details
-          .where((d) =>
-              (d.classificationName ?? c.kClassificationGeneral) ==
-              filter.classificationName)
+          .where(
+            (d) =>
+                (d.classificationName ?? c.kClassificationGeneral) ==
+                filter.classificationName,
+          )
           .toList();
       List<TransactionDetail> finalFilteredDetails;
       switch (filter.reportFilter) {
         case ReportFilter.POS_ONLY:
           finalFilteredDetails = classificationFilteredDetails
-              .where((d) =>
-                  d.accountName == c.kCashAccountName ||
-                  d.accountName == c.kSalesRevenueAccountName)
+              .where(
+                (d) =>
+                    d.accountName == c.kCashAccountName ||
+                    d.accountName == c.kSalesRevenueAccountName,
+              )
               .toList();
           break;
         case ReportFilter.ACCOUNTS_ONLY:
           finalFilteredDetails = classificationFilteredDetails
-              .where((d) =>
-                  d.accountName != c.kCashAccountName &&
-                  d.accountName != c.kSalesRevenueAccountName &&
-                  d.accountName != c.kEquityAccountName)
+              .where(
+                (d) =>
+                    d.accountName != c.kCashAccountName &&
+                    d.accountName != c.kSalesRevenueAccountName &&
+                    d.accountName != c.kEquityAccountName,
+              )
               .toList();
           break;
         case ReportFilter.ALL:
@@ -434,20 +631,25 @@ class ReportsService {
           finalFilteredDetails = classificationFilteredDetails;
           break;
       }
-      finalFilteredDetails.removeWhere((detail) =>
-          detail.accountName == c.kEquityAccountName ||
-          detail.accountName == c.kSalesRevenueAccountName);
+      finalFilteredDetails.removeWhere(
+        (detail) =>
+            detail.accountName == c.kEquityAccountName ||
+            detail.accountName == c.kSalesRevenueAccountName,
+      );
       final groupedByMonth = groupBy(
-          finalFilteredDetails,
-          (detail) =>
-              '${detail.transactionDate.year}-${detail.transactionDate.month.toString().padLeft(2, '0')}');
+        finalFilteredDetails,
+        (detail) =>
+            '${detail.transactionDate.year}-${detail.transactionDate.month.toString().padLeft(2, '0')}',
+      );
       final List<MonthlySummary> summaries = [];
       for (final monthEntry in groupedByMonth.entries) {
         final parts = monthEntry.key.split('-');
         final year = int.parse(parts[0]), month = int.parse(parts[1]);
         final monthDetails = monthEntry.value;
-        final groupedByCurrency =
-            groupBy(monthDetails, (detail) => detail.currencyCode);
+        final groupedByCurrency = groupBy(
+          monthDetails,
+          (detail) => detail.currencyCode,
+        );
         for (final currencyEntry in groupedByCurrency.entries) {
           final currencyCode = currencyEntry.key;
           final currencyDetails = currencyEntry.value;
@@ -460,14 +662,16 @@ class ReportsService {
             }
           }
           final netBalance = totalDebit - totalCredit;
-          summaries.add(MonthlySummary(
-            year: year,
-            month: month,
-            currencyCode: currencyCode,
-            totalDebit: totalDebit,
-            totalCredit: totalCredit,
-            netBalance: netBalance,
-          ));
+          summaries.add(
+            MonthlySummary(
+              year: year,
+              month: month,
+              currencyCode: currencyCode,
+              totalDebit: totalDebit,
+              totalCredit: totalCredit,
+              netBalance: netBalance,
+            ),
+          );
         }
       }
       summaries.sort((a, b) {
@@ -479,28 +683,36 @@ class ReportsService {
     });
   }
 
-  Stream<List<TransactionDetail>> watchTransactionDetailsFiltered({required TotalAmountsFilter filter}) {
+  Stream<List<TransactionDetail>> watchTransactionDetailsFiltered({
+    required TotalAmountsFilter filter,
+  }) {
     return watchTransactionDetails().map((details) {
       final classificationFilteredDetails = details
-          .where((d) =>
-              (d.classificationName ?? c.kClassificationGeneral) ==
-              filter.classificationName)
+          .where(
+            (d) =>
+                (d.classificationName ?? c.kClassificationGeneral) ==
+                filter.classificationName,
+          )
           .toList();
       List<TransactionDetail> finalFilteredDetails;
       switch (filter.reportFilter) {
         case ReportFilter.POS_ONLY:
           finalFilteredDetails = classificationFilteredDetails
-              .where((d) =>
-                  d.accountName == c.kCashAccountName ||
-                  d.accountName == c.kSalesRevenueAccountName)
+              .where(
+                (d) =>
+                    d.accountName == c.kCashAccountName ||
+                    d.accountName == c.kSalesRevenueAccountName,
+              )
               .toList();
           break;
         case ReportFilter.ACCOUNTS_ONLY:
           finalFilteredDetails = classificationFilteredDetails
-              .where((d) =>
-                  d.accountName != c.kCashAccountName &&
-                  d.accountName != c.kSalesRevenueAccountName &&
-                  d.accountName != c.kEquityAccountName)
+              .where(
+                (d) =>
+                    d.accountName != c.kCashAccountName &&
+                    d.accountName != c.kSalesRevenueAccountName &&
+                    d.accountName != c.kEquityAccountName,
+              )
               .toList();
           break;
         case ReportFilter.ALL:
@@ -508,11 +720,14 @@ class ReportsService {
           finalFilteredDetails = classificationFilteredDetails;
           break;
       }
-      finalFilteredDetails.removeWhere((detail) =>
-          detail.accountName == c.kEquityAccountName ||
-          detail.accountName == c.kSalesRevenueAccountName);
-      finalFilteredDetails
-          .sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
+      finalFilteredDetails.removeWhere(
+        (detail) =>
+            detail.accountName == c.kEquityAccountName ||
+            detail.accountName == c.kSalesRevenueAccountName,
+      );
+      finalFilteredDetails.sort(
+        (a, b) => b.transactionDate.compareTo(a.transactionDate),
+      );
       return finalFilteredDetails;
     });
   }
@@ -520,20 +735,25 @@ class ReportsService {
   Stream<List<ClassificationSummary>> watchTotalClassificationsSummary() {
     return watchTransactionDetails().map((details) {
       final groupedByClassification = groupBy(
-          details, (detail) => detail.classificationName ?? c.kClassificationGeneral);
+        details,
+        (detail) => detail.classificationName ?? c.kClassificationGeneral,
+      );
       final List<ClassificationSummary> summaries = [];
       for (final classEntry in groupedByClassification.entries) {
         final classificationName = classEntry.key;
         final classificationDetails = classEntry.value;
-        final groupedByCurrency =
-            groupBy(classificationDetails, (detail) => detail.currencyCode);
+        final groupedByCurrency = groupBy(
+          classificationDetails,
+          (detail) => detail.currencyCode,
+        );
         for (final currencyEntry in groupedByCurrency.entries) {
           final currencyCode = currencyEntry.key;
           final currencyDetails = currencyEntry.value;
           double totalDebit = 0.0, totalCredit = 0.0;
           for (final detail in currencyDetails) {
             if (detail.accountName == c.kEquityAccountName ||
-                detail.accountName == c.kSalesRevenueAccountName) continue;
+                detail.accountName == c.kSalesRevenueAccountName)
+              continue;
             if (detail.entryAmount > 0) {
               totalDebit += detail.entryAmount;
             } else {
@@ -541,13 +761,15 @@ class ReportsService {
             }
           }
           final netBalance = totalDebit - totalCredit;
-          summaries.add(ClassificationSummary(
-            name: classificationName,
-            currencyCode: currencyCode,
-            totalDebit: totalDebit,
-            totalCredit: totalCredit,
-            netBalance: netBalance,
-          ));
+          summaries.add(
+            ClassificationSummary(
+              name: classificationName,
+              currencyCode: currencyCode,
+              totalDebit: totalDebit,
+              totalCredit: totalCredit,
+              netBalance: netBalance,
+            ),
+          );
         }
       }
       summaries.sort((a, b) {
@@ -559,26 +781,31 @@ class ReportsService {
   }
 
   Stream<PnlData> watchProfitAndLoss(DateTimeRange range) {
-    final query = _db.select(_db.transactionEntries).join([
-      d.innerJoin(
-        _db.accounts,
-        _db.accounts.id.equalsExp(_db.transactionEntries.accountId),
-      ),
-      d.innerJoin(
-        _db.transactions,
-        _db.transactions.id.equalsExp(_db.transactionEntries.transactionId),
-      ),
-    ])
-      ..where(_db.accounts.type.isIn(['revenue', 'expense']))
-      ..where(_db.transactions.transactionDate.isBetween(
-        d.Variable(range.start),
-        d.Variable(range.end),
-      ));
+    final query =
+        _db.select(_db.transactionEntries).join([
+            d.innerJoin(
+              _db.accounts,
+              _db.accounts.id.equalsExp(_db.transactionEntries.accountId),
+            ),
+            d.innerJoin(
+              _db.transactions,
+              _db.transactions.id.equalsExp(
+                _db.transactionEntries.transactionId,
+              ),
+            ),
+          ])
+          ..where(_db.accounts.type.isIn(['revenue', 'expense']))
+          ..where(
+            _db.transactions.transactionDate.isBetween(
+              d.Variable(range.start),
+              d.Variable(range.end),
+            ),
+          );
 
     return query.watch().map((rows) {
       final revenueLines = <PnlLine>[];
       final expenseLines = <PnlLine>[];
-      
+
       // FIX: Sum in Cents (int)
       int totalRevenueCents = 0;
       int totalExpensesCents = 0;
@@ -598,18 +825,22 @@ class ReportsService {
 
         if (account.type == 'revenue') {
           final balanceCents = -accountBalanceCents;
-          revenueLines.add(PnlLine(
-            accountType: 'revenue', 
-            accountName: account.name, 
-            balance: balanceCents / 100.0 // Convert to Double
-          ));
+          revenueLines.add(
+            PnlLine(
+              accountType: 'revenue',
+              accountName: account.name,
+              balance: balanceCents / 100.0, // Convert to Double
+            ),
+          );
           totalRevenueCents += balanceCents;
         } else if (account.type == 'expense') {
-          expenseLines.add(PnlLine(
-            accountType: 'expense', 
-            accountName: account.name, 
-            balance: accountBalanceCents / 100.0 // Convert to Double
-          ));
+          expenseLines.add(
+            PnlLine(
+              accountType: 'expense',
+              accountName: account.name,
+              balance: accountBalanceCents / 100.0, // Convert to Double
+            ),
+          );
           totalExpensesCents += accountBalanceCents;
         }
       }
@@ -634,25 +865,44 @@ class ReportsService {
     // netIncome comes as Double from PnlData
     final pnlStream = watchProfitAndLoss(pnlRange).map((pnl) => pnl.netIncome);
 
-    final accountsStream = (_db.select(_db.accounts)
-          ..where((a) => a.type.isIn(['asset', 'liability', 'equity'])))
-        .watch();
+    final accountsStream = (_db.select(
+      _db.accounts,
+    )..where((a) => a.type.isIn(['asset', 'liability', 'equity']))).watch();
 
-    final entriesStream = (_db.select(_db.transactionEntries).join([
-      d.innerJoin(
-        _db.transactions,
-        _db.transactions.id.equalsExp(_db.transactionEntries.transactionId),
-      ),
-    ])
-          // FIX: Use correct Drift syntax for query
-          ..where(_db.transactions.transactionDate.isSmallerOrEqualValue(asOfDate))) 
-        .watch()
-        .map((rows) => rows.map((r) => r.readTable(_db.transactionEntries)).toList());
+    final entriesStream =
+        (_db.select(_db.transactionEntries).join([
+                d.innerJoin(
+                  _db.transactions,
+                  _db.transactions.id.equalsExp(
+                    _db.transactionEntries.transactionId,
+                  ),
+                ),
+              ])
+              // FIX: Use correct Drift syntax for query
+              ..where(
+                _db.transactions.transactionDate.isSmallerOrEqualValue(
+                  asOfDate,
+                ),
+              ))
+            .watch()
+            .map(
+              (rows) =>
+                  rows.map((r) => r.readTable(_db.transactionEntries)).toList(),
+            );
 
-    return StreamZip([pnlStream, accountsStream, entriesStream]).map((values) {
+    // Add Fixed Assets stream
+    final fixedAssetsStream = _db.select(_db.fixedAssets).watch();
+
+    return StreamZip([
+      pnlStream,
+      accountsStream,
+      entriesStream,
+      fixedAssetsStream,
+    ]).map((values) {
       final netIncome = values[0] as double;
       final accounts = values[1] as List<Account>;
       final entries = values[2] as List<TransactionEntry?>;
+      final fixedAssets = values[3] as List<FixedAsset>;
 
       final assetLines = <BalanceSheetLine>[];
       final liabilityLines = <BalanceSheetLine>[];
@@ -667,32 +917,75 @@ class ReportsService {
       for (final account in accounts) {
         // FIX: Convert Initial Balance (Int) to Double
         double balance = account.initialBalance / 100.0;
-        
+
         final accountEntries = entriesByAccount[account.id] ?? [];
         for (final entry in accountEntries) {
           // FIX: Convert Entry Amount (Int) to Double
           balance += (entry.amount / 100.0);
         }
-        
+
         if (account.name == c.kEquityAccountName) {
           balance += netIncome; // netIncome is already Double
         }
 
         if (account.type == 'asset') {
-          assetLines.add(BalanceSheetLine(
-              accountType: 'asset', accountName: account.name, balance: balance));
+          assetLines.add(
+            BalanceSheetLine(
+              accountType: 'asset',
+              accountName: account.name,
+              balance: balance,
+            ),
+          );
           totalAssets += balance;
         } else if (account.type == 'liability') {
           final displayBalance = -balance;
-          liabilityLines.add(BalanceSheetLine(
-              accountType: 'liability', accountName: account.name, balance: displayBalance));
+          liabilityLines.add(
+            BalanceSheetLine(
+              accountType: 'liability',
+              accountName: account.name,
+              balance: displayBalance,
+            ),
+          );
           totalLiabilities += displayBalance;
         } else if (account.type == 'equity') {
           final displayBalance = -balance;
-          equityLines.add(BalanceSheetLine(
-              accountType: 'equity', accountName: account.name, balance: displayBalance));
+          equityLines.add(
+            BalanceSheetLine(
+              accountType: 'equity',
+              accountName: account.name,
+              balance: displayBalance,
+            ),
+          );
           totalEquity += displayBalance;
         }
+      }
+
+      // Compute Fixed Assets Summary
+      FixedAssetsSummary? fixedAssetsSummary;
+      if (fixedAssets.isNotEmpty) {
+        int totalCost = 0;
+        int totalDepreciation = 0;
+        int activeCount = 0;
+        int fullyDepreciatedCount = 0;
+
+        for (final asset in fixedAssets) {
+          totalCost += asset.acquisitionCost;
+          totalDepreciation += asset.totalDepreciation;
+          if (asset.status == 'ACTIVE') {
+            activeCount++;
+          } else if (asset.status == 'FULLY_DEPRECIATED') {
+            fullyDepreciatedCount++;
+          }
+        }
+
+        fixedAssetsSummary = FixedAssetsSummary(
+          totalAcquisitionCost: totalCost,
+          totalAccumulatedDepreciation: totalDepreciation,
+          netBookValue: totalCost - totalDepreciation,
+          assetCount: fixedAssets.length,
+          activeCount: activeCount,
+          fullyDepreciatedCount: fullyDepreciatedCount,
+        );
       }
 
       return BalanceSheetData(
@@ -702,6 +995,7 @@ class ReportsService {
         totalAssets: totalAssets,
         totalLiabilities: totalLiabilities,
         totalEquity: totalEquity,
+        fixedAssetsSummary: fixedAssetsSummary,
       );
     });
   }
@@ -715,35 +1009,39 @@ class ReportsService {
       final entries = values[1] as List<TransactionEntry>;
 
       final lines = <TrialBalanceLine>[];
-      
+
       final entriesByAccount = groupBy(entries, (e) => e.accountId);
 
       for (final account in accounts) {
         // FIX: Work with Cents (Int) first
         int balanceCents = account.initialBalance;
-        
+
         final accountEntries = entriesByAccount[account.id] ?? [];
         for (final entry in accountEntries) {
           balanceCents += entry.amount;
         }
-        
+
         if (balanceCents == 0) continue;
 
         // Convert to Double for output
         final double balanceDouble = balanceCents / 100.0;
 
         if (balanceDouble > 0) {
-          lines.add(TrialBalanceLine(
-            accountName: account.name,
-            debit: balanceDouble,
-            credit: 0.0,
-          ));
+          lines.add(
+            TrialBalanceLine(
+              accountName: account.name,
+              debit: balanceDouble,
+              credit: 0.0,
+            ),
+          );
         } else {
-          lines.add(TrialBalanceLine(
-            accountName: account.name,
-            debit: 0.0,
-            credit: -balanceDouble,
-          ));
+          lines.add(
+            TrialBalanceLine(
+              accountName: account.name,
+              debit: 0.0,
+              credit: -balanceDouble,
+            ),
+          );
         }
       }
 

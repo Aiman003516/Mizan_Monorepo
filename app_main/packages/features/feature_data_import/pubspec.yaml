@@ -1,0 +1,27 @@
+name: feature_data_import
+description: Data import module for Mizan - supports CSV/Excel with custom field mapping
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.4.9
+  csv: ^6.0.0
+  excel: ^4.0.6
+  file_picker: ^8.0.0+1
+  core_data:
+    path: ../../core/core_data
+  core_database:
+    path: ../../core/core_database
+  shared_ui:
+    path: ../../shared/shared_ui
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0

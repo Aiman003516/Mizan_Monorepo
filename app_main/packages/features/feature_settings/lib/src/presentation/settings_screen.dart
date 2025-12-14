@@ -14,7 +14,7 @@ import 'package:feature_settings/src/presentation/currency_settings_screen.dart'
 import 'package:feature_settings/src/presentation/roles/roles_list_screen.dart'; // ⚡ NEW: Import Roles Screen
 
 // Import Sync Feature
-import 'package:feature_sync/feature_sync.dart'; 
+import 'package:feature_sync/feature_sync.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -25,10 +25,11 @@ class SettingsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     final syncStatus = ref.read(syncStatusProvider);
-    
+
     // Prevent double-action
-    if (syncStatus == SyncStatus.backupInProgress || 
-        syncStatus == SyncStatus.restoreInProgress) return;
+    if (syncStatus == SyncStatus.backupInProgress ||
+        syncStatus == SyncStatus.restoreInProgress)
+      return;
 
     final didConfirm = await showDialog<bool>(
       context: context,
@@ -41,9 +42,7 @@ class SettingsScreen extends ConsumerWidget {
             onPressed: () => Navigator.of(context).pop(false),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.restore),
             onPressed: () => Navigator.of(context).pop(true),
           ),
@@ -122,7 +121,7 @@ class SettingsScreen extends ConsumerWidget {
           RadioListTile<Locale?>(
             title: Text(l10n.english),
             // ⚡ FIX: Removed 'const'
-            value: Locale('en'), 
+            value: Locale('en'),
             groupValue: currentLocale,
             onChanged: (locale) {
               ref.read(localeControllerProvider.notifier).setLocale(locale);
@@ -132,7 +131,7 @@ class SettingsScreen extends ConsumerWidget {
           RadioListTile<Locale?>(
             title: Text(l10n.arabic),
             // ⚡ FIX: Removed 'const'
-            value: Locale('ar'), 
+            value: Locale('ar'),
             groupValue: currentLocale,
             onChanged: (locale) {
               ref.read(localeControllerProvider.notifier).setLocale(locale);
@@ -151,7 +150,7 @@ class SettingsScreen extends ConsumerWidget {
     final syncStatus = ref.watch(syncStatusProvider);
     final isBackingUp = syncStatus == SyncStatus.backupInProgress;
     final isRestoring = syncStatus == SyncStatus.restoreInProgress;
-    final isBusy = isBackingUp || isRestoring; 
+    final isBusy = isBackingUp || isRestoring;
 
     // 👂 LISTENER 1: Success Messages (Granular)
     ref.listen<SyncStatus>(syncStatusProvider, (previous, next) {
@@ -160,7 +159,7 @@ class SettingsScreen extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             // ⚡ FIX: No 'const', and passed argument "Google Drive"
             SnackBar(
-              content: Text(l10n.backupSuccessful), 
+              content: Text(l10n.backupSuccessful),
               backgroundColor: Colors.green,
             ),
           );
@@ -200,9 +199,11 @@ class SettingsScreen extends ConsumerWidget {
           title: Text(l10n.companyProfile),
           trailing: const Icon(Icons.arrow_forward_ios),
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const CompanyProfileScreen(),
-            ));
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const CompanyProfileScreen(),
+              ),
+            );
           },
         ),
         ListTile(
@@ -210,9 +211,11 @@ class SettingsScreen extends ConsumerWidget {
           title: Text(l10n.securityOptions),
           trailing: const Icon(Icons.arrow_forward_ios),
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const SecuritySettingsScreen(),
-            ));
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const SecuritySettingsScreen(),
+              ),
+            );
           },
         ),
         ListTile(
@@ -220,9 +223,48 @@ class SettingsScreen extends ConsumerWidget {
           title: Text(l10n.currencyOptions),
           trailing: const Icon(Icons.arrow_forward_ios),
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const CurrencySettingsScreen(),
-            ));
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const CurrencySettingsScreen(),
+              ),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.business),
+          title: Text(l10n.fixedAssets),
+          subtitle: Text(l10n.fixedAssetsDescription),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const FixedAssetsScreen(),
+              ),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.blur_circular),
+          title: Text(l10n.ghostMoney),
+          subtitle: Text(l10n.ghostMoneyDescription),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const GhostMoneyScreen()),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.trending_down),
+          title: Text(l10n.depreciation),
+          subtitle: Text(l10n.depreciationProcessing),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const DepreciationScreen(),
+              ),
+            );
           },
         ),
         ListTile(
@@ -240,15 +282,18 @@ class SettingsScreen extends ConsumerWidget {
         const Divider(),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child:
-              Text(l10n.dataAndSync, style: const TextStyle(fontWeight: FontWeight.bold)),
+          child: Text(
+            l10n.dataAndSync,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
         ListTile(
           leading: isBackingUp
               ? const SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2))
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
               : const Icon(Icons.sync),
           title: Text(l10n.backupNow),
           subtitle: Text(l10n.backupHint),
@@ -261,21 +306,24 @@ class SettingsScreen extends ConsumerWidget {
               ? const SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2))
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
               : const Icon(Icons.restore, color: Colors.redAccent),
-          title: Text(l10n.restoreFromBackup,
-              style: const TextStyle(color: Colors.redAccent)),
+          title: Text(
+            l10n.restoreFromBackup,
+            style: const TextStyle(color: Colors.redAccent),
+          ),
           subtitle: Text(l10n.restoreWarning),
           onTap: isBusy ? null : () => _showRestoreDialog(context, ref),
         ),
-        
+
         const Divider(),
 
         // 🛡️ SYSTEM ACTIVATION & ADMIN CONTROLS (Phase 4 Logic)
         Consumer(
           builder: (context, ref, _) {
             final roleAsync = ref.watch(userRoleProvider);
-            
+
             return roleAsync.when(
               data: (role) {
                 // Scenario A: User is already the Owner/Admin
@@ -288,7 +336,7 @@ class SettingsScreen extends ConsumerWidget {
                         title: Text("Enterprise License Active"),
                         subtitle: Text("You are the System Administrator"),
                       ),
-                      
+
                       // 🌟 NEW: Roles Management Button (Only for Admins)
                       ListTile(
                         leading: const Icon(Icons.badge, color: Colors.purple),
@@ -298,22 +346,28 @@ class SettingsScreen extends ConsumerWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const RolesListScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => const RolesListScreen(),
+                            ),
                           );
                         },
                       ),
 
-
                       // 🌟 NEW: Billing Management
                       ListTile(
-                        leading: const Icon(Icons.credit_card, color: Colors.orange),
+                        leading: const Icon(
+                          Icons.credit_card,
+                          color: Colors.orange,
+                        ),
                         title: const Text("Manage Subscription"),
                         subtitle: const Text("View plans & billing"),
                         trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const SubscriptionScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => const SubscriptionScreen(),
+                            ),
                           );
                         },
                       ),
@@ -326,7 +380,9 @@ class SettingsScreen extends ConsumerWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const StaffListScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => const StaffListScreen(),
+                            ),
                           );
                         },
                       ),
@@ -341,16 +397,19 @@ class SettingsScreen extends ConsumerWidget {
                   title: const Text("Activate Business License"),
                   subtitle: const Text("Initialize system & claim ownership"),
                   onTap: () async {
-                    
                     // 🔍 DEBUGGING: Check who is logged in
                     final user = FirebaseAuth.instance.currentUser;
-                    print("🕵️‍♂️ [DEBUG] Current User: ${user?.email ?? 'NULL (Guest)'}");
+                    print(
+                      "🕵️‍♂️ [DEBUG] Current User: ${user?.email ?? 'NULL (Guest)'}",
+                    );
                     print("🕵️‍♂️ [DEBUG] UID: ${user?.uid}");
 
                     if (user == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("⚠️ You are not logged in! Please Sign In first."),
+                          content: Text(
+                            "⚠️ You are not logged in! Please Sign In first.",
+                          ),
                           backgroundColor: Colors.orange,
                         ),
                       );
@@ -359,12 +418,16 @@ class SettingsScreen extends ConsumerWidget {
 
                     try {
                       // 👑 RUN THE CLEAN GENESIS
-                      await ref.read(saasSeedingServiceProvider).activateSystemForBuyer();
-                      
+                      await ref
+                          .read(saasSeedingServiceProvider)
+                          .activateSystemForBuyer();
+
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("✅ System Activated! Welcome, Admin."),
+                            content: Text(
+                              "✅ System Activated! Welcome, Admin.",
+                            ),
                             backgroundColor: Colors.green,
                           ),
                         );
