@@ -2,21 +2,24 @@
 
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' as d;
-import 'package:audioplayers/audioplayers.dart'; // 🔊 Core Audio Package
+import 'package:audioplayers/audioplayers.dart';
 import 'package:printing/printing.dart';
 
 // Core Imports
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_data/core_data.dart';
+import 'package:core_database/core_database.dart';
 
 // Shared Imports
 import 'package:shared_ui/shared_ui.dart';
 
 // Feature Imports
-// ✅ FIX 1: Hide databaseProvider to prevent "Ambiguous Import" error
-import 'package:feature_products/feature_products.dart' hide accountsRepositoryProvider, databaseProvider;
+import 'package:feature_products/feature_products.dart'
+    hide accountsRepositoryProvider, databaseProvider;
 import 'package:feature_accounts/feature_accounts.dart';
 
 // Local Feature Imports
@@ -25,15 +28,19 @@ import 'package:feature_transactions/src/data/database_provider.dart';
 import 'package:feature_transactions/src/data/receipt_service.dart';
 import 'package:feature_transactions/src/presentation/barcode_scanner_screen.dart';
 
-// ✅ FIX 2: Import the OLD provider as 'legacy' to satisfy the Printer Service types
-import 'package:feature_transactions/src/presentation/pos_receipt_provider.dart' as legacy;
+// Legacy receipt provider (for printer compat)
+import 'package:feature_transactions/src/presentation/pos_receipt_provider.dart'
+    as legacy;
 
-// NEW IMPORTS (Phase 2 System)
+// NEW: State & Widgets
 import 'package:feature_transactions/src/presentation/pos_state_provider.dart';
-import 'package:feature_transactions/src/presentation/widgets/virtual_numpad.dart';
-import 'package:feature_transactions/src/presentation/widgets/pos_order_table.dart';
+import 'package:feature_transactions/src/presentation/widgets/pos_product_grid.dart';
+import 'package:feature_transactions/src/presentation/widgets/pos_cart_sheet.dart';
 
-// Local Provider for Payment Methods
+// ──────────────────────────────────────────────────
+// PROVIDERS
+// ──────────────────────────────────────────────────
+
 final paymentMethodsProvider = StreamProvider<List<PaymentMethod>>((ref) {
   final db = ref.watch(databaseProvider);
   return (db.select(db.paymentMethods)).watch();
@@ -47,22 +54,31 @@ class PosScreen extends ConsumerStatefulWidget {
 }
 
 class _PosScreenState extends ConsumerState<PosScreen> {
-  // --- UI CONTROLLERS ---
-  final TextEditingController _displayController = TextEditingController();
-  
-  // --- STATE ---
-  String _inputBuffer = "";
-  int? _selectedRowIndex;
+  // ─── STATE ───────────────────────────────────────
+  String? _selectedCategoryId;
+  String _searchQuery = '';
+  bool _isSearching = false;
   bool _isProcessing = false;
 
-  // --- AUDIO ENGINE ---
+  // ─── KEYBOARD / BARCODE ─────────────────────────
+  final FocusNode _focusNode = FocusNode();
+  String _barcodeBuffer = '';
+  DateTime? _lastKeyTime;
+
+  // ─── AUDIO ──────────────────────────────────────
   late final AudioPlayer _audioPlayer;
-  final _beepSound = AssetSource('audio/beep.mp3'); 
+  final _beepSound = AssetSource('audio/beep.mp3');
+
+  // ─── SEARCH ─────────────────────────────────────
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _initAudioEngine();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
   }
 
   Future<void> _initAudioEngine() async {
@@ -75,9 +91,7 @@ class _PosScreenState extends ConsumerState<PosScreen> {
         usageType: AndroidUsageType.assistanceSonification,
         audioFocus: AndroidAudioFocus.gainTransientMayDuck,
       ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.ambient,
-      ),
+      iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
     );
     await _audioPlayer.setAudioContext(audioContext);
     await _audioPlayer.setReleaseMode(ReleaseMode.stop);
@@ -90,142 +104,199 @@ class _PosScreenState extends ConsumerState<PosScreen> {
 
   @override
   void dispose() {
-    _displayController.dispose();
     _audioPlayer.dispose();
+    _focusNode.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
-  // --- LOGIC: NUMPAD & INPUT ---
+  // ─── KEYBOARD HANDLER ───────────────────────────
 
-  void _onNumpadPress(String value) {
-    setState(() {
-      _inputBuffer += value;
-      _displayController.text = _inputBuffer;
-    });
-  }
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is! KeyDownEvent) return;
 
-  void _onBackspace() {
-    if (_inputBuffer.isNotEmpty) {
-      setState(() {
-        _inputBuffer = _inputBuffer.substring(0, _inputBuffer.length - 1);
-        _displayController.text = _inputBuffer;
-      });
+    if (event.logicalKey == LogicalKeyboardKey.f1) {
+      _showPaymentDialog();
+      return;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.f2) {
+      _handleHoldOrder();
+      return;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      if (_isSearching) {
+        setState(() {
+          _isSearching = false;
+          _searchQuery = '';
+          _searchController.clear();
+        });
+      }
+      return;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+      if (_barcodeBuffer.isNotEmpty) {
+        _handleBarcodeScan(_barcodeBuffer);
+        _barcodeBuffer = '';
+        _lastKeyTime = null;
+      }
+      return;
+    }
+
+    final String? char = event.character;
+    if (char != null && char.isNotEmpty) {
+      final now = DateTime.now();
+      if (_lastKeyTime != null &&
+          now.difference(_lastKeyTime!).inMilliseconds > 50) {
+        _barcodeBuffer = '';
+      }
+      _barcodeBuffer += char;
+      _lastKeyTime = now;
     }
   }
 
-  void _onClear() {
-    setState(() {
-      _inputBuffer = "";
-      _displayController.text = "";
-      _selectedRowIndex = null;
-    });
-  }
-
-  void _onEnter() async {
-    if (_inputBuffer.isEmpty) return;
-
-    // MODE A: QTY UPDATE (If row selected)
-    if (_selectedRowIndex != null) {
-       final qty = double.tryParse(_inputBuffer);
-       if (qty != null) {
-         ref.read(posStateProvider.notifier).updateLineItem(_selectedRowIndex!, quantity: qty);
-       }
-       _onClear();
-       return;
-    }
-
-    // MODE B: BARCODE SCAN
-    await _handleBarcodeScan(_inputBuffer);
-    _onClear();
-  }
+  // ─── BARCODE SCAN ───────────────────────────────
 
   Future<void> _handleBarcodeScan(String barcode) async {
     if (barcode.isEmpty) return;
     final l10n = AppLocalizations.of(context)!;
 
-    // 1. Search Product
     final product = await ref
         .read(productsRepositoryProvider)
         .findProductByBarcode(barcode);
 
     if (product != null) {
-      // 2. Add to Cart (Using NEW Provider)
       ref.read(posStateProvider.notifier).addItem(product);
-      
-      // 3. Play Sound
-      _audioPlayer.resume(); 
+      _audioPlayer.resume();
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.productNotFound(barcode)), duration: const Duration(milliseconds: 500)),
+          SnackBar(
+            content: Text(l10n.productNotFound(barcode)),
+            duration: const Duration(milliseconds: 500),
+          ),
         );
       }
     }
   }
 
-  void _openMobileScanner() {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => BarcodeScannerScreen(
-        onScan: (code) async {
-           await _handleBarcodeScan(code);
-        },
-      ),
-    ));
+  void _onProductTapped(Product product) {
+    ref.read(posStateProvider.notifier).addItem(product);
+    _audioPlayer.resume();
   }
 
-  // --- LOGIC: HOLD & RECALL ---
+  void _openMobileScanner() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BarcodeScannerScreen(
+          onScan: (code) async => await _handleBarcodeScan(code),
+        ),
+      ),
+    );
+  }
+
+  // ─── HOLD & RECALL ──────────────────────────────
 
   void _handleHoldOrder() {
     final state = ref.read(posStateProvider);
     if (state.activeOrder.items.isEmpty) return;
+    final l10n = AppLocalizations.of(context)!;
 
     ref.read(posStateProvider.notifier).parkOrder();
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Order Parked")));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(l10n.orderParked)));
   }
 
   void _showParkedOrdersDialog() {
     final state = ref.read(posStateProvider);
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Recall Order"),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(l10n.recallOrder),
           content: SizedBox(
-            width: 300,
+            width: 340,
             height: 400,
-            child: state.parkedOrders.isEmpty 
-              ? const Center(child: Text("No parked orders"))
-              : ListView.builder(
-                  itemCount: state.parkedOrders.length,
-                  itemBuilder: (ctx, i) {
-                    final order = state.parkedOrders[i];
-                    return ListTile(
-                      leading: const Icon(Icons.receipt_long),
-                      title: Text("Order #${order.id.substring(0, 4)}"),
-                      subtitle: Text("${order.items.length} items • ${order.createdAt.minute} mins ago"),
-                      trailing: Text(CurrencyFormatter.formatCentsToCurrency((order.total * 100).round())),
-                      onTap: () {
-                        ref.read(posStateProvider.notifier).recallOrder(order.id);
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
+            child: state.parkedOrders.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.inbox_outlined,
+                            size: 48,
+                            color: context.appColors.subtleText
+                                .withValues(alpha: 0.4)),
+                        const SizedBox(height: 12),
+                        Text(l10n.noParkedOrders,
+                            style: TextStyle(
+                                color: context.appColors.subtleText)),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: state.parkedOrders.length,
+                    itemBuilder: (ctx, i) {
+                      final order = state.parkedOrders[i];
+                      final minutesAgo = DateTime.now()
+                          .difference(order.createdAt)
+                          .inMinutes;
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: context.appColors.primary
+                                .withValues(alpha: 0.1),
+                            child: Icon(Icons.receipt_long,
+                                color: context.appColors.primary),
+                          ),
+                          title: Text(l10n
+                              .orderNumber(order.id.substring(0, 4))),
+                          subtitle: Text(l10n.itemsAndTime(
+                              order.items.length, minutesAgo)),
+                          trailing: Text(
+                            CurrencyFormatter.formatCentsToCurrency(
+                              (order.total * 100).round(),
+                            ),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: context.appColors.primary,
+                            ),
+                          ),
+                          onTap: () {
+                            ref
+                                .read(posStateProvider.notifier)
+                                .recallOrder(order.id);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      );
+                    },
+                  ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Close")),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.closeBtn),
+            ),
           ],
         );
       },
     );
   }
 
-  // --- LOGIC: PAYMENT & PRINTING ---
+  // ─── PAYMENT ────────────────────────────────────
 
   void _showPaymentDialog() {
     final state = ref.read(posStateProvider);
     if (state.activeOrder.items.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cart is empty")));
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.cartEmpty)));
       return;
     }
 
@@ -236,6 +307,8 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(l10n.orderDetails),
           content: SizedBox(
             width: 400,
@@ -245,24 +318,32 @@ class _PosScreenState extends ConsumerState<PosScreen> {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("${l10n.total}: ${CurrencyFormatter.formatCentsToCurrency((state.activeOrder.total * 100).round())}", 
-                      style: Theme.of(context).textTheme.headlineMedium),
+                    Text(
+                      "${l10n.total}: ${CurrencyFormatter.formatCentsToCurrency((state.activeOrder.total * 100).round())}",
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
                     const SizedBox(height: 20),
-                    ...methods.map((m) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: FilledButton.icon(
-                          onPressed: () async {
-                             Navigator.pop(context); // Close dialog
-                             await _processTransaction(m);
-                          },
-                          icon: const Icon(Icons.payment),
-                          label: Text("Pay with ${m.name}"),
+                    ...methods.map(
+                      (m) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: FilledButton.icon(
+                            onPressed: () async {
+                              Navigator.pop(context);
+                              await _processTransaction(m);
+                            },
+                            style: FilledButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                            ),
+                            icon: const Icon(Icons.payment),
+                            label: Text(l10n.payWith(m.name)),
+                          ),
                         ),
                       ),
-                    )),
+                    ),
                   ],
                 );
               },
@@ -271,7 +352,7 @@ class _PosScreenState extends ConsumerState<PosScreen> {
             ),
           ),
         );
-      }
+      },
     );
   }
 
@@ -280,14 +361,32 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     final profileData = ref.read(companyProfileProvider);
-    
-    // 1. Get Data from NEW Provider (PosStateProvider)
+
+    // Check Period Lock
+    final prefsRepo = ref.read(preferencesRepositoryProvider);
+    final lockDate = await prefsRepo.getPeriodLockDate();
+    if (lockDate != null) {
+      final now = DateTime.now();
+      final tDate = DateTime(now.year, now.month, now.day);
+      final lDate = DateTime(lockDate.year, lockDate.month, lockDate.day);
+
+      if (tDate.compareTo(lDate) <= 0) {
+        setState(() => _isProcessing = false);
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.periodLockedError),
+            backgroundColor: context.appColors.error,
+          ),
+        );
+        return;
+      }
+    }
+
     final order = ref.read(posStateProvider).activeOrder;
     final newItems = order.items;
     final totalAmount = order.total;
 
-    // ✅ FIX 3: Convert NEW Items to OLD Items (Type Adapter)
-    // The ReceiptService expects 'legacy.PosReceiptItem', but we have 'PosReceiptItem' from state provider.
+    // Convert to legacy items for receipt service
     final List<legacy.PosReceiptItem> legacyItems = newItems.map((item) {
       return legacy.PosReceiptItem(
         product: item.product,
@@ -295,10 +394,10 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       );
     }).toList();
 
-    // 2. Database Logic
     final accountsRepo = ref.read(accountsRepositoryProvider);
-    final salesAccountId = await accountsRepo.getAccountIdByName(kSalesRevenueAccountName);
-    
+    final salesAccountId =
+        await accountsRepo.getAccountIdByName(kSalesRevenueAccountName);
+
     if (salesAccountId == null) {
       setState(() => _isProcessing = false);
       messenger.showSnackBar(SnackBar(content: Text(l10n.criticalSetupError)));
@@ -322,187 +421,254 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     ];
 
     try {
-      final description = l10n.posSale(DateTime.now().microsecondsSinceEpoch.toString());
-
-      await ref.read(transactionsRepositoryProvider).createPosSale(
-        transactionCompanion: TransactionsCompanion.insert(
-          description: description,
-          transactionDate: DateTime.now(),
-          attachmentPath: const d.Value(null),
-          currencyCode: const d.Value('Local'),
-          relatedTransactionId: const d.Value(null),
-        ),
-        entries: entries,
-        items: legacyItems, // ✅ Passing the converted legacy items here
-        totalAmount: totalAmount,
+      final description = l10n.posSale(
+        DateTime.now().microsecondsSinceEpoch.toString(),
       );
 
-      // 3. Printing Logic
+      await ref.read(transactionsRepositoryProvider).createPosSale(
+            transactionCompanion: TransactionsCompanion.insert(
+              description: description,
+              transactionDate: DateTime.now(),
+              attachmentPath: const d.Value(null),
+              currencyCode: const d.Value('Local'),
+              relatedTransactionId: const d.Value(null),
+            ),
+            entries: entries,
+            items: legacyItems,
+            totalAmount: totalAmount,
+          );
+
+      // Print receipt
       try {
         final pdfData = await ref.read(receiptServiceProvider).generatePosReceipt(
-          items: legacyItems, // ✅ Passing the converted legacy items here
-          total: totalAmount,
-          profile: profileData,
-          l10n: l10n,
-        );
+              items: legacyItems,
+              total: totalAmount,
+              profile: profileData,
+              l10n: l10n,
+            );
         await Printing.layoutPdf(onLayout: (format) async => pdfData);
       } catch (e) {
         debugPrint("Print Error: $e");
       }
 
-      // 4. Success & Cleanup
+      // Cleanup
       ref.read(posStateProvider.notifier).clearActiveOrder();
-      messenger.showSnackBar(SnackBar(content: Text(l10n.saleRecorded(totalAmount.toStringAsFixed(2)))));
-      
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.saleRecorded(totalAmount.toStringAsFixed(2))),
+        ),
+      );
     } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text('${l10n.transactionFailed} $e')));
+      messenger.showSnackBar(
+        SnackBar(content: Text('${l10n.transactionFailed} $e')),
+      );
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
   }
 
-  // --- UI BUILD ---
+  // ─── FILTERING ──────────────────────────────────
+
+  List<Product> _filterProducts(List<Product> allProducts) {
+    var filtered = allProducts;
+
+    // Category filter
+    if (_selectedCategoryId != null) {
+      filtered = filtered
+          .where((p) => p.categoryId == _selectedCategoryId)
+          .toList();
+    }
+
+    // Search filter
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      filtered = filtered
+          .where((p) => p.name.toLowerCase().contains(query) ||
+              (p.barcode?.toLowerCase().contains(query) ?? false))
+          .toList();
+    }
+
+    return filtered;
+  }
+
+  // ═══════════════════════════════════════════════════
+  //  BUILD
+  // ═══════════════════════════════════════════════════
 
   @override
   Widget build(BuildContext context) {
-    final activeTotal = ref.watch(posActiveTotalProvider);
+    final l10n = AppLocalizations.of(context)!;
     final parkCount = ref.watch(posStateProvider).parkedOrders.length;
+    final categoriesAsync = ref.watch(categoriesStreamProvider);
+    final productsAsync = ref.watch(allProductsStreamProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("POS Terminal"),
-        actions: [
-           // 🔍 PRODUCT LOOKUP
-           IconButton(
-             icon: const Icon(Icons.search),
-             tooltip: "Search Product",
-             onPressed: _openMobileScanner, 
-           ),
-           const VerticalDivider(indent: 10, endIndent: 10),
-           // ⏸️ PARK BUTTON
-           Badge(
-            label: Text(parkCount.toString()),
-            isLabelVisible: parkCount > 0,
-            child: IconButton(
-              icon: const Icon(Icons.history),
-              onPressed: _showParkedOrdersDialog,
-              tooltip: "Recall Order",
-            ),
-          ),
-          TextButton.icon(
-            onPressed: _handleHoldOrder, 
-            icon: const Icon(Icons.pause_circle_outline),
-            label: const Text("HOLD"),
-          ),
-        ],
-      ),
-      body: Row(
-        children: [
-          // LEFT: Data Table & Input (60%)
-          Expanded(
-            flex: 6,
-            child: Column(
-              children: [
-                // Display
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  color: Colors.black87,
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        _selectedRowIndex != null ? "EDIT QTY MODE" : "SCAN MODE",
-                        style: const TextStyle(color: Colors.grey, fontSize: 10),
-                      ),
-                      Text(
-                        _displayController.text.isEmpty ? "0" : _displayController.text,
-                        style: const TextStyle(
-                          color: Colors.greenAccent, 
-                          fontSize: 32, 
-                          fontFamily: 'Courier', 
-                          fontWeight: FontWeight.bold
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Table
-                Expanded(
-                  child: PosOrderTable(
-                    selectedIndex: _selectedRowIndex,
-                    onRowTap: (index) {
-                      setState(() {
-                        if (_selectedRowIndex == index) {
-                          _selectedRowIndex = null;
-                          _inputBuffer = "";
-                        } else {
-                          _selectedRowIndex = index;
-                          _inputBuffer = "";
-                        }
-                        _displayController.text = "";
-                      });
-                    },
-                  ),
-                ),
-                // Total
-                Container(
-                  color: Colors.black,
-                  padding: const EdgeInsets.all(24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("TOTAL", style: TextStyle(color: Colors.white, fontSize: 20)),
-                      Text(
-                        CurrencyFormatter.formatCentsToCurrency((activeTotal * 100).round()), 
-                        style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-          const VerticalDivider(width: 1),
-          // RIGHT: Numpad (40%)
-          Expanded(
-            flex: 4,
-            child: Column(
-              children: [
-                Expanded(
-                  child: VirtualNumpad(
-                    onKeyPressed: _onNumpadPress,
-                    onEnter: _onEnter,
-                    onClear: _onClear,
-                    onBackspace: _onBackspace,
-                  ),
-                ),
-                // PAY BUTTON
-                SizedBox(
-                  width: double.infinity,
-                  height: 80,
-                  child: FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.green.shade700,
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+    return KeyboardListener(
+      focusNode: _focusNode,
+      autofocus: true,
+      onKeyEvent: _handleKeyEvent,
+      child: Scaffold(
+        // ─── APP BAR ──────────────────────────────
+        appBar: AppBar(
+          title: _isSearching
+              ? TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: l10n.searchProducts,
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(
+                      color: context.appColors.subtleText.withValues(alpha: 0.7),
                     ),
-                    onPressed: _isProcessing ? null : _showPaymentDialog,
-                    child: _isProcessing 
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("PAY / PRINT", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  ),
+                  style: TextStyle(color: context.appColors.onSurface),
+                  onChanged: (value) {
+                    setState(() => _searchQuery = value);
+                  },
+                )
+              : Text(l10n.posTerminalTitle),
+          actions: [
+            // Search
+            IconButton(
+              icon: Icon(_isSearching ? Icons.close : Icons.search),
+              tooltip: l10n.searchProductTooltip,
+              onPressed: () {
+                setState(() {
+                  _isSearching = !_isSearching;
+                  if (!_isSearching) {
+                    _searchQuery = '';
+                    _searchController.clear();
+                  }
+                });
+              },
+            ),
+            // Barcode Scanner
+            IconButton(
+              icon: const Icon(Icons.qr_code_scanner),
+              tooltip: l10n.scanMode,
+              onPressed: _openMobileScanner,
+            ),
+            // Parked Orders
+            Badge(
+              label: Text(parkCount.toString()),
+              isLabelVisible: parkCount > 0,
+              child: IconButton(
+                icon: const Icon(Icons.history),
+                onPressed: _showParkedOrdersDialog,
+                tooltip: l10n.recallOrderTooltip,
+              ),
+            ),
+            const SizedBox(width: 4),
+          ],
+        ),
+
+        // ─── BODY ─────────────────────────────────
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                // ── Category Filter Chips ──
+                categoriesAsync.when(
+                  data: (categories) => _buildCategoryChips(categories, l10n),
+                  loading: () => const SizedBox(height: 50),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
+
+                // ── Product Grid ──
+                Expanded(
+                  child: productsAsync.when(
+                    data: (allProducts) {
+                      final filtered = _filterProducts(allProducts);
+                      return PosProductGrid(
+                        products: filtered,
+                        onAddToCart: _onProductTapped,
+                      );
+                    },
+                    loading: () => const PosProductGrid(
+                      products: [],
+                      onAddToCart: _dummyAdd,
+                      isLoading: true,
+                    ),
+                    error: (e, _) => Center(child: Text('Error: $e')),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+
+            // ── Draggable Cart Bottom Sheet ──
+            PosCartSheet(
+              onPayPressed: _showPaymentDialog,
+              onHoldPressed: _handleHoldOrder,
+            ),
+          ],
+        ),
+
+        // ─── FAB (mobile only) ────────────────────
+        floatingActionButton: (!Platform.isWindows)
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 50),
+                child: FloatingActionButton(
+                  onPressed: _openMobileScanner,
+                  child: const Icon(Icons.qr_code_scanner),
+                ),
+              )
+            : null,
       ),
-      floatingActionButton: (!Platform.isWindows) 
-        ? FloatingActionButton(
-            onPressed: _openMobileScanner,
-            child: const Icon(Icons.qr_code_scanner),
-          )
-        : null,
     );
   }
+
+  // ─── CATEGORY CHIPS ─────────────────────────────
+
+  Widget _buildCategoryChips(List<Category> categories, AppLocalizations l10n) {
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        children: [
+          // "All" chip
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ChoiceChip(
+              label: Text(l10n.allCategories),
+              selected: _selectedCategoryId == null,
+              selectedColor: context.appColors.primary,
+              labelStyle: TextStyle(
+                color: _selectedCategoryId == null
+                    ? context.appColors.onPrimary
+                    : null,
+                fontWeight: FontWeight.w600,
+              ),
+              onSelected: (_) {
+                setState(() => _selectedCategoryId = null);
+              },
+            ),
+          ),
+          // Category chips
+          ...categories.map((cat) {
+            final isSelected = _selectedCategoryId == cat.id;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ChoiceChip(
+                label: Text(cat.name),
+                selected: isSelected,
+                selectedColor: context.appColors.primary,
+                labelStyle: TextStyle(
+                  color: isSelected ? context.appColors.onPrimary : null,
+                  fontWeight: FontWeight.w600,
+                ),
+                onSelected: (_) {
+                  setState(() {
+                    _selectedCategoryId = isSelected ? null : cat.id;
+                  });
+                },
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  static void _dummyAdd(Product p) {}
 }

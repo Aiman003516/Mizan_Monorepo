@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:core_l10n/app_localizations.dart';
 
@@ -93,7 +94,8 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
           ),
           if (_showOverlay)
             Container(
-              color: Colors.green.withOpacity(0.5),
+              // ignore: deprecated_member_use
+              color: context.appColors.success.withValues(alpha: 0.5),
             ),
         ],
       ),

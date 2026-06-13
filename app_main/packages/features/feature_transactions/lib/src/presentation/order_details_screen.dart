@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:core_database/core_database.dart';
+
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_reports/feature_reports.dart'; // FIX: Import feature_reports
 import 'package:feature_transactions/src/data/transactions_repository.dart';
 import 'package:feature_transactions/src/presentation/return_items_screen.dart';
-
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:core_data/core_data.dart'; // ZatcaEncoder, CompanyProfile
 
 class OrderDetailsScreen extends ConsumerWidget {
   final Transaction transaction;
@@ -22,10 +23,12 @@ class OrderDetailsScreen extends ConsumerWidget {
     required this.isReturned,
   });
 
-  Widget _buildOrderItemsList(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
-    final orderAsync = ref.watch(
-      orderForTransactionProvider(transaction.id)
-    );
+  Widget _buildOrderItemsList(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
+    final orderAsync = ref.watch(orderForTransactionProvider(transaction.id));
 
     return orderAsync.when(
       data: (order) {
@@ -39,7 +42,7 @@ class OrderDetailsScreen extends ConsumerWidget {
             if (items.isEmpty) {
               return Center(child: Text(l10n.noLineItemsSaved));
             }
-            
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -49,12 +52,18 @@ class OrderDetailsScreen extends ConsumerWidget {
                     itemBuilder: (context, index) {
                       final item = items[index];
                       final itemTotal = item.quantity * item.priceAtSale;
-                      final bool isFullyReturned = item.quantityReturned >= item.quantity;
+                      final bool isFullyReturned =
+                          item.quantityReturned >= item.quantity;
 
                       return ListTile(
-                        title: Text(item.productName, style: TextStyle(
-                          decoration: isFullyReturned ? TextDecoration.lineThrough : null,
-                        )),
+                        title: Text(
+                          item.productName,
+                          style: TextStyle(
+                            decoration: isFullyReturned
+                                ? TextDecoration.lineThrough
+                                : null,
+                          ),
+                        ),
                         subtitle: Text(
                           '${l10n.quantity} ${item.quantity.toString()} ${l10n.atPrice(item.priceAtSale.toStringAsFixed(2))}',
                         ),
@@ -64,7 +73,9 @@ class OrderDetailsScreen extends ConsumerWidget {
                           children: [
                             Text(
                               itemTotal.toStringAsFixed(2),
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             if (item.quantityReturned > 0)
                               Text(
@@ -73,7 +84,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                                   color: Theme.of(context).colorScheme.error,
                                   fontSize: 12,
                                 ),
-                              )
+                              ),
                           ],
                         ),
                       );
@@ -86,17 +97,19 @@ class OrderDetailsScreen extends ConsumerWidget {
                     icon: const Icon(Icons.history),
                     label: Text(l10n.manageReturn),
                     style: FilledButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primaryContainer,
+                      foregroundColor: Theme.of(
+                        context,
+                      ).colorScheme.onPrimaryContainer,
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => ReturnItemsScreen(
-                            order: order,
-                            entries: entries,
-                          ),
+                          builder: (context) =>
+                              ReturnItemsScreen(order: order, entries: entries),
                         ),
                       );
                     },
@@ -114,15 +127,12 @@ class OrderDetailsScreen extends ConsumerWidget {
     );
   }
 
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.orderDetails),
-      ),
+      appBar: AppBar(title: Text(l10n.orderDetails)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -131,27 +141,30 @@ class OrderDetailsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(transaction.description,
-                    style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  transaction.description,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 const SizedBox(height: 8),
                 Text(
-                  DateFormat.yMMMd(l10n.localeName)
-                      .add_jm()
-                      .format(transaction.transactionDate),
+                  DateFormat.yMMMd(
+                    l10n.localeName,
+                  ).add_jm().format(transaction.transactionDate),
                 ),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(l10n.total,
-                        style: Theme.of(context).textTheme.titleLarge),
+                    Text(
+                      l10n.total,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                     Text(
                       '${totalAmount.toStringAsFixed(2)} ${transaction.currencyCode}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineSmall
+                      style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(
-                              color: Theme.of(context).colorScheme.primary),
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                     ),
                   ],
                 ),
@@ -165,23 +178,65 @@ class OrderDetailsScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  Icon(Icons.check_circle,
-                      color: Theme.of(context).colorScheme.onErrorContainer),
+                  Icon(
+                    Icons.check_circle,
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
-                      l10n.orderReturned, 
+                      l10n.orderReturned,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onErrorContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          Expanded(
-            child: _buildOrderItemsList(context, ref, l10n),
+          Expanded(child: _buildOrderItemsList(context, ref, l10n)),
+          const Divider(),
+          // 🇸🇦 ZATCA QR CODE SECTION
+          Consumer(
+            builder: (context, ref, child) {
+              final profile = ref.watch(companyProfileProvider);
+
+              // For now, assuming Total includes 15% VAT for demo purposes
+              final double vatAmount = totalAmount - (totalAmount / 1.15);
+
+              final qrData = ZatcaEncoder.generateTlvBase64(
+                sellerName: profile.companyName.isEmpty
+                    ? 'Mizan Merchant'
+                    : profile.companyName,
+                vatRegistrationNumber: profile.taxID.isEmpty
+                    ? '123456789'
+                    : profile.taxID,
+                timestamp: transaction.transactionDate,
+                invoiceTotal: totalAmount,
+                vatTotal: vatAmount,
+              );
+
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      QrImageView(
+                        data: qrData,
+                        version: QrVersions.auto,
+                        size: 140.0,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "E-Invoice QR",
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),

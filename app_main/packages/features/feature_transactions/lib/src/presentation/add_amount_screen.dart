@@ -1,17 +1,16 @@
 // FILE: packages/features/feature_transactions/lib/src/presentation/add_amount_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:drift/drift.dart' as d;
 import 'package:core_l10n/app_localizations.dart';
-import 'package:core_database/core_database.dart';
 import 'package:core_data/core_data.dart';
 import 'package:feature_accounts/feature_accounts.dart';
 import 'package:feature_reports/feature_reports.dart';
 import 'package:feature_transactions/src/data/transactions_repository.dart';
-import 'package:feature_transactions/src/data/database_provider.dart' hide databaseProvider;
 
 final _currenciesStreamProvider = StreamProvider<List<Currency>>((ref) {
   final db = ref.watch(databaseProvider);
@@ -374,7 +373,6 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                         icon: const Icon(Icons.camera_alt),
                         tooltip: l10n.addAttachment,
                         onPressed: () {
-                          /* TODO */
                         },
                       ),
                       Expanded(
@@ -422,8 +420,8 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                           label: Text(l10n.paymentCredit),
                           style: FilledButton.styleFrom(
                             backgroundColor: _isCredit
-                                ? Colors.green.shade100
-                                : Colors.grey.shade300,
+                                ? context.appColors.primary
+                                : context.appColors.primary,
                           ),
                           onPressed: () => setState(() => _isCredit = true),
                         ),
@@ -435,8 +433,8 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                           label: Text(l10n.chargeDebit),
                           style: FilledButton.styleFrom(
                             backgroundColor: !_isCredit
-                                ? Colors.red.shade100
-                                : Colors.grey.shade300,
+                                ? context.appColors.primary
+                                : context.appColors.primary,
                           ),
                           onPressed: () => setState(() => _isCredit = false),
                         ),
@@ -470,7 +468,7 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                         dense: true,
                         leading: Icon(
                           isDebit ? Icons.arrow_downward : Icons.arrow_upward,
-                          color: isDebit ? Colors.redAccent : Colors.green,
+                          color: isDebit ? context.appColors.error : context.appColors.success,
                         ),
                         title: Text(detail.transactionDescription),
                         subtitle: Text(DateFormat.yMd()
@@ -480,7 +478,7 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                           '${detail.entryAmount.abs().toStringAsFixed(2)} ${detail.currencyCode}',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isDebit ? Colors.redAccent : Colors.green,
+                            color: isDebit ? context.appColors.error : context.appColors.success,
                           ),
                         ),
                         onTap: () {},

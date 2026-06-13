@@ -46,6 +46,10 @@ dependencies:
     path: ../packages/features/feature_sync
   feature_transactions:
     path: ../packages/features/feature_transactions
+  core_ui:
+    path: ../packages/core/core_ui
+  local_auth: ^2.3.0
+  window_manager: ^0.5.1
 
 dev_dependencies:
   flutter_test:

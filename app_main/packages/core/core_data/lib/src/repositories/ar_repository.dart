@@ -113,6 +113,7 @@ class ARRepository {
     int creditLimit = 0,
     String? receivableAccountId,
     String? notes,
+    bool isOnHold = false,
   }) async {
     final companion = CustomersCompanion.insert(
       name: name,
@@ -123,6 +124,7 @@ class ARRepository {
       creditLimit: Value(creditLimit),
       receivableAccountId: Value(receivableAccountId),
       notes: Value(notes),
+      isOnHold: Value(isOnHold),
     );
 
     final id = await _db.into(_db.customers).insert(companion);
@@ -197,7 +199,7 @@ class ARRepository {
     final count = await _db
         .customSelect('SELECT COUNT(*) as cnt FROM invoices')
         .getSingle();
-    final num = (count.read<int>('cnt') ?? 0) + 1;
+    final num = (count.read<int?>('cnt') ?? 0) + 1;
     return 'INV-${num.toString().padLeft(4, '0')}';
   }
 

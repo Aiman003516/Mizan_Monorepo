@@ -6,12 +6,16 @@ import 'package:core_database/core_database.dart';
 // FIX: Import the provider from the correct file
 import 'package:feature_accounts/src/data/database_provider.dart';
 
-final classificationsRepositoryProvider = Provider<ClassificationsRepository>((ref) {
+final classificationsRepositoryProvider = Provider<ClassificationsRepository>((
+  ref,
+) {
   final db = ref.watch(databaseProvider);
   return ClassificationsRepository(db);
 });
 
-final classificationsStreamProvider = StreamProvider<List<Classification>>((ref) {
+final classificationsStreamProvider = StreamProvider<List<Classification>>((
+  ref,
+) {
   return ref.watch(classificationsRepositoryProvider).watchClassifications();
 });
 
@@ -20,9 +24,9 @@ class ClassificationsRepository {
   final AppDatabase _db;
 
   Stream<List<Classification>> watchClassifications() {
-    return (_db.select(_db.classifications)
-      ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-        .watch();
+    return (_db.select(
+      _db.classifications,
+    )..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
   }
 
   Future<void> createClassification({required String name}) {
@@ -31,11 +35,18 @@ class ClassificationsRepository {
   }
 
   Future<void> updateClassification(Classification classification) {
-    return _db.update(_db.classifications).replace(
-        classification.toCompanion(false).copyWith(lastUpdated: Value(DateTime.now())));
+    return _db
+        .update(_db.classifications)
+        .replace(
+          classification
+              .toCompanion(false)
+              .copyWith(lastUpdated: Value(DateTime.now())),
+        );
   }
 
   Future<void> deleteClassification(String id) {
-    return (_db.delete(_db.classifications)..where((tbl) => tbl.id.equals(id))).go();
+    return (_db.delete(
+      _db.classifications,
+    )..where((tbl) => tbl.id.equals(id))).go();
   }
 }

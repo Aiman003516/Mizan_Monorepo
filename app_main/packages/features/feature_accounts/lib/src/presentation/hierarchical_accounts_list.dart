@@ -1,10 +1,12 @@
 // Hierarchical Accounts List Widget
 // Displays accounts grouped by type with expandable parent/child hierarchy
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 import 'package:feature_accounts/src/presentation/accounts_list_provider.dart';
 import 'package:feature_accounts/src/presentation/add_account_screen.dart';
+import 'package:feature_accounts/src/presentation/account_ledger_screen.dart';
 import 'package:feature_reports/feature_reports.dart';
 import 'package:intl/intl.dart';
 
@@ -156,7 +158,7 @@ class _HierarchicalAccountsListState
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => AddAccountScreen(accountToEdit: account),
+                builder: (context) => AccountLedgerScreen(account: account),
               ),
             );
           },
@@ -188,7 +190,7 @@ class _HierarchicalAccountsListState
                             ? Icons.keyboard_arrow_down
                             : Icons.keyboard_arrow_right,
                         size: 20,
-                        color: Colors.grey[600],
+                        color: context.appColors.subtleText,
                       ),
                     ),
                   )
@@ -203,7 +205,7 @@ class _HierarchicalAccountsListState
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: account.isHeader
-                        ? Colors.grey[400]
+                        ? context.appColors.subtleText
                         : _getTypeColor(account.type),
                   ),
                 ),
@@ -227,7 +229,7 @@ class _HierarchicalAccountsListState
                           account.accountNumber.toString(),
                           style: TextStyle(
                             fontSize: 11,
-                            color: Colors.grey[600],
+                            color: context.appColors.subtleText,
                           ),
                         ),
                     ],
@@ -238,7 +240,9 @@ class _HierarchicalAccountsListState
                 Text(
                   _formatBalance(balance),
                   style: TextStyle(
-                    color: balance >= 0 ? Colors.green[700] : Colors.red[700],
+                    color: balance >= 0
+                        ? context.appColors.primary
+                        : context.appColors.primary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -277,17 +281,17 @@ class _HierarchicalAccountsListState
   Color _getTypeColor(String type) {
     switch (type.toUpperCase()) {
       case 'ASSET':
-        return Colors.blue[700]!;
+        return context.appColors.primary;
       case 'LIABILITY':
-        return Colors.red[700]!;
+        return context.appColors.primary;
       case 'EQUITY':
-        return Colors.purple[700]!;
+        return context.appColors.primary;
       case 'REVENUE':
-        return Colors.green[700]!;
+        return context.appColors.primary;
       case 'EXPENSE':
-        return Colors.orange[700]!;
+        return context.appColors.primary;
       default:
-        return Colors.grey[700]!;
+        return context.appColors.primary;
     }
   }
 

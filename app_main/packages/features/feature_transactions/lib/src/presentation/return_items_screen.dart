@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
@@ -130,7 +131,7 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
     if (success && mounted) {
       messenger.showSnackBar(SnackBar(
         content: Text(l10n.returnSuccess),
-        backgroundColor: Colors.green,
+        backgroundColor: context.appColors.success,
       ));
 
       if (navigator.canPop()) navigator.pop();

@@ -1,6 +1,7 @@
 // FILE: packages/features/feature_auth/lib/src/presentation/login_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -75,7 +76,8 @@ class LoginScreen extends ConsumerWidget {
               Text(
                 l10n.signInToSync,
                 style: textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.6),
+                  // ignore: deprecated_member_use
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -100,7 +102,7 @@ class LoginScreen extends ConsumerWidget {
                     : Container(
                         // The Button (Already 52px via decoration, but explicitly safe here)
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.appColors.onPrimary,
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
                             color: const Color(0xFFDADCE0),
@@ -108,7 +110,8 @@ class LoginScreen extends ConsumerWidget {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              // ignore: deprecated_member_use
+                              color: context.appColors.onSurface.withValues(alpha: 0.05),
                               offset: const Offset(0, 1),
                               blurRadius: 2,
                             ),

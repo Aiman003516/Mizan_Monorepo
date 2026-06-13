@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 
@@ -17,13 +19,14 @@ class CustomerDetailScreen extends ConsumerWidget {
     final invoicesAsync = ref.watch(customerInvoicesProvider(customerId));
     final customersAsync = ref.watch(customersStreamProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = theme.colorScheme;
 
     return customersAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
-        appBar: AppBar(title: const Text('Customer')),
+        appBar: AppBar(title: Text(l10n.customerDetailTitle)),
         body: Center(child: Text('Error: $e')),
       ),
       data: (customers) {
@@ -60,7 +63,7 @@ class CustomerDetailScreen extends ConsumerWidget {
               );
             },
             icon: const Icon(Icons.receipt_long),
-            label: const Text('New Invoice'),
+            label: Text(l10n.newInvoice),
           ),
           body: SingleChildScrollView(
             child: Column(
@@ -149,7 +152,7 @@ class CustomerDetailScreen extends ConsumerWidget {
                     gradient: LinearGradient(
                       colors: customer.balance > 0
                           ? [colorScheme.error, colorScheme.errorContainer]
-                          : [Colors.green, Colors.green.shade300],
+                          : [context.appColors.success, context.appColors.primary],
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -158,14 +161,14 @@ class CustomerDetailScreen extends ConsumerWidget {
                       Text(
                         'Outstanding Balance',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: context.appColors.onPrimary.withValues(alpha: 0.8),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '\$${(customer.balance / 100).toStringAsFixed(2)}',
                         style: theme.textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
+                          color: context.appColors.onPrimary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -305,13 +308,13 @@ class _InvoiceCard extends StatelessWidget {
     Color statusColor;
     switch (invoice.status) {
       case 'paid':
-        statusColor = Colors.green;
+        statusColor = context.appColors.success;
         break;
       case 'overdue':
         statusColor = colorScheme.error;
         break;
       case 'partial':
-        statusColor = Colors.orange;
+        statusColor = context.appColors.warning;
         break;
       default:
         statusColor = colorScheme.primary;
@@ -365,7 +368,7 @@ class _InvoiceCard extends StatelessWidget {
           ],
         ),
         trailing: isPaid
-            ? const Icon(Icons.check_circle, color: Colors.green)
+            ? Icon(Icons.check_circle, color: context.appColors.success)
             : Text(
                 '\$${(outstanding / 100).toStringAsFixed(2)}',
                 style: TextStyle(
@@ -374,7 +377,6 @@ class _InvoiceCard extends StatelessWidget {
                 ),
               ),
         onTap: () {
-          // TODO: Navigate to invoice detail
         },
       ),
     );

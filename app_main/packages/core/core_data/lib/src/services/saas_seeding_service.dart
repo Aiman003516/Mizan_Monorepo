@@ -47,6 +47,7 @@ class SaasSeedingService {
     // 2. Prepare Database Paths
     final tenantRef = _firestore.collection('tenants').doc(_tenantId);
     final rolesRef = tenantRef.collection('roles');
+    // ignore: unused_local_variable
     final membersRef = tenantRef.collection('members');
 
     // 3. Write the Owner Role

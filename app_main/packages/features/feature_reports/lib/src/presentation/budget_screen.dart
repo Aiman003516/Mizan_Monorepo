@@ -3,6 +3,8 @@
 // Reference: Accounting Principles 13e (Weygandt), Chapters 23-24
 
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:core_data/src/services/budgeting_service.dart';
 
@@ -113,27 +115,30 @@ class _BudgetScreenState extends State<BudgetScreen>
 
   String _formatCurrency(int cents) {
     final dollars = cents / 100;
-    if (dollars >= 1000000) {
-      return '\$${(dollars / 1000000).toStringAsFixed(2)}M';
-    } else if (dollars >= 1000) {
-      return '\$${(dollars / 1000).toStringAsFixed(1)}K';
+    final sign = dollars < 0 ? '-' : '';
+    final abs = dollars.abs();
+    if (abs >= 1000000) {
+      return '$sign\$${(abs / 1000000).toStringAsFixed(2)}M';
+    } else if (abs >= 1000) {
+      return '$sign\$${(abs / 1000).toStringAsFixed(1)}K';
     }
-    return '\$${dollars.toStringAsFixed(2)}';
+    return '$sign\$${abs.toStringAsFixed(2)}';
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Budget & Variance Analysis'),
+        title: Text(l10n.budgetAnalysis),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Summary', icon: Icon(Icons.dashboard)),
-            Tab(text: 'Variances', icon: Icon(Icons.compare_arrows)),
-            Tab(text: 'Flexible Budget', icon: Icon(Icons.tune)),
+          tabs: [
+            Tab(text: l10n.summaryTab),
+            Tab(text: l10n.variancesTab),
+            Tab(text: l10n.flexibleBudgetTab),
           ],
         ),
       ),
@@ -149,6 +154,7 @@ class _BudgetScreenState extends State<BudgetScreen>
   }
 
   Widget _buildSummaryTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     // Calculate totals
     int totalBudgetedRevenue = 0;
     int totalActualRevenue = 0;
@@ -179,7 +185,7 @@ class _BudgetScreenState extends State<BudgetScreen>
               Expanded(
                 child: _buildSummaryCard(
                   theme,
-                  title: 'Budgeted Net Income',
+                  title: l10n.budgetedNetIncome,
                   value: _formatCurrency(budgetedNetIncome),
                   icon: Icons.flag,
                   color: theme.colorScheme.primary,
@@ -189,10 +195,10 @@ class _BudgetScreenState extends State<BudgetScreen>
               Expanded(
                 child: _buildSummaryCard(
                   theme,
-                  title: 'Actual Net Income',
+                  title: l10n.actualNetIncome,
                   value: _formatCurrency(actualNetIncome),
                   icon: Icons.check_circle,
-                  color: netIncomeVariance >= 0 ? Colors.green : Colors.red,
+                  color: netIncomeVariance >= 0 ? context.appColors.success : context.appColors.error,
                 ),
               ),
             ],
@@ -200,23 +206,23 @@ class _BudgetScreenState extends State<BudgetScreen>
           const SizedBox(height: 12),
           _buildSummaryCard(
             theme,
-            title: 'Net Income Variance',
+            title: l10n.netIncomeVariance,
             value:
                 '${netIncomeVariance >= 0 ? '+' : ''}${_formatCurrency(netIncomeVariance)}',
             subtitle: netIncomeVariance >= 0
-                ? 'Favorable - Above Budget!'
-                : 'Unfavorable - Below Budget',
+                ? '${l10n.favorableLabel} ✓'
+                : l10n.unfavorableLabel,
             icon: netIncomeVariance >= 0
                 ? Icons.trending_up
                 : Icons.trending_down,
-            color: netIncomeVariance >= 0 ? Colors.green : Colors.red,
+            color: netIncomeVariance >= 0 ? context.appColors.success : context.appColors.error,
           ),
           const SizedBox(height: 24),
 
           // Revenue Summary
           _buildCategoryCard(
             theme,
-            title: 'Revenue',
+            title: l10n.revenueLabel,
             budgeted: totalBudgetedRevenue,
             actual: totalActualRevenue,
             isRevenue: true,
@@ -226,7 +232,7 @@ class _BudgetScreenState extends State<BudgetScreen>
           // Expenses Summary
           _buildCategoryCard(
             theme,
-            title: 'Expenses',
+            title: l10n.expensesLabel,
             budgeted: totalBudgetedExpenses,
             actual: totalActualExpenses,
             isRevenue: false,
@@ -237,18 +243,19 @@ class _BudgetScreenState extends State<BudgetScreen>
   }
 
   Widget _buildVariancesTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Budget vs Actual by Account',
+            l10n.budgetVsActual,
             style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
           Text(
-            'Green = Favorable | Red = Unfavorable',
+            l10n.greenFavorable,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -275,7 +282,7 @@ class _BudgetScreenState extends State<BudgetScreen>
             'EXPENSES',
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.orange,
+              color: context.appColors.warning,
             ),
           ),
           const SizedBox(height: 8),
@@ -288,15 +295,16 @@ class _BudgetScreenState extends State<BudgetScreen>
   }
 
   Widget _buildFlexibleBudgetTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Flexible Budget Analysis', style: theme.textTheme.titleLarge),
+          Text(l10n.flexibleBudgetAnalysis, style: theme.textTheme.titleLarge),
           const SizedBox(height: 8),
           Text(
-            'Separate volume variances from spending variances',
+            l10n.separateVariances,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -310,15 +318,15 @@ class _BudgetScreenState extends State<BudgetScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Cost Structure', style: theme.textTheme.titleMedium),
+                  Text(l10n.costStructure, style: theme.textTheme.titleMedium),
                   const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _fixedCostController,
-                          decoration: const InputDecoration(
-                            labelText: 'Fixed Costs',
+                          decoration: InputDecoration(
+                            labelText: l10n.fixedCosts,
                             prefixText: '\$ ',
                             border: OutlineInputBorder(),
                           ),
@@ -333,8 +341,8 @@ class _BudgetScreenState extends State<BudgetScreen>
                       Expanded(
                         child: TextField(
                           controller: _variableRateController,
-                          decoration: const InputDecoration(
-                            labelText: 'Variable Rate/Unit',
+                          decoration: InputDecoration(
+                            labelText: l10n.variableRateUnit,
                             prefixText: '\$ ',
                             border: OutlineInputBorder(),
                           ),
@@ -353,8 +361,8 @@ class _BudgetScreenState extends State<BudgetScreen>
                       Expanded(
                         child: TextField(
                           controller: _plannedActivityController,
-                          decoration: const InputDecoration(
-                            labelText: 'Planned Activity',
+                          decoration: InputDecoration(
+                            labelText: l10n.plannedActivity,
                             suffixText: 'units',
                             border: OutlineInputBorder(),
                           ),
@@ -369,8 +377,8 @@ class _BudgetScreenState extends State<BudgetScreen>
                       Expanded(
                         child: TextField(
                           controller: _actualActivityController,
-                          decoration: const InputDecoration(
-                            labelText: 'Actual Activity',
+                          decoration: InputDecoration(
+                            labelText: l10n.actualActivity,
                             suffixText: 'units',
                             border: OutlineInputBorder(),
                           ),
@@ -386,8 +394,8 @@ class _BudgetScreenState extends State<BudgetScreen>
                   const SizedBox(height: 16),
                   TextField(
                     controller: _actualCostController,
-                    decoration: const InputDecoration(
-                      labelText: 'Actual Total Cost',
+                    decoration: InputDecoration(
+                      labelText: l10n.actualTotalCost,
                       prefixText: '\$ ',
                       border: OutlineInputBorder(),
                     ),
@@ -410,24 +418,24 @@ class _BudgetScreenState extends State<BudgetScreen>
                 child: Column(
                   children: [
                     Text(
-                      'Budget Comparison',
+                      l10n.budgetComparison,
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 16),
                     _buildComparisonRow(
-                      'Static Budget',
+                      l10n.staticBudget,
                       _formatCurrency(_flexibleBudgetResult!.staticBudget),
                       theme.colorScheme.primary,
                     ),
                     _buildComparisonRow(
                       'Flexible Budget',
                       _formatCurrency(_flexibleBudgetResult!.flexibleBudget),
-                      Colors.purple,
+                      context.appColors.secondary,
                     ),
                     _buildComparisonRow(
-                      'Actual Cost',
+                      l10n.actualCost,
                       _formatCurrency(_flexibleBudgetResult!.actualAmount),
-                      Colors.orange,
+                      context.appColors.warning,
                     ),
                   ],
                 ),
@@ -442,26 +450,26 @@ class _BudgetScreenState extends State<BudgetScreen>
                 child: Column(
                   children: [
                     Text(
-                      'Variance Analysis',
+                      l10n.varianceAnalysis,
                       style: theme.textTheme.titleMedium,
                     ),
                     const SizedBox(height: 16),
                     _buildVarianceAnalysisRow(
-                      'Volume Variance',
+                      l10n.volumeVariance,
                       _flexibleBudgetResult!.volumeVariance,
-                      'Due to activity level difference',
+                      l10n.dueToActivityLevel,
                     ),
                     const SizedBox(height: 12),
                     _buildVarianceAnalysisRow(
-                      'Spending Variance',
+                      l10n.spendingVariance,
                       _flexibleBudgetResult!.spendingVariance,
-                      'Due to efficiency/price',
+                      l10n.dueToEfficiency,
                     ),
                     const Divider(height: 24),
                     _buildVarianceAnalysisRow(
-                      'Total Variance',
+                      l10n.totalVariance,
                       _flexibleBudgetResult!.totalVariance,
-                      'Actual - Static Budget',
+                      l10n.actualMinusStatic,
                       isTotal: true,
                     ),
                   ],
@@ -486,7 +494,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Formulas Used',
+                          l10n.costStructure,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.onTertiaryContainer,
@@ -572,9 +580,10 @@ class _BudgetScreenState extends State<BudgetScreen>
     required int actual,
     required bool isRevenue,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     final variance = actual - budgeted;
     final isFavorable = isRevenue ? variance > 0 : variance < 0;
-    final color = isFavorable ? Colors.green : Colors.red;
+    final color = isFavorable ? context.appColors.success : context.appColors.error;
 
     return Card(
       child: Padding(
@@ -590,10 +599,17 @@ class _BudgetScreenState extends State<BudgetScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Budgeted', style: theme.textTheme.bodySmall),
-                      Text(
-                        _formatCurrency(budgeted),
-                        style: theme.textTheme.titleMedium,
+                      Text(l10n.budgetedLabel, style: theme.textTheme.bodySmall),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          '\u200E${_formatCurrency(budgeted)}',
+                          style: theme.textTheme.titleMedium,
+                          textDirection: TextDirection.ltr,
+                          maxLines: 1,
+                          softWrap: false,
+                        ),
                       ),
                     ],
                   ),
@@ -602,10 +618,17 @@ class _BudgetScreenState extends State<BudgetScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Actual', style: theme.textTheme.bodySmall),
-                      Text(
-                        _formatCurrency(actual),
-                        style: theme.textTheme.titleMedium,
+                      Text(l10n.actualLabel, style: theme.textTheme.bodySmall),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          '\u200E${_formatCurrency(actual)}',
+                          style: theme.textTheme.titleMedium,
+                          textDirection: TextDirection.ltr,
+                          maxLines: 1,
+                          softWrap: false,
+                        ),
                       ),
                     ],
                   ),
@@ -614,12 +637,19 @@ class _BudgetScreenState extends State<BudgetScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Variance', style: theme.textTheme.bodySmall),
-                      Text(
-                        '${variance >= 0 ? '+' : ''}${_formatCurrency(variance)}',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: color,
-                          fontWeight: FontWeight.bold,
+                      Text(l10n.varianceLabel, style: theme.textTheme.bodySmall),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          '\u200E${variance >= 0 ? '+' : ''}${_formatCurrency(variance)}',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: color,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textDirection: TextDirection.ltr,
+                          maxLines: 1,
+                          softWrap: false,
                         ),
                       ),
                     ],
@@ -642,7 +672,7 @@ class _BudgetScreenState extends State<BudgetScreen>
       actualAmount: line.actualAmount,
     );
 
-    final color = variance.isFavorable ? Colors.green : Colors.red;
+    final color = variance.isFavorable ? context.appColors.success : context.appColors.error;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -660,22 +690,43 @@ class _BudgetScreenState extends State<BudgetScreen>
               ),
             ),
             Expanded(
-              child: Text(
-                _formatCurrency(line.budgetedAmount),
-                textAlign: TextAlign.right,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerEnd,
+                child: Text(
+                  '\u200E${_formatCurrency(line.budgetedAmount)}',
+                  textAlign: TextAlign.right,
+                  textDirection: TextDirection.ltr,
+                  maxLines: 1,
+                  softWrap: false,
+                ),
               ),
             ),
             Expanded(
-              child: Text(
-                _formatCurrency(line.actualAmount),
-                textAlign: TextAlign.right,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerEnd,
+                child: Text(
+                  '\u200E${_formatCurrency(line.actualAmount)}',
+                  textAlign: TextAlign.right,
+                  textDirection: TextDirection.ltr,
+                  maxLines: 1,
+                  softWrap: false,
+                ),
               ),
             ),
             Expanded(
-              child: Text(
-                '${variance.variance >= 0 ? '+' : ''}${_formatCurrency(variance.variance)}',
-                textAlign: TextAlign.right,
-                style: TextStyle(color: color, fontWeight: FontWeight.bold),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerEnd,
+                child: Text(
+                  '\u200E${variance.variance >= 0 ? '+' : ''}${_formatCurrency(variance.variance)}',
+                  textAlign: TextAlign.right,
+                  textDirection: TextDirection.ltr,
+                  style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  softWrap: false,
+                ),
               ),
             ),
             SizedBox(
@@ -720,12 +771,13 @@ class _BudgetScreenState extends State<BudgetScreen>
     String description, {
     bool isTotal = false,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     final isFavorable = amount < 0; // For costs, negative = good
     final color = amount == 0
-        ? Colors.grey
+        ? context.appColors.subtleText
         : isFavorable
-        ? Colors.green
-        : Colors.red;
+        ? context.appColors.success
+        : context.appColors.error;
 
     return Row(
       children: [
@@ -742,7 +794,7 @@ class _BudgetScreenState extends State<BudgetScreen>
               ),
               Text(
                 description,
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 12, color: context.appColors.primary),
               ),
             ],
           ),
@@ -760,10 +812,10 @@ class _BudgetScreenState extends State<BudgetScreen>
             ),
             Text(
               amount == 0
-                  ? 'On Target'
+                  ? l10n.onTarget
                   : isFavorable
-                  ? 'Favorable'
-                  : 'Unfavorable',
+                  ? l10n.favorableLabel
+                  : l10n.unfavorableLabel,
               style: TextStyle(fontSize: 11, color: color),
             ),
           ],

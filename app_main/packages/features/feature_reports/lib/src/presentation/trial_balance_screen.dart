@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // UPDATED Local Imports
@@ -59,9 +60,13 @@ class TrialBalanceScreen extends ConsumerWidget {
       totalCredit += line.credit;
     }
 
+    final debitColor = context.appColors.success;
+    final creditColor = context.appColors.error;
     const numberStyle = TextStyle(fontFamily: 'Amiri');
-    final boldNumberStyle =
-        textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontFamily: 'Amiri');
+    final boldDebitStyle =
+        textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontFamily: 'Amiri', color: debitColor);
+    final boldCreditStyle =
+        textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontFamily: 'Amiri', color: creditColor);
     final boldHeaderStyle = textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold);
 
     return SingleChildScrollView(
@@ -90,12 +95,16 @@ class TrialBalanceScreen extends ConsumerWidget {
                     line.debit == 0
                         ? '-'
                         : l10n.currencyFormat(line.debit),
-                    style: numberStyle)),
+                    style: line.debit > 0
+                        ? numberStyle.copyWith(color: debitColor)
+                        : numberStyle)),
                 DataCell(Text(
                     line.credit == 0
                         ? '-'
                         : l10n.currencyFormat(line.credit),
-                    style: numberStyle)),
+                    style: line.credit > 0
+                        ? numberStyle.copyWith(color: creditColor)
+                        : numberStyle)),
               ],
             ),
           ),
@@ -104,9 +113,9 @@ class TrialBalanceScreen extends ConsumerWidget {
               DataCell(
                   Text(l10n.total, style: boldHeaderStyle)),
               DataCell(Text(l10n.currencyFormat(totalDebit),
-                  style: boldNumberStyle)),
+                  style: boldDebitStyle)),
               DataCell(Text(l10n.currencyFormat(totalCredit),
-                  style: boldNumberStyle)),
+                  style: boldCreditStyle)),
             ],
           ),
         ],

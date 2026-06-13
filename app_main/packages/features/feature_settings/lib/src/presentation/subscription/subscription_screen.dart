@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:core_data/core_data.dart'; // For Subscription Models
@@ -36,7 +38,7 @@ class SubscriptionScreen extends ConsumerWidget {
                   // ⚡ FIX: Escaped the $ sign
                   price: "\$30 / month",
                   features: const ["Cloud Sync", "Multi-User", "Web Access"],
-                  color: Colors.blue,
+                  color: context.appColors.info,
                   isCurrent: subscription.plan == SubscriptionPlan.enterpriseMonthly,
                   onTap: () => _confirmPurchase(context, ref, SubscriptionPlan.enterpriseMonthly),
                 ),
@@ -51,7 +53,7 @@ class SubscriptionScreen extends ConsumerWidget {
                   // ⚡ FIX: Escaped the $ sign
                   price: "\$0 / forever",
                   features: const ["Local Only", "Manual Backup"],
-                  color: Colors.grey,
+                  color: context.appColors.subtleText,
                   isCurrent: subscription.plan == SubscriptionPlan.free,
                   onTap: () => _confirmPurchase(context, ref, SubscriptionPlan.free),
                 ),
@@ -86,7 +88,7 @@ class SubscriptionScreen extends ConsumerWidget {
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+                    SnackBar(content: Text("Error: $e"), backgroundColor: context.appColors.error),
                   );
                 }
               }
@@ -111,12 +113,12 @@ class _CurrentPlanCard extends StatelessWidget {
         : "Never";
 
     return Card(
-      color: Colors.green.shade50,
+      color: context.appColors.primary,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Text("CURRENT PLAN", style: TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold)),
+            Text("CURRENT PLAN", style: TextStyle(fontSize: 12, color: context.appColors.success, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(
               subscription.plan.name.toUpperCase(),
@@ -171,16 +173,16 @@ class _PlanCard extends StatelessWidget {
                     Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
                     Text(price, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 8),
-                    ...features.map((f) => Text("• $f", style: TextStyle(color: Colors.grey[700]))),
+                    ...features.map((f) => Text("• $f", style: TextStyle(color: context.appColors.primary))),
                   ],
                 ),
               ),
               if (isCurrent)
-                const Icon(Icons.check_circle, color: Colors.green, size: 32)
+                Icon(Icons.check_circle, color: context.appColors.success, size: 32)
               else
                 ElevatedButton(
                   onPressed: onTap,
-                  style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: context.appColors.onPrimary),
                   child: const Text("Buy"),
                 ),
             ],

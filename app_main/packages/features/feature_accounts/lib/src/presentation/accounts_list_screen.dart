@@ -3,26 +3,40 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_accounts/src/presentation/accounts_list_provider.dart';
 import 'package:feature_accounts/src/presentation/add_account_screen.dart';
+import 'package:feature_accounts/src/presentation/account_ledger_screen.dart';
 
-// We will create this package soon. This error is expected.
-import 'package:feature_dashboard/feature_dashboard.dart'; 
-// We will create this package soon. This error is expected.
-import 'package:feature_reports/feature_reports.dart'; 
+import 'package:shared_services/shared_services.dart';
+import 'package:feature_reports/feature_reports.dart';
 
 class AccountsListScreen extends ConsumerWidget {
   const AccountsListScreen({super.key});
+
+  static String _getLocalizedAccountType(String type, AppLocalizations l10n) {
+    switch (type.toLowerCase()) {
+      case 'asset':
+        return l10n.accountTypeAsset;
+      case 'liability':
+        return l10n.accountTypeLiability;
+      case 'equity':
+        return l10n.accountTypeEquity;
+      case 'revenue':
+        return l10n.accountTypeRevenue;
+      case 'expense':
+        return l10n.accountTypeExpense;
+      default:
+        return type;
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
-    // This provider will be defined in feature_dashboard. This error is expected.
-    final searchQuery = ref.watch(mainDashboardSearchProvider); 
+    final searchQuery = ref.watch(mainDashboardSearchProvider);
 
     final accountsAsync = ref.watch(accountsStreamProvider);
 
-    // This provider will be defined in feature_reports. This error is expected.
-    final summariesAsync = ref.watch(allAccountSummariesProvider); 
+    final summariesAsync = ref.watch(allAccountSummariesProvider);
 
     return summariesAsync.when(
       data: (summariesMap) {
@@ -30,16 +44,18 @@ class AccountsListScreen extends ConsumerWidget {
           data: (accounts) {
             final filteredAccounts = accounts.where((account) {
               if (searchQuery.isEmpty) return true;
-              return account.name
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase());
+              return account.name.toLowerCase().contains(
+                searchQuery.toLowerCase(),
+              );
             }).toList();
 
             if (filteredAccounts.isEmpty) {
               return Center(
-                child: Text(searchQuery.isEmpty
-                    ? l10n.noAccountsYet
-                    : l10n.noResultsFound(searchQuery)),
+                child: Text(
+                  searchQuery.isEmpty
+                      ? l10n.noAccountsYet
+                      : l10n.noResultsFound(searchQuery),
+                ),
               );
             }
 
@@ -54,14 +70,17 @@ class AccountsListScreen extends ConsumerWidget {
                 return ListTile(
                   title: Text(account.name),
                   subtitle: Text(
-                      '${l10n.type} ${account.type} / ${l10n.balance} ${currentBalance.toStringAsFixed(2)}\n${account.phoneNumber != null ? '${l10n.phone} ${account.phoneNumber}' : ''}'),
+                    '\u200E${l10n.type} ${_getLocalizedAccountType(account.type, l10n)} \u200E/ \u200E${l10n.balance} ${currentBalance.toStringAsFixed(2)}\n${account.phoneNumber != null ? '\u200E${l10n.phone} ${account.phoneNumber}' : ''}',
+                  ),
                   isThreeLine: account.phoneNumber != null,
-                  trailing: const Icon(Icons.edit_note),
+                  trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          AddAccountScreen(accountToEdit: account),
-                    ));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AccountLedgerScreen(account: account),
+                      ),
+                    );
                   },
                 );
               },
@@ -70,17 +89,12 @@ class AccountsListScreen extends ConsumerWidget {
           error: (err, stack) => Center(
             child: Text('${l10n.errorLoadingAccounts} ${err.toString()}'),
           ),
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
-          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
         );
       },
-      error: (err, stack) => Center(
-        child: Text('${l10n.errorLoadingBalances} ${err.toString()}'),
-      ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      error: (err, stack) =>
+          Center(child: Text('${l10n.errorLoadingBalances} ${err.toString()}')),
+      loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
 }

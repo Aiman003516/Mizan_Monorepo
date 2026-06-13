@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 
@@ -14,17 +15,17 @@ class CustomersListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final customersAsync = ref.watch(customersStreamProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Customers'),
+        title: Text(l10n.customersTitle),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // TODO: Implement search
             },
           ),
         ],
@@ -36,7 +37,7 @@ class CustomersListScreen extends ConsumerWidget {
           );
         },
         icon: const Icon(Icons.person_add),
-        label: const Text('Add Customer'),
+        label: Text(l10n.addCustomerBtn),
       ),
       body: customersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

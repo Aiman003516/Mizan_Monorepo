@@ -1,8 +1,11 @@
 // Depreciation Processing Screen - Batch depreciation for all assets
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feature_settings/src/data/fixed_assets_repository.dart';
 import 'package:core_data/core_data.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class DepreciationScreen extends ConsumerStatefulWidget {
@@ -26,13 +29,15 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
   Widget build(BuildContext context) {
     final assetsAsync = ref.watch(activeAssetsStreamProvider);
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Depreciation Processing'),
+        title: Text(l10n.depreciationProcessingTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month),
-            tooltip: 'Select Period End Date',
+            tooltip: l10n.selectPeriodEndDate,
             onPressed: _selectPeriodEndDate,
           ),
         ],
@@ -59,7 +64,7 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Period End Date',
+                        l10n.periodEndDate,
                         style: TextStyle(
                           color: Theme.of(
                             context,
@@ -83,16 +88,16 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
                 FilledButton.icon(
                   onPressed: _isProcessing ? null : _runBatchDepreciation,
                   icon: _isProcessing
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.appColors.onPrimary,
                           ),
                         )
                       : const Icon(Icons.play_arrow),
-                  label: Text(_isProcessing ? 'Processing...' : 'Run All'),
+                  label: Text(_isProcessing ? l10n.processing : l10n.runAll),
                 ),
               ],
             ),
@@ -105,15 +110,15 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Active Assets',
+                  l10n.activeAssets,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 assetsAsync.when(
                   data: (assets) => Text(
-                    '${assets.length} assets',
-                    style: TextStyle(color: Colors.grey[600]),
+                    l10n.assetsCount(assets.length),
+                    style: TextStyle(color: context.appColors.subtleText),
                   ),
                   loading: () => const SizedBox(),
                   error: (_, __) => const SizedBox(),
@@ -134,18 +139,18 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
                         Icon(
                           Icons.inventory_2_outlined,
                           size: 64,
-                          color: Colors.grey[400],
+                          color: context.appColors.subtleText,
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No Active Assets',
+                          l10n.noActiveAssets,
                           style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(color: Colors.grey[600]),
+                              ?.copyWith(color: context.appColors.subtleText),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Add fixed assets to run depreciation',
-                          style: TextStyle(color: Colors.grey[500]),
+                          l10n.addFixedAssetsHint,
+                          style: TextStyle(color: context.appColors.subtleText),
                         ),
                       ],
                     ),
@@ -171,6 +176,7 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
   }
 
   Widget _buildAssetCard(FixedAsset asset) {
+    final l10n = AppLocalizations.of(context)!;
     final depreciableBase = asset.acquisitionCost - asset.salvageValue;
     final remainingDepreciation = depreciableBase - asset.totalDepreciation;
     final monthlyExpected = _calculateMonthlyDepreciation(asset);
@@ -195,25 +201,25 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
                       ),
                       Text(
                         _getMethodLabel(asset.depreciationMethod),
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                        style: TextStyle(color: context.appColors.subtleText, fontSize: 12),
                       ),
                     ],
                   ),
                 ),
                 if (isFullyDepreciated)
                   Chip(
-                    label: const Text(
-                      'Fully Depreciated',
-                      style: TextStyle(fontSize: 11),
+                    label: Text(
+                      l10n.fullyDepreciated,
+                      style: const TextStyle(fontSize: 11),
                     ),
-                    backgroundColor: Colors.orange.withValues(alpha: 0.2),
-                    labelStyle: const TextStyle(color: Colors.orange),
+                    backgroundColor: context.appColors.warning.withValues(alpha: 0.2),
+                    labelStyle: TextStyle(color: context.appColors.warning),
                     visualDensity: VisualDensity.compact,
                   )
                 else
                   IconButton(
                     icon: const Icon(Icons.play_circle_outline),
-                    tooltip: 'Run Depreciation',
+                    tooltip: l10n.runDepreciation,
                     onPressed: () => _runSingleDepreciation(asset),
                   ),
               ],
@@ -222,14 +228,17 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
             Row(
               children: [
                 _buildValueColumn(
-                  'Book Value',
+                  l10n.bookValueLabel,
                   _formatCurrency(
                     asset.acquisitionCost - asset.totalDepreciation,
                   ),
                 ),
-                _buildValueColumn('Monthly', _formatCurrency(monthlyExpected)),
                 _buildValueColumn(
-                  'Remaining',
+                  l10n.monthlyLabel,
+                  _formatCurrency(monthlyExpected),
+                ),
+                _buildValueColumn(
+                  l10n.remainingLabel,
                   _formatCurrency(remainingDepreciation),
                 ),
               ],
@@ -245,7 +254,7 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 11)),
+          Text(label, style: TextStyle(color: context.appColors.subtleText, fontSize: 11)),
           Text(
             value,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -309,14 +318,14 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
             content: Text(
               'Depreciation recorded: ${_formatCurrency(result.annualDepreciation)} for ${asset.name}',
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: context.appColors.success,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
         );
       }
     }
@@ -357,14 +366,14 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
             content: Text(
               'Processed $successCount assets. Total: ${_formatCurrency(totalDepreciation)}',
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: context.appColors.success,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
         );
       }
     } finally {

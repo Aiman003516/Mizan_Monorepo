@@ -1,7 +1,10 @@
 // Ghost Money Reconciliation Screen
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feature_settings/src/data/ghost_money_repository.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class GhostMoneyScreen extends ConsumerStatefulWidget {
@@ -24,13 +27,15 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
     final summaryAsync = ref.watch(ghostMoneySummaryProvider);
     final entriesAsync = ref.watch(unreconciledGhostMoneyProvider);
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ghost Money'),
+        title: Text(l10n.ghostMoneyTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
-            tooltip: 'What is Ghost Money?',
+            tooltip: l10n.whatIsGhostMoneyTooltip,
             onPressed: _showHelpDialog,
           ),
         ],
@@ -45,7 +50,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Pending Reconciliation',
+                    l10n.pendingReconciliation,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -63,20 +68,20 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                                   Icon(
                                     Icons.check_circle,
                                     size: 48,
-                                    color: Colors.green[400],
+                                    color: context.appColors.primary,
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
-                                    'All Balanced!',
+                                    l10n.allBalanced,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium
-                                        ?.copyWith(color: Colors.green),
+                                        ?.copyWith(color: context.appColors.success),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'No ghost money to reconcile',
-                                    style: TextStyle(color: Colors.grey[600]),
+                                    l10n.noGhostMoneyToReconcile,
+                                    style: TextStyle(color: context.appColors.subtleText),
                                   ),
                                 ],
                               ),
@@ -122,8 +127,8 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                                                 ? Icons.trending_up
                                                 : Icons.trending_down,
                                             color: isPositive
-                                                ? Colors.green
-                                                : Colors.red,
+                                                ? context.appColors.success
+                                                : context.appColors.error,
                                             size: 20,
                                           ),
                                         ],
@@ -136,8 +141,8 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                                             .headlineSmall
                                             ?.copyWith(
                                               color: isPositive
-                                                  ? Colors.green
-                                                  : Colors.red,
+                                                  ? context.appColors.success
+                                                  : context.appColors.error,
                                               fontWeight: FontWeight.bold,
                                             ),
                                       ),
@@ -145,7 +150,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                                       Text(
                                         '${s.entryCount} ${s.entryCount == 1 ? 'entry' : 'entries'}',
                                         style: TextStyle(
-                                          color: Colors.grey[600],
+                                          color: context.appColors.subtleText,
                                           fontSize: 12,
                                         ),
                                       ),
@@ -184,11 +189,11 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
           entriesAsync.when(
             data: (entries) {
               if (entries.isEmpty) {
-                return const SliverToBoxAdapter(
+                return SliverToBoxAdapter(
                   child: Center(
                     child: Padding(
-                      padding: EdgeInsets.all(32),
-                      child: Text('No entries to display'),
+                      padding: const EdgeInsets.all(32),
+                      child: Text(l10n.noEntriesToDisplay),
                     ),
                   ),
                 );
@@ -202,11 +207,11 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundColor: isPositive
-                          ? Colors.green.withValues(alpha: 0.1)
-                          : Colors.red.withValues(alpha: 0.1),
+                          ? context.appColors.success.withValues(alpha: 0.1)
+                          : context.appColors.error.withValues(alpha: 0.1),
                       child: Icon(
                         isPositive ? Icons.add : Icons.remove,
-                        color: isPositive ? Colors.green : Colors.red,
+                        color: isPositive ? context.appColors.success : context.appColors.error,
                         size: 20,
                       ),
                     ),
@@ -217,7 +222,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                     ),
                     trailing: Text(
                       _dateFormat.format(entry.createdAt),
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: 11, color: context.appColors.subtleText),
                     ),
                     onTap: () => _reconcileEntry(entry.id),
                   );
@@ -236,11 +241,12 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
   }
 
   void _showHelpDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('What is Ghost Money?'),
-        content: const SingleChildScrollView(
+        title: Text(l10n.whatIsGhostMoney),
+        content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -249,7 +255,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                 'Ghost money represents tiny rounding differences that occur '
                 'during financial calculations.\n',
               ),
-              Text('Examples:', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(l10n.examplesLabel, style: TextStyle(fontWeight: FontWeight.bold)),
               Text('• Splitting a bill 3 ways (100 ÷ 3)'),
               Text('• Currency exchange rate conversions'),
               Text('• Percentage-based tax calculations'),
@@ -264,7 +270,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Got it'),
+            child: Text(l10n.gotItBtn),
           ),
         ],
       ),
@@ -272,10 +278,11 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
   }
 
   void _showReconcileDialog(GhostMoneySummary summary) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Reconcile ${summary.currency}'),
+        title: Text(l10n.reconcileAmount(summary.currency)),
         content: Text(
           'Write off ${_formatAmount(summary.totalAmount)} in ghost money?\n\n'
           'This will create a journal entry to clear ${summary.entryCount} '
@@ -284,14 +291,14 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelBtn),
           ),
           FilledButton(
             onPressed: () async {
               Navigator.pop(context);
               await _reconcileCurrency(summary.currency);
             },
-            child: const Text('Reconcile'),
+            child: Text(l10n.reconcileBtn),
           ),
         ],
       ),
@@ -299,6 +306,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
   }
 
   Future<void> _reconcileCurrency(String currency) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final repo = ref.read(ghostMoneyRepositoryProvider);
       final count = await repo.reconcileByCurrency(currency);
@@ -306,29 +314,30 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Reconciled $count entries for $currency'),
-            backgroundColor: Colors.green,
+            content: Text(l10n.reconciledEntries(count, currency)),
+            backgroundColor: context.appColors.success,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
         );
       }
     }
   }
 
   Future<void> _reconcileEntry(String id) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final repo = ref.read(ghostMoneyRepositoryProvider);
       await repo.reconcileEntry(id);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Entry reconciled'),
+          SnackBar(
+            content: Text(l10n.entryReconciled),
             duration: Duration(seconds: 1),
           ),
         );
@@ -336,7 +345,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
         );
       }
     }

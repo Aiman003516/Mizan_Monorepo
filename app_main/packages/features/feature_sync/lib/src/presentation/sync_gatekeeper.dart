@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:feature_sync/src/data/cloud_sync_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 
 /// 🛡️ THE GATEKEEPER
 /// Ensures "Strict Consistency" by blocking the UI until data is confirmed in the Cloud.
@@ -49,6 +51,7 @@ class SyncGatekeeper {
   }
 
   Future<void> _showFailureDialog(BuildContext context, Object error) async {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -86,8 +89,8 @@ class _BlockingSyncDialog extends StatelessWidget {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              CircularProgressIndicator(),
+            children: [
+              const CircularProgressIndicator(),
               SizedBox(height: 16),
               Text(
                 "Syncing with Headquarters...",

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 enum MainPage {
   dashboard,
   pos,
+  reportsHub, // 🟢 NEW
   reportTotalAmounts,
   reportMonthlyAmounts,
   reportAccountActivity,

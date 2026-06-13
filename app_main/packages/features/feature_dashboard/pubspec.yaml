@@ -20,6 +20,10 @@ dependencies:
     path: ../../core/core_data
   core_l10n:
     path: ../../core/core_l10n
+  core_ui:
+    path: ../../core/core_ui
+  shared_services:
+    path: ../../shared/shared_services
   
   # Feature Dependencies
   feature_accounts:
@@ -36,6 +40,8 @@ dependencies:
     path: ../feature_sync
   feature_transactions:
     path: ../feature_transactions
+  flutter_speed_dial: ^7.0.0
+  fl_chart: ^0.66.2
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart'; // Exports AppRole, AppPermission, RolesRepository
 
@@ -54,10 +57,11 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
   }
 
   Future<void> _saveRole() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
     if (_selectedPermissions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one permission.')),
+        SnackBar(content: Text(l10n.selectPermission)),
       );
       return;
     }
@@ -78,13 +82,13 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
       if (mounted) {
         Navigator.pop(context); // Close screen
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Role saved successfully!'), backgroundColor: Colors.green),
+          SnackBar(content: Text(l10n.roleSaved), backgroundColor: context.appColors.success),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving role: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error saving role: $e'), backgroundColor: context.appColors.error),
         );
       }
     } finally {
@@ -94,11 +98,12 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isEditing = widget.roleToEdit != null;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Role' : 'Create New Role'),
+        title: Text(isEditing ? l10n.editRole : l10n.createNewRole),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
@@ -117,9 +122,9 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                     padding: const EdgeInsets.all(16.0),
                     child: TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Role Name',
-                        hintText: 'e.g., Senior Cashier',
+                      decoration: InputDecoration(
+                        labelText: l10n.roleNameLabel,
+                        hintText: l10n.roleNameHint,
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.badge),
                       ),

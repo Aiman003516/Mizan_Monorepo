@@ -136,23 +136,6 @@ class FixedAssets extends MizanTable {
 }
 
 // --- PHASE 8: ACCOUNTS RECEIVABLE ---
-@DataClassName('Customer')
-class Customers extends MizanTable {
-  TextColumn get name => text()();
-  TextColumn get email => text().nullable()();
-  TextColumn get phone => text().nullable()();
-  TextColumn get address => text().nullable()();
-  TextColumn get taxId => text().nullable()(); // VAT/Tax number
-  IntColumn get creditLimit => integer().withDefault(const Constant(0))();
-  IntColumn get balance =>
-      integer().withDefault(const Constant(0))(); // Outstanding balance
-  TextColumn get receivableAccountId => text().nullable().references(
-    Accounts,
-    #id,
-    onDelete: KeyAction.setNull,
-  )();
-  TextColumn get notes => text().nullable()();
-}
 
 @DataClassName('Invoice')
 class Invoices extends MizanTable {
@@ -174,6 +157,10 @@ class Invoices extends MizanTable {
     #id,
     onDelete: KeyAction.setNull,
   )(); // Link to journal entry
+  // Wave 2: Recurring Invoices
+  BoolColumn get isRecurring => boolean().withDefault(const Constant(false))();
+  TextColumn get recurrenceInterval =>
+      text().nullable()(); // weekly, monthly, quarterly, yearly
 }
 
 @DataClassName('InvoiceItem')
@@ -354,6 +341,142 @@ class BudgetLines extends MizanTable {
   TextColumn get notes => text().nullable()();
 }
 
+// --- PHASE 2.6: PROJECT TRACKING ---
+@DataClassName('Project')
+class Projects extends MizanTable {
+  TextColumn get name => text()();
+  TextColumn get description => text().nullable()();
+  TextColumn get status => text().withDefault(
+    const Constant('active'),
+  )(); // active, completed, archived
+}
+
+// --- PHASE 2.6: AUDIT TRAIL ---
+@DataClassName('AuditLogEntry')
+class AuditLog extends MizanTable {
+  TextColumn get userId => text().nullable()();
+  TextColumn get action => text()(); // INSERT, UPDATE, DELETE
+  TextColumn get targetTableName => text()(); // Renamed to avoid Drift conflict
+  TextColumn get recordId => text()();
+  TextColumn get changesJson => text().nullable()(); // JSON of old/new values
+}
+
+// --- WAVE 1: NOTIFICATION CENTER ---
+@DataClassName('AppNotification')
+class AppNotifications extends MizanTable {
+  TextColumn get title => text()();
+  TextColumn get body => text()();
+  TextColumn get notificationType => text()(); // system, business, inventory
+  BoolColumn get isRead => boolean().withDefault(const Constant(false))();
+  TextColumn get relatedEntityId => text().nullable()(); // e.g., invoiceId
+}
+
+// --- WAVE 2: ESTIMATES & QUOTES ---
+@DataClassName('Quote')
+class Quotes extends MizanTable {
+  TextColumn get customerId =>
+      text().references(Customers, #id, onDelete: KeyAction.cascade)();
+  DateTimeColumn get quoteDate => dateTime()();
+  DateTimeColumn get expiryDate => dateTime().nullable()();
+  TextColumn get status => text().withDefault(
+    const Constant('draft'),
+  )(); // draft, sent, accepted, rejected
+  IntColumn get subtotal => integer().withDefault(const Constant(0))();
+  IntColumn get taxAmount => integer().withDefault(const Constant(0))();
+  IntColumn get totalAmount => integer().withDefault(const Constant(0))();
+  TextColumn get notes => text().nullable()();
+  TextColumn get convertedInvoiceId => text().nullable().references(
+    Invoices,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+}
+
+@DataClassName('QuoteItem')
+class QuoteItems extends MizanTable {
+  TextColumn get quoteId =>
+      text().references(Quotes, #id, onDelete: KeyAction.cascade)();
+  TextColumn get productId => text().nullable().references(
+    Products,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  TextColumn get description => text()();
+  RealColumn get quantity => real()();
+  IntColumn get unitPrice => integer()();
+  IntColumn get lineTotal => integer()();
+}
+
+// --- WAVE 4: MULTI-WAREHOUSE ---
+@DataClassName('Warehouse')
+class Warehouses extends MizanTable {
+  TextColumn get name => text()();
+  TextColumn get address => text().nullable()();
+  BoolColumn get isDefault => boolean().withDefault(const Constant(false))();
+}
+
+@DataClassName('WarehouseInventory')
+class WarehouseInventoryItems extends MizanTable {
+  TextColumn get warehouseId =>
+      text().references(Warehouses, #id, onDelete: KeyAction.cascade)();
+  TextColumn get productId =>
+      text().references(Products, #id, onDelete: KeyAction.cascade)();
+  RealColumn get quantityOnHand => real().withDefault(const Constant(0.0))();
+}
+
+// --- WAVE 4: MILEAGE TRACKER ---
+@DataClassName('MileageEntry')
+class MileageEntries extends MizanTable {
+  DateTimeColumn get tripDate => dateTime()();
+  TextColumn get description => text().nullable()();
+  RealColumn get startKm => real()();
+  RealColumn get endKm => real()();
+  IntColumn get ratePerKm => integer()(); // in cents
+  IntColumn get totalDeduction => integer()(); // calculated
+}
+
+// --- WAVE 4: ATTACHMENTS ---
+@DataClassName('Attachment')
+class Attachments extends MizanTable {
+  TextColumn get transactionId => text().nullable().references(
+    Transactions,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+  TextColumn get invoiceId => text().nullable().references(
+    Invoices,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+  TextColumn get filePath => text()();
+  TextColumn get fileName => text()();
+  TextColumn get mimeType => text().nullable()();
+}
+
+// --- WAVE 4: CONTEXTUAL NOTES ---
+@DataClassName('Comment')
+class Comments extends MizanTable {
+  TextColumn get invoiceId => text().nullable().references(
+    Invoices,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+  TextColumn get transactionId => text().nullable().references(
+    Transactions,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+  TextColumn get userId => text().nullable()();
+  TextColumn get content => text()();
+}
+
+// --- WAVE 4: USER ROLES (RBAC) ---
+@DataClassName('UserRole')
+class UserRoles extends MizanTable {
+  TextColumn get userId => text()();
+  TextColumn get role => text()(); // admin, editor, viewer
+}
+
 // --- CORE TABLES ---
 @DataClassName('Classification')
 class Classifications extends MizanTable {
@@ -377,6 +500,19 @@ class Products extends MizanTable {
   RealColumn get quantityOnHand => real().withDefault(const Constant(0.0))();
   IntColumn get averageCost => integer().withDefault(const Constant(0))();
   TextColumn get customAttributes => text().nullable()(); // Phase 5.1
+  // Phase 2.5: Inventory Enhancements
+  IntColumn get reorderPoint => integer().withDefault(const Constant(0))();
+  BoolColumn get isBundle => boolean().withDefault(const Constant(false))();
+}
+
+// Phase 2.5: Product Bundles
+@DataClassName('ProductBundleItem')
+class ProductBundleItems extends MizanTable {
+  TextColumn get bundleProductId =>
+      text().references(Products, #id, onDelete: KeyAction.cascade)();
+  TextColumn get childProductId =>
+      text().references(Products, #id, onDelete: KeyAction.cascade)();
+  RealColumn get quantity => real()();
 }
 
 @DataClassName('Account')
@@ -427,6 +563,15 @@ class Transactions extends MizanTable {
   )();
   TextColumn get recurringSchedule =>
       text().nullable()(); // JSON for recurring entries
+
+  // Phase 4: Professional Gaps
+  TextColumn get createdByUserId => text().nullable()();
+  // Phase 2.6: Project Tracking
+  TextColumn get projectId => text().nullable().references(
+    Projects,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
 }
 
 @DataClassName('TransactionEntry')
@@ -437,6 +582,27 @@ class TransactionEntries extends MizanTable {
       text().references(Accounts, #id, onDelete: KeyAction.restrict)();
   IntColumn get amount => integer()();
   RealColumn get currencyRate => real().withDefault(const Constant(1.0))();
+}
+
+@DataClassName('Customer')
+class Customers extends MizanTable {
+  TextColumn get name => text()();
+  TextColumn get email => text().nullable()();
+  TextColumn get phone => text().nullable()();
+  TextColumn get address => text().nullable()();
+  TextColumn get taxId => text().nullable()(); // VAT/Tax number
+  IntColumn get creditLimit => integer().withDefault(const Constant(0))();
+  IntColumn get balance =>
+      integer().withDefault(const Constant(0))(); // Outstanding balance
+  TextColumn get receivableAccountId => text().nullable().references(
+    Accounts,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  TextColumn get notes => text().nullable()();
+
+  // Phase 4: Professional Gaps
+  BoolColumn get isOnHold => boolean().withDefault(const Constant(false))();
 }
 
 @DataClassName('Currency')
@@ -509,14 +675,32 @@ class OrderItems extends MizanTable {
     // Phase Budget: Budgeting & Variance Analysis
     Budgets,
     BudgetLines,
+    // Phase 2.5: Inventory Bundles
+    ProductBundleItems,
+    // Phase 2.6: Projects & Audit
+    Projects,
+    AuditLog,
+    // Wave 1-4 Expansion
+    AppNotifications,
+    Quotes,
+    QuoteItems,
+    Warehouses,
+    WarehouseInventoryItems,
+    MileageEntries,
+    Attachments,
+    Comments,
+    UserRoles,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  // ⭐️ BUMPED VERSION: 25 -> 26 (Budgeting)
+  /// 🧪 Constructor for Testing
+  AppDatabase.connect(QueryExecutor connection) : super(connection);
+
+  // ⭐️ BUMPED VERSION: 29 -> 30 (Full Expansion)
   @override
-  int get schemaVersion => 26;
+  int get schemaVersion => 30;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -622,6 +806,44 @@ class AppDatabase extends _$AppDatabase {
       if (from < 26) {
         await m.createTable(budgets);
         await m.createTable(budgetLines);
+      }
+
+      // Phase 4: Professional Gaps (Version 27)
+      if (from < 27) {
+        await m.addColumn(transactions, transactions.createdByUserId);
+        await m.addColumn(customers, customers.isOnHold);
+      }
+
+      // Phase 2.5: Inventory Enhancements (Version 28)
+      if (from < 28) {
+        await m.addColumn(products, products.reorderPoint);
+        await m.addColumn(products, products.isBundle);
+        await m.createTable(productBundleItems);
+      }
+
+      // Phase 2.6: Projects & Audit Trail (Version 29)
+      if (from < 29) {
+        await m.createTable(projects);
+        await m.createTable(auditLog);
+        await m.addColumn(transactions, transactions.projectId);
+      }
+
+      // Wave 1-4 Full Expansion (Version 30)
+      if (from < 30) {
+        // Wave 1: Notifications
+        await m.createTable(appNotifications);
+        // Wave 2: Quotes & Recurring Invoices
+        await m.createTable(quotes);
+        await m.createTable(quoteItems);
+        await m.addColumn(invoices, invoices.isRecurring);
+        await m.addColumn(invoices, invoices.recurrenceInterval);
+        // Wave 4: Warehousing, Mileage, Collaboration
+        await m.createTable(warehouses);
+        await m.createTable(warehouseInventoryItems);
+        await m.createTable(mileageEntries);
+        await m.createTable(attachments);
+        await m.createTable(comments);
+        await m.createTable(userRoles);
       }
     },
     beforeOpen: (details) async {

@@ -5,6 +5,8 @@ import 'package:core_database/core_database.dart';
 import 'package:feature_products/src/data/products_repository.dart';
 import 'package:shared_ui/shared_ui.dart'; // Import Formatter
 
+import 'package:feature_products/src/data/categories_repository.dart';
+
 class AddProductScreen extends ConsumerStatefulWidget {
   final Product? productToEdit; // If null, we are adding a new product
 
@@ -123,7 +125,36 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                    return null;
                 },
               ),
-              // ... Other fields (Category Dropdown, Barcode, ImagePicker)
+              const SizedBox(height: 16),
+              // Category Dropdown
+              Consumer(
+                builder: (context, ref, _) {
+                  final categoriesAsync = ref.watch(categoriesStreamProvider);
+                  return categoriesAsync.when(
+                    data: (categories) {
+                      return DropdownButtonFormField<String>(
+                        value: _selectedCategoryId,
+                        decoration: const InputDecoration(
+                          labelText: 'Category',
+                          prefixIcon: Icon(Icons.category),
+                        ),
+                        items: categories.map((cat) {
+                          return DropdownMenuItem<String>(
+                            value: cat.id,
+                            child: Text(cat.name),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() => _selectedCategoryId = value);
+                        },
+                        validator: (v) => v == null ? 'Please select a category' : null,
+                      );
+                    },
+                    loading: () => const LinearProgressIndicator(),
+                    error: (e, s) => Text('Error loading categories: $e'),
+                  );
+                },
+              ),
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _save,

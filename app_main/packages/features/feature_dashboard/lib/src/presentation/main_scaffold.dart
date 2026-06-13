@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// UPDATED Local Imports
+// Local Imports
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_data/core_data.dart';
 import 'package:core_database/core_database.dart' as c;
@@ -15,7 +17,6 @@ import 'package:feature_transactions/feature_transactions.dart';
 import 'package:feature_sync/feature_sync.dart';
 import 'package:feature_dashboard/src/presentation/main_nav_provider.dart';
 import 'package:feature_dashboard/src/presentation/dashboard_providers.dart';
-
 
 class MainScaffold extends ConsumerStatefulWidget {
   const MainScaffold({super.key});
@@ -101,6 +102,8 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         return Text(l10n.mainDashboard);
       case MainPage.pos:
         return Text(l10n.newSalePOS);
+      case MainPage.reportsHub:
+        return const Text("Reports & Analysis");
       case MainPage.reportTotalAmounts:
         return Text(l10n.totalAmountsReport);
       case MainPage.reportMonthlyAmounts:
@@ -134,7 +137,8 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     List<Widget> actions = [];
     final bool isOffline = authStatus == AuthStatus.authenticated_offline;
 
-    final canSearch = currentPage == MainPage.dashboard ||
+    final canSearch =
+        currentPage == MainPage.dashboard ||
         currentPage == MainPage.reportTotalAmounts ||
         currentPage == MainPage.reportMonthlyAmounts ||
         currentPage == MainPage.manageAccounts ||
@@ -143,47 +147,129 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
     if (canSearch) {
       if (_isSearching) {
-        actions.add(IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: _stopSearching,
-        ));
+        actions.add(
+          IconButton(icon: const Icon(Icons.close), onPressed: _stopSearching),
+        );
       } else {
-        actions.add(IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () {
-            setState(() {
-              _isSearching = true;
-            });
-          },
-        ));
+        actions.add(
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = true;
+              });
+            },
+          ),
+        );
       }
     }
 
     if (currentPage != MainPage.settings &&
         authStatus != AuthStatus.unauthenticated) {
       if (isSyncing) {
-        actions.add(const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: SizedBox(
-            width: 24,
-            height: 24,
-            child:
-                CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+        actions.add(
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+              color: context.appColors.onPrimary,
+                strokeWidth: 2,
+              ),
+            ),
           ),
-        ));
+        );
       } else {
-        actions.add(IconButton(
-          icon: const Icon(Icons.sync),
-          tooltip: l10n.syncData,
-          onPressed: isOffline
-              ? null
-              : () {
-                  ref.read(syncControllerProvider.notifier).runBackup();
-                },
-        ));
+        actions.add(
+          IconButton(
+            icon: const Icon(Icons.sync),
+            tooltip: l10n.syncData,
+            onPressed: isOffline
+                ? null
+                : () {
+                    ref.read(syncControllerProvider.notifier).runBackup();
+                  },
+          ),
+        );
       }
     }
     return actions;
+  }
+
+  /// Custom Drawer Header to permanently prevent text overlap
+  Widget _buildCustomDrawerHeader(AuthStatus authStatus) {
+    // Watch the profile provider to get live updates for name and image
+    final profile = ref.watch(companyProfileProvider);
+    
+    // Safely check if the provider has an image path property (assuming you add this to your model)
+    // Replace `profile.imagePath` with your actual property name if different
+    final String? imagePath = profile.imagePath; 
+
+    final isOnline = authStatus == AuthStatus.authenticated_online;
+    final isOffline = authStatus == AuthStatus.authenticated_offline;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Constrained Avatar
+              CircleAvatar(
+                radius: 36,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                backgroundImage: (imagePath != null && imagePath.isNotEmpty) 
+                    ? FileImage(File(imagePath)) 
+                    : null,
+                child: (imagePath == null || imagePath.isEmpty)
+                    ? Icon(Icons.business, size: 36, color: Theme.of(context).colorScheme.onPrimary)
+                    : null,
+              ),
+              // Cloud Status Icon
+              if (isOnline)
+                Icon(Icons.cloud_queue, color: Theme.of(context).colorScheme.primary)
+              else if (isOffline)
+                Icon(Icons.cloud_off, color: Theme.of(context).colorScheme.error)
+              else
+                Icon(Icons.cloud_off, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ],
+          ),
+          const SizedBox(height: 16), // Explicit, rigid spacing prevents overlap
+          
+          // Dynamic Account Name
+          Text(
+            profile.companyName.isNotEmpty ? profile.companyName : (authStatus != AuthStatus.unauthenticated ? l10n.mizanUser : l10n.notSignedIn),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          
+          // Dynamic Account Status / Email
+          Text(
+            profile.userName.isNotEmpty 
+                ? profile.userName 
+                : (isOnline ? l10n.online : isOffline ? l10n.offlineMode : l10n.syncDisabled),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.8),
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -214,7 +300,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.backupFailed),
-              backgroundColor: Colors.red,
+              backgroundColor: context.appColors.error,
             ),
           );
         }
@@ -224,7 +310,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.restoreSuccessful),
-              backgroundColor: Colors.green,
+              backgroundColor: context.appColors.success,
             ),
           );
         }
@@ -259,32 +345,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              UserAccountsDrawerHeader(
-                accountName: Text(
-                  authStatus != AuthStatus.unauthenticated
-                      ? l10n.mizanUser
-                      : l10n.notSignedIn,
-                ),
-                accountEmail: Text(
-                  authStatus == AuthStatus.authenticated_online
-                      ? l10n.online
-                      : authStatus == AuthStatus.authenticated_offline
-                          ? l10n.offlineMode
-                          : l10n.syncDisabled,
-                ),
-                currentAccountPicture: const CircleAvatar(
-                  child: Icon(Icons.person, size: 40),
-                ),
-                otherAccountsPictures: [
-                  if (authStatus == AuthStatus.authenticated_online)
-                    const Icon(Icons.cloud_queue, color: Colors.white)
-                  else if (authStatus == AuthStatus.authenticated_offline)
-                    const Icon(Icons.cloud_off, color: Colors.white)
-                  else
-                    const Icon(Icons.cloud_off, color: Colors.grey)
-                ],
-              ),
-
+              _buildCustomDrawerHeader(authStatus), // Replaced overlapping header
               ListTile(
                 leading: const Icon(Icons.dashboard),
                 title: Text(l10n.mainDashboard),
@@ -313,9 +374,21 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
               const Divider(),
               Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: Text(l10n.reports,
-                      style: const TextStyle(fontWeight: FontWeight.bold))),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: Text(
+                  l10n.reports,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.dashboard_customize),
+                title: const Text("All Reports & Tools"),
+                onTap: () {
+                  Navigator.pop(context);
+                  ref.read(mainNavProvider.notifier).state =
+                      MainPage.reportsHub;
+                },
+              ),
               ListTile(
                 leading: const Icon(Icons.poll),
                 title: Text(l10n.totalAmountsSummary),
@@ -353,8 +426,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                 },
               ),
               ListTile(
-                leading:
-                    const Icon(Icons.account_balance_outlined),
+                leading: const Icon(Icons.account_balance_outlined),
                 title: Text(l10n.balanceSheetReport),
                 onTap: () {
                   Navigator.pop(context);
@@ -363,8 +435,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                 },
               ),
               ListTile(
-                leading:
-                    const Icon(Icons.table_chart_outlined),
+                leading: const Icon(Icons.table_chart_outlined),
                 title: Text(l10n.trialBalanceReport),
                 onTap: () {
                   Navigator.pop(context);
@@ -375,9 +446,12 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
               const Divider(),
               Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: Text(l10n.management,
-                      style: const TextStyle(fontWeight: FontWeight.bold))),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: Text(
+                  l10n.management,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
               ListTile(
                 leading: const Icon(Icons.account_balance),
                 title: Text(l10n.accounts),
@@ -416,18 +490,23 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               ),
               if (authStatus == AuthStatus.unauthenticated)
                 ListTile(
-                  leading: Icon(Icons.login,
-                      color: Theme.of(context).colorScheme.primary),
+                  leading: Icon(
+                    Icons.login,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   title: Text(
                     l10n.signInWithGoogle,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary),
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
                   },
                 )
               else
@@ -444,16 +523,20 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
         body: switch (currentPage) {
           MainPage.dashboard => TabBarView(
-              children: [
-                FilteredAccountsListPage(
-                    classificationFilter: c.kClassificationGeneral),
-                FilteredAccountsListPage(
-                    classificationFilter: c.kClassificationClients),
-                FilteredAccountsListPage(
-                    classificationFilter: c.kClassificationSuppliers),
-              ],
-            ),
+            children: [
+              FilteredAccountsListPage(
+                classificationFilter: c.kClassificationGeneral,
+              ),
+              FilteredAccountsListPage(
+                classificationFilter: c.kClassificationClients,
+              ),
+              FilteredAccountsListPage(
+                classificationFilter: c.kClassificationSuppliers,
+              ),
+            ],
+          ),
           MainPage.pos => const PosScreen(),
+          MainPage.reportsHub => const ReportsHubScreen(),
           MainPage.reportTotalAmounts => const TotalAmountsScreen(),
           MainPage.reportMonthlyAmounts => const MonthlyAmountsScreen(),
           MainPage.reportAccountActivity => const AccountActivityScreen(),
@@ -461,8 +544,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
           MainPage.manageProducts => const ProductsHubScreen(),
           MainPage.manageCategories => const CategoriesHubScreen(),
           MainPage.settings => const SettingsScreen(),
-          MainPage.orderHistory =>
-            const OrderHistoryScreen(),
+          MainPage.orderHistory => const OrderHistoryScreen(),
           MainPage.reportProfitAndLoss => const ProfitAndLossScreen(),
           MainPage.reportBalanceSheet => const BalanceSheetScreen(),
           MainPage.reportTrialBalance => const TrialBalanceScreen(),

@@ -172,7 +172,7 @@ class APRepository {
     final count = await _db
         .customSelect('SELECT COUNT(*) as cnt FROM bills')
         .getSingle();
-    final num = (count.read<int>('cnt') ?? 0) + 1;
+    final num = (count.read<int>('cnt')) + 1;
     return 'BILL-${num.toString().padLeft(4, '0')}';
   }
 

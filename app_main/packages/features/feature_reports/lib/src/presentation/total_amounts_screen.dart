@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // UPDATED Local Imports
@@ -8,8 +9,7 @@ import 'package:feature_reports/src/data/report_models.dart';
 import 'package:feature_reports/src/data/reports_service.dart';
 import 'package:feature_reports/src/data/export_service.dart';
 
-// We will create this package soon. This error is expected.
-import 'package:feature_dashboard/feature_dashboard.dart';
+import 'package:shared_services/shared_services.dart';
 
 class TotalAmountsScreen extends ConsumerStatefulWidget {
   const TotalAmountsScreen({super.key});
@@ -27,10 +27,7 @@ class _TotalAmountsScreenState extends ConsumerState<TotalAmountsScreen> {
     super.dispose();
   }
 
-  Widget _buildExportButtons(
-    List<AccountSummary> summaries,
-    String title,
-  ) {
+  Widget _buildExportButtons(List<AccountSummary> summaries, String title) {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -38,7 +35,7 @@ class _TotalAmountsScreenState extends ConsumerState<TotalAmountsScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           IconButton(
-            icon: const Icon(Icons.picture_as_pdf, color: Colors.red),
+            icon: Icon(Icons.picture_as_pdf, color: context.appColors.error),
             tooltip: l10n.exportToPDF,
             onPressed: () {
               ref
@@ -47,15 +44,15 @@ class _TotalAmountsScreenState extends ConsumerState<TotalAmountsScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.description, color: Colors.green.shade700),
+            icon: Icon(Icons.description, color: context.appColors.primary),
             tooltip: l10n.exportToExcel,
             onPressed: () {
               ref
                   .read(exportServiceProvider)
                   .exportTotalAmountsExcel(summaries, title);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.excelExportSuccess)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(l10n.excelExportSuccess)));
             },
           ),
         ],
@@ -67,110 +64,117 @@ class _TotalAmountsScreenState extends ConsumerState<TotalAmountsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    // This provider will be defined in feature_dashboard. This error is expected.
-    final searchQuery = ref.watch(mainDashboardSearchProvider); 
+    final searchQuery = ref.watch(mainDashboardSearchProvider);
 
     final filter = TotalAmountsFilter(
       reportFilter: _selectedReportFilter,
       classificationName: _selectedClassification,
     );
 
-    return Column(
-      children: [
-        Container(
-          color: Theme.of(context).appBarTheme.backgroundColor ??
-              Theme.of(context).primaryColor,
-          child: Column(
-            children: [
-              TabBar(
-                indicatorColor: Colors.white,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white70,
-                tabs: [
-                  Tab(text: l10n.general),
-                  Tab(text: l10n.clients),
-                  Tab(text: l10n.suppliers),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.totalAmountsReport),
+          bottom: TabBar(
+            tabs: [
+              Tab(text: l10n.general),
+              Tab(text: l10n.clients),
+              Tab(text: l10n.suppliers),
+            ],
+            onTap: (index) {
+              setState(() {
+                _selectedClassification = [
+                  c.kClassificationGeneral,
+                  c.kClassificationClients,
+                  c.kClassificationSuppliers,
+                ][index];
+              });
+            },
+          ),
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
+              child: SegmentedButton<ReportFilter>(
+                style: SegmentedButton.styleFrom(
+                  // ignore: deprecated_member_use
+                  backgroundColor: context.appColors.onPrimary.withValues(
+                    alpha: 0.1,
+                  ),
+                  foregroundColor: context.appColors.onPrimary,
+                  selectedBackgroundColor: context.appColors.onPrimary,
+                  selectedForegroundColor: Theme.of(context).primaryColor,
+                ),
+                segments: [
+                  ButtonSegment(
+                    value: ReportFilter.ALL,
+                    label: Text(l10n.all),
+                    icon: const Icon(Icons.all_inclusive),
+                  ),
+                  ButtonSegment(
+                    value: ReportFilter.POS_ONLY,
+                    label: Text(l10n.posSales),
+                    icon: const Icon(Icons.point_of_sale),
+                  ),
+                  ButtonSegment(
+                    value: ReportFilter.ACCOUNTS_ONLY,
+                    label: Text(l10n.accounts),
+                    icon: const Icon(Icons.account_balance_wallet),
+                  ),
                 ],
-                onTap: (index) {
+                selected: {_selectedReportFilter},
+                onSelectionChanged: (Set<ReportFilter> newSelection) {
                   setState(() {
-                    _selectedClassification = [
-                      c.kClassificationGeneral,
-                      c.kClassificationClients,
-                      c.kClassificationSuppliers
-                    ][index];
+                    _selectedReportFilter = newSelection.first;
                   });
                 },
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                child: SegmentedButton<ReportFilter>(
-                  style: SegmentedButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.1),
-                    foregroundColor: Colors.white,
-                    selectedBackgroundColor: Colors.white,
-                    selectedForegroundColor: Theme.of(context).primaryColor,
+            ),
+            Expanded(
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _TotalAmountsListView(
+                    filter: filter.copyWith(
+                      classificationName: c.kClassificationGeneral,
+                    ),
+                    searchQuery: searchQuery,
+                    exportBuilder: (summaries) => _buildExportButtons(
+                      summaries,
+                      l10n.totalAmounts(c.kClassificationGeneral),
+                    ),
                   ),
-                  segments: [
-                    ButtonSegment(
-                        value: ReportFilter.ALL,
-                        label: Text(l10n.all),
-                        icon: const Icon(Icons.all_inclusive)),
-                    ButtonSegment(
-                        value: ReportFilter.POS_ONLY,
-                        label: Text(l10n.posSales),
-                        icon: const Icon(Icons.point_of_sale)),
-                    ButtonSegment(
-                        value: ReportFilter.ACCOUNTS_ONLY,
-                        label: Text(l10n.accounts),
-                        icon: const Icon(Icons.account_balance_wallet)),
-                  ],
-                  selected: {_selectedReportFilter},
-                  onSelectionChanged: (Set<ReportFilter> newSelection) {
-                    setState(() {
-                      _selectedReportFilter = newSelection.first;
-                    });
-                  },
-                ),
+                  _TotalAmountsListView(
+                    filter: filter.copyWith(
+                      classificationName: c.kClassificationClients,
+                    ),
+                    searchQuery: searchQuery,
+                    exportBuilder: (summaries) => _buildExportButtons(
+                      summaries,
+                      l10n.totalAmounts(c.kClassificationClients),
+                    ),
+                  ),
+                  _TotalAmountsListView(
+                    filter: filter.copyWith(
+                      classificationName: c.kClassificationSuppliers,
+                    ),
+                    searchQuery: searchQuery,
+                    exportBuilder: (summaries) => _buildExportButtons(
+                      summaries,
+                      l10n.totalAmounts(c.kClassificationSuppliers),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        Expanded(
-          child: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              _TotalAmountsListView(
-                filter: filter.copyWith(
-                    classificationName: c.kClassificationGeneral),
-                searchQuery: searchQuery,
-                exportBuilder: (summaries) => _buildExportButtons(
-                  summaries,
-                  l10n.totalAmounts(c.kClassificationGeneral),
-                ),
-              ),
-              _TotalAmountsListView(
-                filter: filter.copyWith(
-                    classificationName: c.kClassificationClients),
-                searchQuery: searchQuery,
-                exportBuilder: (summaries) => _buildExportButtons(
-                  summaries,
-                  l10n.totalAmounts(c.kClassificationClients),
-                ),
-              ),
-              _TotalAmountsListView(
-                filter: filter.copyWith(
-                    classificationName: c.kClassificationSuppliers),
-                searchQuery: searchQuery,
-                exportBuilder: (summaries) => _buildExportButtons(
-                  summaries,
-                  l10n.totalAmounts(c.kClassificationSuppliers),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -195,45 +199,62 @@ class _TotalAmountsListView extends ConsumerWidget {
       data: (summaries) {
         final filteredSummaries = summaries.where((summary) {
           if (searchQuery.isEmpty) return true;
-          return summary.accountName
-              .toLowerCase()
-              .contains(searchQuery.toLowerCase());
+          return summary.accountName.toLowerCase().contains(
+            searchQuery.toLowerCase(),
+          );
         }).toList();
 
         if (filteredSummaries.isEmpty) {
           return Center(
-              child: Text(searchQuery.isEmpty
+            child: Text(
+              searchQuery.isEmpty
                   ? l10n.noTotals
-                  : l10n.noResultsFound(searchQuery)));
+                  : l10n.noResultsFound(searchQuery),
+            ),
+          );
         }
 
         return Column(
           children: [
             exportBuilder(filteredSummaries),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               child: Row(
                 children: [
                   Expanded(
-                      flex: 3,
-                      child: Text(l10n.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold))),
+                    flex: 3,
+                    child: Text(
+                      l10n.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                   Expanded(
-                      flex: 2,
-                      child: Text(l10n.debit,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.end)),
+                    flex: 2,
+                    child: Text(
+                      l10n.debit,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
                   Expanded(
-                      flex: 2,
-                      child: Text(l10n.credit,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.end)),
+                    flex: 2,
+                    child: Text(
+                      l10n.credit,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
                   Expanded(
-                      flex: 2,
-                      child: Text(l10n.balance,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.end)),
+                    flex: 2,
+                    child: Text(
+                      l10n.balance,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -244,40 +265,51 @@ class _TotalAmountsListView extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final summary = filteredSummaries[index];
                   final isDebitBalance = summary.netBalance >= 0;
-                  final balanceColor =
-                      isDebitBalance ? Colors.red : Colors.green;
+                  final balanceColor = isDebitBalance
+                      ? context.appColors.error
+                      : context.appColors.success;
 
                   return ListTile(
                     visualDensity: VisualDensity.compact,
                     title: Text(summary.accountName),
-                    subtitle: Text('${l10n.currencyLabel} ${summary.currencyCode}',
-                        style:
-                            TextStyle(color: Theme.of(context).primaryColor)),
+                    subtitle: Text(
+                      '${l10n.currencyLabel} ${summary.currencyCode}',
+                      style: TextStyle(color: Theme.of(context).primaryColor),
+                    ),
                     onTap: () {},
                     trailing: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.45,
                       child: Row(
                         children: [
                           Expanded(
-                              flex: 2,
-                              child: Text(
-                                  summary.totalDebit.toStringAsFixed(2),
-                                  textAlign: TextAlign.end,
-                                  style: const TextStyle(color: Colors.green))),
+                            flex: 2,
+                            child: Text(
+                              summary.totalDebit.toStringAsFixed(2),
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                color: context.appColors.success,
+                              ),
+                            ),
+                          ),
                           Expanded(
-                              flex: 2,
-                              child: Text(
-                                  summary.totalCredit.toStringAsFixed(2),
-                                  textAlign: TextAlign.end,
-                                  style: const TextStyle(color: Colors.red))),
+                            flex: 2,
+                            child: Text(
+                              summary.totalCredit.toStringAsFixed(2),
+                              textAlign: TextAlign.end,
+                              style: TextStyle(color: context.appColors.error),
+                            ),
+                          ),
                           Expanded(
-                              flex: 2,
-                              child: Text(
-                                  summary.netBalance.abs().toStringAsFixed(2),
-                                  textAlign: TextAlign.end,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: balanceColor))),
+                            flex: 2,
+                            child: Text(
+                              summary.netBalance.abs().toStringAsFixed(2),
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: balanceColor,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -288,7 +320,8 @@ class _TotalAmountsListView extends ConsumerWidget {
           ],
         );
       },
-      error: (err, stack) => Center(child: Text('${l10n.error} ${err.toString()}')),
+      error: (err, stack) =>
+          Center(child: Text('${l10n.error} ${err.toString()}')),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }

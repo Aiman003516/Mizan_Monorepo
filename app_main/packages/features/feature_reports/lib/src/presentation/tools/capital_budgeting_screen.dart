@@ -2,6 +2,8 @@
 // Purpose: Capital Budgeting Calculator for investment analysis
 
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:core_data/src/services/capital_budgeting_service.dart';
 
@@ -67,6 +69,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
     final investment = double.tryParse(_investmentController.text) ?? 0;
     final discountRate =
         (double.tryParse(_discountRateController.text) ?? 10) / 100;
+    // ignore: unused_local_variable
     final requiredReturn =
         (double.tryParse(_requiredReturnController.text) ?? 10) / 100;
     final cashFlows = _cashFlowControllers
@@ -137,16 +140,17 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Capital Budgeting'),
+        title: Text(l10n.capitalBudgeting),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Calculator', icon: Icon(Icons.calculate)),
-            Tab(text: 'Results', icon: Icon(Icons.analytics)),
-            Tab(text: 'Sensitivity', icon: Icon(Icons.show_chart)),
+          tabs: [
+            Tab(text: l10n.calculatorTab, icon: Icon(Icons.calculate)),
+            Tab(text: l10n.resultsTab, icon: Icon(Icons.analytics)),
+            Tab(text: l10n.sensitivityTab, icon: Icon(Icons.show_chart)),
           ],
         ),
       ),
@@ -162,6 +166,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
   }
 
   Widget _buildCalculatorTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -175,16 +180,16 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Initial Investment',
+                    l10n.initialInvestment,
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _investmentController,
-                    decoration: const InputDecoration(
-                      labelText: 'Investment Amount',
+                    decoration: InputDecoration(
+                      labelText: l10n.investmentAmount,
                       prefixText: '\$ ',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -203,17 +208,17 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Discount Rate', style: theme.textTheme.titleMedium),
+                  Text(l10n.discountRateLabel, style: theme.textTheme.titleMedium),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _discountRateController,
-                          decoration: const InputDecoration(
-                            labelText: 'Rate',
+                          decoration: InputDecoration(
+                            labelText: l10n.rateLabel,
                             suffixText: '%',
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
                           onChanged: (_) => _calculateAll(),
@@ -223,10 +228,10 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                       Expanded(
                         child: TextField(
                           controller: _requiredReturnController,
-                          decoration: const InputDecoration(
-                            labelText: 'Required Return',
+                          decoration: InputDecoration(
+                            labelText: l10n.requiredReturn,
                             suffixText: '%',
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
                           onChanged: (_) => _calculateAll(),
@@ -251,7 +256,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Expected Cash Flows',
+                        l10n.expectedCashFlows,
                         style: theme.textTheme.titleMedium,
                       ),
                       Row(
@@ -303,7 +308,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'For ARR Calculation',
+                    l10n.forArrCalculation,
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 12),
@@ -312,10 +317,10 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                       Expanded(
                         child: TextField(
                           controller: _annualIncomeController,
-                          decoration: const InputDecoration(
-                            labelText: 'Annual Net Income',
+                          decoration: InputDecoration(
+                            labelText: l10n.annualNetIncome,
                             prefixText: '\$ ',
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
                           onChanged: (_) => _calculateAll(),
@@ -325,10 +330,10 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                       Expanded(
                         child: TextField(
                           controller: _residualValueController,
-                          decoration: const InputDecoration(
-                            labelText: 'Residual Value',
+                          decoration: InputDecoration(
+                            labelText: l10n.residualValueLabel,
                             prefixText: '\$ ',
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
                           onChanged: (_) => _calculateAll(),
@@ -351,7 +356,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                 _tabController.animateTo(1);
               },
               icon: const Icon(Icons.calculate),
-              label: const Text('Calculate & View Results'),
+              label: Text(l10n.calculateViewResults),
             ),
           ),
         ],
@@ -360,9 +365,10 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
   }
 
   Widget _buildResultsTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     if (_npvResult == null) {
-      return const Center(
-        child: Text('Enter investment data in the Calculator tab'),
+      return Center(
+        child: Text(l10n.enterDataCalculator),
       );
     }
 
@@ -376,7 +382,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
           // NPV Result
           _buildResultCard(
             theme,
-            title: 'Net Present Value (NPV)',
+            title: l10n.netPresentValue,
             value: '\$${_npvResult!.npv.toStringAsFixed(2)}',
             isGood: _npvResult!.isAcceptable,
             description: _npvResult!.recommendation,
@@ -391,7 +397,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
           // IRR Result
           _buildResultCard(
             theme,
-            title: 'Internal Rate of Return (IRR)',
+            title: l10n.internalRateOfReturn,
             value: '${(_irrResult!.irr * 100).toStringAsFixed(2)}%',
             isGood: _irrResult!.isAcceptable(requiredReturn),
             description: _irrResult!.getRecommendation(requiredReturn),
@@ -405,12 +411,12 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
           // Payback Period
           _buildResultCard(
             theme,
-            title: 'Payback Period',
+            title: l10n.paybackPeriod,
             value: _paybackResult!.formattedPayback,
             isGood: _paybackResult!.recoversInvestment,
             description: _paybackResult!.recoversInvestment
-                ? 'Investment will be recovered'
-                : 'Investment may not be recovered',
+                ? l10n.investmentRecovered
+                : l10n.investmentMayNotRecover,
             details: [],
           ),
           const SizedBox(height: 16),
@@ -418,10 +424,10 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
           // Discounted Payback
           _buildResultCard(
             theme,
-            title: 'Discounted Payback Period',
+            title: l10n.discountedPaybackPeriod,
             value: _discountedPaybackResult!.formattedPayback,
             isGood: _discountedPaybackResult!.recoversInvestment,
-            description: 'Accounts for time value of money',
+            description: l10n.accountsForTimeValue,
             details: [],
           ),
           const SizedBox(height: 16),
@@ -429,7 +435,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
           // Profitability Index
           _buildResultCard(
             theme,
-            title: 'Profitability Index (PI)',
+            title: l10n.profitabilityIndex,
             value: _piResult!.profitabilityIndex.toStringAsFixed(3),
             isGood: _piResult!.isAcceptable,
             description: _piResult!.recommendation,
@@ -443,7 +449,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
           if (_arrResult != null)
             _buildResultCard(
               theme,
-              title: 'Accounting Rate of Return (ARR)',
+              title: l10n.accountingRateOfReturn,
               value: _arrResult!.formattedARR,
               isGood: _arrResult!.arr > requiredReturn,
               description:
@@ -474,12 +480,19 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title, style: theme.textTheme.titleMedium),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: theme.textTheme.titleMedium,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Icon(
                   isGood ? Icons.check_circle : Icons.cancel,
-                  color: isGood ? Colors.green : Colors.red,
+                  color: isGood ? context.appColors.success : context.appColors.error,
                 ),
               ],
             ),
@@ -488,7 +501,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
               value,
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: isGood ? Colors.green : Colors.red,
+                color: isGood ? context.appColors.success : context.appColors.error,
               ),
             ),
             const SizedBox(height: 8),
@@ -535,7 +548,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
     final isAccept = acceptCount > rejectCount;
 
     return Card(
-      color: isAccept ? Colors.green.shade50 : Colors.red.shade50,
+      color: isAccept ? context.appColors.success.withValues(alpha: 0.1) : context.appColors.error.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -543,14 +556,14 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
             Icon(
               isAccept ? Icons.thumb_up : Icons.thumb_down,
               size: 48,
-              color: isAccept ? Colors.green : Colors.red,
+              color: isAccept ? context.appColors.success : context.appColors.error,
             ),
             const SizedBox(height: 16),
             Text(
               'RECOMMENDATION: $recommendation',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: isAccept ? Colors.green.shade800 : Colors.red.shade800,
+                color: isAccept ? context.appColors.success : context.appColors.error,
               ),
             ),
             const SizedBox(height: 8),
@@ -565,9 +578,10 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
   }
 
   Widget _buildSensitivityTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     if (_sensitivityPoints == null || _sensitivityPoints!.isEmpty) {
-      return const Center(
-        child: Text('Enter investment data in the Calculator tab'),
+      return Center(
+        child: Text(l10n.enterDataCalculator),
       );
     }
 
@@ -580,7 +594,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'NPV Sensitivity to Discount Rate',
+            l10n.npvSensitivity,
             style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
@@ -594,53 +608,56 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
 
           // Sensitivity Table
           Card(
-            child: DataTable(
-              columns: const [
-                DataColumn(label: Text('Discount Rate')),
-                DataColumn(label: Text('NPV'), numeric: true),
-                DataColumn(label: Text('Decision')),
-              ],
-              rows: _sensitivityPoints!.map((point) {
-                final isPositive = point.npv > 0;
-                return DataRow(
-                  cells: [
-                    DataCell(
-                      Text('${(point.discountRate * 100).toStringAsFixed(0)}%'),
-                    ),
-                    DataCell(
-                      Text(
-                        '\$${point.npv.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          color: isPositive ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columns: [
+                  DataColumn(label: Text(l10n.discountRateColumn)),
+                  DataColumn(label: Text(l10n.npvColumn), numeric: true),
+                  DataColumn(label: Text(l10n.decisionColumn)),
+                ],
+                rows: _sensitivityPoints!.map((point) {
+                  final isPositive = point.npv > 0;
+                  return DataRow(
+                    cells: [
+                      DataCell(
+                        Text('${(point.discountRate * 100).toStringAsFixed(0)}%'),
                       ),
-                    ),
-                    DataCell(
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isPositive
-                              ? Colors.green.shade100
-                              : Colors.red.shade100,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          isPositive ? 'Accept' : 'Reject',
+                      DataCell(
+                        Text(
+                          '\$${point.npv.toStringAsFixed(0)}',
                           style: TextStyle(
-                            color: isPositive
-                                ? Colors.green.shade800
-                                : Colors.red.shade800,
+                            color: isPositive ? context.appColors.success : context.appColors.error,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              }).toList(),
+                      DataCell(
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isPositive
+                                ? context.appColors.success.withValues(alpha: 0.15)
+                                : context.appColors.error.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            isPositive ? l10n.acceptDecision : l10n.rejectDecision,
+                            style: TextStyle(
+                              color: isPositive
+                                  ? context.appColors.success
+                                  : context.appColors.error,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
           ),
           const SizedBox(height: 24),

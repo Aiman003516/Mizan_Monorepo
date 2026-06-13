@@ -1,5 +1,7 @@
 // Fixed Assets Dashboard Screen - Comprehensive view with metrics and visualizations
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feature_settings/src/data/fixed_assets_repository.dart';
 import 'package:core_data/core_data.dart';
@@ -17,6 +19,8 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
   final _currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
   final _dateFormat = DateFormat('MMM d, yyyy');
   late TabController _tabController;
+
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
 
   String _formatCurrency(int amountInCents) {
     return _currencyFormat.format(amountInCents / 100);
@@ -78,6 +82,17 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
     final assetsAsync = ref.watch(fixedAssetsStreamProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Fixed Assets'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'All Assets'),
+            Tab(text: 'By Category'),
+            Tab(text: 'Schedule'),
+          ],
+        ),
+      ),
       body: assetsAsync.when(
         data: (assets) => _buildDashboard(assets),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -120,88 +135,69 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
         ? (totalDepreciation / totalCost * 100)
         : 0.0;
 
-    return NestedScrollView(
-      headerSliverBuilder: (context, innerBoxIsScrolled) => [
-        SliverAppBar(
-          title: const Text('Fixed Assets'),
-          pinned: true,
-          floating: true,
-          expandedHeight: 340, // Increased from 320
-          flexibleSpace: FlexibleSpaceBar(
-            background: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 56), // AppBar height
-                child: SingleChildScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Main Value Card
-                        _buildMainValueCard(
-                          totalCost,
-                          netBookValue,
-                          totalDepreciation,
-                          depreciationPercent,
-                        ),
-                        const SizedBox(height: 12),
-                        // Status Cards Row
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildStatusCard(
-                                'Active',
-                                activeCount,
-                                Colors.green,
-                                Icons.check_circle,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _buildStatusCard(
-                                'Full Depr.',
-                                fullyDepreciatedCount,
-                                Colors.orange,
-                                Icons.pending,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: _buildStatusCard(
-                                'Disposed',
-                                disposedCount,
-                                Colors.grey,
-                                Icons.cancel,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+    return Column(
+      children: [
+        // Summary Cards Section
+        Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Main Value Card
+              _buildMainValueCard(
+                totalCost,
+                netBookValue,
+                totalDepreciation,
+                depreciationPercent,
+              ),
+              const SizedBox(height: 12),
+              // Status Cards Row
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatusCard(
+                      'Active',
+                      activeCount,
+                      Colors.green,
+                      Icons.check_circle,
                     ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildStatusCard(
+                      'Full Depr.',
+                      fullyDepreciatedCount,
+                      Colors.orange,
+                      Icons.pending,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildStatusCard(
+                      'Disposed',
+                      disposedCount,
+                      Colors.grey,
+                      Icons.cancel,
+                    ),
+                  ),
+                ],
               ),
-            ),
+            ],
           ),
-          bottom: TabBar(
+        ),
+        // Tab Content
+        Expanded(
+          child: TabBarView(
             controller: _tabController,
-            tabs: const [
-              Tab(text: 'All Assets'),
-              Tab(text: 'By Category'),
-              Tab(text: 'Schedule'),
+            children: [
+              _buildAssetsList(assets),
+              _buildCategoryView(assets),
+              _buildScheduleView(assets),
             ],
           ),
         ),
       ],
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildAssetsList(assets),
-          _buildCategoryView(assets),
-          _buildScheduleView(assets),
-        ],
-      ),
     );
   }
 

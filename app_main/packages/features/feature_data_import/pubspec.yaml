@@ -20,6 +20,10 @@ dependencies:
     path: ../../core/core_database
   shared_ui:
     path: ../../shared/shared_ui
+  core_l10n:
+    path: ../../core/core_l10n
+  core_ui:
+    path: ../../core/core_ui
 
 dev_dependencies:
   flutter_test:

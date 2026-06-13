@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 
@@ -15,13 +17,14 @@ class VendorDetailScreen extends ConsumerWidget {
     final billsAsync = ref.watch(vendorBillsProvider(vendorId));
     final vendorsAsync = ref.watch(vendorsStreamProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = theme.colorScheme;
 
     return vendorsAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
-        appBar: AppBar(title: const Text('Vendor')),
+        appBar: AppBar(title: Text(l10n.vendorDetailTitle)),
         body: Center(child: Text('Error: $e')),
       ),
       data: (vendors) {
@@ -52,7 +55,7 @@ class VendorDetailScreen extends ConsumerWidget {
               ),
             ),
             icon: const Icon(Icons.receipt),
-            label: const Text('New Bill'),
+            label: Text(l10n.newBill),
           ),
           body: SingleChildScrollView(
             child: Column(
@@ -143,7 +146,7 @@ class VendorDetailScreen extends ConsumerWidget {
                               colorScheme.tertiary,
                               colorScheme.tertiaryContainer,
                             ]
-                          : [Colors.green, Colors.green.shade300],
+                          : [context.appColors.success, context.appColors.primary],
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -152,14 +155,14 @@ class VendorDetailScreen extends ConsumerWidget {
                       Text(
                         'We Owe',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: context.appColors.onPrimary.withValues(alpha: 0.8),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '\$${(vendor.balance / 100).toStringAsFixed(2)}',
                         style: theme.textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
+                          color: context.appColors.onPrimary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -279,9 +282,9 @@ class _BillCard extends StatelessWidget {
     final isPaid = outstanding <= 0;
 
     Color statusColor = switch (bill.status) {
-      'paid' => Colors.green,
+      'paid' => context.appColors.success,
       'overdue' => colorScheme.error,
-      'partial' => Colors.orange,
+      'partial' => context.appColors.warning,
       _ => colorScheme.tertiary,
     };
 
@@ -333,7 +336,7 @@ class _BillCard extends StatelessWidget {
           ],
         ),
         trailing: isPaid
-            ? const Icon(Icons.check_circle, color: Colors.green)
+            ? Icon(Icons.check_circle, color: context.appColors.success)
             : Text(
                 '\$${(outstanding / 100).toStringAsFixed(2)}',
                 style: TextStyle(

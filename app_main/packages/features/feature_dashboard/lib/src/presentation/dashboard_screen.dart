@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart'; // AppColors extension
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart'; // 🟢 NEW
 
 // Local Imports
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_dashboard/src/presentation/dashboard_card.dart';
 import 'package:feature_dashboard/src/presentation/dashboard_providers.dart';
+import 'package:feature_dashboard/src/presentation/widgets/cash_flow_chart.dart'; // 🟢 NEW
 
 // 🛡️ Imports for Security
 import 'package:shared_ui/shared_ui.dart'; // For PermissionGuard
@@ -61,23 +64,22 @@ class DashboardScreen extends ConsumerWidget {
       final sourceFile = File(p.join(dbFolder.path, 'mizan.db'));
 
       final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-      final destinationPath =
-          p.join(outputDirectory, 'mizan_backup_$timestamp.db');
+      final destinationPath = p.join(
+        outputDirectory,
+        'mizan_backup_$timestamp.db',
+      );
 
       await sourceFile.copy(destinationPath);
 
       scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text(l10n.backupSuccessful),
-          backgroundColor: Colors.green,
+          backgroundColor: context.appColors.success,
         ),
       );
     } catch (e) {
       scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.backupFailed),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(l10n.backupFailed), backgroundColor: context.appColors.error),
       );
     }
   }
@@ -93,7 +95,7 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         // ⚡ CHANGED: Title is now explicitly "Main"
-        title: const Text("Main"),
+        title: Text(l10n.mainDashboard),
         actions: [
           IconButton(
             tooltip: l10n.backupAndRestore,
@@ -102,26 +104,32 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
-      
+
       // ⚡ ADDED: Drawer Menu
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-              ),
-              child: const Column(
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                   Icon(Icons.account_balance_wallet, color: Colors.white, size: 48),
-                   SizedBox(height: 16),
-                   Text(
-                     "Mizan Enterprise",
-                     style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                   ),
+                  Icon(
+                    Icons.account_balance_wallet,
+                    color: context.appColors.onPrimary,
+                    size: 48,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Mizan Enterprise",
+                    style: TextStyle(
+                      color: context.appColors.onPrimary,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -138,168 +146,191 @@ class DashboardScreen extends ConsumerWidget {
         ),
       ),
 
+      // 🚀 NEW: Quick Action FAB
+      floatingActionButton: SpeedDial(
+        icon: Icons.flash_on,
+        activeIcon: Icons.close,
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: context.appColors.onPrimary,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.5,
+        spacing: 12,
+        spaceBetweenChildren: 8,
+        tooltip: 'Quick Actions',
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.point_of_sale),
+            backgroundColor: context.appColors.success,
+            foregroundColor: context.appColors.onPrimary,
+            label: l10n.newSale,
+            onTap: () {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (ctx) => const PosScreen()));
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.shopping_cart),
+            backgroundColor: context.appColors.warning,
+            foregroundColor: context.appColors.onPrimary,
+            label: l10n.newPurchase,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (ctx) => const PurchaseScreen()),
+              );
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.receipt),
+            backgroundColor: context.appColors.info,
+            foregroundColor: context.appColors.onPrimary,
+            label: l10n.addNewTransaction,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => const GeneralJournalScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          // --- TRANSACTION ACTIONS ---
-          
-          PermissionGuard(
-            permission: AppPermission.performSale,
-            child: DashboardCard(
-              title: l10n.newSale,
-              icon: Icons.point_of_sale,
-              color: Colors.green,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const PosScreen()),
-                );
-              },
-            ),
+          // --- FINANCIAL SUMMARY (VISUAL CHART) ---
+          Text(
+            l10n.financialSnapshot,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
-
-          PermissionGuard(
-            permission: AppPermission.manageProducts,
-            child: DashboardCard(
-              title: l10n.newPurchase,
-              icon: Icons.shopping_cart,
-              color: Colors.orange,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const PurchaseScreen()),
-                );
-              },
-            ),
-          ),
-
-          PermissionGuard(
-            permission: AppPermission.voidTransaction,
-            child: DashboardCard(
-              title: l10n.addNewTransaction,
-              icon: Icons.post_add,
-              color: Colors.blue,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (ctx) => const GeneralJournalScreen()),
-                );
-              },
-            ),
-          ),
-          
-          // --- MANAGEMENT ACTIONS ---
-          
-          PermissionGuard(
-            permission: AppPermission.manageProducts,
-            child: DashboardCard(
-              title: l10n.products, 
-              icon: Icons.inventory,
-              color: Colors.amber.shade700,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const ProductsHubScreen()),
-                );
-              },
-            ),
-          ),
-
-          PermissionGuard(
-            permission: AppPermission.viewSalesHistory,
-            child: DashboardCard(
-              title: l10n.orderHistory,
-              icon: Icons.history,
-              color: Colors.purple,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const OrderHistoryScreen()),
-                );
-              },
-            ),
-          ),
-
-          PermissionGuard(
-            permission: AppPermission.viewFinancialReports,
-            child: DashboardCard(
-              title: l10n.reports,
-              icon: Icons.bar_chart,
-              color: Colors.teal,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const AnalyticsDashboardScreen()),
-                );
-              },
-            ),
-          ),
-
-          PermissionGuard(
-            permission: AppPermission.viewFinancialReports,
-            child: DashboardCard(
-              title: "Accounting", 
-              icon: Icons.tune,
-              color: Colors.blueGrey,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const AdjustingEntriesScreen()),
-                );
-              },
-            ),
-          ),
-
-          const SizedBox(height: 24),
-          
-          // --- FINANCIAL SUMMARY ---
-          Text(l10n.quickActions, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
 
           PermissionGuard(
             permission: AppPermission.viewFinancialReports,
             fallback: const SizedBox.shrink(),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildSummaryCard(
-                        context: context,
-                        title: l10n.totalRevenue,
-                        asyncValue: totalRevenue,
-                        color: Colors.green,
+            child: SizedBox(
+              height: 250, // Fixed height for chart area
+              child: Row(
+                children: [
+                  // 📊 Chart on the Left (Flex 2)
+                  Expanded(
+                    flex: 2,
+                    child: totalRevenue.when(
+                      data: (rev) => totalExpenses.when(
+                        data: (exp) =>
+                            CashFlowChart(revenue: rev, expenses: exp),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (_, __) => const SizedBox.shrink(),
                       ),
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (_, __) => const SizedBox.shrink(),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildSummaryCard(
-                        context: context,
-                        title: l10n.totalExpenses,
-                        asyncValue: totalExpenses,
-                        color: Colors.red,
-                      ),
+                  ),
+                  const SizedBox(width: 16),
+
+                  // 💰 Summaries on the Right (Flex 1)
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: _buildSummaryCard(
+                            context: context,
+                            title: l10n.totalReceivable, // "Money In"
+                            asyncValue: totalReceivable,
+                            color: context.appColors.info,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: _buildSummaryCard(
+                            context: context,
+                            title: l10n.totalPayable, // "Money Out"
+                            asyncValue: totalPayable,
+                            color: context.appColors.warning,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildSummaryCard(
-                        context: context,
-                        title: l10n.totalReceivable,
-                        asyncValue: totalReceivable,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildSummaryCard(
-                        context: context,
-                        title: l10n.totalPayable,
-                        asyncValue: totalPayable,
-                        color: Colors.orange,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
+          ),
+
+          const SizedBox(height: 24),
+          const Divider(),
+          const SizedBox(height: 16),
+
+          // --- TRANSACTION ACTIONS ---
+          Text(
+            l10n.quickAccess,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2, // 2 columns for better mobile view
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1.5,
+            children: [
+              PermissionGuard(
+                permission: AppPermission.performSale,
+                child: DashboardCard(
+                  title: l10n.newSale,
+                  icon: Icons.point_of_sale,
+                  color: context.appColors.success,
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => const PosScreen())),
+                ),
+              ),
+              PermissionGuard(
+                permission: AppPermission.manageProducts,
+                child: DashboardCard(
+                  title: l10n.products,
+                  icon: Icons.inventory,
+                  color: context.appColors.warning,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ProductsHubScreen(),
+                    ),
+                  ),
+                ),
+              ),
+              PermissionGuard(
+                permission: AppPermission.viewSalesHistory,
+                child: DashboardCard(
+                  title: l10n.orderHistory,
+                  icon: Icons.history,
+                  color: context.appColors.secondary,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const OrderHistoryScreen(),
+                    ),
+                  ),
+                ),
+              ),
+              PermissionGuard(
+                permission: AppPermission.viewFinancialReports,
+                child: DashboardCard(
+                  title: l10n.reports,
+                  icon: Icons.bar_chart,
+                  color: context.appColors.accent,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const AnalyticsDashboardScreen(),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -319,19 +350,22 @@ class DashboardScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               title,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleSmall,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
             asyncValue.when(
               data: (value) => Text(
                 l10n.currencyFormat(value),
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: color,
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, s) => Text(

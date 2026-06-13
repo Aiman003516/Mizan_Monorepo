@@ -33,8 +33,7 @@ class ProductsRepository {
   }
 
   Future<Product?> findProductByBarcode(String barcode) {
-    return (_db.select(_db.products)
-          ..where((p) => p.barcode.equals(barcode)))
+    return (_db.select(_db.products)..where((p) => p.barcode.equals(barcode)))
         .getSingleOrNull();
   }
 
@@ -62,13 +61,14 @@ class ProductsRepository {
   /// Uses a transaction batch to insert/update thousands of rows efficiently.
   Future<void> bulkCreateProducts(List<ProductsCompanion> products) async {
     await _db.batch((batch) {
-      // insertAllOnConflictUpdate ensures we don't crash if a barcode exists; 
+      // insertAllOnConflictUpdate ensures we don't crash if a barcode exists;
       // it just updates the existing record.
       batch.insertAllOnConflictUpdate(_db.products, products);
     });
   }
 
-  Future<void> updateProduct(Product original, {
+  Future<void> updateProduct(
+    Product original, {
     required String newName,
     required double newPrice,
     required String newCategoryId,
@@ -76,15 +76,15 @@ class ProductsRepository {
     String? newImagePath,
   }) async {
     await _db.update(_db.products).replace(
-      original.toCompanion(false).copyWith(
-        name: Value(newName),
-        price: Value((newPrice * 100).round()),
-        categoryId: Value(newCategoryId),
-        barcode: Value(newBarcode),
-        imagePath: Value(newImagePath),
-        lastUpdated: Value(DateTime.now()),
-      ),
-    );
+          original.toCompanion(false).copyWith(
+                name: Value(newName),
+                price: Value((newPrice * 100).round()),
+                categoryId: Value(newCategoryId),
+                barcode: Value(newBarcode),
+                imagePath: Value(newImagePath),
+                lastUpdated: Value(DateTime.now()),
+              ),
+        );
   }
 
   Future<void> deleteProduct(String id) async {
@@ -101,8 +101,8 @@ class ProductsRepository {
         .getSingle();
 
     final double oldQty = product.quantityOnHand;
-    final double oldCostCents = product.averageCost.toDouble(); 
-    
+    final double oldCostCents = product.averageCost.toDouble();
+
     final double newQty = quantityPurchased;
     final double newCostCents = costPerItem * 100.0;
 
@@ -110,7 +110,8 @@ class ProductsRepository {
 
     double newAverageCostCents = 0.0;
     if (totalQuantity > 0) {
-      newAverageCostCents = ((oldQty * oldCostCents) + (newQty * newCostCents)) / totalQuantity;
+      newAverageCostCents =
+          ((oldQty * oldCostCents) + (newQty * newCostCents)) / totalQuantity;
     }
 
     final companion = product.toCompanion(false).copyWith(
@@ -120,5 +121,32 @@ class ProductsRepository {
         );
 
     await _db.update(_db.products).replace(companion);
+  }
+
+  // --- Phase 2.5: Product Bundles ---
+  /// Deducts stock from child products when a bundle is sold.
+  Future<void> sellBundle(String bundleProductId, double bundleQtySold) async {
+    // 1. Get all child items for this bundle
+    final bundleItems = await (_db.select(_db.productBundleItems)
+          ..where((tbl) => tbl.bundleProductId.equals(bundleProductId)))
+        .get();
+
+    // 2. For each child, deduct (childQty * bundleQtySold) from stock
+    for (final item in bundleItems) {
+      final childProduct = await (_db.select(_db.products)
+            ..where((p) => p.id.equals(item.childProductId)))
+          .getSingleOrNull();
+
+      if (childProduct != null) {
+        final newQty =
+            childProduct.quantityOnHand - (item.quantity * bundleQtySold);
+        await _db.update(_db.products).replace(
+              childProduct.toCompanion(false).copyWith(
+                    quantityOnHand: Value(newQty < 0 ? 0 : newQty),
+                    lastUpdated: Value(DateTime.now()),
+                  ),
+            );
+      }
+    }
   }
 }

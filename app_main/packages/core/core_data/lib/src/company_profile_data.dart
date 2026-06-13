@@ -6,12 +6,14 @@ class CompanyProfileData {
   final String userName;
   final String companyAddress;
   final String taxID;
+  final String? imagePath;
 
   CompanyProfileData({
     required this.companyName,
     required this.userName,
     required this.companyAddress,
     required this.taxID,
+    this.imagePath,
   });
 
   /// Factory constructor to load data from the repository
@@ -21,6 +23,7 @@ class CompanyProfileData {
       userName: repo.getUserName(),
       companyAddress: repo.getCompanyAddress(),
       taxID: repo.getTaxID(),
+      imagePath: repo.getImagePath(),
     );
   }
 
@@ -30,12 +33,14 @@ class CompanyProfileData {
     String? userName,
     String? companyAddress,
     String? taxID,
+    String? imagePath,
   }) {
     return CompanyProfileData(
       companyName: companyName ?? this.companyName,
       userName: userName ?? this.userName,
       companyAddress: companyAddress ?? this.companyAddress,
       taxID: taxID ?? this.taxID,
+      imagePath: imagePath ?? this.imagePath,
     );
   }
 }

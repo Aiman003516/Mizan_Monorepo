@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 
@@ -106,6 +107,7 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // ignore: unused_local_variable
     final colorScheme = theme.colorScheme;
 
     return Container(
@@ -126,7 +128,7 @@ class _SummaryCard extends StatelessWidget {
         ],
       ),
       child: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.white))
+          ? Center(child: CircularProgressIndicator(color: context.appColors.onPrimary))
           : error != null
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,7 +137,7 @@ class _SummaryCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Error',
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
+                  style: TextStyle(color: context.appColors.onPrimary.withValues(alpha: 0.8)),
                 ),
               ],
             )
@@ -147,7 +149,7 @@ class _SummaryCard extends StatelessWidget {
                 Text(
                   '\$${((total ?? 0) / 100).toStringAsFixed(0)}',
                   style: theme.textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
+                    color: context.appColors.onPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -161,7 +163,7 @@ class _SummaryCard extends StatelessWidget {
                         child: Container(
                           height: 6,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: context.appColors.onPrimary,
                             borderRadius: BorderRadius.circular(3),
                           ),
                         ),
@@ -172,7 +174,7 @@ class _SummaryCard extends StatelessWidget {
                           child: Container(
                             height: 6,
                             decoration: BoxDecoration(
-                              color: Colors.red.shade300,
+                              color: context.appColors.primary,
                               borderRadius: BorderRadius.circular(3),
                             ),
                           ),
@@ -186,13 +188,13 @@ class _SummaryCard extends StatelessWidget {
                       Text(
                         'Current',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: context.appColors.onPrimary.withValues(alpha: 0.8),
                         ),
                       ),
                       Text(
                         'Overdue',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.red.shade200,
+                          color: context.appColors.primary,
                         ),
                       ),
                     ],
@@ -202,7 +204,7 @@ class _SummaryCard extends StatelessWidget {
                 Text(
                   '${count ?? 0} $countLabel',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: context.appColors.onPrimary.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -225,16 +227,16 @@ class _Header extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.2),
+            color: context.appColors.onPrimary.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: Colors.white, size: 16),
+          child: Icon(icon, color: context.appColors.onPrimary, size: 16),
         ),
         const SizedBox(width: 8),
         Text(
           title,
           style: theme.textTheme.titleSmall?.copyWith(
-            color: Colors.white,
+            color: context.appColors.onPrimary,
             fontWeight: FontWeight.w500,
           ),
         ),

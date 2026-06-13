@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 
@@ -21,6 +23,8 @@ class _BankReconciliationScreenState
   List<UnreconciledTransaction> _transactions = [];
   bool _isLoading = true;
   double _bookBalance = 0;
+
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
 
   @override
   void initState() {
@@ -93,8 +97,8 @@ class _BankReconciliationScreenState
 
     if (selectedTxnIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select transactions to reconcile'),
+        SnackBar(
+          content: Text(l10n.selectTransactionsToReconcile),
         ),
       );
       return;
@@ -110,9 +114,9 @@ class _BankReconciliationScreenState
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Reconciliation completed!'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text(l10n.reconciliationCompleted),
+            backgroundColor: context.appColors.success,
           ),
         );
         Navigator.pop(context, true);
@@ -240,12 +244,12 @@ class _BankReconciliationScreenState
                       ),
                       if (isBalanced) ...[
                         const SizedBox(height: 8),
-                        const Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.check_circle,
-                              color: Colors.green,
+                              color: context.appColors.success,
                               size: 20,
                             ),
                             SizedBox(width: 8),
@@ -303,10 +307,10 @@ class _BankReconciliationScreenState
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.check_circle_outline,
                                 size: 48,
-                                color: Colors.green,
+                                color: context.appColors.success,
                               ),
                               const SizedBox(height: 8),
                               Text(

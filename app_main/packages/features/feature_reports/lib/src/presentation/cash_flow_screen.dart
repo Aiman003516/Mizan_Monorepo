@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 import '../data/reports_service.dart';
@@ -228,10 +230,11 @@ class _CashFlowScreenState extends ConsumerState<CashFlowScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Statement of Cash Flows'),
+        title: Text(l10n.statementOfCashFlows),
         centerTitle: true,
         actions: [
           TextButton.icon(
@@ -261,11 +264,11 @@ class _CashFlowScreenState extends ConsumerState<CashFlowScreen> {
 
                   // Operating Activities Section
                   _SectionHeader(
-                    title: 'Cash Flows from Operating Activities',
-                    color: Colors.blue,
+                    title: l10n.cashFlowsOperating,
+                    color: context.appColors.info,
                   ),
                   _CashFlowRow(
-                    label: 'Net Income',
+                    label: l10n.netCashOperating,
                     amount: _data.netIncome,
                     isBold: true,
                   ),
@@ -284,20 +287,20 @@ class _CashFlowScreenState extends ConsumerState<CashFlowScreen> {
                   ),
                   const Divider(),
                   _CashFlowRow(
-                    label: 'Net Cash from Operating',
+                    label: l10n.netCashOperating,
                     amount: _data.netCashFromOperating,
                     isBold: true,
-                    color: Colors.blue,
+                    color: context.appColors.info,
                   ),
                   const SizedBox(height: 24),
 
                   // Investing Activities Section
                   _SectionHeader(
-                    title: 'Cash Flows from Investing Activities',
-                    color: Colors.orange,
+                    title: l10n.cashFlowsInvesting,
+                    color: context.appColors.warning,
                   ),
                   if (_data.investingActivities.isEmpty)
-                    _CashFlowRow(label: 'No investing activities', amount: 0)
+                    _CashFlowRow(label: l10n.noInvestingActivities, amount: 0)
                   else
                     ..._data.investingActivities.map(
                       (line) => _CashFlowRow(
@@ -307,20 +310,20 @@ class _CashFlowScreenState extends ConsumerState<CashFlowScreen> {
                     ),
                   const Divider(),
                   _CashFlowRow(
-                    label: 'Net Cash from Investing',
+                    label: l10n.netCashInvesting,
                     amount: _data.netCashFromInvesting,
                     isBold: true,
-                    color: Colors.orange,
+                    color: context.appColors.warning,
                   ),
                   const SizedBox(height: 24),
 
                   // Financing Activities Section
                   _SectionHeader(
-                    title: 'Cash Flows from Financing Activities',
-                    color: Colors.purple,
+                    title: l10n.cashFlowsFinancing,
+                    color: context.appColors.secondary,
                   ),
                   if (_data.financingActivities.isEmpty)
-                    _CashFlowRow(label: 'No financing activities', amount: 0)
+                    _CashFlowRow(label: l10n.noFinancingActivities, amount: 0)
                   else
                     ..._data.financingActivities.map(
                       (line) => _CashFlowRow(
@@ -330,10 +333,10 @@ class _CashFlowScreenState extends ConsumerState<CashFlowScreen> {
                     ),
                   const Divider(),
                   _CashFlowRow(
-                    label: 'Net Cash from Financing',
+                    label: l10n.netCashFinancing,
                     amount: _data.netCashFromFinancing,
                     isBold: true,
-                    color: Colors.purple,
+                    color: context.appColors.secondary,
                   ),
                   const SizedBox(height: 24),
 
@@ -349,17 +352,17 @@ class _CashFlowScreenState extends ConsumerState<CashFlowScreen> {
                     child: Column(
                       children: [
                         _CashFlowRow(
-                          label: 'Net Change in Cash',
+                          label: l10n.netChangeInCash,
                           amount: _data.netChangeInCash,
                           isBold: true,
                         ),
                         _CashFlowRow(
-                          label: 'Beginning Cash Balance',
+                          label: l10n.beginningCashBalance,
                           amount: _data.beginningCash,
                         ),
                         const Divider(),
                         _CashFlowRow(
-                          label: 'Ending Cash Balance',
+                          label: l10n.endingCashBalance,
                           amount: _data.endingCash,
                           isBold: true,
                           isLarge: true,
@@ -421,7 +424,7 @@ class _CashFlowRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isNegative = amount < 0;
-    final displayColor = color ?? (isNegative ? Colors.red : null);
+    final displayColor = color ?? (isNegative ? context.appColors.error : null);
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: isLarge ? 8 : 4),

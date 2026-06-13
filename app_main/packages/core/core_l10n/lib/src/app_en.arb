@@ -41,13 +41,13 @@
   },
   "type": "Type:",
   "balance": "Balance:",
-  "phone": "Phone:",
-  "errorLoadingAccounts": "Error loading accounts:",
+  "phone": "Phone",
+  "errorLoadingAccounts": "Error loading accounts",
   "errorLoadingBalances": "Error loading balances:",
   "addNewAccount": "Add New Account",
   "editAccount": "Edit Account",
   "accountNameHint": "Account Name (e.g., \"Cash\", \"Customer A\")",
-  "pleaseEnterName": "Please enter a name",
+  "pleaseEnterName": "Please enter your name",
   "accountType": "Account Type",
   "classificationOptional": "Classification (Optional)",
   "errorLoadingClassifications": "Error loading classifications:",
@@ -114,7 +114,7 @@
   "price": "Price",
   "pleaseEnterPrice": "Please enter a price",
   "noProductsSaved": "No products saved.\nTap \"+\" to add one.",
-  "priceLabel": "Price:",
+  "priceLabel": "Price",
   "newCategory": "New Category",
   "categoryName": "Category Name",
   "cancel": "Cancel",
@@ -144,7 +144,7 @@
   },
   "noMonthlyTotals": "No monthly totals to display for this filter.",
   "month": "Month",
-  "currencyLabel": "Currency:",
+  "currencyLabel": "Currency",
   "totalAmounts": "Total Amounts - {classification}",
   "@totalAmounts": {
     "placeholders": {
@@ -274,8 +274,8 @@
   "noHistory": "No history for this account.",
   "errorLoadingHistory": "Error loading history:",
   "pleaseAddCategory": "Please add a category first.",
-  "noProductsInCategory": "No products in this category.",
-  "quantity": "Qty:",
+  "noProductsInCategory": "No products in this category",
+  "quantity": "Qty",
   "clear": "Clear",
   "printReceipt": "Print Receipt",
   "zeroTotalError": "Cannot process sale with zero total.",
@@ -388,14 +388,11 @@
   "totalEquity": "Total Equity",
   "totalLiabilitiesAndEquity": "Total Liabilities & Equity",
   "trialBalance": "Trial Balance",
-  "debit": "Debit",
-  "credit": "Credit",
-  "total": "Total",
   "selectSupplier": "Select a Supplier",
   "makePayment": "Make Payment",
-"payFromAccount": "Pay From Account",
-"payToAccount": "Pay To Account",
-"pleaseEnterValidAmount": "Please enter a valid amount greater than zero",
+  "payFromAccount": "Pay From Account",
+  "payToAccount": "Pay To Account",
+  "pleaseEnterValidAmount": "Please enter a valid amount greater than zero",
   "supplier": "Supplier",
   "pleaseSelectSupplier": "Please select a supplier",
   "profitAndLossReport": "Profit & Loss Statement",
@@ -407,7 +404,7 @@
   "cost": "Cost",
   "totalCost": "Total Cost",
   "costPerItem": "Cost per item",
-  "totalPayable": "total Payable",
+  "totalPayable": "Total Payable",
   "pleaseEnterCost": "Please enter a cost",
   "pleaseEnterQuantity": "Please enter a quantity",
   "purchaseSaved": "Purchase saved successfully.",
@@ -438,8 +435,6 @@
   "learnMore": "Learn More",
   "dashboard": "Dashboard",
   "newSale": "New Sale",
-  "totalRevenue": "Total Revenue",
-  "totalExpenses": "Total Expenses",
   "totalReceivable": "Total Receivable",
   "currencyFormat": "{value}",
   "@currencyFormat": {
@@ -505,7 +500,6 @@
   "criticalInventoryError": "Critical Error: Inventory or COGS accounts not found.",
   "drLabel": "Dr:",
   "crLabel": "Cr:",
-
   "fixedAssets": "Fixed Assets",
   "fixedAssetsDescription": "Manage equipment, vehicles, and property",
   "netBookValue": "Net Book Value",
@@ -537,7 +531,6 @@
   "depreciationProgress": "Depreciation Progress",
   "currentPeriod": "Current Period",
   "monthly": "Monthly",
-
   "depreciation": "Depreciation",
   "depreciationProcessing": "Depreciation Processing",
   "periodEndDate": "Period End Date",
@@ -552,7 +545,6 @@
       }
     }
   },
-
   "ghostMoney": "Ghost Money",
   "ghostMoneyDescription": "Reconcile rounding differences",
   "pendingReconciliation": "Pending Reconciliation",
@@ -576,7 +568,6 @@
   "sourceSplit": "Bill Split",
   "sourceExchange": "Exchange",
   "sourceImport": "Import",
-
   "accountCash": "Cash",
   "accountPettyCash": "Petty Cash",
   "accountBankAccount": "Bank Account",
@@ -608,7 +599,6 @@
   "accountInsuranceExpense": "Insurance Expense",
   "accountSuppliesExpense": "Supplies Expense",
   "accountMiscellaneousExpense": "Miscellaneous Expense",
-
   "joinOrganization": "Join Organization",
   "enterInviteCode": "Enter the invite code from your administrator",
   "inviteCode": "Invite Code",
@@ -616,41 +606,33 @@
   "invalidInviteCode": "Invalid or expired invite code",
   "codeMustBe6Digits": "Code must be 6 digits",
   "pleaseEnterInviteCode": "Please enter the invite code",
-  "yourName": "Your Name",
   "enterDisplayName": "Enter your display name",
-  "pleaseEnterName": "Please enter your name",
   "successfullyJoined": "Successfully joined organization!",
   "inviteCodeUsed": "This invite code has already been used",
   "inviteCodeExpired": "This invite code has expired",
   "pleaseSignInFirst": "Please sign in first",
   "createNewOrganization": "Create New Organization",
   "role": "Role",
-
   "customers": "Customers",
   "addCustomer": "Add Customer",
   "newCustomer": "New Customer",
   "editCustomer": "Edit Customer",
   "customerName": "Customer Name",
   "email": "Email",
-  "phone": "Phone",
   "address": "Address",
   "taxId": "Tax ID / VAT Number",
   "creditLimit": "Credit Limit",
   "notes": "Notes",
   "noCustomersYet": "No customers yet",
   "tapToAddFirstCustomer": "Tap the button below to add your first customer",
-  "totalReceivable": "Total Receivable",
   "outstanding": "Outstanding",
   "owed": "Owed",
-
   "invoices": "Invoices",
   "newInvoice": "New Invoice",
   "invoiceDate": "Invoice Date",
   "dueDate": "Due Date",
   "lineItems": "Line Items",
   "addItem": "Add Item",
-  "description": "Description",
-  "quantity": "Qty",
   "unitPrice": "Unit Price",
   "subtotal": "Subtotal",
   "createInvoice": "Create Invoice",
@@ -661,7 +643,6 @@
   "overdue": "Overdue",
   "draft": "Draft",
   "sent": "Sent",
-
   "arAgingReport": "AR Aging Report",
   "totalReceivables": "Total Receivables",
   "current": "Current",
@@ -672,7 +653,6 @@
   "noOutstandingReceivables": "No Outstanding Receivables",
   "allInvoicesPaid": "All invoices are paid!",
   "customersWithBalances": "customers with balances",
-
   "vendors": "Vendors",
   "addVendor": "Add Vendor",
   "newVendor": "New Vendor",
@@ -681,9 +661,7 @@
   "paymentTerms": "Payment Terms",
   "noVendorsYet": "No vendors yet",
   "tapToAddFirstVendor": "Tap the button below to add your first vendor",
-  "totalPayable": "Total Payable",
   "weOwe": "We Owe",
-
   "bills": "Bills",
   "newBill": "New Bill",
   "billDate": "Bill Date",
@@ -692,19 +670,16 @@
   "billCreated": "Bill created",
   "noBillsYet": "No bills yet",
   "pending": "Pending",
-
   "apAgingReport": "AP Aging Report",
   "totalPayables": "Total Payables",
   "byVendor": "By Vendor",
   "noOutstandingPayables": "No Outstanding Payables",
   "allBillsPaid": "All bills are paid!",
   "vendorsWithBalances": "vendors with balances",
-
   "statementOfCashFlows": "Statement of Cash Flows",
   "cashFlowsFromOperating": "Cash Flows from Operating Activities",
   "cashFlowsFromInvesting": "Cash Flows from Investing Activities",
   "cashFlowsFromFinancing": "Cash Flows from Financing Activities",
-  "netIncome": "Net Income",
   "addDepreciation": "Add: Depreciation Expense",
   "decreaseInReceivables": "Decrease in Accounts Receivable",
   "increaseInReceivables": "Increase in Accounts Receivable",
@@ -719,22 +694,19 @@
   "endingCashBalance": "Ending Cash Balance",
   "noInvestingActivities": "No investing activities",
   "noFinancingActivities": "No financing activities",
-
   "financialRatios": "Financial Ratios",
   "currentRatio": "Current Ratio",
   "quickRatio": "Quick Ratio",
   "debtToEquity": "Debt/Equity",
   "grossProfitMargin": "Gross Profit Margin",
   "netProfitMargin": "Net Profit Margin",
-  "returnOnAssets": "Return on Assets",
+  "returnOnAssets": "Return on Assets (ROA)",
   "workingCapital": "Working Capital",
   "receivablesTurnover": "Receivables Turnover",
-
   "receivables": "Receivables",
   "payables": "Payables",
   "currentAmount": "Current",
   "overdueAmount": "Overdue",
-
   "bankReconciliations": "Bank Reconciliations",
   "newReconciliation": "New Reconciliation",
   "noReconciliationsYet": "No reconciliations yet",
@@ -744,7 +716,7 @@
   "statementEndingBalance": "Statement Ending Balance",
   "statementBalance": "Statement Balance",
   "bookBalance": "Book Balance",
-  "selectedCleared": "Selected Cleared",
+  "selectedCleared": "Selected Cleared:",
   "differenceAmount": "Difference",
   "balanced": "Balanced!",
   "unclearedTransactions": "Uncleared Transactions",
@@ -754,5 +726,957 @@
   "completeReconciliation": "Complete Reconciliation",
   "reconciliationCompleted": "Reconciliation completed!",
   "pleaseSelectTransactions": "Please select transactions to reconcile",
-  "noBankAccountsFound": "No bank accounts found"
+  "noBankAccountsFound": "No bank accounts found",
+  "closeBooks": "Close Books",
+  "currentLockDate": "Current Lock Date",
+  "booksAreOpen": "Books are OPEN",
+  "closingInstructionsTitle": "Closing Instructions",
+  "closingInstructionsBody": "This action will:\n1. Zero out all Revenue & Expenses for the period.\n2. Transfer Net Income to Retained Earnings.\n3. LOCK the period from future edits.",
+  "stepSelectDate": "Step 1: Select Closing Date",
+  "stepSelectEquityAccount": "Step 2: Select Retained Earnings Account",
+  "errorNoEquityAccount": "Error: No Equity accounts found. Please create one in Accounts.",
+  "closePeriodAndLock": "CLOSE PERIOD & LOCK",
+  "confirmPeriodCloseTitle": "Confirm Period Close",
+  "confirmPeriodCloseMessage": "Are you sure? This will lock all transactions on or before this date. This action cannot be easily undone.",
+  "periodClosedSuccessfully": "Period Closed Successfully.",
+  "periodLockedError": "Period is closed for edits.",
+  "cvpAnalysis": "CVP Analysis",
+  "calculator": "Calculator",
+  "breakEven": "Break-Even",
+  "marginOfSafety": "Margin of Safety",
+  "whatIf": "What-If",
+  "costStructure": "Cost Structure",
+  "fixedCostsTotal": "Fixed Costs (Total)",
+  "fixedCostsHelper": "Rent, salaries, depreciation, etc.",
+  "perUnitData": "Per-Unit Data",
+  "sellingPrice": "Selling Price",
+  "variableCost": "Variable Cost",
+  "contributionMargin": "Contribution Margin",
+  "contributionMarginPerUnit": "CM per Unit",
+  "actualExpectedSales": "Actual/Expected Sales",
+  "unitsSold": "Units Sold",
+  "targetProfit": "Target Profit",
+  "desiredProfit": "Desired Profit",
+  "desiredProfitHelper": "How much profit do you want to earn?",
+  "analyzeAndViewResults": "Analyze & View Results",
+  "enterDataFirst": "Enter data in the Calculator tab first",
+  "breakEvenPoint": "Break-Even Point",
+  "units": "Units",
+  "sales": "Sales",
+  "targetProfitAnalysis": "Target Profit Analysis",
+  "requiredUnits": "Required Units",
+  "requiredSales": "Required Sales",
+  "risk": "RISK",
+  "mosRatio": "MOS Ratio",
+  "financialSnapshot": "Financial Snapshot",
+  "quickAccess": "Quick Access",
+  "cashFlow": "Cash Flow",
+  "operatingLeverage": "Operating Leverage",
+  "degreeOfOperatingLeverage": "Degree of Operating Leverage",
+  "leverageLevel": "Leverage Level",
+  "leverageImpact": "Impact",
+  "priceSensitivityAnalysis": "Price Sensitivity Analysis",
+  "priceSensitivityDescription": "Shows how break-even changes when you adjust selling price",
+  "currentBreakEven": "Current Break-Even: {units} units",
+  "@currentBreakEven": {
+    "placeholders": {
+      "units": {
+        "type": "String"
+      }
+    }
+  },
+  "depreciationProcessingTitle": "Depreciation Processing",
+  "selectPeriodEndDate": "Select Period End Date",
+  "processing": "Processing...",
+  "noActiveAssets": "No Active Assets",
+  "addFixedAssetsHint": "Add fixed assets to run depreciation",
+  "bookValueLabel": "Book Value",
+  "monthlyLabel": "Monthly",
+  "remainingLabel": "Remaining",
+  "depreciationRecordedFor": "Depreciation recorded: {amount} for {assetName}",
+  "@depreciationRecordedFor": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "assetName": {
+        "type": "String"
+      }
+    }
+  },
+  "processedAssetsTotal": "Processed {count} assets. Total: {amount}",
+  "@processedAssetsTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "assetsCount": "{count} assets",
+  "@assetsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ghostMoneyTitle": "Ghost Money",
+  "whatIsGhostMoneyTooltip": "What is Ghost Money?",
+  "allBalanced": "All Balanced!",
+  "noGhostMoneyToReconcile": "No ghost money to reconcile",
+  "entryLabel": "entry",
+  "entriesLabel": "entries",
+  "noEntriesToDisplay": "No entries to display",
+  "reconcileCurrency": "Reconcile {currency}",
+  "@reconcileCurrency": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "writeOffConfirmation": "Write off {amount} in ghost money?\n\nThis will create a journal entry to clear {count} {entryText}.",
+  "@writeOffConfirmation": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "entryText": {
+        "type": "String"
+      }
+    }
+  },
+  "reconcileButton": "Reconcile",
+  "reconciledEntries": "Reconciled {count} entries for {currency}",
+  "@reconciledEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "entryReconciledMessage": "Entry reconciled",
+  "ghostMoneyDialogTitle": "What is Ghost Money?",
+  "ghostMoneyDialogContent": "Ghost money represents tiny rounding differences that occur during financial calculations.\n\nExamples:\n• Splitting a bill 3 ways (100 ÷ 3)\n• Currency exchange rate conversions\n• Percentage-based tax calculations\n\nThese small differences typically accumulate to just a few cents and can be periodically written off or allocated.",
+  "gotIt": "Got it",
+  "fixedAssetsTitle": "Fixed Assets",
+  "netBookValueLabel": "Net Book Value",
+  "totalCostLabel": "Total Cost",
+  "depreciatedLabel": "Depreciated",
+  "progressLabel": "Progress",
+  "activeLabel": "Active",
+  "fullDeprLabel": "Full Depr.",
+  "disposedLabel": "Disposed",
+  "allAssetsTab": "All Assets",
+  "byCategoryTab": "By Category",
+  "scheduleTab": "Schedule",
+  "noFixedAssets": "No Fixed Assets",
+  "addFixedAssetsDescription": "Add equipment, vehicles, or property to track depreciation",
+  "noScheduledDepreciation": "No Scheduled Depreciation",
+  "percentDepreciated": "{percent}% depreciated",
+  "@percentDepreciated": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyDepreciationInfo": "Monthly: {amount} • {months} months left",
+  "@monthlyDepreciationInfo": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "valueInformationTitle": "Value Information",
+  "depreciationSettingsTitle": "Depreciation Settings",
+  "acquisitionCostLabel": "Acquisition Cost",
+  "salvageValueLabel": "Salvage Value",
+  "accumulatedDepreciationLabel": "Accumulated Depreciation",
+  "methodLabel": "Method",
+  "usefulLifeLabel": "Useful Life",
+  "usefulLifeMonths": "{months} months",
+  "@usefulLifeMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "runDepreciationButton": "Run Depreciation",
+  "disposeButton": "Dispose",
+  "addAssetName": "Asset Name",
+  "addAssetDescription": "Description (Optional)",
+  "addAssetAcquisitionCost": "Acquisition Cost",
+  "addAssetSalvageValue": "Salvage Value",
+  "addAssetUsefulLife": "Useful Life (Months)",
+  "addAssetAcquisitionDate": "Acquisition Date",
+  "addAssetDepreciationMethod": "Depreciation Method",
+  "addAssetDecliningRate": "Declining Balance Rate",
+  "reportsAndAnalytics": "Reports & Analytics",
+  "reportMarketplaceTooltip": "Report Marketplace",
+  "financialStatementsSection": "Financial Statements",
+  "performanceSection": "Performance",
+  "analysisToolsSection": "Analysis Tools",
+  "inventoryOperationsSection": "Inventory & Operations (Coming Soon)",
+  "cvpAnalysisTitle": "CVP Analysis",
+  "capitalBudgetingTitle": "Capital Budgeting",
+  "budgetAnalysisTitle": "Budget Analysis",
+  "fraudDetectionTitle": "Fraud Detection",
+  "standardCostingTitle": "Standard Costing",
+  "financialRatiosTitle": "Financial Ratios",
+  "stockVelocityTitle": "Stock Velocity",
+  "lowStockAlertTitle": "Low Stock Alert",
+  "salesByCashierTitle": "Sales by Cashier",
+  "taxLiabilityTitle": "Tax Liability",
+  "reportHubTitle": "Report Hub",
+  "myReportsTab": "My Reports",
+  "marketplaceTab": "Marketplace",
+  "noInstalledReports": "No Installed Reports",
+  "goToMarketplaceHint": "Go to the Marketplace to download standard reports.",
+  "marketplaceUnavailable": "Marketplace Unavailable",
+  "noStandardReportsOnline": "No standard reports found online.",
+  "installButton": "Install",
+  "includedLabel": "Included",
+  "buyLabel": "Buy {price}",
+  "@buyLabel": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "lockedLabel": "Locked",
+  "purchaseReportTitle": "Purchase Report",
+  "buyReportConfirmation": "Buy '{title}' for {price}?",
+  "@buyReportConfirmation": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "buyNowButton": "Buy Now",
+  "processingPayment": "Processing Payment...",
+  "installedReport": "✅ Installed {title}",
+  "@installedReport": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumReportLocked": "🔒 Premium Report. Upgrade to Pro or Enterprise.",
+  "posTerminalTitle": "POS Terminal",
+  "searchProductTooltip": "Search Product",
+  "recallOrderTooltip": "Recall Order",
+  "holdButton": "HOLD",
+  "orderParkedMessage": "Order Parked",
+  "recallOrderTitle": "Recall Order",
+  "noParkedOrders": "No parked orders",
+  "orderNumberLabel": "Order #{orderId}",
+  "@orderNumberLabel": {
+    "placeholders": {
+      "orderId": {
+        "type": "String"
+      }
+    }
+  },
+  "orderInfo": "{itemCount} items • {minutes} mins ago",
+  "@orderInfo": {
+    "placeholders": {
+      "itemCount": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "closeButton": "Close",
+  "cartIsEmpty": "Cart is empty",
+  "payWithButton": "Pay with {method}",
+  "@payWithButton": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "editQtyMode": "EDIT QTY MODE",
+  "scanMode": "SCAN MODE",
+  "totalLabel": "TOTAL",
+  "payPrintButton": "PAY / PRINT",
+  "importProductsTitle": "Import Products",
+  "selectDefaultCategoryHint": "1. Select a default category for these products:",
+  "pleaseCreateCategoryFirst": "Please create a category first.",
+  "uploadFileHint": "2. Upload CSV or Excel file (Cols: Name, Barcode, Cat, Price, Cost, Qty)",
+  "selectFileButton": "Select File",
+  "noProductsFoundInFile": "No products found in file.",
+  "noDataLoaded": "No data loaded. Upload a file to preview.",
+  "importProductsButton": "Import {count} Products",
+  "@importProductsButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importSuccessMessage": "Successfully imported {count} products!",
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importFailedMessage": "Import Failed: {error}",
+  "@importFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseSelectDefaultCategory": "Please select a Default Category",
+  "budgetAnalysis": "Budget Analysis",
+  "summaryTab": "Summary",
+  "variancesTab": "Variances",
+  "flexibleBudgetTab": "Flexible Budget",
+  "budgetedNetIncome": "Budgeted Net Income",
+  "actualNetIncome": "Actual Net Income",
+  "netIncomeVariance": "Net Income Variance",
+  "revenueLabel": "Revenue",
+  "expensesLabel": "Expenses",
+  "flexibleBudgetAnalysis": "Flexible Budget Analysis",
+  "fixedCosts": "Fixed Costs",
+  "variableRateUnit": "Variable Rate/Unit",
+  "plannedActivity": "Planned Activity",
+  "actualActivity": "Actual Activity",
+  "actualTotalCost": "Actual Total Cost",
+  "budgetedLabel": "Budgeted",
+  "actualLabel": "Actual",
+  "varianceLabel": "Variance",
+  "favorableLabel": "Favorable",
+  "unfavorableLabel": "Unfavorable",
+  "onTarget": "On Target",
+  "capitalBudgeting": "Capital Budgeting",
+  "calculatorTab": "Calculator",
+  "resultsTab": "Results",
+  "sensitivityTab": "Sensitivity",
+  "initialInvestment": "Initial Investment",
+  "investmentAmount": "Investment Amount",
+  "discountRateLabel": "Discount Rate",
+  "rateLabel": "Rate",
+  "requiredReturn": "Required Return",
+  "expectedCashFlows": "Expected Cash Flows",
+  "forArrCalculation": "For ARR Calculation",
+  "annualNetIncome": "Annual Net Income",
+  "residualValueLabel": "Residual Value",
+  "calculateViewResults": "Calculate & View Results",
+  "netPresentValue": "Net Present Value (NPV)",
+  "internalRateOfReturn": "Internal Rate of Return (IRR)",
+  "paybackPeriod": "Payback Period",
+  "investmentRecovered": "Investment will be recovered",
+  "investmentMayNotRecover": "Investment may not be recovered",
+  "discountedPaybackPeriod": "Discounted Payback Period",
+  "accountsForTimeValue": "Accounts for time value of money",
+  "profitabilityIndex": "Profitability Index (PI)",
+  "accountingRateOfReturn": "Accounting Rate of Return (ARR)",
+  "acceptDecision": "Accept",
+  "rejectDecision": "Reject",
+  "npvSensitivity": "NPV Sensitivity to Discount Rate",
+  "discountRateColumn": "Discount Rate",
+  "npvColumn": "NPV",
+  "decisionColumn": "Decision",
+  "selectPeriodTooltip": "Select Period",
+  "refreshTooltip": "Refresh",
+  "errorLoadingRatios": "Error loading ratios",
+  "analysisPeriod": "Analysis Period",
+  "liquidityRatios": "Liquidity Ratios",
+  "activityRatios": "Activity Ratios",
+  "profitabilityRatios": "Profitability Ratios",
+  "leverageRatios": "Leverage Ratios",
+  "cashRatio": "Cash Ratio",
+  "workingCapitalLabel": "Working Capital",
+  "inventoryTurnover": "Inventory Turnover",
+  "daysSalesInInventory": "Days Sales in Inventory",
+  "daysSalesOutstanding": "Days Sales Outstanding",
+  "cashConversionCycle": "Cash Conversion Cycle",
+  "assetTurnover": "Asset Turnover",
+  "operatingProfitMargin": "Operating Profit Margin",
+  "returnOnEquity": "Return on Equity (ROE)",
+  "ebitdaMargin": "EBITDA Margin",
+  "debtToEquityRatio": "Debt-to-Equity Ratio",
+  "debtToAssetsRatio": "Debt-to-Assets Ratio",
+  "equityMultiplier": "Equity Multiplier",
+  "interestCoverage": "Interest Coverage",
+  "timesInterestEarned": "Times Interest Earned",
+  "cashFlowsOperating": "Cash Flows from Operating Activities",
+  "cashFlowsInvesting": "Cash Flows from Investing Activities",
+  "cashFlowsFinancing": "Cash Flows from Financing Activities",
+  "netCashOperating": "Net Cash from Operating",
+  "netCashInvesting": "Net Cash from Investing",
+  "netCashFinancing": "Net Cash from Financing",
+  "fraudDetection": "Fraud Detection (M-Score)",
+  "inputTab": "Input",
+  "learnTab": "Learn",
+  "currentPeriodLabel": "Current Period",
+  "priorPeriod": "Prior Period",
+  "componentIndices": "Component Indices",
+  "redFlagsLabel": "Red Flags",
+  "whatIsBeneish": "What is the Beneish M-Score?",
+  "theFormula": "The Formula",
+  "indexExplanations": "Index Explanations",
+  "famousCases": "Famous Cases",
+  "probableManipulator": "Probable Manipulator",
+  "standardCosting": "Standard Costing",
+  "standardsTab": "Standards",
+  "materialsTab": "Materials",
+  "laborTab": "Labor",
+  "overheadTab": "Overhead",
+  "importData": "Import Data",
+  "selectFile": "Select File",
+  "chooseDataType": "Choose Data Type",
+  "mapColumns": "Map Columns",
+  "chooseFile": "Choose File",
+  "continueBtn": "Continue",
+  "importBtn": "Import",
+  "backBtn": "Back",
+  "doneBtn": "Done",
+  "selectCsvFile": "Select a CSV or Excel file to import.",
+  "whatDataImporting": "What type of data are you importing?",
+  "mapEachColumn": "Map each column to a field:",
+  "errorsLabel": "Errors:",
+  "productsTitle": "Products",
+  "newProduct": "New Product",
+  "addProductTitle": "Add Product",
+  "editProductTitle": "Edit Product",
+  "saveProduct": "Save Product",
+  "vendorsTitle": "Vendors",
+  "addVendorBtn": "Add Vendor",
+  "newVendorForm": "New Vendor",
+  "editVendorForm": "Edit Vendor",
+  "vendorCreated": "Vendor created",
+  "vendorUpdated": "Vendor updated",
+  "vendorDetailTitle": "Vendor",
+  "customersTitle": "Customers",
+  "addCustomerBtn": "Add Customer",
+  "newCustomerForm": "New Customer",
+  "editCustomerForm": "Edit Customer",
+  "customerCreated": "Customer created",
+  "customerUpdated": "Customer updated",
+  "customerDetailTitle": "Customer",
+  "putCustomerOnHold": "Put Customer On Hold",
+  "preventsNewInvoices": "Prevents new invoices/orders",
+  "pleaseAddLineItem": "Please add at least one line item",
+  "saveBtn": "Save",
+  "cancelBtn": "Cancel",
+  "createBtn": "Create",
+  "changeBtn": "Change",
+  "reconcileBtn": "Reconcile",
+  "statementBalanceLabel": "Statement Balance:",
+  "bookBalanceLabel": "Book Balance:",
+  "entryReconciled": "Entry reconciled",
+  "staffManagement": "Staff Management",
+  "manageRoles": "Manage Roles",
+  "changeRole": "Change Role",
+  "removeAccess": "Remove Access",
+  "roleSaved": "Role saved successfully!",
+  "roleNameLabel": "Role Name",
+  "selectPermission": "Please select at least one permission.",
+  "systemAdminReadonly": "System Admin role cannot be edited.",
+  "customFieldsProducts": "Custom Fields (Products)",
+  "enterDataCalculator": "Enter investment data in the Calculator tab",
+  "enterDataAnalysis": "Enter data to see analysis",
+  "enterFinancialData": "Enter financial data to see results",
+  "iUnderstand": "I Understand",
+  "gotItBtn": "Got it",
+  "budgetVsActual": "Budget vs Actual by Account",
+  "greenFavorable": "Green = Favorable | Red = Unfavorable",
+  "budgetComparison": "Budget Comparison",
+  "staticBudget": "Static Budget",
+  "actualCost": "Actual Cost",
+  "varianceAnalysis": "Variance Analysis",
+  "volumeVariance": "Volume Variance",
+  "dueToActivityLevel": "Due to activity level difference",
+  "spendingVariance": "Spending Variance",
+  "dueToEfficiency": "Due to efficiency/price",
+  "totalVariance": "Total Variance",
+  "actualMinusStatic": "Actual - Static Budget",
+  "separateVariances": "Separate volume variances from spending variances",
+  "formulasUsed": "Formulas Used",
+  "revenueInput": "Revenue",
+  "receivablesInput": "Receivables",
+  "grossProfitInput": "Gross Profit",
+  "totalAssetsInput": "Total Assets",
+  "currentAssetsInput": "Current Assets",
+  "ppeInput": "PP&E",
+  "depreciationInput": "Depreciation",
+  "sgaExpenseInput": "SG&A Expense",
+  "netIncomeInput": "Net Income",
+  "cashFromOps": "Cash from Ops",
+  "longTermDebt": "Long-Term Debt",
+  "currentLiabilities": "Current Liabilities",
+  "probableManipulatorLabel": "PROBABLE MANIPULATOR",
+  "vendorInvoiceOptional": "Vendor Invoice # (Optional)",
+  "customerNameRequired": "Customer Name *",
+  "vendorNameRequired": "Vendor Name *",
+  "paymentTermsHint": "Payment Terms (e.g., Net 30)",
+  "emailLabel": "Email",
+  "phoneLabel": "Phone",
+  "phoneNumber": "Phone Number",
+  "addressLabel": "Address",
+  "notesLabel": "Notes",
+  "descriptionLabel": "Description",
+  "quantityLabel": "Quantity",
+  "qtyLabel": "Qty",
+  "dateLabel": "Date",
+  "barcode": "Barcode",
+  "joinedOrganization": "Successfully joined organization!",
+  "roleNameHint": "e.g., Senior Cashier",
+  "mapTo": "Map to",
+  "addAssetComingSoon": "Add Asset feature coming soon",
+  "assetDisposalComingSoon": "Asset disposal feature coming soon",
+  "errorLoadingData": "Error loading data",
+  "errorLoadingBills": "Error loading bills",
+  "errorLoadingInvoices": "Error loading invoices",
+  "errorSavingRole": "Error saving role",
+  "selectTransactionsToReconcile": "Please select transactions to reconcile",
+  "reconcileAmount": "Reconcile {currency}",
+  "@reconcileAmount": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "enterDataInCalculator": "Enter data in the Calculator tab first",
+  "scenarioColumn": "Scenario",
+  "breakEvenColumn": "Break-Even",
+  "changeColumn": "Change",
+  "impactColumn": "Impact",
+  "variableOverhead": "Variable Overhead",
+  "fixedOverhead": "Fixed Overhead",
+  "examplesLabel": "Examples:",
+  "reconciliation": "Reconciliation",
+  "letsSetUpCorrectly": "Let's set things up correctly.",
+  "addField": "Add Field",
+  "editField": "Edit Field",
+  "editRole": "Edit Role",
+  "createNewRole": "Create New Role",
+  "creatingBtn": "Creating...",
+  "allCategories": "All",
+  "inStock": "{count} in stock",
+  "@inStock": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cartSummary": "Cart: {count} items — {total}",
+  "@cartSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "orderSummary": "Order Summary",
+  "taxLabel": "Tax ({rate}%)",
+  "@taxLabel": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "discountLabel": "Discount",
+  "totalUppercase": "TOTAL",
+  "holdOrder": "Hold Order",
+  "noProducts": "No products found",
+  "searchProducts": "Search products...",
+  "outOfStock": "Out of stock",
+  "cartEmpty": "Your cart is empty",
+  "cartEmptyHint": "Tap products to add them to your order",
+  "payWith": "Pay with {method}",
+  "@payWith": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "orderParked": "Order Parked",
+  "recallOrder": "Recall Order",
+  "orderNumber": "Order #{id}",
+  "@orderNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "itemsAndTime": "{count} items • {time} mins ago",
+  "@itemsAndTime": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "int"
+      }
+    }
+  },
+  "closeBtn": "Close",
+  "getStarted": "Get Started",
+  "selectPrimaryCurrency": "Select Primary Currency",
+  "currencyCodeLabel": "Code (e.g. YER)",
+  "currencySymbolLabel": "Symbol (﷼)",
+  "benchmarkLabel": "Benchmark: {value}",
+  "@benchmarkLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "breakEvenTab": "Break-Even",
+  "marginOfSafetyTab": "Margin of Safety",
+  "whatIfTab": "What-If",
+  "contributionMarginLabel": "Contribution Margin:",
+  "perUnitSuffix": "per unit",
+  "unitsSuffix": "units",
+  "salesRevenueLabel": "Sales Revenue",
+  "analyzeViewResults": "Analyze & View Results",
+  "enterDataCalculatorFirst": "Enter data in the Calculator tab first",
+  "unitsLabel": "UNITS",
+  "salesLabel": "SALES",
+  "contributionMarginTitle": "Contribution Margin",
+  "cmPerUnit": "CM per Unit",
+  "cmRatio": "CM Ratio",
+  "marginOfSafetyTitle": "Margin of Safety",
+  "riskSuffix": "RISK",
+  "mosDollar": "MOS ($)",
+  "mosUnits": "MOS (Units)",
+  "impactLabel": "Impact",
+  "leverageImpactDesc": "1% sales change → {percent}% profit change",
+  "@leverageImpactDesc": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "priceSensitivityDesc": "Shows how break-even changes when you adjust selling price",
+  "baseImpact": "Base",
+  "betterImpact": "Better",
+  "worseImpact": "Worse",
+  "keyInsights": "Key Insights",
+  "projectedProfit": "PROJECTED PROFIT",
+  "projectedLoss": "PROJECTED LOSS",
+  "strongSafetyMargin": "Strong safety margin. Sales can drop {percent}% before reaching break-even.",
+  "@strongSafetyMargin": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "moderateSafetyMargin": "Moderate safety margin. Consider strategies to increase sales or reduce costs.",
+  "thinSafetyMargin": "Thin safety margin. The business is close to break-even and vulnerable to sales declines.",
+  "belowBreakEven": "Operating below break-even. Immediate action needed to increase revenue or reduce costs.",
+  "higherPricesInsight": "Higher prices = Lower break-even (fewer units needed)",
+  "lowerPricesInsight": "Lower prices = Higher break-even (more units needed)",
+  "priceIncreaseEffect": "A 10% price increase reduces break-even by {units} units",
+  "@priceIncreaseEffect": {
+    "placeholders": {
+      "units": {
+        "type": "String"
+      }
+    }
+  },
+  "priceDecreaseEffect": "A 10% price decrease increases break-even by {units} units",
+  "@priceDecreaseEffect": {
+    "placeholders": {
+      "units": {
+        "type": "String"
+      }
+    }
+  },
+  "formulaCurrentRatio": "Current Assets ÷ Current Liabilities",
+  "formulaQuickRatio": "(Cash + Receivables) ÷ Current Liabilities",
+  "formulaCashRatio": "Cash ÷ Current Liabilities",
+  "formulaWorkingCapital": "Current Assets - Current Liabilities",
+  "formulaInventoryTurnover": "COGS ÷ Average Inventory",
+  "formulaDaysSalesInInventory": "365 ÷ Inventory Turnover",
+  "formulaReceivablesTurnover": "Net Sales ÷ Average Receivables",
+  "formulaDaysSalesOutstanding": "365 ÷ Receivables Turnover",
+  "formulaCashConversionCycle": "DSI + DSO - DPO",
+  "formulaAssetTurnover": "Net Sales ÷ Average Total Assets",
+  "formulaGrossProfitMargin": "(Revenue - COGS) ÷ Revenue",
+  "formulaOperatingProfitMargin": "Operating Income ÷ Revenue",
+  "formulaNetProfitMargin": "Net Income ÷ Revenue",
+  "formulaReturnOnAssets": "Net Income ÷ Average Total Assets",
+  "formulaReturnOnEquity": "Net Income ÷ Average Equity",
+  "formulaEbitdaMargin": "EBITDA ÷ Revenue",
+  "formulaDebtToEquity": "Total Liabilities ÷ Shareholders' Equity",
+  "formulaDebtToAssets": "Total Liabilities ÷ Total Assets",
+  "formulaEquityMultiplier": "Total Assets ÷ Shareholders' Equity",
+  "formulaInterestCoverage": "EBIT ÷ Interest Expense",
+  "formulaTimesInterestEarned": "(Net Income + Interest + Tax) ÷ Interest",
+  "notAvailable": "N/A",
+  "daysSuffix": "days",
+  "standardCostCard": "Standard Cost Card",
+  "materialQtyUnit": "Material Qty/Unit",
+  "materialPrice": "Material Price",
+  "laborHoursUnit": "Labor Hours/Unit",
+  "laborRate": "Labor Rate",
+  "vohRate": "VOH Rate",
+  "budgetedFoh": "Budgeted FOH",
+  "normalCapacity": "Normal Capacity",
+  "actualProduction": "Actual Production",
+  "unitsProduced": "Units Produced",
+  "materialUsed": "Material Used",
+  "laborHours": "Labor Hours",
+  "actualVoh": "Actual VOH",
+  "actualFoh": "Actual FOH",
+  "totalVarianceAmount": "Total Variance: {amount}",
+  "@totalVarianceAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "netFavorable": "Net Favorable",
+  "netUnfavorable": "Net Unfavorable",
+  "directMaterialsVariance": "Direct Materials Variance",
+  "standardCost": "Standard Cost",
+  "actualCostLabel": "Actual Cost",
+  "varianceBreakdown": "Variance Breakdown",
+  "priceVariance": "Price Variance",
+  "priceVarianceFormula": "(AP - SP) × AQ",
+  "quantityVariance": "Quantity Variance",
+  "quantityVarianceFormula": "(AQ - SQ) × SP",
+  "materialsFormulas": "Materials Formulas",
+  "priceVarianceFormulaFull": "Price Variance = (Actual Price - Standard Price) × Actual Qty",
+  "quantityVarianceFormulaFull": "Quantity Variance = (Actual Qty - Standard Qty) × Standard Price",
+  "directLaborVariance": "Direct Labor Variance",
+  "rateVariance": "Rate Variance",
+  "rateVarianceFormula": "(AR - SR) × AH",
+  "efficiencyVariance": "Efficiency Variance",
+  "efficiencyVarianceFormula": "(AH - SH) × SR",
+  "laborFormulas": "Labor Formulas",
+  "rateVarianceFormulaFull": "Rate Variance = (Actual Rate - Standard Rate) × Actual Hours",
+  "efficiencyVarianceFormulaFull": "Efficiency Variance = (Actual Hours - Std Hours) × Std Rate",
+  "manufacturingOverheadVariance": "Manufacturing Overhead Variance",
+  "appliedOverhead": "Applied Overhead",
+  "actualOverhead": "Actual Overhead",
+  "overapplied": "Overapplied",
+  "underapplied": "Underapplied",
+  "budgetVariance": "Budget Variance",
+  "actualFohMinusBudgeted": "Actual FOH - Budgeted FOH",
+  "budgetedFohMinusApplied": "Budgeted FOH - Applied FOH",
+  "actualVohFormula": "Actual VOH - (AH × SR)",
+  "unitSuffix": "units",
+  "dollarPerUnit": "$/unit",
+  "hrsSuffix": "hrs",
+  "dollarPerHr": "$/hr",
+  "favorableBadge": "F",
+  "unfavorableBadge": "U",
+  "mScoreValue": "M-Score: {value}",
+  "@mScoreValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "riskLevelLabel": "{level} Risk",
+  "@riskLevelLabel": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "riskOfEarningsManipulation": "{level} Risk of Earnings Manipulation",
+  "@riskOfEarningsManipulation": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "thresholdNote": "Threshold: > -1.78 indicates manipulation",
+  "dsriAbbr": "DSRI",
+  "dsriDesc": "Receivables/Sales",
+  "gmiAbbr": "GMI",
+  "gmiDesc": "Gross Margin",
+  "aqiAbbr": "AQI",
+  "aqiDesc": "Asset Quality",
+  "sgiAbbr": "SGI",
+  "sgiDesc": "Sales Growth",
+  "depiAbbr": "DEPI",
+  "depiDesc": "Depreciation",
+  "sgaiAbbr": "SGAI",
+  "sgaiDesc": "SG&A Expenses",
+  "tataAbbr": "TATA",
+  "tataDesc": "Accruals",
+  "lvgiAbbr": "LVGI",
+  "lvgiDesc": "Leverage",
+  "redFlagsCount": "Red Flags ({count})",
+  "@redFlagsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "whatIsBeneishMScore": "What is the Beneish M-Score?",
+  "beneishDescription": "The M-Score is a mathematical model that uses 8 financial ratios to identify whether a company has manipulated its earnings. Developed by Professor Messod Beneish, it is widely used by auditors, investors, and analysts.",
+  "beneishFormula": "M = -4.84 + 0.92×DSRI + 0.528×GMI\n+ 0.404×AQI + 0.892×SGI\n+ 0.115×DEPI - 0.172×SGAI\n+ 4.679×TATA - 0.327×LVGI",
+  "indexExplanationsTitle": "Index Explanations",
+  "dsriFullName": "Days Sales in Receivables Index",
+  "dsriExplanation": "Measures if receivables grew faster than sales",
+  "gmiFullName": "Gross Margin Index",
+  "gmiExplanation": "Detects deteriorating gross margins",
+  "aqiFullName": "Asset Quality Index",
+  "aqiExplanation": "Identifies expense capitalization",
+  "sgiFullName": "Sales Growth Index",
+  "sgiExplanation": "High growth creates manipulation pressure",
+  "depiFullName": "Depreciation Index",
+  "depiExplanation": "Detects slowing depreciation rates",
+  "sgaiFullName": "SG&A Index",
+  "sgaiExplanation": "Measures administrative efficiency",
+  "tataFullName": "Total Accruals to Total Assets",
+  "tataExplanation": "High accruals vs cash = low quality",
+  "lvgiFullName": "Leverage Index",
+  "lvgiExplanation": "Increasing debt creates pressure",
+  "famousCasesTitle": "Famous Cases",
+  "famousCasesContent": "• Enron (2001): Would have had M-Score > -1.78\n• WorldCom (2002): Showed multiple red flags\n• Satyam (2009): DSRI and AQI were extreme\n• The model correctly identifies ~76% of manipulators",
+  "yearLabel": "Year {number}",
+  "@yearLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "pvOfCashFlows": "PV of Cash Flows: {value}",
+  "@pvOfCashFlows": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "initialInvestmentDetail": "Initial Investment: {value}",
+  "@initialInvestmentDetail": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "discountRateDetail": "Discount Rate: {value}",
+  "@discountRateDetail": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "convergedLabel": "Converged: {value}",
+  "@convergedLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "iterationsLabel": "Iterations: {value}",
+  "@iterationsLabel": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "averageInvestment": "Average Investment: {value}",
+  "@averageInvestment": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "acceptLabel": "ACCEPT",
+  "rejectLabel": "REJECT",
+  "recommendationLabel": "RECOMMENDATION: {value}",
+  "@recommendationLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "criteriaMetLabel": "{count} of 4 criteria met",
+  "@criteriaMetLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "npvSensitivityDesc": "Shows how NPV changes as the discount rate varies",
+  "irrApproxLabel": "The IRR (where NPV = 0) is approximately {min}% - {max}%",
+  "@irrApproxLabel": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "revenueSection": "REVENUE",
+  "expensesSection": "EXPENSES",
+  "formulasDescription": "• Static Budget = Fixed + (Variable × Planned Activity)\n• Flexible Budget = Fixed + (Variable × Actual Activity)\n• Volume Variance = Flexible Budget - Static Budget\n• Spending Variance = Actual Cost - Flexible Budget",
+  "addExchangeRate": "Add Exchange Rate",
+  "fromCurrency": "From",
+  "toCurrency": "To",
+  "pleaseEnterCurrency": "Please select currency",
+  "exchangeRateHelper": "1 From = X To",
+  "pleaseEnterValidRate": "Valid rate required",
+  "accountCurrency": "Currency",
+  "initialBalances": "Initial Balances",
+  "debitBalance": "Debit Balance",
+  "creditBalance": "Credit Balance",
+  "netBalance": "Net Balance",
+  "exchangeRates": "Exchange Rates",
+  "noExchangeRates": "No rates added",
+  "saveAccount": "Save Account"
 }

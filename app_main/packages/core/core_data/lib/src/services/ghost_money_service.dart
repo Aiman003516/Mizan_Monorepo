@@ -106,6 +106,7 @@ class GhostMoneyService {
     required String description,
   }) async {
     // Get or create a rounding expense/income account
+    // ignore: unused_local_variable
     final accountType = amount > 0 ? 'expense' : 'revenue';
 
     final transaction = await _db

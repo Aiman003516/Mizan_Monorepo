@@ -1,0 +1,7 @@
+.agents/
+.idea/
+.vscode/
+.dart_tool/
+build/
+skills-lock.json
+*.iml

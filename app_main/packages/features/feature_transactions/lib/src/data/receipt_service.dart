@@ -1,6 +1,5 @@
 // FILE: packages/features/feature_transactions/lib/src/data/receipt_service.dart
 
-import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +12,6 @@ import 'package:shared_ui/shared_ui.dart'; // FIX: Import Formatter
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 
 final receiptServiceProvider = Provider<ReceiptService>((ref) {
   return ReceiptService(ref);
@@ -21,6 +19,7 @@ final receiptServiceProvider = Provider<ReceiptService>((ref) {
 
 class ReceiptService {
   ReceiptService(this._ref);
+  // ignore: unused_field
   final Ref _ref;
 
   static const double _kReceiptWidth = 58 * PdfPageFormat.mm;

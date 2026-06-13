@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -64,7 +65,7 @@ class ProfitAndLossScreen extends ConsumerWidget {
         const SizedBox(height: 24),
 
         Text(l10n.revenue,
-            style: textTheme.titleLarge?.copyWith(color: Colors.green)),
+            style: textTheme.titleLarge?.copyWith(color: context.appColors.success)),
         const Divider(),
         for (final line in data.revenueLines)
           ListTile(
@@ -84,7 +85,7 @@ class ProfitAndLossScreen extends ConsumerWidget {
         const SizedBox(height: 24),
 
         Text(l10n.expenses,
-            style: textTheme.titleLarge?.copyWith(color: Colors.red)),
+            style: textTheme.titleLarge?.copyWith(color: context.appColors.error)),
         const Divider(),
         for (final line in data.expenseLines)
           ListTile(
@@ -111,7 +112,7 @@ class ProfitAndLossScreen extends ConsumerWidget {
             style: textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               fontFamily: 'Amiri',
-              color: data.netIncome >= 0 ? Colors.green : Colors.red,
+              color: data.netIncome >= 0 ? context.appColors.success : context.appColors.error,
             ),
           ),
         ),

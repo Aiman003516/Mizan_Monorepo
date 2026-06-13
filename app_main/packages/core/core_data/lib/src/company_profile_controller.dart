@@ -22,12 +22,14 @@ class CompanyProfileController extends StateNotifier<CompanyProfileData> {
     required String userName,
     required String companyAddress,
     required String taxID,
+    String? imagePath,
   }) async {
     // Save to repository
     await _repo.setCompanyName(companyName);
     await _repo.setUserName(userName);
     await _repo.setCompanyAddress(companyAddress);
     await _repo.setTaxID(taxID);
+    await _repo.setImagePath(imagePath);
 
     // Update the state
     state = state.copyWith(
@@ -35,6 +37,7 @@ class CompanyProfileController extends StateNotifier<CompanyProfileData> {
       userName: userName,
       companyAddress: companyAddress,
       taxID: taxID,
+      imagePath: imagePath,
     );
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_l10n/app_localizations.dart';
@@ -45,7 +47,7 @@ class _SetPasscodeScreenState extends ConsumerState<SetPasscodeScreen> {
 
       messenger.showSnackBar(SnackBar(
         content: Text(l10n.passcodeSetSuccess),
-        backgroundColor: Colors.green,
+        backgroundColor: context.appColors.success,
       ));
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -54,7 +56,7 @@ class _SetPasscodeScreenState extends ConsumerState<SetPasscodeScreen> {
       });
       messenger.showSnackBar(SnackBar(
         content: Text('${l10n.failedToSavePasscode} $e'),
-        backgroundColor: Colors.red,
+        backgroundColor: context.appColors.error,
       ));
     }
   }
@@ -116,12 +118,12 @@ class _SetPasscodeScreenState extends ConsumerState<SetPasscodeScreen> {
               const SizedBox(height: 32),
               FilledButton.icon(
                 icon: _isLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
+                      color: context.appColors.onPrimary,
                     ))
                     : const Icon(Icons.save),
                 label: Text(l10n.savePasscode),

@@ -15,6 +15,7 @@ final adjustingEntriesRepositoryProvider = Provider<AdjustingEntriesRepository>(
 
 class AdjustingEntriesRepository {
   final AppDatabase _db;
+  // ignore: unused_field
   final TransactionsRepository _transactionsRepo;
 
   AdjustingEntriesRepository(this._db, this._transactionsRepo);

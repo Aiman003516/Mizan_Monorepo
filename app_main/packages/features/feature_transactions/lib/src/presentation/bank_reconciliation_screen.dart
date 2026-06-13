@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:core_l10n/app_localizations.dart'; // Assuming localization exists
+// Assuming localization exists
 import 'package:core_database/core_database.dart';
 import 'package:shared_ui/shared_ui.dart'; // CurrencyFormatter
 import 'package:feature_accounts/feature_accounts.dart'; // Account selection
@@ -78,7 +79,7 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
             data: (accounts) {
               final assetAccounts = accounts.where((a) => a.type == 'asset').toList();
               return DropdownButtonFormField<String>(
-                value: _selectedAccountId,
+                initialValue: _selectedAccountId,
                 decoration: const InputDecoration(labelText: "Select Bank Account", border: OutlineInputBorder()),
                 items: assetAccounts.map((a) => DropdownMenuItem(value: a.id, child: Text(a.name))).toList(),
                 onChanged: (v) => setState(() => _selectedAccountId = v),
@@ -160,13 +161,14 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
   Widget _buildReconcileStep() {
     final diff = _differenceCents;
     final isBalanced = diff == 0;
-    final color = isBalanced ? Colors.green : Colors.red;
+    final color = isBalanced ? context.appColors.success : context.appColors.error;
 
     return Column(
       children: [
         // --- THE SCOREBOARD ---
         Container(
-          color: color.withOpacity(0.1),
+          // ignore: deprecated_member_use
+          color: color.withValues(alpha: 0.1),
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
@@ -229,7 +231,7 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
                       secondary: Text(
                         CurrencyFormatter.formatCentsToCurrency(tx.amount.abs()),
                         style: TextStyle(
-                          color: isDeposit ? Colors.green : Colors.black,
+                          color: isDeposit ? context.appColors.success : context.appColors.onSurface,
                           fontWeight: FontWeight.bold
                         ),
                       ),
@@ -242,14 +244,13 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: Colors.grey.shade300))
+            border: Border(top: BorderSide(color: context.appColors.primary))
           ),
           child: Row(
             children: [
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
-                    // TODO: Open "Add Adjustment" Dialog (Bank Fee)
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Bank Fee / Interest feature coming soon!")));
                   }, 
                   child: const Text("Add Adjustment"),
@@ -261,7 +262,7 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
                   // 🔒 GUARD: Disable until balanced
                   onPressed: (!isBalanced || _isLoading) ? null : _finishReconciliation,
                   child: _isLoading 
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white)) 
+                      ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: context.appColors.onPrimary)) 
                       : const Text("Finish"),
                 ),
               ),
@@ -283,7 +284,7 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
       );
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Reconciliation Complete!"), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Reconciliation Complete!"), backgroundColor: context.appColors.success));
         Navigator.pop(context);
       }
     } catch (e) {

@@ -30,6 +30,7 @@ class PreferencesRepository {
   static const keyUserName = 'user_name';
   static const keyCompanyAddress = 'company_address';
   static const keyTaxID = 'tax_id';
+  static const keyImagePath = 'company_image_path'; // 🟢 NEW
   static const keyDefaultCurrency = 'default_currency_code';
   static const keyCurrencySymbol = 'currency_symbol'; // 🟢 NEW
   static const keyPeriodLockDate = 'period_lock_date';
@@ -101,6 +102,15 @@ class PreferencesRepository {
   String getTaxID() => _prefs.getString(keyTaxID) ?? '';
   Future<void> setTaxID(String taxId) async =>
       await _prefs.setString(keyTaxID, taxId);
+
+  String? getImagePath() => _prefs.getString(keyImagePath);
+  Future<void> setImagePath(String? path) async {
+    if (path == null) {
+      await _prefs.remove(keyImagePath);
+    } else {
+      await _prefs.setString(keyImagePath, path);
+    }
+  }
 
   // --- Period Locking ---
   DateTime? getPeriodLockDate() {

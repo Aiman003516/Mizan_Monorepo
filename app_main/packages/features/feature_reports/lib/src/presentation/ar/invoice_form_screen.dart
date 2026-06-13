@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 
@@ -23,6 +25,8 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
   DateTime _invoiceDate = DateTime.now();
   DateTime _dueDate = DateTime.now().add(const Duration(days: 30));
   final _notesController = TextEditingController();
+
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
 
   List<_LineItem> _lineItems = [_LineItem()];
   bool _isLoading = false;
@@ -92,9 +96,9 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
 
     if (!hasValidItems) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please add at least one line item'),
-          backgroundColor: Colors.orange,
+        SnackBar(
+          content: Text(l10n.pleaseAddLineItem),
+          backgroundColor: context.appColors.warning,
         ),
       );
       return;
@@ -128,9 +132,9 @@ class _InvoiceFormScreenState extends ConsumerState<InvoiceFormScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invoice created'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text(l10n.invoiceCreated),
+            backgroundColor: context.appColors.success,
           ),
         );
         Navigator.of(context).pop(true);

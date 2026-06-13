@@ -18,7 +18,7 @@ class ProductsHubScreen extends ConsumerWidget {
     return Scaffold(
       // ✅ NEW: Added AppBar to house the "Action" buttons
       appBar: AppBar(
-        title: const Text('Products'), // You can replace this with l10n.products later
+        title: Text(l10n.productsTitle), // You can replace this with l10n.products later
         actions: [
           // ⬇️ THE IMPORT BUTTON
           IconButton(

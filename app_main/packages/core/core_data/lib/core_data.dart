@@ -30,7 +30,7 @@ export 'src/repositories/ar_repository.dart';
 // Phase 8C: Accounts Payable
 export 'src/repositories/ap_repository.dart';
 // Phase E: Bank Reconciliation
-export 'src/repositories/bank_reconciliation_repository.dart';
+
 // Phase 1 Advanced: Financial Analysis & Tools
 export 'src/services/financial_analysis_service.dart';
 export 'src/services/tvm_calculator_service.dart';
@@ -40,4 +40,21 @@ export 'src/services/cvp_analysis_service.dart';
 // Phase Budget: Budgeting & Variance Analysis
 export 'src/services/budgeting_service.dart';
 // Phase Standard Costing: Standard Costs & Variance Analysis
-export 'src/services/standard_costing_service.dart';
+// Phase 2.3: ZATCA Compliance
+export 'src/utils/zatca_encoder.dart';
+// Phase 2.4: Reconciliation
+export 'src/repositories/bank_reconciliation_repository.dart';
+export 'src/services/auto_categorization_service.dart';
+// Phase 2.6: Audit Trail
+export 'src/services/audit_service.dart';
+
+// Wave 1-4 Expansion Services & Repositories
+export 'src/services/notification_service.dart';
+export 'src/services/rbac_service.dart';
+export 'src/services/csv_export_service.dart';
+export 'src/services/cash_flow_forecast_service.dart';
+export 'src/repositories/quotes_repository.dart';
+export 'src/repositories/mileage_repository.dart';
+export 'src/repositories/warehouse_repository.dart';
+export 'src/repositories/attachments_repository.dart';
+export 'src/repositories/comments_repository.dart';

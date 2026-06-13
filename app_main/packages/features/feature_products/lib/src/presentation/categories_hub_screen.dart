@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_products/src/data/categories_repository.dart';
 
-// We will create this package soon. This error is expected.
-import 'package:feature_dashboard/feature_dashboard.dart'; 
+
 
 import 'dart:io';
 import 'package:shared_ui/shared_ui.dart';
@@ -20,7 +20,6 @@ class CategoriesHubScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final categoriesAsync = ref.watch(categoriesStreamProvider);
 
-    // This provider will be defined in feature_dashboard. This error is expected.
     final searchQuery = ref.watch(mainDashboardSearchProvider);
 
     return Scaffold(
@@ -47,7 +46,7 @@ class CategoriesHubScreen extends ConsumerWidget {
 
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: context.appColors.primary,
                   child: imagePath != null && imagePath.isNotEmpty
                       ? ClipOval(
                           child: Image.file(

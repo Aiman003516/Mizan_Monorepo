@@ -3,9 +3,10 @@
 import 'package:feature_reports/src/data/report_models.dart';
 import 'package:feature_reports/src/data/report_templates_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_ui/shared_ui.dart'; // For formatting utilities
+// For formatting utilities
 
 class DynamicReportScreen extends ConsumerStatefulWidget {
   final ReportTemplate template;
@@ -66,7 +67,7 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
           if (widget.template.parameters.isNotEmpty)
             Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.grey.shade100,
+              color: context.appColors.primary,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -90,7 +91,7 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _error != null
-                    ? Center(child: Text("Error: $_error", style: const TextStyle(color: Colors.red)))
+                    ? Center(child: Text("Error: $_error", style: TextStyle(color: context.appColors.error)))
                     : _results == null
                         ? const Center(child: Text("Set parameters and run report."))
                         : _results!.isEmpty
@@ -109,7 +110,7 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
         title: Text(param.label),
         subtitle: Text(DateFormat.yMMMd().format(date)),
         trailing: const Icon(Icons.calendar_today),
-        tileColor: Colors.white,
+        tileColor: context.appColors.onPrimary,
         onTap: () async {
           final picked = await showDatePicker(
             context: context,
@@ -128,7 +129,7 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
       decoration: InputDecoration(
         labelText: param.label,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: context.appColors.onPrimary,
       ),
       onChanged: (v) => _paramValues[param.key] = v,
     );

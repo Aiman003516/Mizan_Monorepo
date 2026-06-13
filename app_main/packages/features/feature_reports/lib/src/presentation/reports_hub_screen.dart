@@ -32,11 +32,11 @@ class ReportsHubScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Reports & Analytics"),
+        title: Text(l10n.reportsAndAnalytics),
         actions: [
           IconButton(
             icon: const Icon(Icons.storefront),
-            tooltip: "Report Marketplace",
+            tooltip: l10n.reportMarketplaceTooltip,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -54,7 +54,7 @@ class ReportsHubScreen extends ConsumerWidget {
             // SECTION 1: FINANCIAL STATEMENTS
             _buildSectionHeader(
               context,
-              "Financial Statements",
+              l10n.financialStatementsSection,
               Icons.account_balance,
             ),
             _buildGrid(context, [
@@ -88,7 +88,7 @@ class ReportsHubScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // SECTION 2: PERFORMANCE & SALES
-            _buildSectionHeader(context, "Performance", Icons.bar_chart),
+            _buildSectionHeader(context, l10n.performanceSection, Icons.bar_chart),
             _buildGrid(context, [
               _ReportCard(
                 // ✅ FIX: Use 'totalAmountsReport' (String) instead of 'totalAmounts' (Function)
@@ -116,40 +116,40 @@ class ReportsHubScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // SECTION 3: ANALYSIS TOOLS
-            _buildSectionHeader(context, "Analysis Tools", Icons.analytics),
+            _buildSectionHeader(context, l10n.analysisToolsSection, Icons.analytics),
             _buildGrid(context, [
               _ReportCard(
-                title: "CVP Analysis",
+                title: l10n.cvpAnalysisTitle,
                 icon: Icons.trending_up,
                 color: Colors.deepPurple,
                 onTap: () => _nav(context, const CVPAnalysisScreen()),
               ),
               _ReportCard(
-                title: "Capital Budgeting",
+                title: l10n.capitalBudgetingTitle,
                 icon: Icons.account_tree,
                 color: Colors.green,
                 onTap: () => _nav(context, const CapitalBudgetingScreen()),
               ),
               _ReportCard(
-                title: "Budget Analysis",
+                title: l10n.budgetAnalysisTitle,
                 icon: Icons.account_balance_wallet,
                 color: Colors.teal,
                 onTap: () => _nav(context, const BudgetScreen()),
               ),
               _ReportCard(
-                title: "Fraud Detection",
+                title: l10n.fraudDetectionTitle,
                 icon: Icons.security,
                 color: Colors.red,
                 onTap: () => _nav(context, const FraudDetectionScreen()),
               ),
               _ReportCard(
-                title: "Standard Costing",
+                title: l10n.standardCostingTitle,
                 icon: Icons.precision_manufacturing,
                 color: Colors.indigo,
                 onTap: () => _nav(context, const StandardCostingScreen()),
               ),
               _ReportCard(
-                title: "Financial Ratios",
+                title: l10n.financialRatiosTitle,
                 icon: Icons.pie_chart,
                 color: Colors.cyan,
                 onTap: () => _nav(context, const FinancialRatiosScreen()),
@@ -161,30 +161,30 @@ class ReportsHubScreen extends ConsumerWidget {
             // SECTION 4: UPCOMING (The "Power 10" Placeholders)
             _buildSectionHeader(
               context,
-              "Inventory & Operations (Coming Soon)",
+              l10n.inventoryOperationsSection,
               Icons.inventory_2,
             ),
             _buildGrid(context, [
               _ReportCard(
-                title: "Stock Velocity",
+                title: l10n.stockVelocityTitle,
                 icon: Icons.speed,
                 color: Colors.grey,
                 isLocked: true,
               ),
               _ReportCard(
-                title: "Low Stock Alert",
+                title: l10n.lowStockAlertTitle,
                 icon: Icons.warning_amber,
                 color: Colors.grey,
                 isLocked: true,
               ),
               _ReportCard(
-                title: "Sales by Cashier",
+                title: l10n.salesByCashierTitle,
                 icon: Icons.badge,
                 color: Colors.grey,
                 isLocked: true,
               ),
               _ReportCard(
-                title: "Tax Liability",
+                title: l10n.taxLiabilityTitle,
                 icon: Icons.receipt_long,
                 color: Colors.grey,
                 isLocked: true,
@@ -207,11 +207,13 @@ class ReportsHubScreen extends ConsumerWidget {
         children: [
           Icon(icon, size: 20, color: Theme.of(context).primaryColor),
           const SizedBox(width: 8),
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
+          Expanded(
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ),
         ],

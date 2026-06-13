@@ -23,13 +23,12 @@ dependencies:
     path: ../../core/core_database
   core_l10n:
     path: ../../core/core_l10n
+  core_ui:
+    path: ../../core/core_ui
   shared_ui:
     path: ../../shared/shared_ui
   shared_services:
     path: ../../shared/shared_services
-  
-  feature_dashboard:
-    path: ../feature_dashboard
 
 dev_dependencies:
   flutter_test:

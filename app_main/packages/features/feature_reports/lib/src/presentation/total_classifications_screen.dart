@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // UPDATED Local Imports
@@ -22,7 +23,7 @@ class TotalClassificationsScreen extends ConsumerWidget {
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.picture_as_pdf, color: Colors.red),
+            icon: Icon(Icons.picture_as_pdf, color: context.appColors.error),
             tooltip: l10n.exportToPDF,
             onPressed: () {},
           ),
@@ -79,7 +80,7 @@ class TotalClassificationsScreen extends ConsumerWidget {
                     final summary = summaries[index];
                     final isDebitBalance = summary.netBalance >= 0;
                     final balanceColor =
-                    isDebitBalance ? Colors.green : Colors.red;
+                    isDebitBalance ? context.appColors.success : context.appColors.error;
 
                     return ListTile(
                       title: Text(summary.name),
@@ -94,7 +95,7 @@ class TotalClassificationsScreen extends ConsumerWidget {
                               flex: 2,
                               child: Text(
                                 summary.totalDebit.toStringAsFixed(2),
-                                style: const TextStyle(color: Colors.green),
+                                style: TextStyle(color: context.appColors.success),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -102,7 +103,7 @@ class TotalClassificationsScreen extends ConsumerWidget {
                               flex: 2,
                               child: Text(
                                 summary.totalCredit.toStringAsFixed(2),
-                                style: const TextStyle(color: Colors.red),
+                                style: TextStyle(color: context.appColors.error),
                                 textAlign: TextAlign.center,
                               ),
                             ),

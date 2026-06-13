@@ -2,30 +2,33 @@
 // Purpose: Cost-Volume-Profit Analysis interactive calculator
 // Reference: Accounting Principles 13e (Weygandt), Chapter 22
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:core_data/src/services/cvp_analysis_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:core_data/core_data.dart';
+import 'package:core_l10n/app_localizations.dart';
 
 /// CVP Analysis Calculator Screen
-class CVPAnalysisScreen extends StatefulWidget {
+class CVPAnalysisScreen extends ConsumerStatefulWidget {
   const CVPAnalysisScreen({super.key});
 
   @override
-  State<CVPAnalysisScreen> createState() => _CVPAnalysisScreenState();
+  ConsumerState<CVPAnalysisScreen> createState() => _CVPAnalysisScreenState();
 }
 
-class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
+class _CVPAnalysisScreenState extends ConsumerState<CVPAnalysisScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final CVPAnalysisService _cvpService = CVPAnalysisService();
+  Timer? _debounceTimer;
 
   // Input controllers (amounts in cents, display as dollars)
-  final _fixedCostsController = TextEditingController(text: '100000');
-  final _sellingPriceController = TextEditingController(text: '50');
-  final _variableCostController = TextEditingController(text: '30');
-  final _actualSalesController = TextEditingController(text: '300000');
-  final _actualUnitsController = TextEditingController(text: '6000');
-  final _targetProfitController = TextEditingController(text: '50000');
+  final _fixedCostsController = TextEditingController();
+  final _sellingPriceController = TextEditingController();
+  final _variableCostController = TextEditingController();
+  final _actualSalesController = TextEditingController();
+  final _actualUnitsController = TextEditingController();
+  final _targetProfitController = TextEditingController();
 
   // Results
   BreakEvenResult? _breakEvenResult;
@@ -44,6 +47,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _tabController.dispose();
     _fixedCostsController.dispose();
     _sellingPriceController.dispose();
@@ -52,6 +56,13 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
     _actualUnitsController.dispose();
     _targetProfitController.dispose();
     super.dispose();
+  }
+
+  void _onInputChanged() {
+    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      _calculateAll();
+    });
   }
 
   // Convert dollars to cents for calculations
@@ -70,6 +81,8 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
   }
 
   void _calculateAll() {
+    final cvpService = ref.read(cvpAnalysisServiceProvider);
+
     final fixedCosts = _dollarsToCents(_fixedCostsController.text);
     final sellingPrice = _dollarsToCents(_sellingPriceController.text);
     final variableCost = _dollarsToCents(_variableCostController.text);
@@ -91,14 +104,14 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
 
     setState(() {
       // Break-even analysis
-      _breakEvenResult = _cvpService.analyzeBreakEven(
+      _breakEvenResult = cvpService.analyzeBreakEven(
         fixedCosts: fixedCosts,
         unitSellingPrice: sellingPrice,
         variableCostPerUnit: variableCost,
       );
 
       // Target profit analysis
-      _targetProfitResult = _cvpService.analyzeTargetProfit(
+      _targetProfitResult = cvpService.analyzeTargetProfit(
         fixedCosts: fixedCosts,
         targetProfit: targetProfit,
         unitSellingPrice: sellingPrice,
@@ -106,7 +119,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
       );
 
       // Margin of safety
-      _mosResult = _cvpService.analyzeMarginOfSafety(
+      _mosResult = cvpService.analyzeMarginOfSafety(
         actualSales: actualSales,
         actualUnits: actualUnits,
         fixedCosts: fixedCosts,
@@ -116,14 +129,14 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
 
       // Operating leverage
       final variableCosts = variableCost * actualUnits;
-      _leverageResult = _cvpService.analyzeOperatingLeverage(
+      _leverageResult = cvpService.analyzeOperatingLeverage(
         actualSales: actualSales,
         variableCosts: variableCosts,
         fixedCosts: fixedCosts,
       );
 
       // Projected profit
-      _projectedProfit = _cvpService.calculateProjectedProfit(
+      _projectedProfit = cvpService.calculateProjectedProfit(
         projectedUnits: actualUnits,
         unitSellingPrice: sellingPrice,
         variableCostPerUnit: variableCost,
@@ -131,7 +144,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
       );
 
       // Sensitivity analysis
-      _sensitivityResult = _cvpService.performSensitivityAnalysis(
+      _sensitivityResult = cvpService.performSensitivityAnalysis(
         fixedCosts: fixedCosts,
         unitSellingPrice: sellingPrice,
         variableCostPerUnit: variableCost,
@@ -143,34 +156,36 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CVP Analysis'),
+        title: Text(l10n.cvpAnalysisTitle),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
-          tabs: const [
-            Tab(text: 'Calculator', icon: Icon(Icons.calculate)),
-            Tab(text: 'Break-Even', icon: Icon(Icons.trending_up)),
-            Tab(text: 'Margin of Safety', icon: Icon(Icons.security)),
-            Tab(text: 'What-If', icon: Icon(Icons.compare_arrows)),
+          tabAlignment: TabAlignment.start,
+          tabs: [
+            Tab(text: l10n.calculatorTab, icon: const Icon(Icons.calculate)),
+            Tab(text: l10n.breakEvenTab, icon: const Icon(Icons.trending_up)),
+            Tab(text: l10n.marginOfSafetyTab, icon: const Icon(Icons.security)),
+            Tab(text: l10n.whatIfTab, icon: const Icon(Icons.compare_arrows)),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildCalculatorTab(theme),
-          _buildBreakEvenTab(theme),
-          _buildMarginOfSafetyTab(theme),
-          _buildWhatIfTab(theme),
+          _buildCalculatorTab(theme, l10n),
+          _buildBreakEvenTab(theme, l10n),
+          _buildMarginOfSafetyTab(theme, l10n),
+          _buildWhatIfTab(theme, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildCalculatorTab(ThemeData theme) {
+  Widget _buildCalculatorTab(ThemeData theme, AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -191,7 +206,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Cost Structure',
+                        l10n.costStructure,
                         style: theme.textTheme.titleMedium,
                       ),
                     ],
@@ -199,15 +214,15 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                   const SizedBox(height: 16),
                   TextField(
                     controller: _fixedCostsController,
-                    decoration: const InputDecoration(
-                      labelText: 'Fixed Costs (Total)',
+                    decoration: InputDecoration(
+                      labelText: l10n.fixedCostsTotal,
                       prefixText: '\$ ',
                       border: OutlineInputBorder(),
-                      helperText: 'Rent, salaries, depreciation, etc.',
+                      helperText: l10n.fixedCostsHelper,
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    onChanged: (_) => _calculateAll(),
+                    onChanged: (_) => _onInputChanged(),
                   ),
                 ],
               ),
@@ -229,7 +244,10 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                         color: theme.colorScheme.primary,
                       ),
                       const SizedBox(width: 8),
-                      Text('Per-Unit Data', style: theme.textTheme.titleMedium),
+                      Text(
+                        l10n.perUnitData,
+                        style: theme.textTheme.titleMedium,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -238,26 +256,26 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       Expanded(
                         child: TextField(
                           controller: _sellingPriceController,
-                          decoration: const InputDecoration(
-                            labelText: 'Selling Price',
+                          decoration: InputDecoration(
+                            labelText: l10n.sellingPrice,
                             prefixText: '\$ ',
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
-                          onChanged: (_) => _calculateAll(),
+                          onChanged: (_) => _onInputChanged(),
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: TextField(
                           controller: _variableCostController,
-                          decoration: const InputDecoration(
-                            labelText: 'Variable Cost',
+                          decoration: InputDecoration(
+                            labelText: l10n.variableCost,
                             prefixText: '\$ ',
                             border: OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
-                          onChanged: (_) => _calculateAll(),
+                          onChanged: (_) => _onInputChanged(),
                         ),
                       ),
                     ],
@@ -274,17 +292,25 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Contribution Margin:',
-                            style: TextStyle(
-                              color: theme.colorScheme.onPrimaryContainer,
+                          Expanded(
+                            child: Text(
+                              l10n.contributionMarginLabel,
+                              style: TextStyle(
+                                color: theme.colorScheme.onPrimaryContainer,
+                              ),
                             ),
                           ),
-                          Text(
-                            '${_formatCurrency(_breakEvenResult!.contributionMarginPerUnit)} per unit (${(_breakEvenResult!.contributionMarginRatio * 100).toStringAsFixed(1)}%)',
-                            style: TextStyle(
-                              color: theme.colorScheme.onPrimaryContainer,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              '${_formatCurrency(_breakEvenResult!.contributionMarginPerUnit)} per unit (${(_breakEvenResult!.contributionMarginRatio * 100).toStringAsFixed(1)}%)',
+                              style: TextStyle(
+                                color: theme.colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.end,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -309,7 +335,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       Icon(Icons.bar_chart, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
-                        'Actual/Expected Sales',
+                        l10n.actualExpectedSales,
                         style: theme.textTheme.titleMedium,
                       ),
                     ],
@@ -320,9 +346,9 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       Expanded(
                         child: TextField(
                           controller: _actualUnitsController,
-                          decoration: const InputDecoration(
-                            labelText: 'Units Sold',
-                            suffixText: 'units',
+                          decoration: InputDecoration(
+                            labelText: l10n.unitsSold,
+                            suffixText: l10n.unitsSuffix,
                             border: OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
@@ -337,8 +363,10 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                                 double.tryParse(_sellingPriceController.text) ??
                                 0;
                             final sales = (units * price).round();
-                            _actualSalesController.text = sales.toString();
-                            _calculateAll();
+                            if (sales > 0) {
+                              _actualSalesController.text = sales.toString();
+                            }
+                            _onInputChanged();
                           },
                         ),
                       ),
@@ -346,8 +374,8 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       Expanded(
                         child: TextField(
                           controller: _actualSalesController,
-                          decoration: const InputDecoration(
-                            labelText: 'Sales Revenue',
+                          decoration: InputDecoration(
+                            labelText: l10n.salesRevenueLabel,
                             prefixText: '\$ ',
                             border: OutlineInputBorder(),
                           ),
@@ -355,7 +383,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
-                          onChanged: (_) => _calculateAll(),
+                          onChanged: (_) => _onInputChanged(),
                         ),
                       ),
                     ],
@@ -377,21 +405,24 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                     children: [
                       Icon(Icons.flag, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
-                      Text('Target Profit', style: theme.textTheme.titleMedium),
+                      Text(
+                        l10n.targetProfit,
+                        style: theme.textTheme.titleMedium,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _targetProfitController,
-                    decoration: const InputDecoration(
-                      labelText: 'Desired Profit',
+                    decoration: InputDecoration(
+                      labelText: l10n.desiredProfit,
                       prefixText: '\$ ',
                       border: OutlineInputBorder(),
-                      helperText: 'How much profit do you want to earn?',
+                      helperText: l10n.desiredProfitHelper,
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    onChanged: (_) => _calculateAll(),
+                    onChanged: (_) => _onInputChanged(),
                   ),
                 ],
               ),
@@ -408,7 +439,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                 _tabController.animateTo(1);
               },
               icon: const Icon(Icons.analytics),
-              label: const Text('Analyze & View Results'),
+              label: Text(l10n.analyzeViewResults),
             ),
           ),
         ],
@@ -416,11 +447,9 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
     );
   }
 
-  Widget _buildBreakEvenTab(ThemeData theme) {
+  Widget _buildBreakEvenTab(ThemeData theme, AppLocalizations l10n) {
     if (_breakEvenResult == null) {
-      return const Center(
-        child: Text('Enter data in the Calculator tab first'),
-      );
+      return Center(child: Text(l10n.enterDataCalculatorFirst));
     }
 
     return SingleChildScrollView(
@@ -437,7 +466,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                   const Icon(Icons.trending_up, size: 48),
                   const SizedBox(height: 16),
                   Text(
-                    'Break-Even Point',
+                    l10n.breakEvenPoint,
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: theme.colorScheme.onPrimaryContainer,
                     ),
@@ -449,7 +478,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       _buildMetricColumn(
                         theme,
                         '${_breakEvenResult!.breakEvenUnits}',
-                        'UNITS',
+                        l10n.unitsLabel,
                         theme.colorScheme.onPrimaryContainer,
                       ),
                       Container(
@@ -462,7 +491,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       _buildMetricColumn(
                         theme,
                         _formatCurrency(_breakEvenResult!.breakEvenSales),
-                        'SALES',
+                        l10n.salesLabel,
                         theme.colorScheme.onPrimaryContainer,
                       ),
                     ],
@@ -476,15 +505,15 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
           // Contribution Margin Details
           _buildInfoCard(
             theme,
-            title: 'Contribution Margin',
+            title: l10n.contributionMarginTitle,
             icon: Icons.pie_chart,
             rows: [
               _buildInfoRow(
-                'CM per Unit',
+                l10n.cmPerUnit,
                 _formatCurrency(_breakEvenResult!.contributionMarginPerUnit),
               ),
               _buildInfoRow(
-                'CM Ratio',
+                l10n.cmRatio,
                 '${(_breakEvenResult!.contributionMarginRatio * 100).toStringAsFixed(1)}%',
               ),
             ],
@@ -495,19 +524,19 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
           if (_targetProfitResult != null)
             _buildInfoCard(
               theme,
-              title: 'Target Profit Analysis',
+              title: l10n.targetProfitAnalysis,
               icon: Icons.flag,
               rows: [
                 _buildInfoRow(
-                  'Target Profit',
+                  l10n.targetProfit,
                   _formatCurrency(_targetProfitResult!.targetProfit),
                 ),
                 _buildInfoRow(
-                  'Required Units',
+                  l10n.requiredUnits,
                   '${_targetProfitResult!.requiredUnits} units',
                 ),
                 _buildInfoRow(
-                  'Required Sales',
+                  l10n.requiredSales,
                   _formatCurrency(_targetProfitResult!.requiredSales),
                 ),
               ],
@@ -516,17 +545,15 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
 
           // Current Performance
           if (_projectedProfit != null)
-            _buildProfitCard(theme, _projectedProfit!),
+            _buildProfitCard(theme, _projectedProfit!, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildMarginOfSafetyTab(ThemeData theme) {
+  Widget _buildMarginOfSafetyTab(ThemeData theme, AppLocalizations l10n) {
     if (_mosResult == null || _leverageResult == null) {
-      return const Center(
-        child: Text('Enter data in the Calculator tab first'),
-      );
+      return Center(child: Text(l10n.enterDataCalculatorFirst));
     }
 
     final mosColor = _mosResult!.riskLevel == 'LOW'
@@ -548,10 +575,13 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Margin of Safety',
-                        style: theme.textTheme.titleLarge,
+                      Expanded(
+                        child: Text(
+                          l10n.marginOfSafetyTitle,
+                          style: theme.textTheme.titleLarge,
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -562,7 +592,11 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
-                          '${_mosResult!.riskLevel} RISK',
+                          '${_mosResult!.riskLevel == 'LOW'
+                              ? 'LOW'
+                              : _mosResult!.riskLevel == 'MODERATE'
+                              ? 'MODERATE'
+                              : 'HIGH'} ${l10n.riskSuffix}',
                           style: TextStyle(
                             color: mosColor,
                             fontWeight: FontWeight.bold,
@@ -598,7 +632,10 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                                 color: mosColor,
                               ),
                             ),
-                            Text('MOS Ratio', style: theme.textTheme.bodySmall),
+                            Text(
+                              l10n.mosRatio,
+                              style: theme.textTheme.bodySmall,
+                            ),
                           ],
                         ),
                       ],
@@ -611,13 +648,13 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       _buildMetricColumn(
                         theme,
                         _formatCurrency(_mosResult!.marginOfSafetyDollars),
-                        'MOS (\$)',
+                        l10n.mosDollar,
                         mosColor,
                       ),
                       _buildMetricColumn(
                         theme,
                         '${_mosResult!.marginOfSafetyUnits}',
-                        'MOS (Units)',
+                        l10n.mosUnits,
                         mosColor,
                       ),
                     ],
@@ -639,7 +676,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      _getMOSInterpretation(),
+                      _getMOSInterpretation(l10n),
                       style: TextStyle(color: mosColor.shade700),
                     ),
                   ),
@@ -652,17 +689,19 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
           // Operating Leverage Card
           _buildInfoCard(
             theme,
-            title: 'Operating Leverage',
+            title: l10n.operatingLeverage,
             icon: Icons.speed,
             rows: [
               _buildInfoRow(
-                'Degree of Operating Leverage',
+                l10n.degreeOfOperatingLeverage,
                 _leverageResult!.degreeOfOperatingLeverage.toStringAsFixed(2),
               ),
-              _buildInfoRow('Leverage Level', _leverageResult!.leverageLevel),
+              _buildInfoRow(l10n.leverageLevel, _leverageResult!.leverageLevel),
               _buildInfoRow(
-                'Impact',
-                '1% sales change → ${_leverageResult!.impactMultiplier.toStringAsFixed(1)}% profit change',
+                l10n.leverageImpact,
+                l10n.leverageImpactDesc(
+                  _leverageResult!.impactMultiplier.toStringAsFixed(1),
+                ),
               ),
             ],
           ),
@@ -671,11 +710,9 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
     );
   }
 
-  Widget _buildWhatIfTab(ThemeData theme) {
+  Widget _buildWhatIfTab(ThemeData theme, AppLocalizations l10n) {
     if (_sensitivityResult == null) {
-      return const Center(
-        child: Text('Enter data in the Calculator tab first'),
-      );
+      return Center(child: Text(l10n.enterDataCalculatorFirst));
     }
 
     return SingleChildScrollView(
@@ -683,10 +720,13 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Price Sensitivity Analysis', style: theme.textTheme.titleLarge),
+          Text(
+            l10n.priceSensitivityAnalysis,
+            style: theme.textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
           Text(
-            'Shows how break-even changes when you adjust selling price',
+            l10n.priceSensitivityDescription,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -707,7 +747,9 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Current Break-Even: ${_sensitivityResult!.baseBreakEvenUnits} units',
+                      l10n.currentBreakEven(
+                        '${_sensitivityResult!.baseBreakEvenUnits}',
+                      ),
                       style: TextStyle(
                         color: theme.colorScheme.onSecondaryContainer,
                         fontWeight: FontWeight.bold,
@@ -725,11 +767,11 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('Scenario')),
-                  DataColumn(label: Text('Break-Even'), numeric: true),
-                  DataColumn(label: Text('Change'), numeric: true),
-                  DataColumn(label: Text('Impact')),
+                columns: [
+                  DataColumn(label: Text(l10n.scenarioColumn)),
+                  DataColumn(label: Text(l10n.breakEvenColumn), numeric: true),
+                  DataColumn(label: Text(l10n.changeColumn), numeric: true),
+                  DataColumn(label: Text(l10n.impactLabel)),
                 ],
                 rows: _sensitivityResult!.scenarios.map((scenario) {
                   final isBase = scenario.changePercent == 0;
@@ -796,10 +838,10 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                           ),
                           child: Text(
                             isBase
-                                ? 'Base'
+                                ? l10n.baseImpact
                                 : isBetter
-                                ? 'Better'
-                                : 'Worse',
+                                ? l10n.betterImpact
+                                : l10n.worseImpact,
                             style: TextStyle(
                               fontSize: 12,
                               color: isBetter
@@ -835,7 +877,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Key Insights',
+                        l10n.keyInsights,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.onTertiaryContainer,
@@ -845,7 +887,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    _getSensitivityInsights(),
+                    _getSensitivityInsights(l10n),
                     style: TextStyle(
                       color: theme.colorScheme.onTertiaryContainer,
                     ),
@@ -866,22 +908,30 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
     String label,
     Color color,
   ) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: theme.textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: color,
+    return Expanded(
+      child: Column(
+        children: [
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
           ),
-        ),
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: color.withValues(alpha: 0.7),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: color.withValues(alpha: 0.7),
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -918,14 +968,22 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(label)),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              '\u200E$value',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.end,
+              textDirection: TextDirection.ltr,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildProfitCard(ThemeData theme, int profit) {
+  Widget _buildProfitCard(ThemeData theme, int profit, AppLocalizations l10n) {
     final isProfit = profit >= 0;
     final color = isProfit ? Colors.green : Colors.red;
 
@@ -942,7 +1000,7 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              isProfit ? 'PROJECTED PROFIT' : 'PROJECTED LOSS',
+              isProfit ? l10n.projectedProfit : l10n.projectedLoss,
               style: theme.textTheme.titleMedium?.copyWith(color: color),
             ),
             const SizedBox(height: 8),
@@ -959,20 +1017,20 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
     );
   }
 
-  String _getMOSInterpretation() {
+  String _getMOSInterpretation(AppLocalizations l10n) {
     final ratio = _mosResult!.marginOfSafetyRatio;
     if (ratio >= 0.30) {
-      return 'Strong safety margin. Sales can drop ${(ratio * 100).toStringAsFixed(0)}% before reaching break-even.';
+      return l10n.strongSafetyMargin((ratio * 100).toStringAsFixed(0));
     } else if (ratio >= 0.15) {
-      return 'Moderate safety margin. Consider strategies to increase sales or reduce costs.';
+      return l10n.moderateSafetyMargin;
     } else if (ratio > 0) {
-      return 'Thin safety margin. The business is close to break-even and vulnerable to sales declines.';
+      return l10n.thinSafetyMargin;
     } else {
-      return 'Operating below break-even. Immediate action needed to increase revenue or reduce costs.';
+      return l10n.belowBreakEven;
     }
   }
 
-  String _getSensitivityInsights() {
+  String _getSensitivityInsights(AppLocalizations l10n) {
     if (_sensitivityResult == null || _sensitivityResult!.scenarios.isEmpty) {
       return '';
     }
@@ -985,27 +1043,22 @@ class _CVPAnalysisScreenState extends State<CVPAnalysisScreen>
         .firstOrNull;
 
     final buffer = StringBuffer();
-    buffer.writeln('• Higher prices = Lower break-even (fewer units needed)');
-    buffer.writeln('• Lower prices = Higher break-even (more units needed)');
+    buffer.writeln(l10n.higherPricesInsight);
+    buffer.writeln(l10n.lowerPricesInsight);
 
     if (priceIncrease10 != null) {
       buffer.writeln(
-        '• A 10% price increase reduces break-even by ${priceIncrease10.changeFromBase.abs()} units',
+        l10n.priceIncreaseEffect(
+          priceIncrease10.changeFromBase.abs().toString(),
+        ),
       );
     }
     if (priceDecrease10 != null) {
       buffer.writeln(
-        '• A 10% price decrease increases break-even by ${priceDecrease10.changeFromBase} units',
+        l10n.priceDecreaseEffect(priceDecrease10.changeFromBase.toString()),
       );
     }
 
     return buffer.toString().trim();
-  }
-}
-
-extension _ColorShade on Color {
-  Color get shade700 {
-    final hsl = HSLColor.fromColor(this);
-    return hsl.withLightness((hsl.lightness - 0.1).clamp(0.0, 1.0)).toColor();
   }
 }

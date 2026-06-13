@@ -16,6 +16,10 @@ dependencies:
   # Local Dependencies
   core_database:
     path: ../../core/core_database
+  core_l10n:
+    path: ../../core/core_l10n
+  core_ui:
+    path: ../../core/core_ui
 
 # --- Architecture Modules ---
   core_data:

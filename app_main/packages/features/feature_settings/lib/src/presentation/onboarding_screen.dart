@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 import 'package:feature_settings/src/presentation/onboarding_tutorial_screen.dart';
@@ -21,6 +22,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   bool _isCustomCurrency = false;
   String _selectedCurrency = 'USD';
 
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
+
   final List<Map<String, String>> _commonCurrencies = [
     {'code': 'USD', 'symbol': '\$', 'name': 'US Dollar'},
     {'code': 'SAR', 'symbol': 'ر.س', 'name': 'Saudi Riyal'},
@@ -41,6 +44,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeControllerProvider);
     final locale = ref.watch(localeControllerProvider);
+    // ignore: unused_local_variable
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -60,12 +64,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    "Welcome to Mizan",
+                    l10n.welcomeToMizan,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Text("Let's set things up correctly."),
+                  Text(l10n.letsSetUpCorrectly),
                 ],
               ),
             ),
@@ -75,7 +79,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
                   // 🌍 SECTION 1: LANGUAGE
-                  _buildSectionHeader("1. Language / اللغة", Icons.language),
+                  _buildSectionHeader("\u200E1. ${l10n.language}", Icons.language),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -103,24 +107,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   const SizedBox(height: 32),
 
                   // 🎨 SECTION 2: THEME
-                  _buildSectionHeader("2. Appearance", Icons.palette),
+                  _buildSectionHeader("\u200E2. ${l10n.light} / ${l10n.dark}", Icons.palette),
                   const SizedBox(height: 16),
                   SegmentedButton<ThemeMode>(
-                    segments: const [
+                    segments: [
                       ButtonSegment(
                         value: ThemeMode.light,
-                        icon: Icon(Icons.wb_sunny),
-                        label: Text("Light"),
+                        icon: const Icon(Icons.wb_sunny),
+                        label: Text(l10n.light),
                       ),
                       ButtonSegment(
                         value: ThemeMode.dark,
-                        icon: Icon(Icons.nightlight_round),
-                        label: Text("Dark"),
+                        icon: const Icon(Icons.nightlight_round),
+                        label: Text(l10n.dark),
                       ),
                       ButtonSegment(
                         value: ThemeMode.system,
-                        icon: Icon(Icons.settings_suggest),
-                        label: Text("Auto"),
+                        icon: const Icon(Icons.settings_suggest),
+                        label: Text(l10n.systemDefault),
                       ),
                     ],
                     selected: {themeMode},
@@ -133,13 +137,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   const SizedBox(height: 32),
 
                   // 💰 SECTION 3: CURRENCY
-                  _buildSectionHeader("3. Currency", Icons.monetization_on),
+                  _buildSectionHeader("\u200E3. ${l10n.currencyOptions}", Icons.monetization_on),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: _selectedCurrency,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Select Primary Currency",
+                    initialValue: _selectedCurrency,
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      labelText: l10n.selectPrimaryCurrency,
                     ),
                     items: _commonCurrencies.map((c) {
                       return DropdownMenuItem(
@@ -178,9 +182,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           flex: 2,
                           child: TextField(
                             controller: _customCodeCtrl,
-                            decoration: const InputDecoration(
-                              labelText: "Code (e.g. YER)",
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.currencyCodeLabel,
+                              border: const OutlineInputBorder(),
                             ),
                           ),
                         ),
@@ -189,9 +193,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           flex: 1,
                           child: TextField(
                             controller: _customSymbolCtrl,
-                            decoration: const InputDecoration(
-                              labelText: "Symbol (﷼)",
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.currencySymbolLabel,
+                              border: const OutlineInputBorder(),
                             ),
                           ),
                         ),
@@ -210,9 +214,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 height: 56,
                 child: FilledButton(
                   onPressed: () => _completeOnboarding(ref),
-                  child: const Text(
-                    "Get Started",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: Text(
+                    l10n.getStarted,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -228,9 +232,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       children: [
         Icon(icon, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ),
       ],
     );
@@ -308,7 +314,7 @@ class _LanguageCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? Theme.of(context).colorScheme.primaryContainer
-              : Theme.of(context).colorScheme.surfaceVariant,
+              : Theme.of(context).colorScheme.surfaceContainerHighest,
           border: isSelected
               ? Border.all(
                   color: Theme.of(context).colorScheme.primary,

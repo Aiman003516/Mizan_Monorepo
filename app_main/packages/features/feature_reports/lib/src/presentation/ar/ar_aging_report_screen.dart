@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 
@@ -13,11 +15,12 @@ class ARAgingReportScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final reportAsync = ref.watch(arAgingReportProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AR Aging Report'),
+        title: Text(l10n.arAgingReport),
         centerTitle: true,
         actions: [
           IconButton(
@@ -49,13 +52,13 @@ class ARAgingReportScreen extends ConsumerWidget {
                   Icon(
                     Icons.check_circle_outline,
                     size: 64,
-                    color: Colors.green,
+                    color: context.appColors.success,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'No Outstanding Receivables',
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.green,
+                      color: context.appColors.success,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -92,14 +95,14 @@ class ARAgingReportScreen extends ConsumerWidget {
                       Text(
                         'Total Receivables',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: context.appColors.onPrimary.withValues(alpha: 0.8),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '\$${(report.totalReceivables / 100).toStringAsFixed(2)}',
                         style: theme.textTheme.headlineLarge?.copyWith(
-                          color: Colors.white,
+                          color: context.appColors.onPrimary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -107,7 +110,7 @@ class ARAgingReportScreen extends ConsumerWidget {
                       Text(
                         '${report.customerBalances.length} customers with balances',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: context.appColors.onPrimary.withValues(alpha: 0.8),
                         ),
                       ),
                     ],
@@ -122,7 +125,7 @@ class ARAgingReportScreen extends ConsumerWidget {
                       child: _AgingBucket(
                         label: 'Current\n(0-30)',
                         amount: report.current,
-                        color: Colors.green,
+                        color: context.appColors.success,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -130,7 +133,7 @@ class ARAgingReportScreen extends ConsumerWidget {
                       child: _AgingBucket(
                         label: '31-60\nDays',
                         amount: report.days31to60,
-                        color: Colors.orange,
+                        color: context.appColors.warning,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -138,7 +141,7 @@ class ARAgingReportScreen extends ConsumerWidget {
                       child: _AgingBucket(
                         label: '61-90\nDays',
                         amount: report.days61to90,
-                        color: Colors.deepOrange,
+                        color: context.appColors.warning,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -279,19 +282,19 @@ class _CustomerAgingCard extends StatelessWidget {
                   _MiniAgingChip(
                     label: 'Current',
                     amount: balance.current,
-                    color: Colors.green,
+                    color: context.appColors.success,
                   ),
                   const SizedBox(width: 4),
                   _MiniAgingChip(
                     label: '31-60',
                     amount: balance.days31to60,
-                    color: Colors.orange,
+                    color: context.appColors.warning,
                   ),
                   const SizedBox(width: 4),
                   _MiniAgingChip(
                     label: '61-90',
                     amount: balance.days61to90,
-                    color: Colors.deepOrange,
+                    color: context.appColors.warning,
                   ),
                   const SizedBox(width: 4),
                   _MiniAgingChip(
@@ -331,7 +334,7 @@ class _MiniAgingChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: hasAmount
               ? color.withValues(alpha: 0.1)
-              : Colors.grey.withValues(alpha: 0.1),
+              : context.appColors.subtleText.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Column(
@@ -339,14 +342,14 @@ class _MiniAgingChip extends StatelessWidget {
             Text(
               label,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: hasAmount ? color : Colors.grey,
+                color: hasAmount ? color : context.appColors.subtleText,
                 fontSize: 9,
               ),
             ),
             Text(
               '\$${(amount / 100).toStringAsFixed(0)}',
               style: theme.textTheme.labelSmall?.copyWith(
-                color: hasAmount ? color : Colors.grey,
+                color: hasAmount ? color : context.appColors.subtleText,
                 fontWeight: FontWeight.bold,
               ),
             ),

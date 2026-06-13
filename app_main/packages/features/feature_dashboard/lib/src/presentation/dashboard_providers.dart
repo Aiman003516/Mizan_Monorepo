@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feature_reports/feature_reports.dart';
-
-final mainDashboardSearchProvider = StateProvider<String>((ref) => '');
+export 'package:shared_services/shared_services.dart' show mainDashboardSearchProvider;
 
 final totalRevenueProvider = FutureProvider.autoDispose<double>((ref) {
   final service = ref.watch(reportsServiceProvider);

@@ -1,7 +1,7 @@
 // FILE: packages/features/feature_transactions/lib/src/presentation/pos_receipt_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
-import 'package:shared_ui/shared_ui.dart'; // Import the formatter
+// Import the formatter
 
 class PosReceiptItem {
   final Product product;

@@ -1,11 +1,13 @@
 // FILE: packages/features/feature_reports/lib/src/presentation/report_marketplace_screen.dart
 
 import 'package:core_data/core_data.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_auth/feature_auth.dart'; // To get Current User
 import 'package:feature_reports/src/data/report_models.dart';
 import 'package:feature_reports/src/data/report_templates_repository.dart';
 import 'package:feature_reports/src/presentation/dynamic_report_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_ui/shared_ui.dart';
 
@@ -13,10 +15,13 @@ class ReportMarketplaceScreen extends ConsumerStatefulWidget {
   const ReportMarketplaceScreen({super.key});
 
   @override
-  ConsumerState<ReportMarketplaceScreen> createState() => _ReportMarketplaceScreenState();
+  ConsumerState<ReportMarketplaceScreen> createState() =>
+      _ReportMarketplaceScreenState();
 }
 
-class _ReportMarketplaceScreenState extends ConsumerState<ReportMarketplaceScreen> with SingleTickerProviderStateMixin {
+class _ReportMarketplaceScreenState
+    extends ConsumerState<ReportMarketplaceScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -26,24 +31,33 @@ class _ReportMarketplaceScreenState extends ConsumerState<ReportMarketplaceScree
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Report Hub'),
+        title: Text(l10n.reportHubTitle),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'My Reports', icon: Icon(Icons.folder)),
-            Tab(text: 'Marketplace', icon: Icon(Icons.cloud_download)),
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          tabs: [
+            Tab(text: l10n.myReportsTab, icon: const Icon(Icons.folder)),
+            Tab(
+              text: l10n.marketplaceTab,
+              icon: const Icon(Icons.cloud_download),
+            ),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          _InstalledReportsTab(),
-          _MarketplaceTab(),
-        ],
+        children: const [_InstalledReportsTab(), _MarketplaceTab()],
       ),
     );
   }
@@ -54,7 +68,9 @@ class _InstalledReportsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stream = ref.watch(reportTemplatesRepositoryProvider).watchInstalledReports();
+    final stream = ref
+        .watch(reportTemplatesRepositoryProvider)
+        .watchInstalledReports();
 
     return StreamBuilder<List<ReportTemplate>>(
       stream: stream,
@@ -79,17 +95,21 @@ class _InstalledReportsTab extends ConsumerWidget {
           itemBuilder: (ctx, index) {
             final report = reports[index];
             return ListTile(
-              leading: const Icon(Icons.description, color: Colors.blue),
+              leading: Icon(Icons.description, color: context.appColors.info),
               title: Text(report.title),
               subtitle: Text(report.description),
               trailing: IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () => ref.read(reportTemplatesRepositoryProvider).deleteReport(report.id),
+                icon: Icon(Icons.delete_outline, color: context.appColors.error),
+                onPressed: () => ref
+                    .read(reportTemplatesRepositoryProvider)
+                    .deleteReport(report.id),
               ),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => DynamicReportScreen(template: report)),
+                  MaterialPageRoute(
+                    builder: (_) => DynamicReportScreen(template: report),
+                  ),
                 );
               },
             );
@@ -104,8 +124,11 @@ class _MarketplaceTab extends ConsumerWidget {
   const _MarketplaceTab();
 
   Future<void> _handleInstall(
-      BuildContext context, WidgetRef ref, ReportTemplate report, AppUser? user) async {
-    
+    BuildContext context,
+    WidgetRef ref,
+    ReportTemplate report,
+    AppUser? user,
+  ) async {
     // 1. Check Logic: "Who Gets What"
     bool canInstall = false;
     bool requiresPayment = false;
@@ -131,7 +154,9 @@ class _MarketplaceTab extends ConsumerWidget {
     // 2. Execution
     if (!canInstall) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("🔒 Premium Report. Upgrade to Pro or Enterprise.")),
+        const SnackBar(
+          content: Text("🔒 Premium Report. Upgrade to Pro or Enterprise."),
+        ),
       );
       return;
     }
@@ -144,33 +169,45 @@ class _MarketplaceTab extends ConsumerWidget {
           title: const Text("Purchase Report"),
           content: Text("Buy '${report.title}' for \$4.99?"),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Cancel")),
-            ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text("Buy Now")),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text("Buy Now"),
+            ),
           ],
         ),
       );
 
       if (confirmed != true) return;
-      
+
       // Simulate Processing
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Processing Payment...")));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Processing Payment...")));
       }
       await Future.delayed(const Duration(seconds: 2));
     }
 
+    if (!context.mounted) return;
+
     // 3. Install
     await ref.read(reportTemplatesRepositoryProvider).installReport(report);
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("✅ Installed ${report.title}")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("✅ Installed ${report.title}")));
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stream = ref.watch(reportTemplatesRepositoryProvider).watchStandardReports();
+    final stream = ref
+        .watch(reportTemplatesRepositoryProvider)
+        .watchStandardReports();
     final userAsync = ref.watch(currentUserStreamProvider);
 
     return StreamBuilder<List<ReportTemplate>>(
@@ -200,21 +237,21 @@ class _MarketplaceTab extends ConsumerWidget {
             // Determine Button Style
             String label = "Install";
             IconData icon = Icons.download;
-            Color color = Colors.blue;
+            Color color = context.appColors.info;
 
             if (report.isPremium) {
               if (user?.hasCloudAccess == true) {
                 label = "Included";
                 icon = Icons.check_circle;
-                color = Colors.green;
+                color = context.appColors.success;
               } else if (user?.isPro == true) {
                 label = "Buy \$4.99";
                 icon = Icons.shopping_cart;
-                color = Colors.amber.shade800;
+                color = context.appColors.primary;
               } else {
                 label = "Locked";
                 icon = Icons.lock;
-                color = Colors.grey;
+                color = context.appColors.subtleText;
               }
             }
 
@@ -227,7 +264,8 @@ class _MarketplaceTab extends ConsumerWidget {
                 icon: Icon(icon, size: 16),
                 label: Text(label),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: color.withOpacity(0.1),
+                  // ignore: deprecated_member_use
+                  backgroundColor: color.withValues(alpha: 0.1),
                   foregroundColor: color,
                 ),
               ),

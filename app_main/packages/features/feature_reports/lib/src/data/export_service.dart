@@ -21,6 +21,7 @@ final exportServiceProvider = Provider<ExportService>((ref) {
 });
 
 class ExportService {
+  // ignore: unused_field
   final Ref _ref;
   ExportService(this._ref);
 
@@ -63,7 +64,8 @@ class ExportService {
         header: (context) => _buildPdfHeader(title, isRtl: isRtl, l10n: l10n),
         build: (pw.Context context) {
           return [
-            pw.Table.fromTextArray(
+            // ignore: deprecated_member_use
+            pw.TableHelper.fromTextArray(
               headers: [
                 l10n.name,
                 l10n.currency,
@@ -120,7 +122,8 @@ class ExportService {
         header: (context) => _buildPdfHeader(title, isRtl: isRtl, l10n: l10n),
         build: (pw.Context context) {
           return [
-            pw.Table.fromTextArray(
+            // ignore: deprecated_member_use
+            pw.TableHelper.fromTextArray(
               headers: [
                 l10n.month,
                 l10n.year,
@@ -179,7 +182,8 @@ class ExportService {
         header: (context) => _buildPdfHeader(title, isRtl: isRtl, l10n: l10n),
         build: (pw.Context context) {
           return [
-            pw.Table.fromTextArray(
+            // ignore: deprecated_member_use
+            pw.TableHelper.fromTextArray(
               headers: [
                 l10n.date,
                 l10n.account,
@@ -279,7 +283,8 @@ class ExportService {
         header: (context) => _buildPdfHeader(title, isRtl: isRtl, l10n: l10n),
         build: (pw.Context context) {
           return [
-            pw.Table.fromTextArray(
+            // ignore: deprecated_member_use
+            pw.TableHelper.fromTextArray(
               headers: headers,
               data: data,
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
@@ -422,7 +427,8 @@ class ExportService {
         header: (context) => _buildPdfHeader(l10n.trialBalance, isRtl: isRtl, l10n: l10n),
         build: (pw.Context context) {
           return [
-            pw.Table.fromTextArray(
+            // ignore: deprecated_member_use
+            pw.TableHelper.fromTextArray(
               headers: [l10n.account, l10n.debit, l10n.credit],
               data: data
                   .map((line) => [

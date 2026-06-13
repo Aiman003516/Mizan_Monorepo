@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:core_l10n/app_localizations.dart';
@@ -49,50 +50,66 @@ class _TransactionsListScreenState extends ConsumerState<TransactionsListScreen>
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(transactionsListProvider.notifier).refresh(),
-        child: transactions.isEmpty && !listState.isLoading
-            ? Center(
-                // Empty State
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.receipt_long, size: 64, color: Colors.grey),
-                    const SizedBox(height: 16),
-                    Text(l10n.noTransactionsYet, style: const TextStyle(color: Colors.grey)),
-                  ],
-                ),
-              )
-            : ListView.builder(
-                controller: _scrollController,
-                // Add 1 to item count for the loading indicator if there is more to load
-                itemCount: transactions.length + (listState.hasMore ? 1 : 0),
-                itemBuilder: (context, index) {
-                  // --- Loading Indicator Row ---
-                  if (index == transactions.length) {
-                    return const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-
-                  // --- Transaction Row ---
-                  final transaction = transactions[index];
-                  return ListTile(
-                    leading: const CircleAvatar(
-                      child: Icon(Icons.receipt),
-                    ),
-                    title: Text(transaction.description),
-                    subtitle: Text(
-                      DateFormat.yMMMd().add_jm().format(transaction.transactionDate),
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      // Future: Navigate to details screen
-                      // Navigator.of(context).push(...);
-                    },
-                  );
-                },
-              ),
+        child: _buildBody(listState, transactions, l10n),
       ),
+    );
+  }
+
+  Widget _buildBody(listState, transactions, l10n) {
+    // Initial loading state
+    if (transactions.isEmpty && listState.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Empty state
+    if (transactions.isEmpty && !listState.isLoading) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.receipt_long, size: 64, color: context.appColors.subtleText),
+            const SizedBox(height: 16),
+            Text(l10n.noTransactionsYet, style: TextStyle(color: context.appColors.subtleText)),
+          ],
+        ),
+      );
+    }
+
+    // List view
+    return ListView.builder(
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(), // Ensures RefreshIndicator works even if list is small
+      padding: const EdgeInsets.all(8.0), // Better spacing around the edges
+      itemCount: transactions.length + (listState.hasMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        // --- Loading Indicator Row ---
+        if (index == transactions.length) {
+          return const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        // --- Transaction Row ---
+        final transaction = transactions[index];
+        return Card( // Wrap ListTile in a Card for better UI spacing
+          margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+          child: ListTile(
+            leading: const CircleAvatar(
+              child: Icon(Icons.receipt),
+            ),
+            title: Text(transaction.description),
+            subtitle: Text(
+              DateFormat.yMMMd(l10n.localeName).add_jm().format(transaction.transactionDate),
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              // Future: Navigate to details screen
+              // Navigator.of(context).push(...);
+            },
+          ),
+        );
+      },
     );
   }
 }

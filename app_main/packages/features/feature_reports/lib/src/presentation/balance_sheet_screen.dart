@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -58,6 +59,9 @@ class BalanceSheetScreen extends ConsumerWidget {
     const numberStyle = TextStyle(fontFamily: 'Amiri');
     final boldNumberStyle =
         textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, fontFamily: 'Amiri');
+    final assetColor = context.appColors.success;
+    final liabilityColor = context.appColors.error;
+    final equityColor = context.appColors.success;
 
     return ListView(
       padding: const EdgeInsets.all(16.0),
@@ -66,51 +70,56 @@ class BalanceSheetScreen extends ConsumerWidget {
             style: textTheme.titleMedium, textAlign: TextAlign.center),
         const SizedBox(height: 24),
         Text(l10n.assets,
-            style: textTheme.titleLarge?.copyWith(color: Colors.green[700])),
+            style: textTheme.titleLarge?.copyWith(color: assetColor)),
         const Divider(),
         for (final line in data.assetLines)
           ListTile(
             title: Text(line.accountName),
-            trailing: Text(l10n.currencyFormat(line.balance), style: numberStyle),
+            trailing: Text(l10n.currencyFormat(line.balance),
+                style: numberStyle.copyWith(color: assetColor)),
           ),
         ListTile(
           title: Text(l10n.totalAssets,
               style: textTheme.titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold)),
           trailing:
-              Text(l10n.currencyFormat(data.totalAssets), style: boldNumberStyle),
+              Text(l10n.currencyFormat(data.totalAssets),
+                  style: boldNumberStyle?.copyWith(color: assetColor)),
         ),
         const SizedBox(height: 24),
         Text(l10n.liabilities,
-            style: textTheme.titleLarge?.copyWith(color: Colors.red[700])),
+            style: textTheme.titleLarge?.copyWith(color: liabilityColor)),
         const Divider(),
         for (final line in data.liabilityLines)
           ListTile(
             title: Text(line.accountName),
-            trailing: Text(l10n.currencyFormat(line.balance), style: numberStyle),
+            trailing: Text(l10n.currencyFormat(line.balance),
+                style: numberStyle.copyWith(color: liabilityColor)),
           ),
         ListTile(
           title: Text(l10n.totalLiabilities,
               style: textTheme.titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold)),
           trailing: Text(l10n.currencyFormat(data.totalLiabilities),
-              style: boldNumberStyle),
+              style: boldNumberStyle?.copyWith(color: liabilityColor)),
         ),
         const SizedBox(height: 24),
         Text(l10n.equity,
-            style: textTheme.titleLarge?.copyWith(color: Colors.blue[700])),
+            style: textTheme.titleLarge?.copyWith(color: equityColor)),
         const Divider(),
         for (final line in data.equityLines)
           ListTile(
             title: Text(line.accountName),
-            trailing: Text(l10n.currencyFormat(line.balance), style: numberStyle),
+            trailing: Text(l10n.currencyFormat(line.balance),
+                style: numberStyle.copyWith(color: equityColor)),
           ),
         ListTile(
           title: Text(l10n.totalEquity,
               style: textTheme.titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold)),
           trailing:
-              Text(l10n.currencyFormat(data.totalEquity), style: boldNumberStyle),
+              Text(l10n.currencyFormat(data.totalEquity),
+                  style: boldNumberStyle?.copyWith(color: equityColor)),
         ),
         const SizedBox(height: 24),
         const Divider(thickness: 2),

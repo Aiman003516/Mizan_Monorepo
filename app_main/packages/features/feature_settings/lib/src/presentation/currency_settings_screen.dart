@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_l10n/app_localizations.dart';
-import 'package:core_database/core_database.dart';
 import 'package:feature_settings/src/data/currencies_repository.dart';
 import 'package:feature_settings/src/presentation/currency_controller.dart';
 import 'package:core_data/core_data.dart'; // Import for defaultCurrencyProvider
@@ -102,7 +103,7 @@ class _CurrencySettingsScreenState
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('${l10n.failedToSave} $e'),
-                          backgroundColor: Colors.red,
+                          backgroundColor: context.appColors.error,
                         ),
                       );
                     }
@@ -142,7 +143,9 @@ class _CurrencySettingsScreenState
                   '${l10n.codeLabel} ${currency.code}${currency.symbol != null ? " (${currency.symbol})" : ""}',
                 ),
                 value: currency.code,
+                // ignore: deprecated_member_use
                 groupValue: defaultCurrencyCode,
+                // ignore: deprecated_member_use
                 onChanged: (String? newCode) {
                   if (newCode != null) {
                     ref
@@ -152,7 +155,7 @@ class _CurrencySettingsScreenState
                 },
                 secondary:
                 defaultCurrencyCode == currency.code
-                    ? const Icon(Icons.check_circle, color: Colors.green)
+                    ? Icon(Icons.check_circle, color: context.appColors.success)
                     : null,
               );
             },

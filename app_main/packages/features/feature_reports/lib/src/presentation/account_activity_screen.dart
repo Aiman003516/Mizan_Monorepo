@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -19,12 +20,10 @@ class AccountActivityScreen extends ConsumerStatefulWidget {
 
 class _AccountActivityScreenState extends ConsumerState<AccountActivityScreen> {
   ReportFilter _selectedReportFilter = ReportFilter.ALL;
+  // ignore: unused_field
   String _selectedClassification = c.kClassificationGeneral;
 
-  Widget _buildExportButtons(
-    List<TransactionDetail> details,
-    String title,
-  ) {
+  Widget _buildExportButtons(List<TransactionDetail> details, String title) {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -32,7 +31,7 @@ class _AccountActivityScreenState extends ConsumerState<AccountActivityScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           IconButton(
-            icon: const Icon(Icons.picture_as_pdf, color: Colors.red),
+            icon: Icon(Icons.picture_as_pdf, color: context.appColors.error),
             tooltip: l10n.exportToPDF,
             onPressed: () {
               ref
@@ -41,15 +40,15 @@ class _AccountActivityScreenState extends ConsumerState<AccountActivityScreen> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.description, color: Colors.green.shade700),
+            icon: Icon(Icons.description, color: context.appColors.primary),
             tooltip: l10n.exportToExcel,
             onPressed: () {
               ref
                   .read(exportServiceProvider)
                   .exportAccountActivityExcel(details, title);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.excelExportSuccess)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(l10n.excelExportSuccess)));
             },
           ),
         ],
@@ -60,105 +59,101 @@ class _AccountActivityScreenState extends ConsumerState<AccountActivityScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Column(
-      children: [
-        Container(
-          color: Theme.of(context).appBarTheme.backgroundColor ??
-              Theme.of(context).primaryColor,
-          child: Column(
-            children: [
-              TabBar(
-                indicatorColor: Colors.white,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white70,
-                tabs: [
-                  Tab(text: l10n.general),
-                  Tab(text: l10n.clients),
-                  Tab(text: l10n.suppliers),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.accountActivity),
+          bottom: TabBar(
+            tabs: [
+              Tab(text: l10n.general),
+              Tab(text: l10n.clients),
+              Tab(text: l10n.suppliers),
+            ],
+            onTap: (index) {
+              setState(() {
+                _selectedClassification = [
+                  c.kClassificationGeneral,
+                  c.kClassificationClients,
+                  c.kClassificationSuppliers,
+                ][index];
+              });
+            },
+          ),
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
+              child: SegmentedButton<ReportFilter>(
+                segments: [
+                  ButtonSegment(
+                    value: ReportFilter.ALL,
+                    label: Text(l10n.all),
+                    icon: const Icon(Icons.all_inclusive),
+                  ),
+                  ButtonSegment(
+                    value: ReportFilter.POS_ONLY,
+                    label: Text(l10n.posSales),
+                    icon: const Icon(Icons.point_of_sale),
+                  ),
+                  ButtonSegment(
+                    value: ReportFilter.ACCOUNTS_ONLY,
+                    label: Text(l10n.accounts),
+                    icon: const Icon(Icons.account_balance_wallet),
+                  ),
                 ],
-                onTap: (index) {
+                selected: {_selectedReportFilter},
+                onSelectionChanged: (Set<ReportFilter> newSelection) {
                   setState(() {
-                    _selectedClassification = [
-                      c.kClassificationGeneral,
-                      c.kClassificationClients,
-                      c.kClassificationSuppliers
-                    ][index];
+                    _selectedReportFilter = newSelection.first;
                   });
                 },
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                child: SegmentedButton<ReportFilter>(
-                  style: SegmentedButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.1),
-                    foregroundColor: Colors.white,
-                    selectedBackgroundColor: Colors.white,
-                    selectedForegroundColor: Theme.of(context).primaryColor,
+            ),
+            Expanded(
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _AccountActivityList(
+                    filter: TotalAmountsFilter(
+                      reportFilter: _selectedReportFilter,
+                      classificationName: c.kClassificationGeneral,
+                    ),
+                    exportBuilder: (details) => _buildExportButtons(
+                      details,
+                      '${l10n.accountActivity} - ${l10n.general}',
+                    ),
                   ),
-                  segments: [
-                    ButtonSegment(
-                        value: ReportFilter.ALL,
-                        label: Text(l10n.all),
-                        icon: const Icon(Icons.all_inclusive)),
-                    ButtonSegment(
-                        value: ReportFilter.POS_ONLY,
-                        label: Text(l10n.posSales),
-                        icon: const Icon(Icons.point_of_sale)),
-                    ButtonSegment(
-                        value: ReportFilter.ACCOUNTS_ONLY,
-                        label: Text(l10n.accounts),
-                        icon: const Icon(Icons.account_balance_wallet)),
-                  ],
-                  selected: {_selectedReportFilter},
-                  onSelectionChanged: (Set<ReportFilter> newSelection) {
-                    setState(() {
-                      _selectedReportFilter = newSelection.first;
-                    });
-                  },
-                ),
+                  _AccountActivityList(
+                    filter: TotalAmountsFilter(
+                      reportFilter: _selectedReportFilter,
+                      classificationName: c.kClassificationClients,
+                    ),
+                    exportBuilder: (details) => _buildExportButtons(
+                      details,
+                      '${l10n.accountActivity} - ${l10n.clients}',
+                    ),
+                  ),
+                  _AccountActivityList(
+                    filter: TotalAmountsFilter(
+                      reportFilter: _selectedReportFilter,
+                      classificationName: c.kClassificationSuppliers,
+                    ),
+                    exportBuilder: (details) => _buildExportButtons(
+                      details,
+                      '${l10n.accountActivity} - ${l10n.suppliers}',
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        Expanded(
-          child: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              _AccountActivityList(
-                filter: TotalAmountsFilter(
-                  reportFilter: _selectedReportFilter,
-                  classificationName: c.kClassificationGeneral,
-                ),
-                exportBuilder: (details) => _buildExportButtons(
-                  details,
-                  '${l10n.accountActivity} - ${l10n.general}',
-                ),
-              ),
-              _AccountActivityList(
-                filter: TotalAmountsFilter(
-                  reportFilter: _selectedReportFilter,
-                  classificationName: c.kClassificationClients,
-                ),
-                exportBuilder: (details) => _buildExportButtons(
-                  details,
-                  '${l10n.accountActivity} - ${l10n.clients}',
-                ),
-              ),
-              _AccountActivityList(
-                filter: TotalAmountsFilter(
-                  reportFilter: _selectedReportFilter,
-                  classificationName: c.kClassificationSuppliers,
-                ),
-                exportBuilder: (details) => _buildExportButtons(
-                  details,
-                  '${l10n.accountActivity} - ${l10n.suppliers}',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -190,9 +185,9 @@ class _AccountActivityList extends ConsumerWidget {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   if (constraints.maxWidth < 600) {
-                    return _buildNarrowLayout(details, l10n);
+                    return _buildNarrowLayout(context, details, l10n);
                   } else {
-                    return _buildWideLayout(details, l10n);
+                    return _buildWideLayout(context, details, l10n);
                   }
                 },
               ),
@@ -200,12 +195,17 @@ class _AccountActivityList extends ConsumerWidget {
           ],
         );
       },
-      error: (err, stack) => Center(child: Text('${l10n.error} ${err.toString()}')),
+      error: (err, stack) =>
+          Center(child: Text('${l10n.error} ${err.toString()}')),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
 
-  Widget _buildNarrowLayout(List<TransactionDetail> details, AppLocalizations l10n) {
+  Widget _buildNarrowLayout(
+    BuildContext context,
+    List<TransactionDetail> details,
+    AppLocalizations l10n,
+  ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
@@ -227,14 +227,14 @@ class _AccountActivityList extends ConsumerWidget {
               DataCell(
                 Text(
                   isDebit ? detail.entryAmount.toStringAsFixed(2) : '',
-                  style: const TextStyle(color: Colors.green),
+                  style: TextStyle(color: context.appColors.success),
                   textAlign: TextAlign.right,
                 ),
               ),
               DataCell(
                 Text(
                   !isDebit ? detail.entryAmount.abs().toStringAsFixed(2) : '',
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: context.appColors.error),
                   textAlign: TextAlign.right,
                 ),
               ),
@@ -246,7 +246,11 @@ class _AccountActivityList extends ConsumerWidget {
     );
   }
 
-  Widget _buildWideLayout(List<TransactionDetail> details, AppLocalizations l10n) {
+  Widget _buildWideLayout(
+    BuildContext context,
+    List<TransactionDetail> details,
+    AppLocalizations l10n,
+  ) {
     return Column(
       children: [
         _buildWideHeader(l10n),
@@ -256,7 +260,7 @@ class _AccountActivityList extends ConsumerWidget {
             itemCount: details.length,
             itemBuilder: (context, index) {
               final detail = details[index];
-              return _buildWideRow(detail);
+              return _buildWideRow(context, detail);
             },
             separatorBuilder: (context, index) =>
                 const Divider(height: 1, indent: 16),
@@ -267,8 +271,11 @@ class _AccountActivityList extends ConsumerWidget {
   }
 
   Widget _buildWideHeader(AppLocalizations l10n) {
-    Widget headerText(String text,
-        {required int flex, TextAlign align = TextAlign.start}) {
+    Widget headerText(
+      String text, {
+      required int flex,
+      TextAlign align = TextAlign.start,
+    }) {
       return Expanded(
         flex: flex,
         child: Padding(
@@ -296,11 +303,15 @@ class _AccountActivityList extends ConsumerWidget {
     );
   }
 
-  Widget _buildWideRow(TransactionDetail detail) {
+  Widget _buildWideRow(BuildContext context, TransactionDetail detail) {
     final isDebit = detail.entryAmount > 0;
 
-    Widget cellText(String text,
-        {required int flex, TextAlign align = TextAlign.start, Color? color}) {
+    Widget cellText(
+      String text, {
+      required int flex,
+      TextAlign align = TextAlign.start,
+      Color? color,
+    }) {
       return Expanded(
         flex: flex,
         child: Padding(
@@ -325,13 +336,13 @@ class _AccountActivityList extends ConsumerWidget {
           flex: 2,
           isDebit ? detail.entryAmount.toStringAsFixed(2) : '',
           align: TextAlign.end,
-          color: Colors.green,
+          color: context.appColors.success,
         ),
         cellText(
           flex: 2,
           !isDebit ? detail.entryAmount.abs().toStringAsFixed(2) : '',
           align: TextAlign.end,
-          color: Colors.red,
+          color: context.appColors.error,
         ),
         cellText(flex: 2, detail.currencyCode, align: TextAlign.end),
       ],

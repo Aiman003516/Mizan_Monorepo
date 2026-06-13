@@ -2,6 +2,7 @@
 
 import 'package:feature_auth/src/data/auth_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BusinessSetupScreen extends ConsumerStatefulWidget {
@@ -43,7 +44,7 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
         );
       }
     } finally {
@@ -67,9 +68,9 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "This will enable Sync, Staff Management, and Advanced Reports.",
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: context.appColors.subtleText),
               ),
               const SizedBox(height: 32),
               

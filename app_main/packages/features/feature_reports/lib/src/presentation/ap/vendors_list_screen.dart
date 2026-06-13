@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 
@@ -14,10 +15,11 @@ class VendorsListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final vendorsAsync = ref.watch(vendorsStreamProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Vendors'), centerTitle: true),
+      appBar: AppBar(title: Text(l10n.vendorsTitle), centerTitle: true),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.of(context).push(
@@ -25,7 +27,7 @@ class VendorsListScreen extends ConsumerWidget {
           );
         },
         icon: const Icon(Icons.add_business),
-        label: const Text('Add Vendor'),
+        label: Text(l10n.addVendorBtn),
       ),
       body: vendorsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

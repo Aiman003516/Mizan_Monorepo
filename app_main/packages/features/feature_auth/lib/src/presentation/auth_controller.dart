@@ -22,16 +22,16 @@ class AuthState {
 
 final authControllerProvider =
 StateNotifierProvider<AuthController, AuthState>((ref) {
-  return AuthController(ref.watch(authRepositoryProvider), ref);
+  return AuthController(ref.watch(authRepositoryProvider));
 });
 
 class AuthController extends StateNotifier<AuthState> {
-  AuthController(this._authRepository, this._ref) : super(AuthState()) {
+  AuthController(this._authRepository) : super(AuthState()) {
     _trySilentSignIn();
   }
 
   final AuthRepository _authRepository;
-  final Ref _ref;
+// ignore: unused_field
 
   Future<void> _trySilentSignIn() async {
     state = AuthState(status: AuthStatus.loading);

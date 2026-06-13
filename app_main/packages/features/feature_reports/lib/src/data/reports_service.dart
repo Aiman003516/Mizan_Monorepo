@@ -494,6 +494,7 @@ class ReportsService {
         return summaries;
       });
 
+  // ignore: unused_element
   Stream<List<TransactionDetail>> _watchFilteredDetails(
     String? classificationNameFilter,
   ) {
@@ -539,6 +540,7 @@ class ReportsService {
               .toList();
           break;
         case ReportFilter.ALL:
+        // ignore: unreachable_switch_default
         default:
           finalFilteredDetails = classificationFilteredDetails;
           break;
@@ -627,6 +629,7 @@ class ReportsService {
               .toList();
           break;
         case ReportFilter.ALL:
+        // ignore: unreachable_switch_default
         default:
           finalFilteredDetails = classificationFilteredDetails;
           break;
@@ -716,6 +719,7 @@ class ReportsService {
               .toList();
           break;
         case ReportFilter.ALL:
+        // ignore: unreachable_switch_default
         default:
           finalFilteredDetails = classificationFilteredDetails;
           break;
@@ -814,6 +818,7 @@ class ReportsService {
         return row.readTable(_db.accounts);
       });
 
+      // ignore: deprecated_member_use
       for (var account in groupedByAccount.keys.whereNotNull()) {
         final entries = groupedByAccount[account]!;
         int accountBalanceCents = 0;
@@ -911,6 +916,7 @@ class ReportsService {
       double totalLiabilities = 0.0;
       double totalEquity = 0.0;
 
+      // ignore: deprecated_member_use
       final validEntries = entries.whereNotNull().toList();
       final entriesByAccount = groupBy(validEntries, (e) => e.accountId);
 

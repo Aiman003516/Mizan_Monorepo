@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -89,15 +90,16 @@ class _SalesLineChart extends ConsumerWidget {
               topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
-            borderData: FlBorderData(show: true, border: Border.all(color: Colors.grey.shade300)),
+            borderData: FlBorderData(show: true, border: Border.all(color: context.appColors.primary)),
             lineBarsData: [
               LineChartBarData(
                 spots: spots,
                 isCurved: true,
-                color: Colors.blue,
+                color: context.appColors.info,
                 barWidth: 3,
                 dotData: const FlDotData(show: false),
-                belowBarData: BarAreaData(show: true, color: Colors.blue.withOpacity(0.1)),
+                // ignore: deprecated_member_use
+                belowBarData: BarAreaData(show: true, color: context.appColors.info.withValues(alpha: 0.1)),
               ),
             ],
             maxY: maxAmount * 1.2, // Add headroom
@@ -140,7 +142,7 @@ class _CategoryPieChart extends ConsumerWidget {
                       value: item.totalRevenue,
                       title: isLarge ? '${(item.totalRevenue / total * 100).toStringAsFixed(0)}%' : '',
                       radius: 50,
-                      titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                      titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.appColors.onPrimary),
                     );
                   }).toList(),
                   centerSpaceRadius: 40,
@@ -194,8 +196,8 @@ class _TopProductsList extends ConsumerWidget {
             return ListTile(
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
-                backgroundColor: Colors.amber.shade100,
-                child: const Icon(Icons.emoji_events, color: Colors.amber),
+                backgroundColor: context.appColors.primary,
+                child: Icon(Icons.emoji_events, color: context.appColors.warning),
               ),
               title: Text(p.productName),
               trailing: Text("${p.quantitySold.toStringAsFixed(0)} sold", style: const TextStyle(fontWeight: FontWeight.bold)),

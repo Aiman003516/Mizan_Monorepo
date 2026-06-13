@@ -41,13 +41,13 @@
   },
   "type": "النوع:",
   "balance": "الرصيد:",
-  "phone": "الهاتف:",
-  "errorLoadingAccounts": "خطأ في تحميل الحسابات:",
+  "phone": "الهاتف",
+  "errorLoadingAccounts": "خطأ في تحميل الحسابات",
   "errorLoadingBalances": "خطأ في تحميل الأرصدة:",
   "addNewAccount": "إضافة حساب جديد",
   "editAccount": "تعديل الحساب",
   "accountNameHint": "اسم الحساب (مثال: \"الصندوق\"، \"العميل أ\")",
-  "pleaseEnterName": "الرجاء \nإدخال اسم",
+  "pleaseEnterName": "الرجاء إدخال اسمك",
   "accountType": "نوع الحساب",
   "classificationOptional": "التصنيف (اختياري)",
   "errorLoadingClassifications": "خطأ في تحميل التصنيفات:",
@@ -106,7 +106,7 @@
   "ok": "موافق",
   "addNewProduct": "إضافة منتج جديد",
   "editProduct": "تعديل المنتج",
-  "pleaseSelectCategory": "الرجاء اختيار صنف",
+  "pleaseSelectCategory": "الرجاء اختيار فئة",
   "failedToSaveProduct": "فشل حفظ المنتج:",
   "selectCategory": "اختر صنف",
   "errorLoadingCategories": "خطأ في تحميل الأصناف:",
@@ -114,9 +114,9 @@
   "price": "السعر",
   "pleaseEnterPrice": "الرجاء إدخال سعر",
   "noProductsSaved": "لا توجد منتجات محفوظة.\nانقر \"+\" لإضافة واحد.",
-  "priceLabel": "السعر:",
+  "priceLabel": "السعر",
   "newCategory": "صنف جديد",
-  "categoryName": "اسم الصنف",
+  "categoryName": "اسم الفئة",
   "cancel": "إلغاء",
   "save": "حفظ",
   "editCategory": "تعديل الصنف",
@@ -144,7 +144,7 @@
   },
   "noMonthlyTotals": "لا توجد إجماليات شهرية لعرضها لهذا الفلتر.",
   "month": "الشهر",
-  "currencyLabel": "العملة:",
+  "currencyLabel": "العملة",
   "totalAmounts": "الإجماليات - {classification}",
   "@totalAmounts": {
     "placeholders": {
@@ -159,7 +159,7 @@
   "totalClassifications": "إجمالي التصنيفات",
   "noClassificationTotals": "لا توجد إجماليات تصنيفات لعرضها.",
   "classification": "التصنيف",
-  "total": "المجموع",
+  "total": "الإجمالي",
   "upgradeToPro": "الترقية إلى Pro",
   "unlockMizanPro": "افتح ميزان Pro",
   "proPrice": "احصل على النسخة الكاملة مقابل \nدفعة لمرة واحدة",
@@ -261,9 +261,6 @@
   "totalAssets": "إجمالي الأصول",
   "liabilities": "الالتزامات",
   "trialBalance": "ميزان المراجعة",
-  "debit": "مدين",
-  "credit": "دائن",
-  "total": "الإجمالي",
   "totalLiabilities": "إجمالي الالتزامات",
   "equity": "حقوق الملكية",
   "totalEquity": "إجمالي حقوق الملكية",
@@ -293,8 +290,8 @@
   "noHistory": "لا يوجد سجل عمليات لهذا الحساب.",
   "errorLoadingHistory": "خطأ في تحميل السجل:",
   "pleaseAddCategory": "الرجاء إضافة صنف أولاً.",
-  "noProductsInCategory": "لا توجد منتجات في هذا الصنف.",
-  "quantity": "الكمية:",
+  "noProductsInCategory": "لا توجد منتجات في هذه الفئة",
+  "quantity": "الكمية",
   "clear": "مسح",
   "printReceipt": "طباعة إيصال",
   "zeroTotalError": "لا يمكن معالجة عملية بيع بإجمالي صفر.",
@@ -380,9 +377,9 @@
   },
   "orderReturned": "تم إرجاع هذا الطلب.",
   "makePayment": "إجراء دفعة",
-"payFromAccount": "الدفع من حساب",
-"payToAccount": "الدفع إلى حساب",
-"pleaseEnterValidAmount": "الرجاء إدخال مبلغ صحيح أكبر من صفر",
+  "payFromAccount": "الدفع من حساب",
+  "payToAccount": "الدفع إلى حساب",
+  "pleaseEnterValidAmount": "الرجاء إدخال مبلغ صحيح أكبر من صفر",
   "pay": "ادفع",
   "noLineItemsSaved": "لم يتم حفظ أصناف لهذا الطلب.",
   "fieldRequired": "الحقل مطلوب",
@@ -407,7 +404,7 @@
   "cost": "التكلفة",
   "totalCost": "التكلفة الإجمالية",
   "costPerItem": "التكلفة",
-  "totalPayable": "مجموع المدفوع",
+  "totalPayable": "إجمالي المستحقات",
   "pleaseEnterCost": "الرجاء إدخال التكلفة",
   "pleaseEnterQuantity": "الرجاء إدخال الكمية",
   "purchaseSaved": "تم حفظ فاتورة الشراء بنجاح.",
@@ -438,8 +435,6 @@
   "learnMore": "اعرف المزيد",
   "dashboard": "لوحة التحكم",
   "newSale": "عملية بيع جديدة",
-  "totalRevenue": "إجمالي الإيرادات",
-  "totalExpenses": "إجمالي المصروفات",
   "totalReceivable": "إجمالي المستحقات",
   "currencyFormat": "{value}",
   "@currencyFormat": {
@@ -505,7 +500,6 @@
   "criticalInventoryError": "خطأ فادح: حسابات المخزون أو تكلفة البضاعة المباعة غير موجودة.",
   "drLabel": "مدين:",
   "crLabel": "دائن:",
-
   "fixedAssets": "الأصول الثابتة",
   "fixedAssetsDescription": "إدارة المعدات والمركبات والعقارات",
   "netBookValue": "صافي القيمة الدفترية",
@@ -529,15 +523,14 @@
   "straightLine": "القسط الثابت",
   "decliningBalance": "القسط المتناقص",
   "unitsOfActivity": "وحدات النشاط",
-  "runDepreciation": "تشغيل الإهلاك",
-  "disposeAsset": "استبعاد",
+  "runDepreciation": "تشغيل الاستهلاك",
+  "disposeAsset": "التخلص",
   "assetDetails": "تفاصيل الأصل",
   "valueInformation": "معلومات القيمة",
   "depreciationSettings": "إعدادات الإهلاك",
   "depreciationProgress": "تقدم الإهلاك",
   "currentPeriod": "الفترة الحالية",
   "monthly": "شهري",
-
   "depreciation": "الإهلاك",
   "depreciationProcessing": "معالجة الإهلاك",
   "periodEndDate": "تاريخ نهاية الفترة",
@@ -552,7 +545,6 @@
       }
     }
   },
-
   "ghostMoney": "الفروقات المالية",
   "ghostMoneyDescription": "تسوية فروقات التقريب",
   "pendingReconciliation": "في انتظار التسوية",
@@ -570,13 +562,12 @@
       }
     }
   },
-  "whatIsGhostMoney": "ما هي الفروقات المالية؟",
+  "whatIsGhostMoney": "ما هي الأموال الشبحية؟",
   "ghostMoneyExplanation": "الفروقات المالية تمثل فروقات التقريب الصغيرة التي تحدث أثناء العمليات الحسابية مثل تقسيم الفواتير أو تحويل العملات أو حسابات النسب المئوية. هذه الفروقات طبيعية ومتوقعة في المحاسبة.",
   "sourceTransaction": "عملية",
   "sourceSplit": "تقسيم فاتورة",
   "sourceExchange": "صرف عملات",
   "sourceImport": "استيراد",
-
   "accountCash": "الصندوق",
   "accountPettyCash": "النثريات",
   "accountBankAccount": "الحساب البنكي",
@@ -608,49 +599,40 @@
   "accountInsuranceExpense": "مصروفات التأمين",
   "accountSuppliesExpense": "مصروفات المستلزمات",
   "accountMiscellaneousExpense": "مصروفات متنوعة",
-
-  "joinOrganization": "الانضمام للمؤسسة",
+  "joinOrganization": "الانضمام للمنظمة",
   "enterInviteCode": "أدخل كود الدعوة من المسؤول",
-  "inviteCode": "كود الدعوة",
+  "inviteCode": "رمز الدعوة",
   "validInviteCode": "كود دعوة صالح!",
   "invalidInviteCode": "كود دعوة غير صالح أو منتهي الصلاحية",
   "codeMustBe6Digits": "يجب أن يكون الكود ٦ أرقام",
   "pleaseEnterInviteCode": "الرجاء إدخال كود الدعوة",
-  "yourName": "اسمك",
-  "enterDisplayName": "أدخل اسم العرض الخاص بك",
-  "pleaseEnterName": "الرجاء إدخال اسمك",
+  "enterDisplayName": "أدخل اسم العرض",
   "successfullyJoined": "تم الانضمام للمؤسسة بنجاح!",
   "inviteCodeUsed": "تم استخدام كود الدعوة هذا بالفعل",
   "inviteCodeExpired": "انتهت صلاحية كود الدعوة هذا",
   "pleaseSignInFirst": "الرجاء تسجيل الدخول أولاً",
   "createNewOrganization": "إنشاء مؤسسة جديدة",
   "role": "الصلاحية",
-
   "customers": "العملاء",
   "addCustomer": "إضافة عميل",
   "newCustomer": "عميل جديد",
   "editCustomer": "تعديل العميل",
   "customerName": "اسم العميل",
   "email": "البريد الإلكتروني",
-  "phone": "الهاتف",
   "address": "العنوان",
   "taxId": "الرقم الضريبي",
   "creditLimit": "حد الائتمان",
   "notes": "ملاحظات",
   "noCustomersYet": "لا يوجد عملاء حتى الآن",
   "tapToAddFirstCustomer": "اضغط على الزر أدناه لإضافة أول عميل",
-  "totalReceivable": "إجمالي المستحقات",
   "outstanding": "المتبقي",
   "owed": "مستحق",
-
   "invoices": "الفواتير",
-  "newInvoice": "فاتورة جديدة",
+  "newInvoice": "فاتورة بيع جديدة",
   "invoiceDate": "تاريخ الفاتورة",
   "dueDate": "تاريخ الاستحقاق",
   "lineItems": "بنود الفاتورة",
   "addItem": "إضافة بند",
-  "description": "الوصف",
-  "quantity": "الكمية",
   "unitPrice": "سعر الوحدة",
   "subtotal": "المجموع الفرعي",
   "createInvoice": "إنشاء الفاتورة",
@@ -661,7 +643,6 @@
   "overdue": "متأخرة",
   "draft": "مسودة",
   "sent": "مرسلة",
-
   "arAgingReport": "تقرير أعمار الذمم المدينة",
   "totalReceivables": "إجمالي الذمم المدينة",
   "current": "حالية",
@@ -672,7 +653,6 @@
   "noOutstandingReceivables": "لا توجد مستحقات معلقة",
   "allInvoicesPaid": "جميع الفواتير مدفوعة!",
   "customersWithBalances": "عملاء لديهم أرصدة",
-
   "vendors": "الموردين",
   "addVendor": "إضافة مورد",
   "newVendor": "مورد جديد",
@@ -681,30 +661,25 @@
   "paymentTerms": "شروط الدفع",
   "noVendorsYet": "لا يوجد موردين حتى الآن",
   "tapToAddFirstVendor": "اضغط على الزر أدناه لإضافة أول مورد",
-  "totalPayable": "إجمالي المستحقات",
   "weOwe": "ندين",
-
   "bills": "الفواتير",
-  "newBill": "فاتورة جديدة",
+  "newBill": "فاتورة شراء جديدة",
   "billDate": "تاريخ الفاتورة",
   "vendorInvoice": "رقم فاتورة المورد",
-  "createBill": "إنشاء الفاتورة",
+  "createBill": "إنشاء فاتورة",
   "billCreated": "تم إنشاء الفاتورة",
   "noBillsYet": "لا توجد فواتير حتى الآن",
   "pending": "معلقة",
-
   "apAgingReport": "تقرير أعمار الذمم الدائنة",
   "totalPayables": "إجمالي الذمم الدائنة",
   "byVendor": "حسب المورد",
   "noOutstandingPayables": "لا توجد ذمم دائنة معلقة",
   "allBillsPaid": "جميع الفواتير مدفوعة!",
   "vendorsWithBalances": "موردين لديهم أرصدة",
-
   "statementOfCashFlows": "قائمة التدفقات النقدية",
   "cashFlowsFromOperating": "التدفقات النقدية من الأنشطة التشغيلية",
   "cashFlowsFromInvesting": "التدفقات النقدية من الأنشطة الاستثمارية",
   "cashFlowsFromFinancing": "التدفقات النقدية من الأنشطة التمويلية",
-  "netIncome": "صافي الدخل",
   "addDepreciation": "إضافة: مصروف الإهلاك",
   "decreaseInReceivables": "انخفاض في الذمم المدينة",
   "increaseInReceivables": "زيادة في الذمم المدينة",
@@ -719,32 +694,29 @@
   "endingCashBalance": "رصيد النقد في النهاية",
   "noInvestingActivities": "لا توجد أنشطة استثمارية",
   "noFinancingActivities": "لا توجد أنشطة تمويلية",
-
   "financialRatios": "النسب المالية",
-  "currentRatio": "نسبة التداول",
-  "quickRatio": "نسبة السيولة السريعة",
+  "currentRatio": "النسبة الجارية",
+  "quickRatio": "النسبة السريعة",
   "debtToEquity": "الديون/حقوق الملكية",
   "grossProfitMargin": "هامش الربح الإجمالي",
   "netProfitMargin": "هامش صافي الربح",
   "returnOnAssets": "العائد على الأصول",
   "workingCapital": "رأس المال العامل",
   "receivablesTurnover": "معدل دوران الذمم المدينة",
-
   "receivables": "المستحقات",
   "payables": "المدفوعات",
   "currentAmount": "حالية",
   "overdueAmount": "متأخرة",
-
-  "bankReconciliations": "تسويات البنك",
+  "bankReconciliations": "التسويات البنكية",
   "newReconciliation": "تسوية جديدة",
   "noReconciliationsYet": "لا توجد تسويات حتى الآن",
   "startReconciling": "ابدأ بتسوية كشوف حساباتك البنكية",
   "bankAccount": "الحساب البنكي",
   "statementDate": "تاريخ الكشف",
-  "statementEndingBalance": "الرصيد النهائي للكشف",
+  "statementEndingBalance": "الرصيد الختامي للكشف",
   "statementBalance": "رصيد الكشف",
   "bookBalance": "الرصيد الدفتري",
-  "selectedCleared": "المحدد المقاص",
+  "selectedCleared": "المحدد كمقاصة:",
   "differenceAmount": "الفرق",
   "balanced": "متوازن!",
   "unclearedTransactions": "المعاملات غير المقاصة",
@@ -752,15 +724,14 @@
   "deselectAll": "إلغاء تحديد الكل",
   "allTransactionsReconciled": "كل المعاملات تمت تسويتها!",
   "completeReconciliation": "إتمام التسوية",
-  "reconciliationCompleted": "تم إتمام التسوية!",
+  "reconciliationCompleted": "تمت التسوية بنجاح!",
   "pleaseSelectTransactions": "الرجاء تحديد المعاملات للتسوية",
   "noBankAccountsFound": "لم يتم العثور على حسابات بنكية",
-
-  "importData": "استيراد البيانات",
+  "importData": "استيراد بيانات",
   "importWizard": "معالج الاستيراد",
   "selectFile": "اختر ملف",
   "selectFileHint": "اختر ملف CSV أو Excel للاستيراد.",
-  "chooseFile": "اختيار ملف",
+  "chooseFile": "اختر ملف",
   "chooseDataType": "اختر نوع البيانات",
   "whatDataImporting": "ما نوع البيانات التي تستوردها؟",
   "mapColumns": "ربط الأعمدة",
@@ -768,8 +739,12 @@
   "rowsFound": "تم العثور على {count} صف مع {columns} عمود.",
   "@rowsFound": {
     "placeholders": {
-      "count": {"type": "int"},
-      "columns": {"type": "int"}
+      "count": {
+        "type": "int"
+      },
+      "columns": {
+        "type": "int"
+      }
     }
   },
   "results": "النتائج",
@@ -780,39 +755,66 @@
   "pleaseSelectFile": "الرجاء اختيار ملف",
   "errorParsingFile": "خطأ في تحليل الملف: {error}",
   "@errorParsingFile": {
-    "placeholders": {"error": {"type": "String"}}
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "errorImporting": "خطأ في الاستيراد: {error}",
   "@errorImporting": {
-    "placeholders": {"error": {"type": "String"}}
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "importComplete": "اكتمل الاستيراد",
   "recordsImported": "تم استيراد {count} سجل بنجاح",
   "@recordsImported": {
-    "placeholders": {"count": {"type": "int"}}
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "errorsCount": "{count} أخطاء",
   "@errorsCount": {
-    "placeholders": {"count": {"type": "int"}}
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "durationSeconds": "المدة: {seconds} ثانية",
   "@durationSeconds": {
-    "placeholders": {"seconds": {"type": "int"}}
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
   },
   "errors": "الأخطاء",
   "rowNumber": "الصف {number}",
   "@rowNumber": {
-    "placeholders": {"number": {"type": "int"}}
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
   },
   "andMoreErrors": "... و{count} أخطاء أخرى",
   "@andMoreErrors": {
-    "placeholders": {"count": {"type": "int"}}
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "mapTo": "ربط بـ",
   "skipThisColumn": "(تخطي هذا العمود)",
   "createCustomField": "+ إنشاء حقل مخصص",
   "fields": "حقول",
-
   "noActiveAssets": "لا توجد أصول نشطة",
   "addFixedAssetsToRun": "أضف أصولاً ثابتة لتشغيل الإهلاك",
   "selectPeriodEndDate": "اختر تاريخ نهاية الفترة",
@@ -820,16 +822,940 @@
   "depreciationRecorded": "تم تسجيل الإهلاك: {amount} لـ {assetName}",
   "@depreciationRecorded": {
     "placeholders": {
-      "amount": {"type": "String"},
-      "assetName": {"type": "String"}
+      "amount": {
+        "type": "String"
+      },
+      "assetName": {
+        "type": "String"
+      }
     }
   },
   "processedAssets": "تمت معالجة {count} أصول. الإجمالي: {total}",
   "@processedAssets": {
     "placeholders": {
-      "count": {"type": "int"},
-      "total": {"type": "String"}
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
     }
   },
-  "remainingValue": "المتبقي"
+  "remainingValue": "المتبقي",
+  "financialSnapshot": "نظرة مالية",
+  "quickAccess": "وصول سريع",
+  "cashFlow": "التدفق النقدي",
+  "depreciationProcessingTitle": "معالجة الإهلاك",
+  "addFixedAssetsHint": "أضف أصولاً ثابتة لتشغيل الإهلاك",
+  "bookValueLabel": "القيمة الدفترية",
+  "monthlyLabel": "شهري",
+  "remainingLabel": "المتبقي",
+  "depreciationRecordedFor": "تم تسجيل الإهلاك: {amount} لـ {assetName}",
+  "@depreciationRecordedFor": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "assetName": {
+        "type": "String"
+      }
+    }
+  },
+  "processedAssetsTotal": "تمت معالجة {count} أصول. الإجمالي: {amount}",
+  "@processedAssetsTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "assetsCount": "{count} أصول",
+  "@assetsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ghostMoneyTitle": "فروقات التقريب",
+  "whatIsGhostMoneyTooltip": "ما هي فروقات التقريب؟",
+  "allBalanced": "متوازن بالكامل!",
+  "noGhostMoneyToReconcile": "لا توجد فروقات تقريب للتسوية",
+  "entryLabel": "إدخال",
+  "entriesLabel": "إدخالات",
+  "noEntriesToDisplay": "لا توجد قيود للعرض",
+  "reconcileCurrency": "تسوية {currency}",
+  "@reconcileCurrency": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "writeOffConfirmation": "شطب {amount} من فروقات التقريب؟\n\nسيتم إنشاء قيد يومية لمسح {count} {entryText}.",
+  "@writeOffConfirmation": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "entryText": {
+        "type": "String"
+      }
+    }
+  },
+  "reconcileButton": "تسوية",
+  "reconciledEntries": "تمت تسوية {count} قيود لـ {currency}",
+  "@reconciledEntries": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "entryReconciledMessage": "تم تسوية الإدخال",
+  "ghostMoneyDialogTitle": "ما هي فروقات التقريب؟",
+  "ghostMoneyDialogContent": "فروقات التقريب تمثل فروقات صغيرة تحدث أثناء العمليات الحسابية.\n\nأمثلة:\n• تقسيم فاتورة على 3 (100 ÷ 3)\n• تحويل أسعار صرف العملات\n• حسابات الضرائب النسبية\n\nهذه الفروقات الصغيرة تتراكم عادة لتصل لبضعة قروش ويمكن شطبها أو توزيعها دورياً.",
+  "gotIt": "فهمت",
+  "fixedAssetsTitle": "الأصول الثابتة",
+  "netBookValueLabel": "صافي القيمة الدفترية",
+  "totalCostLabel": "التكلفة الإجمالية",
+  "depreciatedLabel": "المُهلَك",
+  "progressLabel": "التقدم",
+  "activeLabel": "نشط",
+  "fullDeprLabel": "مُهلَك كلياً",
+  "disposedLabel": "مُستبعَد",
+  "allAssetsTab": "جميع الأصول",
+  "byCategoryTab": "حسب الفئة",
+  "scheduleTab": "الجدول",
+  "noFixedAssets": "لا توجد أصول ثابتة",
+  "addFixedAssetsDescription": "أضف معدات أو مركبات أو عقارات لتتبع الإهلاك",
+  "noScheduledDepreciation": "لا يوجد إهلاك مجدول",
+  "percentDepreciated": "{percent}% مُهلَك",
+  "@percentDepreciated": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyDepreciationInfo": "شهري: {amount} • {months} شهر متبقي",
+  "@monthlyDepreciationInfo": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "valueInformationTitle": "معلومات القيمة",
+  "depreciationSettingsTitle": "إعدادات الإهلاك",
+  "acquisitionCostLabel": "تكلفة الاقتناء",
+  "salvageValueLabel": "القيمة المتبقية",
+  "accumulatedDepreciationLabel": "الإهلاك المتراكم",
+  "methodLabel": "الطريقة",
+  "usefulLifeLabel": "العمر الإنتاجي",
+  "usefulLifeMonths": "{months} شهر",
+  "@usefulLifeMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "runDepreciationButton": "تشغيل الإهلاك",
+  "disposeButton": "استبعاد",
+  "addAssetName": "اسم الأصل",
+  "addAssetDescription": "الوصف (اختياري)",
+  "addAssetAcquisitionCost": "تكلفة الاقتناء",
+  "addAssetSalvageValue": "القيمة المتبقية",
+  "addAssetUsefulLife": "العمر الإنتاجي (بالأشهر)",
+  "addAssetAcquisitionDate": "تاريخ الاقتناء",
+  "addAssetDepreciationMethod": "طريقة الإهلاك",
+  "addAssetDecliningRate": "معدل القسط المتناقص",
+  "reportsAndAnalytics": "التقارير والتحليلات",
+  "reportMarketplaceTooltip": "سوق التقارير",
+  "financialStatementsSection": "القوائم المالية",
+  "performanceSection": "الأداء",
+  "analysisToolsSection": "أدوات التحليل",
+  "inventoryOperationsSection": "المخزون والعمليات (قريباً)",
+  "cvpAnalysisTitle": "تحليل التكلفة-الحجم-الربح",
+  "capitalBudgetingTitle": "موازنة رأس المال",
+  "budgetAnalysisTitle": "تحليل الموازنة",
+  "fraudDetectionTitle": "كشف الاحتيال",
+  "standardCostingTitle": "التكلفة المعيارية",
+  "financialRatiosTitle": "النسب المالية",
+  "stockVelocityTitle": "سرعة دوران المخزون",
+  "lowStockAlertTitle": "تنبيه نقص المخزون",
+  "salesByCashierTitle": "المبيعات حسب الكاشير",
+  "taxLiabilityTitle": "الالتزام الضريبي",
+  "reportHubTitle": "مركز التقارير",
+  "myReportsTab": "تقاريري",
+  "marketplaceTab": "السوق",
+  "noInstalledReports": "لا توجد تقارير مثبتة",
+  "goToMarketplaceHint": "اذهب إلى السوق لتحميل التقارير القياسية.",
+  "marketplaceUnavailable": "السوق غير متاح",
+  "noStandardReportsOnline": "لم يتم العثور على تقارير قياسية.",
+  "installButton": "تثبيت",
+  "includedLabel": "مُضمَّن",
+  "buyLabel": "شراء {price}",
+  "@buyLabel": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "lockedLabel": "مقفل",
+  "purchaseReportTitle": "شراء التقرير",
+  "buyReportConfirmation": "شراء '{title}' بسعر {price}؟",
+  "@buyReportConfirmation": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "buyNowButton": "اشترِ الآن",
+  "processingPayment": "جاري معالجة الدفع...",
+  "installedReport": "✅ تم تثبيت {title}",
+  "@installedReport": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumReportLocked": "🔒 تقرير مميز. قم بالترقية إلى Pro أو Enterprise.",
+  "posTerminalTitle": "نقطة البيع",
+  "searchProductTooltip": "البحث عن منتج",
+  "recallOrderTooltip": "استدعاء طلب",
+  "holdButton": "تعليق",
+  "orderParkedMessage": "تم تعليق الطلب",
+  "recallOrderTitle": "استدعاء طلب",
+  "noParkedOrders": "لا توجد طلبات معلقة",
+  "orderNumberLabel": "طلب #{orderId}",
+  "@orderNumberLabel": {
+    "placeholders": {
+      "orderId": {
+        "type": "String"
+      }
+    }
+  },
+  "orderInfo": "{itemCount} عناصر • قبل {minutes} دقيقة",
+  "@orderInfo": {
+    "placeholders": {
+      "itemCount": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "closeButton": "إغلاق",
+  "cartIsEmpty": "السلة فارغة",
+  "payWithButton": "الدفع بـ {method}",
+  "@payWithButton": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "editQtyMode": "وضع تعديل الكمية",
+  "scanMode": "وضع المسح",
+  "totalLabel": "المجموع",
+  "payPrintButton": "دفع / طباعة",
+  "importProductsTitle": "استيراد المنتجات",
+  "selectDefaultCategoryHint": "١. اختر فئة افتراضية لهذه المنتجات:",
+  "pleaseCreateCategoryFirst": "يرجى إنشاء فئة أولاً.",
+  "uploadFileHint": "٢. ارفع ملف CSV أو Excel (الأعمدة: الاسم، الباركود، الفئة، السعر، التكلفة، الكمية)",
+  "selectFileButton": "اختر ملف",
+  "noProductsFoundInFile": "لم يتم العثور على منتجات في الملف.",
+  "noDataLoaded": "لا توجد بيانات. ارفع ملفاً للمعاينة.",
+  "importProductsButton": "استيراد {count} منتج",
+  "@importProductsButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importSuccessMessage": "تم استيراد {count} منتج بنجاح!",
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importFailedMessage": "فشل الاستيراد: {error}",
+  "@importFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseSelectDefaultCategory": "يرجى اختيار فئة افتراضية",
+  "budgetAnalysis": "تحليل الميزانية",
+  "summaryTab": "ملخص",
+  "variancesTab": "الانحرافات",
+  "flexibleBudgetTab": "الميزانية المرنة",
+  "budgetedNetIncome": "صافي الدخل المقدّر",
+  "actualNetIncome": "صافي الدخل الفعلي",
+  "netIncomeVariance": "انحراف صافي الدخل",
+  "revenueLabel": "الإيرادات",
+  "expensesLabel": "المصروفات",
+  "flexibleBudgetAnalysis": "تحليل الميزانية المرنة",
+  "costStructure": "هيكل التكاليف",
+  "fixedCosts": "التكاليف الثابتة",
+  "variableRateUnit": "المعدل المتغير/الوحدة",
+  "plannedActivity": "النشاط المخطط",
+  "actualActivity": "النشاط الفعلي",
+  "actualTotalCost": "التكلفة الفعلية الإجمالية",
+  "budgetedLabel": "المقدّر",
+  "actualLabel": "الفعلي",
+  "varianceLabel": "الانحراف",
+  "favorableLabel": "مواتٍ",
+  "unfavorableLabel": "غير مواتٍ",
+  "onTarget": "في الهدف",
+  "capitalBudgeting": "الموازنة الرأسمالية",
+  "calculatorTab": "الآلة الحاسبة",
+  "resultsTab": "النتائج",
+  "sensitivityTab": "الحساسية",
+  "initialInvestment": "الاستثمار الأولي",
+  "investmentAmount": "مبلغ الاستثمار",
+  "discountRateLabel": "معدل الخصم",
+  "rateLabel": "المعدل",
+  "requiredReturn": "العائد المطلوب",
+  "expectedCashFlows": "التدفقات النقدية المتوقعة",
+  "forArrCalculation": "لحساب معدل العائد المحاسبي",
+  "annualNetIncome": "صافي الدخل السنوي",
+  "residualValueLabel": "القيمة المتبقية",
+  "calculateViewResults": "احسب واعرض النتائج",
+  "netPresentValue": "صافي القيمة الحالية",
+  "internalRateOfReturn": "معدل العائد الداخلي",
+  "paybackPeriod": "فترة الاسترداد",
+  "investmentRecovered": "سيتم استرداد الاستثمار",
+  "investmentMayNotRecover": "قد لا يتم استرداد الاستثمار",
+  "discountedPaybackPeriod": "فترة الاسترداد المخصومة",
+  "accountsForTimeValue": "يأخذ القيمة الزمنية للنقود في الاعتبار",
+  "profitabilityIndex": "مؤشر الربحية",
+  "accountingRateOfReturn": "معدل العائد المحاسبي",
+  "acceptDecision": "قبول",
+  "rejectDecision": "رفض",
+  "npvSensitivity": "حساسية صافي القيمة الحالية لمعدل الخصم",
+  "discountRateColumn": "معدل الخصم",
+  "npvColumn": "صافي القيمة الحالية",
+  "decisionColumn": "القرار",
+  "selectPeriodTooltip": "اختر الفترة",
+  "refreshTooltip": "تحديث",
+  "errorLoadingRatios": "خطأ في تحميل النسب",
+  "analysisPeriod": "فترة التحليل",
+  "liquidityRatios": "نسب السيولة",
+  "activityRatios": "نسب النشاط",
+  "profitabilityRatios": "نسب الربحية",
+  "leverageRatios": "نسب الرافعة المالية",
+  "cashRatio": "نسبة النقد",
+  "workingCapitalLabel": "رأس المال العامل",
+  "inventoryTurnover": "معدل دوران المخزون",
+  "daysSalesInInventory": "أيام المبيعات في المخزون",
+  "daysSalesOutstanding": "أيام المبيعات المستحقة",
+  "cashConversionCycle": "دورة التحويل النقدي",
+  "assetTurnover": "معدل دوران الأصول",
+  "operatingProfitMargin": "هامش الربح التشغيلي",
+  "returnOnEquity": "العائد على حقوق الملكية",
+  "ebitdaMargin": "هامش الأرباح قبل الفوائد والضرائب",
+  "debtToEquityRatio": "نسبة الدين إلى حقوق الملكية",
+  "debtToAssetsRatio": "نسبة الدين إلى الأصول",
+  "equityMultiplier": "مضاعف حقوق الملكية",
+  "interestCoverage": "تغطية الفائدة",
+  "timesInterestEarned": "مرات تحقق الفائدة",
+  "cashFlowsOperating": "التدفقات النقدية من الأنشطة التشغيلية",
+  "cashFlowsInvesting": "التدفقات النقدية من الأنشطة الاستثمارية",
+  "cashFlowsFinancing": "التدفقات النقدية من الأنشطة التمويلية",
+  "netCashOperating": "صافي النقد من التشغيل",
+  "netCashInvesting": "صافي النقد من الاستثمار",
+  "netCashFinancing": "صافي النقد من التمويل",
+  "fraudDetection": "كشف الاحتيال (M-Score)",
+  "inputTab": "الإدخال",
+  "learnTab": "تعلّم",
+  "currentPeriodLabel": "الفترة الحالية",
+  "priorPeriod": "الفترة السابقة",
+  "componentIndices": "مؤشرات المكونات",
+  "redFlagsLabel": "علامات التحذير",
+  "whatIsBeneish": "ما هو مقياس بينيش M-Score؟",
+  "theFormula": "الصيغة",
+  "indexExplanations": "شرح المؤشرات",
+  "famousCases": "حالات شهيرة",
+  "probableManipulator": "تلاعب محتمل",
+  "standardCosting": "التكاليف المعيارية",
+  "standardsTab": "المعايير",
+  "materialsTab": "المواد",
+  "laborTab": "العمالة",
+  "overheadTab": "النفقات العامة",
+  "continueBtn": "متابعة",
+  "importBtn": "استيراد",
+  "backBtn": "رجوع",
+  "doneBtn": "تم",
+  "selectCsvFile": "اختر ملف CSV أو Excel للاستيراد.",
+  "mapEachColumn": "ربط كل عمود بحقل:",
+  "errorsLabel": "الأخطاء:",
+  "productsTitle": "المنتجات",
+  "newProduct": "منتج جديد",
+  "addProductTitle": "إضافة منتج",
+  "editProductTitle": "تعديل منتج",
+  "saveProduct": "حفظ المنتج",
+  "vendorsTitle": "الموردون",
+  "addVendorBtn": "إضافة مورد",
+  "newVendorForm": "مورد جديد",
+  "editVendorForm": "تعديل مورد",
+  "vendorCreated": "تم إنشاء المورد",
+  "vendorUpdated": "تم تحديث المورد",
+  "vendorDetailTitle": "المورد",
+  "customersTitle": "العملاء",
+  "addCustomerBtn": "إضافة عميل",
+  "newCustomerForm": "عميل جديد",
+  "editCustomerForm": "تعديل عميل",
+  "customerCreated": "تم إنشاء العميل",
+  "customerUpdated": "تم تحديث العميل",
+  "customerDetailTitle": "العميل",
+  "putCustomerOnHold": "تعليق العميل",
+  "preventsNewInvoices": "يمنع إنشاء فواتير/طلبات جديدة",
+  "pleaseAddLineItem": "الرجاء إضافة بند واحد على الأقل",
+  "saveBtn": "حفظ",
+  "cancelBtn": "إلغاء",
+  "createBtn": "إنشاء",
+  "changeBtn": "تغيير",
+  "reconcileBtn": "تسوية",
+  "statementBalanceLabel": "رصيد الكشف:",
+  "bookBalanceLabel": "الرصيد الدفتري:",
+  "entryReconciled": "تمت تسوية القيد",
+  "staffManagement": "إدارة الموظفين",
+  "manageRoles": "إدارة الأدوار",
+  "changeRole": "تغيير الدور",
+  "removeAccess": "إزالة الوصول",
+  "roleSaved": "تم حفظ الدور بنجاح!",
+  "roleNameLabel": "اسم الدور",
+  "selectPermission": "الرجاء اختيار صلاحية واحدة على الأقل.",
+  "systemAdminReadonly": "لا يمكن تعديل دور مدير النظام.",
+  "customFieldsProducts": "حقول مخصصة (المنتجات)",
+  "enterDataCalculator": "أدخل بيانات الاستثمار في تبويب الآلة الحاسبة",
+  "enterDataAnalysis": "أدخل البيانات لعرض التحليل",
+  "enterFinancialData": "أدخل البيانات المالية لعرض النتائج",
+  "iUnderstand": "فهمت",
+  "gotItBtn": "حسنًا",
+  "budgetVsActual": "الميزانية مقابل الفعلي حسب الحساب",
+  "greenFavorable": "أخضر = مواتٍ | أحمر = غير مواتٍ",
+  "budgetComparison": "مقارنة الميزانية",
+  "staticBudget": "الميزانية الثابتة",
+  "actualCost": "التكلفة الفعلية",
+  "varianceAnalysis": "تحليل الانحرافات",
+  "volumeVariance": "انحراف الحجم",
+  "dueToActivityLevel": "بسبب اختلاف مستوى النشاط",
+  "spendingVariance": "انحراف الإنفاق",
+  "dueToEfficiency": "بسبب الكفاءة/السعر",
+  "totalVariance": "إجمالي الانحراف",
+  "actualMinusStatic": "الفعلي - الميزانية الثابتة",
+  "separateVariances": "فصل انحرافات الحجم عن انحرافات الإنفاق",
+  "formulasUsed": "الصيغ المستخدمة",
+  "revenueInput": "الإيرادات",
+  "receivablesInput": "الذمم المدينة",
+  "grossProfitInput": "إجمالي الربح",
+  "totalAssetsInput": "إجمالي الأصول",
+  "currentAssetsInput": "الأصول المتداولة",
+  "ppeInput": "الممتلكات والمعدات",
+  "depreciationInput": "الاستهلاك",
+  "sgaExpenseInput": "مصاريف البيع والإدارة",
+  "netIncomeInput": "صافي الدخل",
+  "cashFromOps": "النقد من العمليات",
+  "longTermDebt": "الديون طويلة الأجل",
+  "currentLiabilities": "الالتزامات المتداولة",
+  "probableManipulatorLabel": "تلاعب محتمل",
+  "vendorInvoiceOptional": "رقم فاتورة المورد (اختياري)",
+  "customerNameRequired": "اسم العميل *",
+  "vendorNameRequired": "اسم المورد *",
+  "paymentTermsHint": "شروط الدفع (مثال: صافي 30)",
+  "emailLabel": "البريد الإلكتروني",
+  "phoneLabel": "الهاتف",
+  "phoneNumber": "رقم الهاتف",
+  "addressLabel": "العنوان",
+  "notesLabel": "ملاحظات",
+  "descriptionLabel": "الوصف",
+  "quantityLabel": "الكمية",
+  "qtyLabel": "الكمية",
+  "dateLabel": "التاريخ",
+  "barcode": "الباركود",
+  "joinedOrganization": "تم الانضمام للمنظمة بنجاح!",
+  "roleNameHint": "مثال: كاشير أول",
+  "addAssetComingSoon": "ميزة إضافة الأصول قريبًا",
+  "assetDisposalComingSoon": "ميزة التخلص من الأصول قريبًا",
+  "errorLoadingData": "خطأ في تحميل البيانات",
+  "errorLoadingBills": "خطأ في تحميل الفواتير",
+  "errorLoadingInvoices": "خطأ في تحميل الفواتير",
+  "errorSavingRole": "خطأ في حفظ الدور",
+  "selectTransactionsToReconcile": "الرجاء اختيار المعاملات للتسوية",
+  "reconcileAmount": "تسوية {currency}",
+  "@reconcileAmount": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "enterDataInCalculator": "أدخل البيانات في تبويب الآلة الحاسبة أولاً",
+  "mosRatio": "نسبة هامش الأمان",
+  "priceSensitivityAnalysis": "تحليل حساسية السعر",
+  "scenarioColumn": "السيناريو",
+  "breakEvenColumn": "التعادل",
+  "changeColumn": "التغيير",
+  "impactColumn": "التأثير",
+  "variableOverhead": "التكاليف المتغيرة غير المباشرة",
+  "fixedOverhead": "التكاليف الثابتة غير المباشرة",
+  "examplesLabel": "أمثلة:",
+  "reconciliation": "التسوية",
+  "letsSetUpCorrectly": "دعنا نقوم بالإعداد بشكل صحيح.",
+  "addField": "إضافة حقل",
+  "editField": "تعديل حقل",
+  "editRole": "تعديل الدور",
+  "createNewRole": "إنشاء دور جديد",
+  "creatingBtn": "جارِ الإنشاء...",
+  "allCategories": "الكل",
+  "inStock": "{count} في المخزون",
+  "@inStock": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cartSummary": "السلة: {count} منتجات — {total}",
+  "@cartSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "orderSummary": "ملخص الطلب",
+  "taxLabel": "الضريبة ({rate}%)",
+  "@taxLabel": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "discountLabel": "الخصم",
+  "totalUppercase": "الإجمالي",
+  "holdOrder": "تعليق الطلب",
+  "noProducts": "لا توجد منتجات",
+  "searchProducts": "البحث عن منتجات...",
+  "outOfStock": "غير متوفر",
+  "cartEmpty": "سلتك فارغة",
+  "cartEmptyHint": "اضغط على المنتجات لإضافتها إلى طلبك",
+  "payWith": "الدفع بـ {method}",
+  "@payWith": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "orderParked": "تم تعليق الطلب",
+  "recallOrder": "استرجاع الطلب",
+  "orderNumber": "طلب #{id}",
+  "@orderNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "itemsAndTime": "{count} منتجات • منذ {time} دقائق",
+  "@itemsAndTime": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "int"
+      }
+    }
+  },
+  "closeBtn": "إغلاق",
+  "getStarted": "البدء",
+  "selectPrimaryCurrency": "اختر العملة الأساسية",
+  "currencyCodeLabel": "الرمز (مثال: YER)",
+  "currencySymbolLabel": "العلامة (﷼)",
+  "benchmarkLabel": "المؤشر المرجعي: {value}",
+  "@benchmarkLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cvpAnalysis": "تحليل التكلفة-الحجم-الربح",
+  "breakEvenTab": "نقطة التعادل",
+  "marginOfSafetyTab": "هامش الأمان",
+  "whatIfTab": "ماذا لو",
+  "fixedCostsTotal": "التكاليف الثابتة (الإجمالي)",
+  "fixedCostsHelper": "الإيجار، الرواتب، الاستهلاك، إلخ.",
+  "perUnitData": "بيانات الوحدة",
+  "sellingPrice": "سعر البيع",
+  "variableCost": "التكلفة المتغيرة",
+  "contributionMarginLabel": "هامش المساهمة:",
+  "perUnitSuffix": "لكل وحدة",
+  "actualExpectedSales": "المبيعات الفعلية/المتوقعة",
+  "unitsSold": "الوحدات المباعة",
+  "unitsSuffix": "وحدة",
+  "salesRevenueLabel": "إيرادات المبيعات",
+  "targetProfit": "الربح المستهدف",
+  "desiredProfit": "الربح المطلوب",
+  "desiredProfitHelper": "كم من الربح تريد تحقيقه؟",
+  "analyzeViewResults": "تحليل وعرض النتائج",
+  "enterDataCalculatorFirst": "أدخل البيانات في تبويب الآلة الحاسبة أولاً",
+  "breakEvenPoint": "نقطة التعادل",
+  "unitsLabel": "الوحدات",
+  "salesLabel": "المبيعات",
+  "contributionMarginTitle": "هامش المساهمة",
+  "cmPerUnit": "هامش المساهمة لكل وحدة",
+  "cmRatio": "نسبة هامش المساهمة",
+  "targetProfitAnalysis": "تحليل الربح المستهدف",
+  "requiredUnits": "الوحدات المطلوبة",
+  "requiredSales": "المبيعات المطلوبة",
+  "marginOfSafetyTitle": "هامش الأمان",
+  "riskSuffix": "مخاطرة",
+  "mosDollar": "هامش الأمان ($)",
+  "mosUnits": "هامش الأمان (وحدات)",
+  "operatingLeverage": "الرافعة التشغيلية",
+  "degreeOfOperatingLeverage": "درجة الرافعة التشغيلية",
+  "leverageLevel": "مستوى الرافعة",
+  "impactLabel": "التأثير",
+  "leverageImpactDesc": "تغيير 1% في المبيعات → تغيير {percent}% في الربح",
+  "@leverageImpactDesc": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "priceSensitivityDesc": "يوضح كيف تتغير نقطة التعادل عند تعديل سعر البيع",
+  "currentBreakEven": "نقطة التعادل الحالية: {units} وحدة",
+  "@currentBreakEven": {
+    "placeholders": {
+      "units": {
+        "type": "String"
+      }
+    }
+  },
+  "baseImpact": "أساس",
+  "betterImpact": "أفضل",
+  "worseImpact": "أسوأ",
+  "keyInsights": "رؤى رئيسية",
+  "projectedProfit": "ربح متوقع",
+  "projectedLoss": "خسارة متوقعة",
+  "strongSafetyMargin": "هامش أمان قوي. يمكن أن تنخفض المبيعات بنسبة {percent}% قبل الوصول إلى نقطة التعادل.",
+  "@strongSafetyMargin": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "moderateSafetyMargin": "هامش أمان معتدل. فكر في استراتيجيات لزيادة المبيعات أو تقليل التكاليف.",
+  "thinSafetyMargin": "هامش أمان ضعيف. الأعمال قريبة من نقطة التعادل ومعرضة لانخفاض المبيعات.",
+  "belowBreakEven": "تعمل تحت نقطة التعادل. يلزم اتخاذ إجراء فوري لزيادة الإيرادات أو تقليل التكاليف.",
+  "higherPricesInsight": "أسعار أعلى = نقطة تعادل أقل (وحدات أقل مطلوبة)",
+  "lowerPricesInsight": "أسعار أقل = نقطة تعادل أعلى (وحدات أكثر مطلوبة)",
+  "priceIncreaseEffect": "زيادة السعر 10% تقلل نقطة التعادل بمقدار {units} وحدة",
+  "@priceIncreaseEffect": {
+    "placeholders": {
+      "units": {
+        "type": "String"
+      }
+    }
+  },
+  "priceDecreaseEffect": "انخفاض السعر 10% يزيد نقطة التعادل بمقدار {units} وحدة",
+  "@priceDecreaseEffect": {
+    "placeholders": {
+      "units": {
+        "type": "String"
+      }
+    }
+  },
+  "formulaCurrentRatio": "الأصول المتداولة ÷ الالتزامات المتداولة",
+  "formulaQuickRatio": "(النقد + المدينون) ÷ الالتزامات المتداولة",
+  "formulaCashRatio": "النقد ÷ الالتزامات المتداولة",
+  "formulaWorkingCapital": "الأصول المتداولة - الالتزامات المتداولة",
+  "formulaInventoryTurnover": "تكلفة البضاعة المباعة ÷ متوسط المخزون",
+  "formulaDaysSalesInInventory": "365 ÷ معدل دوران المخزون",
+  "formulaReceivablesTurnover": "صافي المبيعات ÷ متوسط المدينين",
+  "formulaDaysSalesOutstanding": "365 ÷ معدل دوران المدينين",
+  "formulaCashConversionCycle": "أيام المخزون + أيام المدينين - أيام الدائنين",
+  "formulaAssetTurnover": "صافي المبيعات ÷ متوسط إجمالي الأصول",
+  "formulaGrossProfitMargin": "(الإيرادات - تكلفة البضاعة) ÷ الإيرادات",
+  "formulaOperatingProfitMargin": "الدخل التشغيلي ÷ الإيرادات",
+  "formulaNetProfitMargin": "صافي الدخل ÷ الإيرادات",
+  "formulaReturnOnAssets": "صافي الدخل ÷ متوسط إجمالي الأصول",
+  "formulaReturnOnEquity": "صافي الدخل ÷ متوسط حقوق الملكية",
+  "formulaEbitdaMargin": "الأرباح قبل الفوائد والضرائب والاستهلاك ÷ الإيرادات",
+  "formulaDebtToEquity": "إجمالي الالتزامات ÷ حقوق المساهمين",
+  "formulaDebtToAssets": "إجمالي الالتزامات ÷ إجمالي الأصول",
+  "formulaEquityMultiplier": "إجمالي الأصول ÷ حقوق المساهمين",
+  "formulaInterestCoverage": "الأرباح قبل الفوائد والضرائب ÷ مصروف الفوائد",
+  "formulaTimesInterestEarned": "(صافي الدخل + الفوائد + الضرائب) ÷ الفوائد",
+  "notAvailable": "غ/م",
+  "daysSuffix": "يوم",
+  "standardCostCard": "بطاقة التكلفة المعيارية",
+  "materialQtyUnit": "كمية المواد/الوحدة",
+  "materialPrice": "سعر المواد",
+  "laborHoursUnit": "ساعات العمل/الوحدة",
+  "laborRate": "معدل الأجور",
+  "vohRate": "معدل التكاليف المتغيرة غير المباشرة",
+  "budgetedFoh": "التكاليف الثابتة غير المباشرة المخططة",
+  "normalCapacity": "الطاقة العادية",
+  "actualProduction": "الإنتاج الفعلي",
+  "unitsProduced": "الوحدات المنتجة",
+  "materialUsed": "المواد المستخدمة",
+  "laborHours": "ساعات العمل",
+  "actualVoh": "التكاليف المتغيرة غير المباشرة الفعلية",
+  "actualFoh": "التكاليف الثابتة غير المباشرة الفعلية",
+  "totalVarianceAmount": "إجمالي الانحراف: {amount}",
+  "@totalVarianceAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "netFavorable": "صافي ملائم",
+  "netUnfavorable": "صافي غير ملائم",
+  "directMaterialsVariance": "انحراف المواد المباشرة",
+  "standardCost": "التكلفة المعيارية",
+  "actualCostLabel": "التكلفة الفعلية",
+  "varianceBreakdown": "تحليل الانحرافات",
+  "priceVariance": "انحراف السعر",
+  "priceVarianceFormula": "(السعر الفعلي - المعياري) × الكمية الفعلية",
+  "quantityVariance": "انحراف الكمية",
+  "quantityVarianceFormula": "(الكمية الفعلية - المعيارية) × السعر المعياري",
+  "materialsFormulas": "معادلات المواد",
+  "priceVarianceFormulaFull": "انحراف السعر = (السعر الفعلي - المعياري) × الكمية الفعلية",
+  "quantityVarianceFormulaFull": "انحراف الكمية = (الكمية الفعلية - المعيارية) × السعر المعياري",
+  "directLaborVariance": "انحراف العمالة المباشرة",
+  "rateVariance": "انحراف المعدل",
+  "rateVarianceFormula": "(المعدل الفعلي - المعياري) × الساعات الفعلية",
+  "efficiencyVariance": "انحراف الكفاءة",
+  "efficiencyVarianceFormula": "(الساعات الفعلية - المعيارية) × المعدل المعياري",
+  "laborFormulas": "معادلات العمالة",
+  "rateVarianceFormulaFull": "انحراف المعدل = (المعدل الفعلي - المعياري) × الساعات الفعلية",
+  "efficiencyVarianceFormulaFull": "انحراف الكفاءة = (الساعات الفعلية - المعيارية) × المعدل المعياري",
+  "manufacturingOverheadVariance": "انحراف التكاليف الصناعية غير المباشرة",
+  "appliedOverhead": "التكاليف غير المباشرة المحملة",
+  "actualOverhead": "التكاليف غير المباشرة الفعلية",
+  "overapplied": "محملة بالزيادة",
+  "underapplied": "محملة بالنقص",
+  "budgetVariance": "انحراف الموازنة",
+  "actualFohMinusBudgeted": "الفعلية - المخططة",
+  "budgetedFohMinusApplied": "المخططة - المحملة",
+  "actualVohFormula": "الفعلية - (الساعات × المعدل)",
+  "unitSuffix": "وحدة",
+  "dollarPerUnit": "$/وحدة",
+  "hrsSuffix": "ساعة",
+  "dollarPerHr": "$/ساعة",
+  "favorableBadge": "م",
+  "unfavorableBadge": "غ",
+  "mScoreValue": "M-Score: {value}",
+  "@mScoreValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "riskLevelLabel": "مخاطرة {level}",
+  "@riskLevelLabel": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "riskOfEarningsManipulation": "مخاطرة {level} للتلاعب بالأرباح",
+  "@riskOfEarningsManipulation": {
+    "placeholders": {
+      "level": {
+        "type": "String"
+      }
+    }
+  },
+  "thresholdNote": "الحد: > -1.78 يشير إلى تلاعب",
+  "dsriAbbr": "DSRI",
+  "dsriDesc": "المدينين/المبيعات",
+  "gmiAbbr": "GMI",
+  "gmiDesc": "هامش الربح الإجمالي",
+  "aqiAbbr": "AQI",
+  "aqiDesc": "جودة الأصول",
+  "sgiAbbr": "SGI",
+  "sgiDesc": "نمو المبيعات",
+  "depiAbbr": "DEPI",
+  "depiDesc": "الاستهلاك",
+  "sgaiAbbr": "SGAI",
+  "sgaiDesc": "المصاريف الإدارية والعمومية",
+  "tataAbbr": "TATA",
+  "tataDesc": "المستحقات",
+  "lvgiAbbr": "LVGI",
+  "lvgiDesc": "الرافعة المالية",
+  "redFlagsCount": "علامات تحذيرية ({count})",
+  "@redFlagsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "whatIsBeneishMScore": "ما هو نموذج بينيش M-Score؟",
+  "beneishDescription": "نموذج M-Score هو نموذج رياضي يستخدم 8 نسب مالية لتحديد ما إذا كانت الشركة قد تلاعبت بأرباحها. طوره البروفيسور ميسود بينيش، ويستخدم على نطاق واسع من قبل المراجعين والمستثمرين والمحللين.",
+  "beneishFormula": "M = -4.84 + 0.92×DSRI + 0.528×GMI\n+ 0.404×AQI + 0.892×SGI\n+ 0.115×DEPI - 0.172×SGAI\n+ 4.679×TATA - 0.327×LVGI",
+  "indexExplanationsTitle": "شرح المؤشرات",
+  "dsriFullName": "مؤشر أيام المبيعات في المدينين",
+  "dsriExplanation": "يقيس ما إذا كانت المدينين نمت أسرع من المبيعات",
+  "gmiFullName": "مؤشر هامش الربح الإجمالي",
+  "gmiExplanation": "يكشف تدهور هوامش الربح الإجمالي",
+  "aqiFullName": "مؤشر جودة الأصول",
+  "aqiExplanation": "يحدد رسملة المصروفات",
+  "sgiFullName": "مؤشر نمو المبيعات",
+  "sgiExplanation": "النمو العالي يخلق ضغطاً للتلاعب",
+  "depiFullName": "مؤشر الاستهلاك",
+  "depiExplanation": "يكشف تباطؤ معدلات الاستهلاك",
+  "sgaiFullName": "مؤشر المصاريف الإدارية",
+  "sgaiExplanation": "يقيس الكفاءة الإدارية",
+  "tataFullName": "إجمالي المستحقات إلى إجمالي الأصول",
+  "tataExplanation": "مستحقات عالية مقابل النقد = جودة منخفضة",
+  "lvgiFullName": "Leverage Index",
+  "lvgiExplanation": "زيادة الديون تخلق ضغطاً",
+  "famousCasesTitle": "حالات شهيرة",
+  "famousCasesContent": "• إنرون (2001): كان سيكون لديها M-Score > -1.78\n• وورلدكوم (2002): أظهرت علامات تحذيرية متعددة\n• ساتيام (2009): كانت DSRI و AQI متطرفة\n• النموذج يحدد بشكل صحيح ~76% من المتلاعبين",
+  "yearLabel": "السنة {number}",
+  "@yearLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "pvOfCashFlows": "القيمة الحالية للتدفقات: {value}",
+  "@pvOfCashFlows": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "initialInvestmentDetail": "الاستثمار الأولي: {value}",
+  "@initialInvestmentDetail": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "discountRateDetail": "معدل الخصم: {value}",
+  "@discountRateDetail": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "convergedLabel": "التقارب: {value}",
+  "@convergedLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "iterationsLabel": "التكرارات: {value}",
+  "@iterationsLabel": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "averageInvestment": "متوسط الاستثمار: {value}",
+  "@averageInvestment": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "acceptLabel": "قبول",
+  "rejectLabel": "رفض",
+  "recommendationLabel": "التوصية: {value}",
+  "@recommendationLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "criteriaMetLabel": "{count} من 4 معايير مستوفاة",
+  "@criteriaMetLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "npvSensitivityDesc": "يوضح كيف يتغير صافي القيمة الحالية مع تغير معدل الخصم",
+  "irrApproxLabel": "معدل العائد الداخلي (حيث صافي القيمة الحالية = 0) هو تقريباً {min}% - {max}%",
+  "@irrApproxLabel": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "revenueSection": "الإيرادات",
+  "expensesSection": "المصروفات",
+  "formulasDescription": "• الموازنة الثابتة = التكاليف الثابتة + (المتغيرة × النشاط المخطط)\n• الموازنة المرنة = التكاليف الثابتة + (المتغيرة × النشاط الفعلي)\n• انحراف الحجم = الموازنة المرنة - الموازنة الثابتة\n• انحراف الإنفاق = التكلفة الفعلية - الموازنة المرنة",
+  "addExchangeRate": "إضافة سعر صرف",
+  "fromCurrency": "من عملة",
+  "toCurrency": "إلى عملة",
+  "pleaseEnterCurrency": "الرجاء تحديد العملة",
+  "exchangeRateHelper": "1 من = X إلى",
+  "pleaseEnterValidRate": "مطلوب سعر صحيح",
+  "accountCurrency": "العملة",
+  "initialBalances": "الأرصدة الافتتاحية",
+  "debitBalance": "رصيد مدين",
+  "creditBalance": "رصيد دائن",
+  "netBalance": "صافي الرصيد",
+  "exchangeRates": "أسعار الصرف",
+  "noExchangeRates": "لم تتم إضافة أسعار صرف",
+  "saveAccount": "حفظ الحساب"
 }

@@ -2,7 +2,6 @@
 
 import 'dart:io';
 import 'package:csv/csv.dart';
-import 'package:drift/drift.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -64,6 +63,7 @@ class ImportService {
   /// 2. Save Data to Database
   Future<void> commitImport(List<ImportedProductDraft> drafts) async {
     final categoriesRepo = _ref.read(categoriesRepositoryProvider);
+    // ignore: unused_local_variable
     final productsRepo = _ref.read(productsRepositoryProvider);
     
     // Cache categories to avoid DB spam
@@ -75,6 +75,7 @@ class ImportService {
     // We map Name -> ID
     final Map<String, String> categoryCache = {};
 
+    // ignore: unused_local_variable
     final List<ProductsCompanion> productCompanions = [];
 
     for (final draft in drafts) {
@@ -87,6 +88,7 @@ class ImportService {
         // NOTE: Ideally CategoriesRepository should have findByName. 
         // We will assume we create it for now to save complexity.
         
+        // ignore: unused_local_variable
         final newId = const Uuid().v4();
         await categoriesRepo.createCategory(name: draft.categoryName);
         // We can't easily get the ID back from createCategory unless we change that signature.
@@ -130,6 +132,7 @@ class ImportService {
     // to prevent crashes.
     
     // Let's build the companions
+    // ignore: unused_local_variable
     for (final draft in drafts) {
        // Note: This needs a valid CategoryID. 
        // In a real scenario, we'd lookup [draft.categoryName].

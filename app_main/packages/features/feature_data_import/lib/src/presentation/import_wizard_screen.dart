@@ -3,6 +3,8 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -30,11 +32,13 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
   ImportResult? _result;
   bool _isLoading = false;
 
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Import Data'),
+        title: Text(l10n.importData),
       ),
       body: Stepper(
         currentStep: _currentStep,
@@ -54,20 +58,20 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(_currentStep == 2 ? 'Import' : 'Continue'),
+                        : Text(_currentStep == 2 ? l10n.importBtn : l10n.continueBtn),
                   ),
                 if (_currentStep > 0 && _currentStep < 3)
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: TextButton(
                       onPressed: details.onStepCancel,
-                      child: const Text('Back'),
+                      child: Text(l10n.backBtn),
                     ),
                   ),
                 if (_currentStep == 3)
                   ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(_result),
-                    child: const Text('Done'),
+                    child: Text(l10n.doneBtn),
                   ),
               ],
             ),
@@ -75,7 +79,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
         },
         steps: [
           Step(
-            title: const Text('Select File'),
+            title: Text(l10n.selectFile),
             subtitle: _selectedFile != null
                 ? Text(_selectedFile!.path.split(Platform.pathSeparator).last)
                 : null,
@@ -84,14 +88,14 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
             state: _currentStep > 0 ? StepState.complete : StepState.indexed,
           ),
           Step(
-            title: const Text('Choose Data Type'),
+            title: Text(l10n.chooseDataType),
             subtitle: _currentStep > 1 ? Text(_targetEntity) : null,
             content: _buildEntitySelectionStep(),
             isActive: _currentStep >= 1,
             state: _currentStep > 1 ? StepState.complete : StepState.indexed,
           ),
           Step(
-            title: const Text('Map Columns'),
+            title: Text(l10n.mapColumns),
             subtitle: _preview != null
                 ? Text('${_preview!.parsedData.rowCount} rows')
                 : null,
@@ -100,7 +104,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
             state: _currentStep > 2 ? StepState.complete : StepState.indexed,
           ),
           Step(
-            title: const Text('Results'),
+            title: Text(l10n.resultsTab),
             content: _buildResultsStep(),
             isActive: _currentStep >= 3,
             state: _result != null ? StepState.complete : StepState.indexed,
@@ -114,12 +118,12 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Select a CSV or Excel file to import.'),
+        Text(l10n.selectCsvFile),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: _pickFile,
           icon: const Icon(Icons.upload_file),
-          label: const Text('Choose File'),
+          label: Text(l10n.chooseFile),
         ),
         if (_selectedFile != null) ...[
           const SizedBox(height: 16),
@@ -143,7 +147,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('What type of data are you importing?'),
+        Text(l10n.whatDataImporting),
         const SizedBox(height: 16),
         ...EntityFieldDefinitions.entityNames
             .map((entity) => RadioListTile<String>.adaptive(
@@ -151,7 +155,9 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
                   subtitle: Text(
                       '${EntityFieldDefinitions.getFieldsFor(entity).length} fields'),
                   value: entity,
+                  // ignore: deprecated_member_use
                   groupValue: _targetEntity,
+                  // ignore: deprecated_member_use
                   onChanged: (value) => setState(() => _targetEntity = value!),
                 )),
       ],
@@ -169,7 +175,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
         Text(
             'Found ${_preview!.parsedData.rowCount} rows with ${_preview!.parsedData.columnCount} columns.'),
         const SizedBox(height: 16),
-        const Text('Map each column to a field:',
+        Text(l10n.mapEachColumn,
             style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         ..._buildMappingRows(),
@@ -197,7 +203,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: mapping.isSkipped
+                initialValue: mapping.isSkipped
                     ? 'skip'
                     : mapping.isExistingField
                         ? mapping.targetField
@@ -266,7 +272,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
       children: [
         Card(
           color:
-              _result!.hasErrors ? Colors.orange.shade50 : Colors.green.shade50,
+              _result!.hasErrors ? context.appColors.primary : context.appColors.primary,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -274,7 +280,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
                 Icon(
                   _result!.hasErrors ? Icons.warning : Icons.check_circle,
                   size: 48,
-                  color: _result!.hasErrors ? Colors.orange : Colors.green,
+                  color: _result!.hasErrors ? context.appColors.warning : context.appColors.success,
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -286,7 +292,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
                 if (_result!.hasErrors)
                   Text(
                     '${_result!.errorCount} errors',
-                    style: const TextStyle(color: Colors.red),
+                    style: TextStyle(color: context.appColors.error),
                   ),
                 Text('Duration: ${_result!.duration.inSeconds}s'),
               ],
@@ -295,12 +301,12 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
         ),
         if (_result!.errors.isNotEmpty) ...[
           const SizedBox(height: 16),
-          const Text('Errors:', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(l10n.errorsLabel, style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           ...(_result!.errors.take(10).map((e) => Card(
-                color: Colors.red.shade50,
+                color: context.appColors.primary,
                 child: ListTile(
-                  leading: const Icon(Icons.error, color: Colors.red),
+                  leading: Icon(Icons.error, color: context.appColors.error),
                   title: Text('Row ${e.rowNumber}'),
                   subtitle: Text(e.message),
                 ),
@@ -381,7 +387,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+      SnackBar(content: Text(message), backgroundColor: context.appColors.error),
     );
   }
 

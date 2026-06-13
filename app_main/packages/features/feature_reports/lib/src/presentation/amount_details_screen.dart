@@ -1,6 +1,7 @@
 // // lib/src/features/reports/presentation/amount_details_screen.dart
 
 // import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:intl/intl.dart';
 // // ⭐️ 1. IMPORT THE GENERATED LOCALIZATIONS FILE
@@ -131,7 +132,7 @@
 //             ],
 //             rows: details.map((detail) {
 //               final isDebit = detail.entryAmount > 0;
-//               final amountColor = isDebit ? Colors.green : Colors.red;
+//               final amountColor = isDebit ? context.appColors.success : context.appColors.error;
 
 //               final amountText = isDebit
 //                   ? '${detail.entryAmount.abs().toStringAsFixed(2)} ${detail.currencyCode}'

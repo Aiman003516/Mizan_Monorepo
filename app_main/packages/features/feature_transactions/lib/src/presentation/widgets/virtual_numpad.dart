@@ -1,6 +1,7 @@
 // FILE: packages/features/feature_transactions/lib/src/presentation/widgets/virtual_numpad.dart
 
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 
 class VirtualNumpad extends StatelessWidget {
   final Function(String) onKeyPressed;
@@ -57,9 +58,9 @@ class VirtualNumpad extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildActionKey(Icons.backspace, Colors.red.shade100, onBackspace),
+                  _buildActionKey(context, Icons.backspace, context.appColors.primary, onBackspace),
                   _buildKey('0'),
-                  _buildActionKey(Icons.keyboard_return, Colors.green.shade100, onEnter),
+                  _buildActionKey(context, Icons.keyboard_return, context.appColors.primary, onEnter),
                 ],
               ),
             ),
@@ -85,7 +86,7 @@ class VirtualNumpad extends StatelessWidget {
     );
   }
 
-  Widget _buildActionKey(IconData icon, Color color, VoidCallback onTap) {
+  Widget _buildActionKey(BuildContext context, IconData icon, Color color, VoidCallback onTap) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(2.0),
@@ -93,7 +94,7 @@ class VirtualNumpad extends StatelessWidget {
           onPressed: onTap,
           style: FilledButton.styleFrom(
             backgroundColor: color,
-            foregroundColor: Colors.black87,
+            foregroundColor: context.appColors.onSurface,
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
           ),
           child: Icon(icon),

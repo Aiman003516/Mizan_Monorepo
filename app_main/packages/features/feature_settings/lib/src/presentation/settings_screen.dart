@@ -1,16 +1,14 @@
-import 'dart:io';
 import 'package:feature_settings/feature_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // ⚡ FIXED: Added missing import
-import 'staff/staff_list_screen.dart'; // Add import
+// Add import
 
 // Local Imports
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_data/core_data.dart';
-import 'package:feature_settings/src/presentation/company_profile_screen.dart';
-import 'package:feature_settings/src/presentation/security_settings_screen.dart';
-import 'package:feature_settings/src/presentation/currency_settings_screen.dart';
 import 'package:feature_settings/src/presentation/roles/roles_list_screen.dart'; // ⚡ NEW: Import Roles Screen
 
 // Import Sync Feature
@@ -42,7 +40,7 @@ class SettingsScreen extends ConsumerWidget {
             onPressed: () => Navigator.of(context).pop(false),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: context.appColors.error),
             child: Text(l10n.restore),
             onPressed: () => Navigator.of(context).pop(true),
           ),
@@ -81,7 +79,9 @@ class SettingsScreen extends ConsumerWidget {
           RadioListTile<ThemeMode>(
             title: Text(l10n.light),
             value: ThemeMode.light,
+            // ignore: deprecated_member_use
             groupValue: currentTheme,
+            // ignore: deprecated_member_use
             onChanged: (mode) {
               ref.read(themeControllerProvider.notifier).setThemeMode(mode!);
               Navigator.pop(context);
@@ -90,7 +90,9 @@ class SettingsScreen extends ConsumerWidget {
           RadioListTile<ThemeMode>(
             title: Text(l10n.dark),
             value: ThemeMode.dark,
+            // ignore: deprecated_member_use
             groupValue: currentTheme,
+            // ignore: deprecated_member_use
             onChanged: (mode) {
               ref.read(themeControllerProvider.notifier).setThemeMode(mode!);
               Navigator.pop(context);
@@ -99,7 +101,9 @@ class SettingsScreen extends ConsumerWidget {
           RadioListTile<ThemeMode>(
             title: Text(l10n.systemDefault),
             value: ThemeMode.system,
+            // ignore: deprecated_member_use
             groupValue: currentTheme,
+            // ignore: deprecated_member_use
             onChanged: (mode) {
               ref.read(themeControllerProvider.notifier).setThemeMode(mode!);
               Navigator.pop(context);
@@ -122,7 +126,9 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(l10n.english),
             // ⚡ FIX: Removed 'const'
             value: Locale('en'),
+            // ignore: deprecated_member_use
             groupValue: currentLocale,
+            // ignore: deprecated_member_use
             onChanged: (locale) {
               ref.read(localeControllerProvider.notifier).setLocale(locale);
               Navigator.pop(context);
@@ -132,7 +138,9 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(l10n.arabic),
             // ⚡ FIX: Removed 'const'
             value: Locale('ar'),
+            // ignore: deprecated_member_use
             groupValue: currentLocale,
+            // ignore: deprecated_member_use
             onChanged: (locale) {
               ref.read(localeControllerProvider.notifier).setLocale(locale);
               Navigator.pop(context);
@@ -160,7 +168,7 @@ class SettingsScreen extends ConsumerWidget {
             // ⚡ FIX: No 'const', and passed argument "Google Drive"
             SnackBar(
               content: Text(l10n.backupSuccessful),
-              backgroundColor: Colors.green,
+              backgroundColor: context.appColors.success,
             ),
           );
         }
@@ -170,7 +178,7 @@ class SettingsScreen extends ConsumerWidget {
             // ⚡ FIX: No 'const'
             SnackBar(
               content: Text(l10n.restoreSuccessful),
-              backgroundColor: Colors.green,
+              backgroundColor: context.appColors.success,
             ),
           );
         }
@@ -185,7 +193,7 @@ class SettingsScreen extends ConsumerWidget {
             // ⚡ FIX: No 'const'
             SnackBar(
               content: Text(l10n.backupFailed),
-              backgroundColor: Colors.red,
+              backgroundColor: context.appColors.error,
             ),
           );
         }
@@ -308,10 +316,10 @@ class SettingsScreen extends ConsumerWidget {
                   height: 24,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Icon(Icons.restore, color: Colors.redAccent),
+              : Icon(Icons.restore, color: context.appColors.error),
           title: Text(
             l10n.restoreFromBackup,
-            style: const TextStyle(color: Colors.redAccent),
+            style: TextStyle(color: context.appColors.error),
           ),
           subtitle: Text(l10n.restoreWarning),
           onTap: isBusy ? null : () => _showRestoreDialog(context, ref),
@@ -331,15 +339,15 @@ class SettingsScreen extends ConsumerWidget {
                 if (role.isSystemAdmin) {
                   return Column(
                     children: [
-                      const ListTile(
-                        leading: Icon(Icons.verified, color: Colors.blue),
+                      ListTile(
+                        leading: Icon(Icons.verified, color: context.appColors.info),
                         title: Text("Enterprise License Active"),
                         subtitle: Text("You are the System Administrator"),
                       ),
 
                       // 🌟 NEW: Roles Management Button (Only for Admins)
                       ListTile(
-                        leading: const Icon(Icons.badge, color: Colors.purple),
+                        leading: Icon(Icons.badge, color: context.appColors.secondary),
                         title: const Text("Manage Roles"),
                         subtitle: const Text("Define staff permissions"),
                         trailing: const Icon(Icons.arrow_forward_ios),
@@ -355,9 +363,9 @@ class SettingsScreen extends ConsumerWidget {
 
                       // 🌟 NEW: Billing Management
                       ListTile(
-                        leading: const Icon(
+                        leading: Icon(
                           Icons.credit_card,
-                          color: Colors.orange,
+                          color: context.appColors.warning,
                         ),
                         title: const Text("Manage Subscription"),
                         subtitle: const Text("View plans & billing"),
@@ -373,7 +381,7 @@ class SettingsScreen extends ConsumerWidget {
                       ),
 
                       ListTile(
-                        leading: const Icon(Icons.group, color: Colors.indigo),
+                        leading: Icon(Icons.group, color: context.appColors.primary),
                         title: const Text("Manage Staff"),
                         subtitle: const Text("View list & invite members"),
                         trailing: const Icon(Icons.arrow_forward_ios),
@@ -393,7 +401,7 @@ class SettingsScreen extends ConsumerWidget {
                 // Scenario B: User is a Guest (New Buyer)
                 // Show the interactive "Activate" button to run the Genesis Script.
                 return ListTile(
-                  leading: const Icon(Icons.rocket_launch, color: Colors.green),
+                  leading: Icon(Icons.rocket_launch, color: context.appColors.success),
                   title: const Text("Activate Business License"),
                   subtitle: const Text("Initialize system & claim ownership"),
                   onTap: () async {
@@ -406,11 +414,11 @@ class SettingsScreen extends ConsumerWidget {
 
                     if (user == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
+                        SnackBar(
+                          content: const Text(
                             "⚠️ You are not logged in! Please Sign In first.",
                           ),
-                          backgroundColor: Colors.orange,
+                          backgroundColor: context.appColors.warning,
                         ),
                       );
                       return;
@@ -424,11 +432,11 @@ class SettingsScreen extends ConsumerWidget {
 
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
+                          SnackBar(
+                            content: const Text(
                               "✅ System Activated! Welcome, Admin.",
                             ),
-                            backgroundColor: Colors.green,
+                            backgroundColor: context.appColors.success,
                           ),
                         );
                       }
@@ -437,7 +445,7 @@ class SettingsScreen extends ConsumerWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("❌ Activation Failed: $e"),
-                            backgroundColor: Colors.red,
+                            backgroundColor: context.appColors.error,
                           ),
                         );
                       }
@@ -462,7 +470,7 @@ class SettingsScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 32),
+                  Icon(Icons.star, color: context.appColors.warning, size: 32),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(

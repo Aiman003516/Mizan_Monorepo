@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 import 'package:share_plus/share_plus.dart'; // Ensure you added this to pubspec
@@ -63,7 +65,7 @@ class _InviteStaffScreenState extends ConsumerState<InviteStaffScreen> {
                 final assignableRoles = roles.where((r) => r.id != 'owner').toList();
                 
                 return DropdownButtonFormField<AppRole>(
-                  value: _selectedRole,
+                  initialValue: _selectedRole,
                   hint: const Text("Choose Role (e.g. Cashier)"),
                   items: assignableRoles.map((role) {
                     return DropdownMenuItem(
@@ -89,10 +91,10 @@ class _InviteStaffScreenState extends ConsumerState<InviteStaffScreen> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: context.appColors.onPrimary,
                 ),
                 child: _isLoading 
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white)) 
+                    ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: context.appColors.onPrimary)) 
                     : const Text("Generate Invite Code"),
               ),
 
@@ -106,23 +108,23 @@ class _InviteStaffScreenState extends ConsumerState<InviteStaffScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: context.appColors.primary,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: context.appColors.primary),
                 ),
                 child: Column(
                   children: [
                     Text(
                       _generatedCode!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 32, 
                         fontWeight: FontWeight.bold, 
                         letterSpacing: 4,
-                        color: Colors.black87
+                        color: context.appColors.onSurface
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text("Valid for 24 hours", style: TextStyle(color: Colors.grey)),
+                    Text("Valid for 24 hours", style: TextStyle(color: context.appColors.subtleText)),
                   ],
                 ),
               ),
@@ -133,8 +135,8 @@ class _InviteStaffScreenState extends ConsumerState<InviteStaffScreen> {
                 label: const Text("Share via WhatsApp / Telegram"),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
+                  backgroundColor: context.appColors.success,
+                  foregroundColor: context.appColors.onPrimary,
                 ),
               ),
             ]

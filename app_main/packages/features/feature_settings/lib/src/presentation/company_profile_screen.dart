@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+
+// Local / Shared Imports
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_data/src/company_profile_controller.dart';
+import 'package:shared_ui/shared_ui.dart'; // Ensure shared_ui barrel exports ImagePickerWidget, or use direct path
+import 'package:shared_ui/src/widgets/image_picker_widget.dart';
+import 'package:shared_services/src/image_picker_service.dart';
 
 class CompanyProfileScreen extends ConsumerStatefulWidget {
   const CompanyProfileScreen({super.key});
@@ -17,6 +24,8 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
   final _userNameController = TextEditingController();
   final _addressController = TextEditingController();
   final _taxIDController = TextEditingController();
+  
+  String? _selectedImagePath;
   bool _isLoading = false;
 
   AppLocalizations get l10n => AppLocalizations.of(context)!;
@@ -29,6 +38,10 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     _userNameController.text = profile.userName;
     _addressController.text = profile.companyAddress;
     _taxIDController.text = profile.taxID;
+    
+    // Attempt to load existing image path if your model supports it
+    // Update `.imagePath` to your exact property name if it differs
+    _selectedImagePath = profile.imagePath;
   }
 
   @override
@@ -40,6 +53,36 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     super.dispose();
   }
 
+  Future<void> _handlePickImage() async {
+    final imageService = ref.read(imagePickerServiceProvider);
+    
+    try {
+      // Using the service you already built which handles Android/iOS/Windows perfectly
+      final pickedPath = await imageService.pickAndCopyImage(ImageSource.gallery);
+      
+      if (pickedPath != null && mounted) {
+        setState(() {
+          _selectedImagePath = pickedPath;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to pick image: $e"),
+            backgroundColor: context.appColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  void _handleRemoveImage() {
+    setState(() {
+      _selectedImagePath = null;
+    });
+  }
+
   Future<void> _saveProfile() async {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
@@ -47,18 +90,21 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     setState(() { _isLoading = true; });
 
     try {
+      // Update this call to include `imagePath: _selectedImagePath` 
+      // if your companyProfileProvider supports it.
       await ref.read(companyProfileProvider.notifier).saveProfile(
         companyName: _companyNameController.text.trim(),
         userName: _userNameController.text.trim(),
         companyAddress: _addressController.text.trim(),
         taxID: _taxIDController.text.trim(),
+        imagePath: _selectedImagePath,
       );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.profileSavedSuccess),
-            backgroundColor: Colors.green,
+            backgroundColor: context.appColors.success,
           ),
         );
         Navigator.of(context).pop();
@@ -68,7 +114,7 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${l10n.failedToSaveProfile} $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: context.appColors.error,
           ),
         );
       }
@@ -99,6 +145,14 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Utilizing your existing custom ImagePickerWidget
+              ImagePickerWidget(
+                imagePath: _selectedImagePath,
+                onPickImage: _handlePickImage,
+                onRemoveImage: _handleRemoveImage,
+              ),
+              const SizedBox(height: 32),
+
               Text(
                 l10n.companyProfileReportHint,
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -148,11 +202,12 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
               const SizedBox(height: 32),
               FilledButton.icon(
                 icon: _isLoading
-                    ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white))
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: context.appColors.onPrimary))
                     : const Icon(Icons.save),
                 label: Text(l10n.saveProfile),
                 onPressed: _isLoading ? null : _saveProfile,

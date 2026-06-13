@@ -1,5 +1,6 @@
 // Onboarding Tutorial Screen for new users
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,7 +32,7 @@ class _OnboardingTutorialScreenState
           'Your complete accounting solution for small businesses. Track transactions, manage inventory, and generate reports.',
       bodyAr:
           'نظام محاسبة متكامل للشركات الصغيرة. تتبع المعاملات، إدارة المخزون، وإنشاء التقارير.',
-      color: Color(0xFF1E3A5F),
+      color: Color(0xFF0F3D3E), // Deep Teal — Welcome
     ),
     OnboardingPage(
       icon: Icons.account_tree,
@@ -41,7 +42,7 @@ class _OnboardingTutorialScreenState
           'Organize your accounts by type: Assets, Liabilities, Equity, Revenue, and Expenses. Use hierarchies for detailed tracking.',
       bodyAr:
           'نظم حساباتك حسب النوع: الأصول، الالتزامات، حقوق الملكية، الإيرادات، والمصروفات.',
-      color: Color(0xFF2E7D32),
+      color: Color(0xFF2D8F7B), // Emerald Green — Accounts
     ),
     OnboardingPage(
       icon: Icons.receipt_long,
@@ -51,7 +52,7 @@ class _OnboardingTutorialScreenState
           'Record sales, purchases, payments, and receipts. Every transaction creates a proper double-entry.',
       bodyAr:
           'سجل المبيعات والمشتريات والمدفوعات والمقبوضات. كل معاملة تُنشئ قيد مزدوج صحيح.',
-      color: Color(0xFF7B1FA2),
+      color: Color(0xFF467373), // Mid Teal — Transactions
     ),
     OnboardingPage(
       icon: Icons.precision_manufacturing,
@@ -61,7 +62,7 @@ class _OnboardingTutorialScreenState
           'Track equipment, vehicles, and property. Automatically calculate depreciation using multiple methods.',
       bodyAr:
           'تتبع المعدات والمركبات والعقارات. احسب الإهلاك تلقائياً باستخدام طرق متعددة.',
-      color: Color(0xFFE65100),
+      color: Color(0xFF3D6B5E), // Forest — Fixed Assets
     ),
     OnboardingPage(
       icon: Icons.bar_chart,
@@ -71,7 +72,7 @@ class _OnboardingTutorialScreenState
           'Generate Balance Sheet, Income Statement, and Trial Balance reports instantly.',
       bodyAr:
           'أنشئ تقارير الميزانية العمومية وقائمة الدخل وميزان المراجعة فوراً.',
-      color: Color(0xFF00838F),
+      color: Color(0xFF5EABA0), // Light Teal — Reports
     ),
   ];
 
@@ -153,7 +154,7 @@ class _OnboardingTutorialScreenState
                   decoration: BoxDecoration(
                     color: _currentPage == index
                         ? _pages[index].color
-                        : Colors.grey.shade300,
+                        : Theme.of(context).colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -205,7 +206,8 @@ class _OnboardingTutorialScreenState
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: page.color.withOpacity(0.1),
+              // ignore: deprecated_member_use
+              color: page.color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(page.icon, size: 60, color: page.color),
@@ -227,7 +229,10 @@ class _OnboardingTutorialScreenState
           // Body
           Text(
             isArabic ? page.bodyAr : page.bodyEn,
-            style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
           ),
         ],

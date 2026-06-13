@@ -40,9 +40,7 @@ class AccountsHubScreen extends ConsumerWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const AddAccountScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => const AddAccountScreen()),
             );
           },
           tooltip: l10n.addNewAccount,

@@ -2,6 +2,7 @@
 
 import 'package:drift/drift.dart' as d;
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -75,7 +76,7 @@ class _MakePaymentScreenState extends ConsumerState<MakePaymentScreen> {
     if (paymentAmount <= 0) {
       scaffoldMessenger.showSnackBar(SnackBar(
         content: Text(l10n.pleaseEnterValidAmount),
-        backgroundColor: Colors.red,
+        backgroundColor: context.appColors.error,
       ));
       return;
     }
@@ -111,13 +112,13 @@ class _MakePaymentScreenState extends ConsumerState<MakePaymentScreen> {
 
       scaffoldMessenger.showSnackBar(SnackBar(
         content: Text(l10n.transactionSaved),
-        backgroundColor: Colors.green,
+        backgroundColor: context.appColors.success,
       ));
       navigator.pop();
     } catch (e) {
       scaffoldMessenger.showSnackBar(SnackBar(
         content: Text(e.toString()),
-        backgroundColor: Colors.red,
+        backgroundColor: context.appColors.error,
       ));
     }
   }
@@ -149,7 +150,7 @@ class _MakePaymentScreenState extends ConsumerState<MakePaymentScreen> {
                   final assetAccounts =
                       accounts.where((a) => a.type == 'asset').toList();
                   return DropdownButtonFormField<Account>(
-                    value: _selectedPaymentAccount,
+                    initialValue: _selectedPaymentAccount,
                     hint: Text(l10n.selectAccount),
                     decoration: InputDecoration(
                       labelText: l10n.payFromAccount,

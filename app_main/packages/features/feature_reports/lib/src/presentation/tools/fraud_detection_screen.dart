@@ -3,6 +3,8 @@
 // Reference: Messod D. Beneish, "The Detection of Earnings Manipulation" (1999)
 
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:core_data/src/services/financial_analysis_service.dart';
 
@@ -118,16 +120,17 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fraud Detection (M-Score)'),
+        title: Text(l10n.fraudDetection),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Input', icon: Icon(Icons.edit)),
-            Tab(text: 'Results', icon: Icon(Icons.warning_amber)),
-            Tab(text: 'Learn', icon: Icon(Icons.school)),
+          tabs: [
+            Tab(text: l10n.inputTab, icon: Icon(Icons.edit)),
+            Tab(text: l10n.resultsTab, icon: Icon(Icons.warning_amber)),
+            Tab(text: l10n.learnTab, icon: Icon(Icons.school)),
           ],
         ),
       ),
@@ -143,6 +146,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
   }
 
   Widget _buildInputTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -167,30 +171,30 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Current Period',
+                        l10n.currentPeriod,
                         style: theme.textTheme.titleMedium,
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _buildInputRow('Revenue', _currentRevenueController),
-                  _buildInputRow('Receivables', _currentReceivablesController),
-                  _buildInputRow('Gross Profit', _currentGrossProfitController),
-                  _buildInputRow('Total Assets', _currentTotalAssetsController),
+                  _buildInputRow(l10n.revenueInput, _currentRevenueController),
+                  _buildInputRow(l10n.receivablesInput, _currentReceivablesController),
+                  _buildInputRow(l10n.grossProfitInput, _currentGrossProfitController),
+                  _buildInputRow(l10n.totalAssetsInput, _currentTotalAssetsController),
                   _buildInputRow(
-                    'Current Assets',
+                    l10n.currentAssetsInput,
                     _currentCurrentAssetsController,
                   ),
-                  _buildInputRow('PP&E', _currentPPEController),
+                  _buildInputRow(l10n.ppeInput, _currentPPEController),
                   _buildInputRow(
-                    'Depreciation',
+                    l10n.depreciationInput,
                     _currentDepreciationController,
                   ),
-                  _buildInputRow('SG&A Expense', _currentSGAController),
-                  _buildInputRow('Net Income', _currentNetIncomeController),
-                  _buildInputRow('Cash from Ops', _currentCFOController),
-                  _buildInputRow('Long-Term Debt', _currentLTDebtController),
-                  _buildInputRow('Current Liabilities', _currentCLController),
+                  _buildInputRow(l10n.sgaExpenseInput, _currentSGAController),
+                  _buildInputRow(l10n.netIncomeInput, _currentNetIncomeController),
+                  _buildInputRow(l10n.cashFromOps, _currentCFOController),
+                  _buildInputRow(l10n.longTermDebt, _currentLTDebtController),
+                  _buildInputRow(l10n.currentLiabilities, _currentCLController),
                 ],
               ),
             ),
@@ -206,25 +210,25 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.history, color: Colors.grey),
+                      Icon(Icons.history, color: context.appColors.subtleText),
                       const SizedBox(width: 8),
-                      Text('Prior Period', style: theme.textTheme.titleMedium),
+                      Text(l10n.priorPeriod, style: theme.textTheme.titleMedium),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  _buildInputRow('Revenue', _priorRevenueController),
-                  _buildInputRow('Receivables', _priorReceivablesController),
-                  _buildInputRow('Gross Profit', _priorGrossProfitController),
-                  _buildInputRow('Total Assets', _priorTotalAssetsController),
+                  _buildInputRow(l10n.revenueInput, _priorRevenueController),
+                  _buildInputRow(l10n.receivablesInput, _priorReceivablesController),
+                  _buildInputRow(l10n.grossProfitInput, _priorGrossProfitController),
+                  _buildInputRow(l10n.totalAssetsInput, _priorTotalAssetsController),
                   _buildInputRow(
-                    'Current Assets',
+                    l10n.currentAssetsInput,
                     _priorCurrentAssetsController,
                   ),
-                  _buildInputRow('PP&E', _priorPPEController),
-                  _buildInputRow('Depreciation', _priorDepreciationController),
-                  _buildInputRow('SG&A Expense', _priorSGAController),
-                  _buildInputRow('Long-Term Debt', _priorLTDebtController),
-                  _buildInputRow('Current Liabilities', _priorCLController),
+                  _buildInputRow(l10n.ppeInput, _priorPPEController),
+                  _buildInputRow(l10n.depreciationInput, _priorDepreciationController),
+                  _buildInputRow(l10n.sgaExpenseInput, _priorSGAController),
+                  _buildInputRow(l10n.longTermDebt, _priorLTDebtController),
+                  _buildInputRow(l10n.currentLiabilities, _priorCLController),
                 ],
               ),
             ),
@@ -259,20 +263,21 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
 
     switch (result.riskLevel) {
       case 'HIGH':
-        color = Colors.red;
+        color = context.appColors.error;
         icon = Icons.warning;
         break;
       case 'MODERATE':
-        color = Colors.orange;
+        color = context.appColors.warning;
         icon = Icons.error_outline;
         break;
       default:
-        color = Colors.green;
+        color = context.appColors.success;
         icon = Icons.check_circle;
     }
 
     return Card(
-      color: color.withOpacity(0.1),
+      // ignore: deprecated_member_use
+      color: color.withValues(alpha: 0.1),
       child: ListTile(
         leading: Icon(icon, color: color, size: 32),
         title: Text(
@@ -292,8 +297,9 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
   }
 
   Widget _buildResultsTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     if (_result == null) {
-      return const Center(child: Text('Enter financial data to see results'));
+      return Center(child: Text(l10n.enterFinancialData));
     }
 
     final result = _result!;
@@ -301,13 +307,13 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
 
     switch (result.riskLevel) {
       case 'HIGH':
-        riskColor = Colors.red;
+        riskColor = context.appColors.error;
         break;
       case 'MODERATE':
-        riskColor = Colors.orange;
+        riskColor = context.appColors.warning;
         break;
       default:
-        riskColor = Colors.green;
+        riskColor = context.appColors.success;
     }
 
     return SingleChildScrollView(
@@ -316,7 +322,8 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
         children: [
           // Main Score Card
           Card(
-            color: riskColor.withOpacity(0.1),
+            // ignore: deprecated_member_use
+            color: riskColor.withValues(alpha: 0.1),
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -351,13 +358,13 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.red,
+                        color: context.appColors.error,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Text(
-                        'PROBABLE MANIPULATOR',
+                      child: Text(
+                        l10n.probableManipulatorLabel,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: context.appColors.onPrimary,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -382,7 +389,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Component Indices', style: theme.textTheme.titleMedium),
+                  Text(l10n.componentIndices, style: theme.textTheme.titleMedium),
                   const SizedBox(height: 16),
                   _buildIndexRow(
                     'DSRI',
@@ -406,7 +413,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
           if (result.redFlags.isNotEmpty) ...[
             const SizedBox(height: 16),
             Card(
-              color: Colors.red.shade50,
+              color: context.appColors.primary,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -414,12 +421,12 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.flag, color: Colors.red),
+                        Icon(Icons.flag, color: context.appColors.error),
                         const SizedBox(width: 8),
                         Text(
                           'Red Flags (${result.redFlags.length})',
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: Colors.red,
+                            color: context.appColors.error,
                           ),
                         ),
                       ],
@@ -431,9 +438,9 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.warning_amber,
-                              color: Colors.red,
+                              color: context.appColors.error,
                               size: 18,
                             ),
                             const SizedBox(width: 8),
@@ -464,7 +471,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
     String description,
   ) {
     final isAboveThreshold = value > threshold;
-    final color = isAboveThreshold ? Colors.red : Colors.green;
+    final color = isAboveThreshold ? context.appColors.error : context.appColors.success;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -475,14 +482,16 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
             child: Text(
               name,
               style: const TextStyle(fontWeight: FontWeight.bold),
+              textDirection: TextDirection.ltr,
             ),
           ),
           Expanded(
             child: Text(description, style: const TextStyle(fontSize: 12)),
           ),
           Text(
-            value.toStringAsFixed(3),
+            '\u200E${value.toStringAsFixed(3)}',
             style: TextStyle(fontWeight: FontWeight.bold, color: color),
+            textDirection: TextDirection.ltr,
           ),
           const SizedBox(width: 8),
           Icon(
@@ -496,6 +505,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
   }
 
   Widget _buildLearnTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -531,7 +541,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('The Formula', style: theme.textTheme.titleMedium),
+                  Text(l10n.theFormula, style: theme.textTheme.titleMedium),
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -672,7 +682,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                 Text(name, style: const TextStyle(fontWeight: FontWeight.w500)),
                 Text(
                   description,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  style: TextStyle(fontSize: 12, color: context.appColors.primary),
                 ),
               ],
             ),

@@ -10,6 +10,7 @@ class SyncController extends StateNotifier<AsyncValue<void>> {
   SyncController(this._syncService, this._ref) : super(const AsyncData(null));
 
   final SyncService _syncService;
+  // ignore: unused_field
   final Ref _ref;
 
   Future<void> runBackup() async {

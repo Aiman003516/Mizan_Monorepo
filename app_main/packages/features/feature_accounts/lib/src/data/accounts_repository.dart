@@ -19,18 +19,20 @@ class AccountsRepository {
   AccountsRepository(this._db, {this.tenantId});
 
   Stream<List<Account>> watchAllAccounts() {
-    return (_db.select(_db.accounts)
-          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-        .watch();
+    return (_db.select(
+      _db.accounts,
+    )..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
   }
 
   Stream<List<Account>> watchAccounts() {
     return (_db.select(_db.accounts)
-          ..where((tbl) => tbl.name.isNotIn([
-                c.kCashAccountName,
-                c.kSalesRevenueAccountName,
-                c.kEquityAccountName
-              ]))
+          ..where(
+            (tbl) => tbl.name.isNotIn([
+              c.kCashAccountName,
+              c.kSalesRevenueAccountName,
+              c.kEquityAccountName,
+            ]),
+          )
           ..orderBy([(t) => OrderingTerm.asc(t.name)]))
         .watch();
   }
@@ -41,6 +43,7 @@ class AccountsRepository {
     double initialBalance = 0.0,
     String? phoneNumber,
     String? classificationId,
+    String? customAttributes,
   }) {
     final int balanceCents = (initialBalance * 100).round();
 
@@ -50,6 +53,7 @@ class AccountsRepository {
       initialBalance: balanceCents,
       phoneNumber: Value(phoneNumber),
       classificationId: Value(classificationId),
+      customAttributes: Value(customAttributes),
       // 🚀 INJECT TENANT ID
       tenantId: Value(tenantId),
     );
@@ -58,13 +62,18 @@ class AccountsRepository {
 
   Future<void> updateAccount(Account account) {
     // 🚀 PRESERVE TENANT ID ON UPDATE
-    // When updating, we usually keep the existing tenantId, 
+    // When updating, we usually keep the existing tenantId,
     // but ensuring it matches the current scope is safer.
-    return _db.update(_db.accounts).replace(
-        account.toCompanion(false).copyWith(
-          lastUpdated: Value(DateTime.now()),
-          tenantId: Value(tenantId), // Ensure ownership stays correct
-        ));
+    return _db
+        .update(_db.accounts)
+        .replace(
+          account
+              .toCompanion(false)
+              .copyWith(
+                lastUpdated: Value(DateTime.now()),
+                tenantId: Value(tenantId), // Ensure ownership stays correct
+              ),
+        );
   }
 
   Future<void> deleteAccount(String id) {
@@ -79,33 +88,34 @@ class AccountsRepository {
   }
 
   Future<String?> getClassificationIdByName(String name) async {
-    final classification = await (_db.select(_db.classifications)
-          ..where((tbl) => tbl.name.equals(name)))
-        .getSingleOrNull();
+    final classification = await (_db.select(
+      _db.classifications,
+    )..where((tbl) => tbl.name.equals(name))).getSingleOrNull();
     return classification?.id;
   }
 
   Future<String?> getAccountIdByName(String name) async {
-    final account = await (_db.select(_db.accounts)
-          ..where((tbl) => tbl.name.equals(name)))
-        .getSingleOrNull();
+    final account = await (_db.select(
+      _db.accounts,
+    )..where((tbl) => tbl.name.equals(name))).getSingleOrNull();
     return account?.id;
   }
 
   Future<double> getAccountBalance(String accountId) async {
-    final account = await (_db.select(_db.accounts)
-          ..where((tbl) => tbl.id.equals(accountId)))
-        .getSingleOrNull();
+    final account = await (_db.select(
+      _db.accounts,
+    )..where((tbl) => tbl.id.equals(accountId))).getSingleOrNull();
 
     final int initialBalanceCents = account?.initialBalance ?? 0;
 
     final entries = _db.transactionEntries;
     final amountSum = entries.amount.sum();
 
-    final result = await (_db.selectOnly(entries)
-      ..where(entries.accountId.equals(accountId))
-      ..addColumns([amountSum]))
-      .getSingleOrNull();
+    final result =
+        await (_db.selectOnly(entries)
+              ..where(entries.accountId.equals(accountId))
+              ..addColumns([amountSum]))
+            .getSingleOrNull();
 
     final int transactionTotalCents = result?.read(amountSum) ?? 0;
     final int totalCents = initialBalanceCents + transactionTotalCents;

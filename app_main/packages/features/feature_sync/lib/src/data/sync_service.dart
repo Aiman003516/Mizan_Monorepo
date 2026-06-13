@@ -161,6 +161,7 @@ class SyncService {
       rethrow;
     } finally {
       // Resurrection
+      // ignore: unused_result
       _ref.refresh(appDatabaseProvider);
       
       // Auto-reset state

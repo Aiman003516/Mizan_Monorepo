@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,6 +25,8 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
   bool _isValidating = false;
   String? _errorMessage;
   Map<String, dynamic>? _inviteDetails;
+
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
 
   @override
   void dispose() {
@@ -96,9 +101,9 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Successfully joined organization!'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text(l10n.joinedOrganization),
+            backgroundColor: context.appColors.success,
           ),
         );
         Navigator.of(context).pop(true); // Return success
@@ -114,10 +119,11 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Join Organization'), centerTitle: true),
+      appBar: AppBar(title: Text(l10n.joinOrganization), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -130,7 +136,7 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                 Icon(Icons.group_add, size: 64, color: colorScheme.primary),
                 const SizedBox(height: 16),
                 Text(
-                  'Join Organization',
+                  l10n.joinOrganization,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -157,7 +163,7 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                   decoration: InputDecoration(
-                    labelText: 'Invite Code',
+                    labelText: l10n.inviteCode,
                     hintText: '000000',
                     border: const OutlineInputBorder(),
                     prefixIcon: const Icon(Icons.vpn_key),
@@ -171,7 +177,7 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                             ),
                           )
                         : _inviteDetails != null
-                        ? const Icon(Icons.check_circle, color: Colors.green)
+                        ? Icon(Icons.check_circle, color: context.appColors.success)
                         : null,
                   ),
                   validator: (value) {
@@ -203,9 +209,9 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.check_circle,
-                            color: Colors.green,
+                            color: context.appColors.success,
                             size: 32,
                           ),
                           const SizedBox(height: 8),
@@ -227,9 +233,9 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                   // Name Input
                   TextFormField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Your Name',
-                      hintText: 'Enter your display name',
+                    decoration: InputDecoration(
+                      labelText: l10n.yourName,
+                      hintText: l10n.enterDisplayName,
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.person),
                     ),
@@ -275,17 +281,17 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: _isLoading
-                        ? const SizedBox(
+                        ? SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: context.appColors.onPrimary,
                             ),
                           )
-                        : const Text(
-                            'Join Organization',
-                            style: TextStyle(fontSize: 16),
+                        : Text(
+                            l10n.joinOrganization,
+                            style: const TextStyle(fontSize: 16),
                           ),
                   ),
                 ),

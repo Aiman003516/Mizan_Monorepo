@@ -1,6 +1,7 @@
 // FILE: packages/features/feature_transactions/lib/src/presentation/purchase_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' as d;
@@ -10,7 +11,6 @@ import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
 
 // Feature Imports
-import 'package:feature_products/src/data/database_provider.dart';
 import 'package:feature_accounts/feature_accounts.dart';
 import 'package:feature_products/feature_products.dart' hide accountsRepositoryProvider;
 // FIX: Un-hide databaseProvider so we can use it!
@@ -97,7 +97,7 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
       if (inventoryAccountId == null) {
         scaffoldMessenger.showSnackBar(SnackBar(
           content: Text(l10n.criticalAccountError),
-          backgroundColor: Colors.red,
+          backgroundColor: context.appColors.error,
         ));
         return;
       }
@@ -145,14 +145,14 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
 
         scaffoldMessenger.showSnackBar(SnackBar(
           content: Text(l10n.purchaseSaved),
-          backgroundColor: Colors.green,
+          backgroundColor: context.appColors.success,
         ));
         navigator.pop();
 
       } catch (e) {
         scaffoldMessenger.showSnackBar(SnackBar(
           content: Text(l10n.failedToSavePurchase(e.toString())),
-          backgroundColor: Colors.red,
+          backgroundColor: context.appColors.error,
         ));
       }
     }
@@ -185,7 +185,7 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
               padding: const EdgeInsets.all(16.0),
               child: suppliersAsync.when(
                 data: (suppliers) => DropdownButtonFormField<Account>(
-                  value: _selectedSupplier,
+                  initialValue: _selectedSupplier,
                   hint: Text(l10n.selectSupplier),
                   isExpanded: true,
                   items: suppliers.map((account) {
@@ -217,7 +217,7 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
                       Expanded(
                         flex: 3,
                         child: DropdownButtonFormField<Product>(
-                          value: _selectedProduct,
+                          initialValue: _selectedProduct,
                           hint: Text(l10n.addProduct),
                           isExpanded: true,
                           items: products.map((product) {
@@ -278,7 +278,7 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
                       children: [
                         Text(total.toStringAsFixed(2)),
                         IconButton(
-                          icon: const Icon(Icons.remove_circle, color: Colors.red),
+                          icon: Icon(Icons.remove_circle, color: context.appColors.error),
                           onPressed: () => _removeItem(index),
                         ),
                       ],

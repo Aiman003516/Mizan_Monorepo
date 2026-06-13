@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
+import 'package:core_l10n/app_localizations.dart';
 
 /// Financial Ratios Dashboard Screen
 class FinancialRatiosScreen extends ConsumerStatefulWidget {
@@ -32,10 +33,11 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
     final ratiosAsync = ref.watch(financialRatiosProvider(_selectedPeriod));
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Financial Ratios'),
+        title: Text(l10n.financialRatiosTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.date_range),
@@ -51,7 +53,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
         ],
       ),
       body: ratiosAsync.when(
-        data: (ratios) => _buildRatiosDashboard(context, ratios),
+        data: (ratios) => _buildRatiosDashboard(context, ratios, l10n),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(
           child: Column(
@@ -59,7 +61,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
             children: [
               Icon(Icons.error_outline, size: 48, color: colorScheme.error),
               const SizedBox(height: 16),
-              Text('Error loading ratios', style: theme.textTheme.titleMedium),
+              Text(l10n.errorLoadingRatios, style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               Text(error.toString(), style: theme.textTheme.bodySmall),
             ],
@@ -84,6 +86,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
   Widget _buildRatiosDashboard(
     BuildContext context,
     FinancialRatiosResult ratios,
+    AppLocalizations l10n,
   ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -97,45 +100,45 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
           // Liquidity Ratios
           _buildSectionHeader(
             context,
-            'Liquidity Ratios',
+            l10n.liquidityRatios,
             Icons.water_drop,
             Colors.blue,
           ),
           const SizedBox(height: 12),
-          _buildLiquidityRatios(ratios),
+          _buildLiquidityRatios(ratios, l10n),
           const SizedBox(height: 24),
 
           // Activity Ratios
           _buildSectionHeader(
             context,
-            'Activity Ratios',
+            l10n.activityRatios,
             Icons.speed,
             Colors.orange,
           ),
           const SizedBox(height: 12),
-          _buildActivityRatios(ratios),
+          _buildActivityRatios(ratios, l10n),
           const SizedBox(height: 24),
 
           // Profitability Ratios
           _buildSectionHeader(
             context,
-            'Profitability Ratios',
+            l10n.profitabilityRatios,
             Icons.trending_up,
             Colors.green,
           ),
           const SizedBox(height: 12),
-          _buildProfitabilityRatios(ratios),
+          _buildProfitabilityRatios(ratios, l10n),
           const SizedBox(height: 24),
 
           // Leverage Ratios
           _buildSectionHeader(
             context,
-            'Leverage Ratios',
+            l10n.leverageRatios,
             Icons.balance,
             Colors.purple,
           ),
           const SizedBox(height: 12),
-          _buildLeverageRatios(ratios),
+          _buildLeverageRatios(ratios, l10n),
           const SizedBox(height: 32),
         ],
       ),
@@ -186,7 +189,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: color, size: 20),
@@ -202,238 +205,275 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
     );
   }
 
-  Widget _buildLiquidityRatios(FinancialRatiosResult ratios) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: [
-        _buildRatioCard(
-          title: 'Current Ratio',
-          value: ratios.currentRatio,
-          format: RatioFormat.ratio,
-          benchmark: 2.0,
-          description: 'Current Assets ÷ Current Liabilities',
-          goodAbove: 1.5,
-          warningBelow: 1.0,
+  Widget _buildLiquidityRatios(
+    FinancialRatiosResult ratios,
+    AppLocalizations l10n,
+  ) {
+    return _buildRatioDataTable(context, [
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.currentRatio,
+        value: ratios.currentRatio,
+        format: RatioFormat.ratio,
+        benchmark: 2.0,
+        description: l10n.formulaCurrentRatio,
+        goodAbove: 1.5,
+        warningBelow: 1.0,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.quickRatio,
+        value: ratios.quickRatio,
+        format: RatioFormat.ratio,
+        benchmark: 1.0,
+        description: l10n.formulaQuickRatio,
+        goodAbove: 1.0,
+        warningBelow: 0.5,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.cashRatio,
+        value: ratios.cashRatio,
+        format: RatioFormat.ratio,
+        benchmark: 0.5,
+        description: l10n.formulaCashRatio,
+        goodAbove: 0.5,
+        warningBelow: 0.2,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: 'Working Capital',
+        value: ratios.workingCapital.toDouble(),
+        format: RatioFormat.currency,
+        description: l10n.formulaWorkingCapital,
+        goodAbove: 0,
+        warningBelow: 0,
+      ),
+    ]);
+  }
+
+  Widget _buildActivityRatios(
+    FinancialRatiosResult ratios,
+    AppLocalizations l10n,
+  ) {
+    return _buildRatioDataTable(context, [
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.inventoryTurnover,
+        value: ratios.inventoryTurnover,
+        format: RatioFormat.times,
+        benchmark: 6.0,
+        description: l10n.formulaInventoryTurnover,
+        goodAbove: 4.0,
+        warningBelow: 2.0,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.daysSalesInInventory,
+        value: ratios.daysSalesInInventory.toDouble(),
+        format: RatioFormat.days,
+        description: l10n.formulaDaysSalesInInventory,
+        goodAbove: 0,
+        warningBelow: 90,
+        invertColors: true, // Lower is better
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.receivablesTurnover,
+        value: ratios.receivablesTurnover,
+        format: RatioFormat.times,
+        benchmark: 8.0,
+        description: l10n.formulaReceivablesTurnover,
+        goodAbove: 6.0,
+        warningBelow: 4.0,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.daysSalesOutstanding,
+        value: ratios.daysSalesOutstanding.toDouble(),
+        format: RatioFormat.days,
+        description: l10n.formulaDaysSalesOutstanding,
+        goodAbove: 0,
+        warningBelow: 45,
+        invertColors: true,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.cashConversionCycle,
+        value: ratios.cashConversionCycle.toDouble(),
+        format: RatioFormat.days,
+        description: l10n.formulaCashConversionCycle,
+        goodAbove: 0,
+        warningBelow: 60,
+        invertColors: true,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.assetTurnover,
+        value: ratios.assetTurnover,
+        format: RatioFormat.times,
+        benchmark: 1.5,
+        description: l10n.formulaAssetTurnover,
+        goodAbove: 1.0,
+        warningBelow: 0.5,
+      ),
+    ]);
+  }
+
+  Widget _buildProfitabilityRatios(
+    FinancialRatiosResult ratios,
+    AppLocalizations l10n,
+  ) {
+    return _buildRatioDataTable(context, [
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.grossProfitMargin,
+        value: ratios.grossProfitMargin,
+        format: RatioFormat.percent,
+        benchmark: 0.35,
+        description: l10n.formulaGrossProfitMargin,
+        goodAbove: 0.30,
+        warningBelow: 0.20,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.operatingProfitMargin,
+        value: ratios.operatingProfitMargin,
+        format: RatioFormat.percent,
+        benchmark: 0.15,
+        description: l10n.formulaOperatingProfitMargin,
+        goodAbove: 0.10,
+        warningBelow: 0.05,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.netProfitMargin,
+        value: ratios.netProfitMargin,
+        format: RatioFormat.percent,
+        benchmark: 0.10,
+        description: l10n.formulaNetProfitMargin,
+        goodAbove: 0.08,
+        warningBelow: 0.03,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.returnOnAssets,
+        value: ratios.returnOnAssets,
+        format: RatioFormat.percent,
+        benchmark: 0.10,
+        description: l10n.formulaReturnOnAssets,
+        goodAbove: 0.08,
+        warningBelow: 0.05,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.returnOnEquity,
+        value: ratios.returnOnEquity,
+        format: RatioFormat.percent,
+        benchmark: 0.15,
+        description: l10n.formulaReturnOnEquity,
+        goodAbove: 0.12,
+        warningBelow: 0.08,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.ebitdaMargin,
+        value: ratios.ebitdaMargin,
+        format: RatioFormat.percent,
+        benchmark: 0.20,
+        description: l10n.formulaEbitdaMargin,
+        goodAbove: 0.15,
+        warningBelow: 0.10,
+      ),
+    ]);
+  }
+
+  Widget _buildLeverageRatios(
+    FinancialRatiosResult ratios,
+    AppLocalizations l10n,
+  ) {
+    return _buildRatioDataTable(context, [
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.debtToEquityRatio,
+        value: ratios.debtToEquityRatio,
+        format: RatioFormat.ratio,
+        benchmark: 1.0,
+        description: l10n.formulaDebtToEquity,
+        goodAbove: 0,
+        warningBelow: 2.0,
+        invertColors: true, // Lower is better
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.debtToAssetsRatio,
+        value: ratios.debtToAssetsRatio,
+        format: RatioFormat.percent,
+        benchmark: 0.40,
+        description: l10n.formulaDebtToAssets,
+        goodAbove: 0,
+        warningBelow: 0.60,
+        invertColors: true,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.equityMultiplier,
+        value: ratios.equityMultiplier,
+        format: RatioFormat.ratio,
+        benchmark: 2.0,
+        description: l10n.formulaEquityMultiplier,
+        goodAbove: 0,
+        warningBelow: 3.0,
+        invertColors: true,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.interestCoverage,
+        value: ratios.interestCoverageRatio,
+        format: RatioFormat.times,
+        benchmark: 5.0,
+        description: l10n.formulaInterestCoverage,
+        goodAbove: 3.0,
+        warningBelow: 1.5,
+      ),
+      _buildRatioDataRow(
+        l10n: l10n,
+        title: l10n.timesInterestEarned,
+        value: ratios.timesInterestEarned,
+        format: RatioFormat.times,
+        benchmark: 5.0,
+        description: l10n.formulaTimesInterestEarned,
+        goodAbove: 3.0,
+        warningBelow: 1.5,
+      ),
+    ]);
+  }
+
+  Widget _buildRatioDataTable(BuildContext context, List<DataRow> rows) {
+    return Card(
+      elevation: 2,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          columnSpacing: 24,
+          headingTextStyle: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+          columns: const [
+            DataColumn(label: Text('Ratio')),
+            DataColumn(label: Text('Value')),
+            DataColumn(label: Text('Benchmark')),
+            DataColumn(label: Text('Status')),
+            DataColumn(label: Text('Description')),
+          ],
+          rows: rows,
         ),
-        _buildRatioCard(
-          title: 'Quick Ratio',
-          value: ratios.quickRatio,
-          format: RatioFormat.ratio,
-          benchmark: 1.0,
-          description: '(Cash + Receivables) ÷ Current Liabilities',
-          goodAbove: 1.0,
-          warningBelow: 0.5,
-        ),
-        _buildRatioCard(
-          title: 'Cash Ratio',
-          value: ratios.cashRatio,
-          format: RatioFormat.ratio,
-          benchmark: 0.5,
-          description: 'Cash ÷ Current Liabilities',
-          goodAbove: 0.5,
-          warningBelow: 0.2,
-        ),
-        _buildRatioCard(
-          title: 'Working Capital',
-          value: ratios.workingCapital.toDouble(),
-          format: RatioFormat.currency,
-          description: 'Current Assets - Current Liabilities',
-          goodAbove: 0,
-          warningBelow: 0,
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildActivityRatios(FinancialRatiosResult ratios) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: [
-        _buildRatioCard(
-          title: 'Inventory Turnover',
-          value: ratios.inventoryTurnover,
-          format: RatioFormat.times,
-          benchmark: 6.0,
-          description: 'COGS ÷ Average Inventory',
-          goodAbove: 4.0,
-          warningBelow: 2.0,
-        ),
-        _buildRatioCard(
-          title: 'Days Sales in Inventory',
-          value: ratios.daysSalesInInventory.toDouble(),
-          format: RatioFormat.days,
-          description: '365 ÷ Inventory Turnover',
-          goodAbove: 0,
-          warningBelow: 90,
-          invertColors: true, // Lower is better
-        ),
-        _buildRatioCard(
-          title: 'Receivables Turnover',
-          value: ratios.receivablesTurnover,
-          format: RatioFormat.times,
-          benchmark: 8.0,
-          description: 'Net Sales ÷ Average Receivables',
-          goodAbove: 6.0,
-          warningBelow: 4.0,
-        ),
-        _buildRatioCard(
-          title: 'Days Sales Outstanding',
-          value: ratios.daysSalesOutstanding.toDouble(),
-          format: RatioFormat.days,
-          description: '365 ÷ Receivables Turnover',
-          goodAbove: 0,
-          warningBelow: 45,
-          invertColors: true,
-        ),
-        _buildRatioCard(
-          title: 'Cash Conversion Cycle',
-          value: ratios.cashConversionCycle.toDouble(),
-          format: RatioFormat.days,
-          description: 'DSI + DSO - DPO',
-          goodAbove: 0,
-          warningBelow: 60,
-          invertColors: true,
-        ),
-        _buildRatioCard(
-          title: 'Asset Turnover',
-          value: ratios.assetTurnover,
-          format: RatioFormat.times,
-          benchmark: 1.5,
-          description: 'Net Sales ÷ Average Total Assets',
-          goodAbove: 1.0,
-          warningBelow: 0.5,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProfitabilityRatios(FinancialRatiosResult ratios) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: [
-        _buildRatioCard(
-          title: 'Gross Profit Margin',
-          value: ratios.grossProfitMargin,
-          format: RatioFormat.percent,
-          benchmark: 0.35,
-          description: '(Revenue - COGS) ÷ Revenue',
-          goodAbove: 0.30,
-          warningBelow: 0.20,
-        ),
-        _buildRatioCard(
-          title: 'Operating Profit Margin',
-          value: ratios.operatingProfitMargin,
-          format: RatioFormat.percent,
-          benchmark: 0.15,
-          description: 'Operating Income ÷ Revenue',
-          goodAbove: 0.10,
-          warningBelow: 0.05,
-        ),
-        _buildRatioCard(
-          title: 'Net Profit Margin',
-          value: ratios.netProfitMargin,
-          format: RatioFormat.percent,
-          benchmark: 0.10,
-          description: 'Net Income ÷ Revenue',
-          goodAbove: 0.08,
-          warningBelow: 0.03,
-        ),
-        _buildRatioCard(
-          title: 'Return on Assets (ROA)',
-          value: ratios.returnOnAssets,
-          format: RatioFormat.percent,
-          benchmark: 0.10,
-          description: 'Net Income ÷ Average Total Assets',
-          goodAbove: 0.08,
-          warningBelow: 0.05,
-        ),
-        _buildRatioCard(
-          title: 'Return on Equity (ROE)',
-          value: ratios.returnOnEquity,
-          format: RatioFormat.percent,
-          benchmark: 0.15,
-          description: 'Net Income ÷ Average Equity',
-          goodAbove: 0.12,
-          warningBelow: 0.08,
-        ),
-        _buildRatioCard(
-          title: 'EBITDA Margin',
-          value: ratios.ebitdaMargin,
-          format: RatioFormat.percent,
-          benchmark: 0.20,
-          description: 'EBITDA ÷ Revenue',
-          goodAbove: 0.15,
-          warningBelow: 0.10,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLeverageRatios(FinancialRatiosResult ratios) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: [
-        _buildRatioCard(
-          title: 'Debt-to-Equity Ratio',
-          value: ratios.debtToEquityRatio,
-          format: RatioFormat.ratio,
-          benchmark: 1.0,
-          description: 'Total Liabilities ÷ Shareholders\' Equity',
-          goodAbove: 0,
-          warningBelow: 2.0,
-          invertColors: true, // Lower is better
-        ),
-        _buildRatioCard(
-          title: 'Debt-to-Assets Ratio',
-          value: ratios.debtToAssetsRatio,
-          format: RatioFormat.percent,
-          benchmark: 0.40,
-          description: 'Total Liabilities ÷ Total Assets',
-          goodAbove: 0,
-          warningBelow: 0.60,
-          invertColors: true,
-        ),
-        _buildRatioCard(
-          title: 'Equity Multiplier',
-          value: ratios.equityMultiplier,
-          format: RatioFormat.ratio,
-          benchmark: 2.0,
-          description: 'Total Assets ÷ Shareholders\' Equity',
-          goodAbove: 0,
-          warningBelow: 3.0,
-          invertColors: true,
-        ),
-        _buildRatioCard(
-          title: 'Interest Coverage',
-          value: ratios.interestCoverageRatio == double.infinity
-              ? 999
-              : ratios.interestCoverageRatio,
-          format: RatioFormat.times,
-          benchmark: 5.0,
-          description: 'EBIT ÷ Interest Expense',
-          goodAbove: 3.0,
-          warningBelow: 1.5,
-        ),
-        _buildRatioCard(
-          title: 'Times Interest Earned',
-          value: ratios.timesInterestEarned == double.infinity
-              ? 999
-              : ratios.timesInterestEarned,
-          format: RatioFormat.times,
-          benchmark: 5.0,
-          description: '(Net Income + Interest + Tax) ÷ Interest',
-          goodAbove: 3.0,
-          warningBelow: 1.5,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRatioCard({
+  DataRow _buildRatioDataRow({
+    required AppLocalizations l10n,
     required String title,
     required double value,
     required RatioFormat format,
@@ -475,66 +515,49 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
       }
     }
 
-    return SizedBox(
-      width: 200,
-      child: Card(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Icon(statusIcon, color: statusColor, size: 20),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                _formatValue(value, format),
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: statusColor,
-                ),
-              ),
-              if (benchmark != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  'Benchmark: ${_formatValue(benchmark, format)}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-              const SizedBox(height: 8),
-              Text(
-                description,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+    final formattedValue = _formatValue(value, format, l10n);
+    final formattedBenchmark = benchmark != null
+        ? _formatValue(benchmark, format, l10n)
+        : '-';
+
+    return DataRow(
+      cells: [
+        DataCell(
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ),
+        DataCell(
+          Text(
+            formattedValue,
+            style: TextStyle(
+              color: statusColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
         ),
-      ),
+        DataCell(Text(formattedBenchmark)),
+        DataCell(Icon(statusIcon, color: statusColor, size: 24)),
+        DataCell(
+          Container(
+            width: 300,
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              description,
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: 13,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  String _formatValue(double value, RatioFormat format) {
-    if (value.isNaN || value.isInfinite) return 'N/A';
+  String _formatValue(double value, RatioFormat format, AppLocalizations l10n) {
+    if (value.isNaN || value.isInfinite) return l10n.notAvailable;
 
     switch (format) {
       case RatioFormat.ratio:
@@ -544,7 +567,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
       case RatioFormat.times:
         return '${value.toStringAsFixed(1)}x';
       case RatioFormat.days:
-        return '${value.round()} days';
+        return '${value.round()} ${l10n.daysSuffix}';
       case RatioFormat.currency:
         return '\$${_formatNumber(value)}';
     }

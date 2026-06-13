@@ -27,12 +27,16 @@ dependencies:
     path: ../../core/core_database
   core_l10n:
     path: ../../core/core_l10n
+  core_ui:
+    path: ../../core/core_ui
   core_data: 
     path: ../../core/core_data 
   
   # Feature Dependencies
   feature_accounts:
     path: ../feature_accounts
+  feature_auth:
+    path: ../feature_auth
   feature_transactions: # ADDED
     path: ../feature_transactions
   
@@ -44,3 +48,4 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^6.0.0

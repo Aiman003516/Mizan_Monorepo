@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:core_database/core_database.dart';
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core_l10n/app_localizations.dart';
 import 'package:shared_ui/shared_ui.dart'; // CurrencyFormatter
 import '../data/adjusting_entries_repository.dart';
 import 'package:feature_accounts/feature_accounts.dart'; // To select accounts
@@ -55,7 +55,7 @@ class AdjustingEntriesScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
+                        Icon(Icons.check_circle_outline, size: 64, color: context.appColors.success),
                         const SizedBox(height: 16),
                         Text("All adjustments approved!", style: Theme.of(context).textTheme.titleMedium),
                       ],
@@ -92,7 +92,7 @@ class AdjustingEntriesScreen extends ConsumerWidget {
                 child: _WizardButton(
                   icon: Icons.hourglass_bottom,
                   label: "Use Prepaid Asset\n(Rent/Insurance)",
-                  color: Colors.blue.shade100,
+                  color: context.appColors.primary,
                   onTap: () => _showSimpleAdjustmentDialog(context, ref, 'prepaid'),
                 ),
               ),
@@ -101,7 +101,7 @@ class AdjustingEntriesScreen extends ConsumerWidget {
                 child: _WizardButton(
                   icon: Icons.access_time,
                   label: "Accrue Expense\n(Unpaid Wages)",
-                  color: Colors.orange.shade100,
+                  color: context.appColors.primary,
                   onTap: () => _showSimpleAdjustmentDialog(context, ref, 'accrual'),
                 ),
               ),
@@ -138,11 +138,11 @@ class _WizardButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black12),
+          border: Border.all(color: context.appColors.border),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 32, color: Colors.black87),
+            Icon(icon, size: 32, color: context.appColors.onSurface),
             const SizedBox(height: 8),
             Text(label, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
           ],
@@ -192,12 +192,12 @@ class _TaskCardState extends ConsumerState<_TaskCard> {
                   onPressed: _isProcessing ? null : () {
                     ref.read(adjustingEntriesRepositoryProvider).deleteTask(widget.task.id);
                   },
-                  child: const Text("Reject", style: TextStyle(color: Colors.red)),
+                  child: Text("Reject", style: TextStyle(color: context.appColors.error)),
                 ),
                 const SizedBox(width: 8),
                 FilledButton.icon(
                   icon: _isProcessing 
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                    ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: context.appColors.onPrimary, strokeWidth: 2)) 
                     : const Icon(Icons.check),
                   label: const Text("Approve"),
                   onPressed: _isProcessing ? null : () async {

@@ -1,12 +1,13 @@
 // FILE: packages/features/feature_transactions/lib/src/presentation/general_journal_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:drift/drift.dart' as d;
 
 // Core Imports
-import 'package:core_database/core_database.dart';
+import 'package:core_data/core_data.dart';
 import 'package:core_l10n/app_localizations.dart';
 
 // Feature Imports
@@ -40,7 +41,9 @@ class JournalEntryLine {
 }
 
 class GeneralJournalScreen extends ConsumerStatefulWidget {
-  const GeneralJournalScreen({super.key});
+  final Account? initialAccount;
+
+  const GeneralJournalScreen({super.key, this.initialAccount});
 
   @override
   ConsumerState<GeneralJournalScreen> createState() =>
@@ -51,7 +54,10 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   DateTime _transactionDate = DateTime.now();
-  final List<JournalEntryLine> _lines = [JournalEntryLine(), JournalEntryLine()];
+  late final List<JournalEntryLine> _lines = [
+    JournalEntryLine()..account = widget.initialAccount,
+    JournalEntryLine(),
+  ];
 
   double _totalDebits = 0.0;
   double _totalCredits = 0.0;
@@ -133,15 +139,39 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
     final bool isBalanced = _balance.abs() < 0.001 && _totalDebits > 0;
 
     if (_formKey.currentState!.validate() && isBalanced) {
+      final prefsRepo = ref.read(preferencesRepositoryProvider);
+      final lockDate = await prefsRepo.getPeriodLockDate();
+      if (lockDate != null) {
+        // Normalize dates to remove time component for comparison
+        final tDate = DateTime(
+          _transactionDate.year,
+          _transactionDate.month,
+          _transactionDate.day,
+        );
+        final lDate = DateTime(lockDate.year, lockDate.month, lockDate.day);
+
+        if (tDate.compareTo(lDate) <= 0) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                l10n.periodLockedError,
+              ), // Needs localized string "Period is locked"
+              backgroundColor: context.appColors.error,
+            ),
+          );
+          return;
+        }
+      }
+
       final entries = <TransactionEntriesCompanion>[];
       for (final line in _lines) {
         if (line.account == null || (line.debit == 0 && line.credit == 0)) {
           continue;
         }
-        
+
         // Calculate amount as Double first
         final double amountDouble = line.debit > 0 ? line.debit : -line.credit;
-        
+
         // FIX: Convert to Cents (Int) for Database
         final int amountCents = (amountDouble * 100).round();
 
@@ -156,10 +186,14 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
       }
 
       if (entries.length < 2) {
-        scaffoldMessenger.showSnackBar(SnackBar(
-          content: Text(l10n.error), // "Error" or "Transaction must have at least 2 lines"
-          backgroundColor: Colors.red,
-        ));
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.error,
+            ), // "Error" or "Transaction must have at least 2 lines"
+            backgroundColor: context.appColors.error,
+          ),
+        );
         return;
       }
 
@@ -172,16 +206,17 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
               entries: entries,
             );
 
-        scaffoldMessenger.showSnackBar(SnackBar(
-          content: Text(l10n.transactionSaved),
-          backgroundColor: Colors.green,
-        ));
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.transactionSaved),
+            backgroundColor: context.appColors.success,
+          ),
+        );
         navigator.pop();
       } catch (e) {
-        scaffoldMessenger.showSnackBar(SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ));
+        scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: context.appColors.error),
+        );
       }
     }
   }
@@ -243,17 +278,35 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
             ),
             const Divider(height: 1),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               child: Row(
                 children: [
-                  Expanded(flex: 3, child: Text(l10n.account, style: Theme.of(context).textTheme.titleSmall)),
                   Expanded(
-                      flex: 2,
-                      child: Text(l10n.debit, textAlign: TextAlign.right, style: Theme.of(context).textTheme.titleSmall)),
+                    flex: 3,
+                    child: Text(
+                      l10n.account,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                  ),
                   Expanded(
-                      flex: 2,
-                      child: Text(l10n.credit, textAlign: TextAlign.right, style: Theme.of(context).textTheme.titleSmall)),
+                    flex: 2,
+                    child: Text(
+                      l10n.debit,
+                      textAlign: TextAlign.right,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      l10n.credit,
+                      textAlign: TextAlign.right,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                  ),
                   const SizedBox(width: 48),
                 ],
               ),
@@ -273,14 +326,16 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                             Expanded(
                               flex: 3,
                               child: DropdownButtonFormField<Account>(
-                                value: line.account,
+                                initialValue: line.account,
                                 hint: Text(l10n.selectAccount),
                                 isExpanded: true,
                                 items: accounts.map((account) {
                                   return DropdownMenuItem<Account>(
                                     value: account,
-                                    child: Text(account.name,
-                                        overflow: TextOverflow.ellipsis),
+                                    child: Text(
+                                      account.name,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   );
                                 }).toList(),
                                 onChanged: (value) {
@@ -304,8 +359,9 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                               flex: 2,
                               child: TextFormField(
                                 controller: line.debitController,
-                                decoration:
-                                    InputDecoration(labelText: l10n.debit),
+                                decoration: InputDecoration(
+                                  labelText: l10n.debit,
+                                ),
                                 keyboardType: TextInputType.number,
                               ),
                             ),
@@ -314,14 +370,17 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                               flex: 2,
                               child: TextFormField(
                                 controller: line.creditController,
-                                decoration:
-                                    InputDecoration(labelText: l10n.credit),
+                                decoration: InputDecoration(
+                                  labelText: l10n.credit,
+                                ),
                                 keyboardType: TextInputType.number,
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.remove_circle_outline,
-                                  color: Colors.red),
+                              icon: Icon(
+                                Icons.remove_circle_outline,
+                                color: context.appColors.error,
+                              ),
                               onPressed: _lines.length > 2
                                   ? () => _removeLine(index)
                                   : null,
@@ -344,8 +403,10 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(l10n.total,
-                          style: Theme.of(context).textTheme.titleMedium),
+                      Text(
+                        l10n.total,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                       Text(
                         "${l10n.drLabel} ${_totalDebits.toStringAsFixed(2)}",
                         style: Theme.of(context).textTheme.titleMedium,
@@ -360,14 +421,15 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(l10n.balance,
-                          style: Theme.of(context).textTheme.titleMedium),
+                      Text(
+                        l10n.balance,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                       Text(
                         _balance.toStringAsFixed(2),
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: isBalanced
-                                  ? Colors.green
-                                  : Colors.red,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: isBalanced ? context.appColors.success : context.appColors.error,
                               fontWeight: FontWeight.bold,
                             ),
                       ),
@@ -380,7 +442,9 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
               padding: const EdgeInsets.all(16.0),
               child: TextButton.icon(
                 icon: const Icon(Icons.add),
-                label: Text(l10n.addProduct), // Ideally this should be "Add Line" in l10n
+                label: Text(
+                  l10n.addProduct,
+                ), // Ideally this should be "Add Line" in l10n
                 onPressed: _addLine,
               ),
             ),

@@ -24,6 +24,8 @@ dependencies:
     path: ../../core/core_data
   core_l10n:
     path: ../../core/core_l10n
+  core_ui:
+    path: ../../core/core_ui
   shared_services:
     path: ../../shared/shared_services
 
@@ -36,6 +38,8 @@ dependencies:
   # This is required for TransactionDetail
   feature_reports:
     path: ../feature_reports
+  qr_flutter: ^4.1.0
+  appinio_swiper: ^2.1.1
 
 dev_dependencies:
   flutter_test:

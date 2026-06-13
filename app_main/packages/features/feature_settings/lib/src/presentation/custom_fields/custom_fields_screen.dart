@@ -2,9 +2,12 @@
 
 import 'package:feature_settings/src/data/custom_fields_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
-import 'package:shared_ui/shared_ui.dart'; // Assuming PermissionGuard/EmptyState
+// Assuming PermissionGuard/EmptyState
 
 class CustomFieldsScreen extends ConsumerWidget {
   final String tenantId;
@@ -13,11 +16,12 @@ class CustomFieldsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     // For now, we only support Product fields. Can add tabs for Accounts/Transactions later.
     final fieldsAsync = ref.watch(productFieldsProvider(tenantId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Custom Fields (Products)')),
+      appBar: AppBar(title: Text(l10n.customFieldsProducts)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showEditor(context, ref, null),
         child: const Icon(Icons.add),
@@ -37,7 +41,7 @@ class CustomFieldsScreen extends ConsumerWidget {
                 title: Text(field.label),
                 subtitle: Text("Type: ${field.type.name} | Key: ${field.key}"),
                 trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: Icon(Icons.delete, color: context.appColors.error),
                   onPressed: () => ref.read(customFieldsRepositoryProvider).deleteDefinition(tenantId, field.id),
                 ),
                 onTap: () => _showEditor(context, ref, field),
@@ -85,8 +89,9 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: Text(widget.existing == null ? 'Add Field' : 'Edit Field'),
+      title: Text(widget.existing == null ? l10n.addField : l10n.editField),
       content: Form(
         key: _formKey,
         child: Column(
@@ -109,7 +114,7 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
               validator: (v) => v!.isEmpty ? "Required" : null,
             ),
             DropdownButtonFormField<CustomFieldType>(
-              value: _selectedType,
+              initialValue: _selectedType,
               decoration: const InputDecoration(labelText: "Data Type"),
               items: CustomFieldType.values.map((t) {
                 return DropdownMenuItem(value: t, child: Text(t.name.toUpperCase()));

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:core_ui/core_ui.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 import 'invite_staff_screen.dart'; // We will create this next
@@ -8,11 +11,12 @@ class StaffListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final staffAsync = ref.watch(staffStreamProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Staff Management'),
+        title: Text(l10n.staffManagement),
         actions: [
           IconButton(
             icon: const Icon(Icons.person_add),
@@ -37,10 +41,10 @@ class StaffListScreen extends ConsumerWidget {
               final member = staffList[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: member.isOwner ? Colors.purple : Colors.blue,
+                  backgroundColor: member.isOwner ? context.appColors.secondary : context.appColors.info,
                   child: Text(
                     member.displayName.isNotEmpty ? member.displayName[0].toUpperCase() : '?',
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: context.appColors.onPrimary),
                   ),
                 ),
                 title: Text(member.displayName),
@@ -48,23 +52,22 @@ class StaffListScreen extends ConsumerWidget {
                   member.isOwner ? 'Owner' : 'Role: ${member.roleId} • ${member.email}',
                 ),
                 trailing: member.isOwner
-                    ? const Icon(Icons.star, color: Colors.amber)
+                    ? Icon(Icons.star, color: context.appColors.warning)
                     : PopupMenuButton(
                         itemBuilder: (context) => [
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'edit',
-                            child: Text('Change Role'),
+                            child: Text(l10n.changeRole),
                           ),
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'remove',
-                            child: Text('Remove Access', style: TextStyle(color: Colors.red)),
+                            child: Text(l10n.removeAccess, style: TextStyle(color: context.appColors.error)),
                           ),
                         ],
                         onSelected: (value) {
                           if (value == 'remove') {
                             _confirmRemove(context, ref, member);
                           }
-                          // TODO: Implement 'edit' to show Role Picker dialog
                         },
                       ),
               );
@@ -90,7 +93,7 @@ class StaffListScreen extends ConsumerWidget {
               Navigator.pop(ctx);
               await ref.read(staffRepositoryProvider).removeStaffMember(member.uid);
             },
-            child: const Text("Remove", style: TextStyle(color: Colors.red)),
+            child: Text("Remove", style: TextStyle(color: context.appColors.error)),
           ),
         ],
       ),

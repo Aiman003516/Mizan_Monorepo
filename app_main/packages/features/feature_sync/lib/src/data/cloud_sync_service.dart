@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Order, Transaction;
 import 'package:core_data/core_data.dart';
-import 'package:core_database/core_database.dart';
 import 'package:feature_auth/feature_auth.dart'; // 👈 Import Auth
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart';
