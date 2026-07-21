@@ -22,6 +22,16 @@ class AccountTemplate {
 
 /// Industry templates for Chart of Accounts
 class ChartOfAccountsTemplates {
+  /// Essential accounts (created on first launch)
+  static const List<AccountTemplate> essentialAccounts = [
+    AccountTemplate(
+      number: 1110,
+      name: 'Cash',
+      type: 'asset',
+      level: 2,
+    ),
+  ];
+
   /// Standard Retail Business template
   static const List<AccountTemplate> retailBusiness = [
     // === ASSETS (1000-1999) ===

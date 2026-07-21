@@ -6,6 +6,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  supabase_flutter: ^2.5.4
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
@@ -21,5 +22,6 @@ dependencies:
   # (No longer depends on core_l10n, core_database, or features)
 
 dev_dependencies:
+  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

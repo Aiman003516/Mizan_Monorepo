@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_accounts/src/presentation/accounts_list_provider.dart';
-import 'package:feature_accounts/src/presentation/add_account_screen.dart';
 import 'package:feature_accounts/src/presentation/account_ledger_screen.dart';
 
 import 'package:shared_services/shared_services.dart';
@@ -59,31 +58,107 @@ class AccountsListScreen extends ConsumerWidget {
               );
             }
 
-            return ListView.builder(
-              itemCount: filteredAccounts.length,
-              itemBuilder: (context, index) {
-                final account = filteredAccounts[index];
-                final summary = summariesMap[account.id];
-                final currentBalance =
-                    account.initialBalance + (summary?.netBalance ?? 0.0);
-
-                return ListTile(
-                  title: Text(account.name),
-                  subtitle: Text(
-                    '\u200E${l10n.type} ${_getLocalizedAccountType(account.type, l10n)} \u200E/ \u200E${l10n.balance} ${currentBalance.toStringAsFixed(2)}\n${account.phoneNumber != null ? '\u200E${l10n.phone} ${account.phoneNumber}' : ''}',
+            return SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  headingRowColor: WidgetStateProperty.all(
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
                   ),
-                  isThreeLine: account.phoneNumber != null,
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            AccountLedgerScreen(account: account),
-                      ),
+                  dataRowColor: WidgetStateProperty.resolveWith<Color?>(
+                    (Set<WidgetState> states) {
+                      return null; // Handle zebra striping in cells or map index
+                    },
+                  ),
+                  columns: [
+                    DataColumn(label: Text(l10n.accountNameHint)),
+                    DataColumn(label: Text(l10n.accountType)),
+                    DataColumn(label: Text(l10n.debitBalance)),
+                    DataColumn(label: Text(l10n.creditBalance)),
+                  ],
+                  rows: filteredAccounts.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final account = entry.value;
+                    final summary = summariesMap[account.id];
+                    final currentBalance =
+                        (account.initialBalance / 100.0) + (summary?.netBalance ?? 0.0);
+
+                    final isGray = index % 2 == 0;
+                    final rowColor = isGray
+                        ? Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3)
+                        : Theme.of(context).colorScheme.surface;
+
+                    return DataRow(
+                      color: WidgetStateProperty.all(rowColor),
+                      cells: [
+                        DataCell(
+                          Text(account.name),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AccountLedgerScreen(account: account),
+                              ),
+                            );
+                          },
+                        ),
+                        DataCell(
+                          Text(_getLocalizedAccountType(account.type, l10n)),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AccountLedgerScreen(account: account),
+                              ),
+                            );
+                          },
+                        ),
+                        DataCell(
+                          Text(
+                            currentBalance >= 0
+                                ? currentBalance.toStringAsFixed(2)
+                                : '0.00',
+                            style: TextStyle(
+                              color: currentBalance >= 0 && currentBalance != 0
+                                  ? Colors.green
+                                  : null,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AccountLedgerScreen(account: account),
+                              ),
+                            );
+                          },
+                        ),
+                        DataCell(
+                          Text(
+                            currentBalance < 0
+                                ? currentBalance.abs().toStringAsFixed(2)
+                                : '0.00',
+                            style: TextStyle(
+                              color: currentBalance < 0 ? Colors.red : null,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AccountLedgerScreen(account: account),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     );
-                  },
-                );
-              },
+                  }).toList(),
+                ),
+              ),
             );
           },
           error: (err, stack) => Center(

@@ -13,7 +13,9 @@ import 'package:feature_reports/src/data/export_service.dart';
 import 'package:shared_services/shared_services.dart';
 
 class MonthlyAmountsScreen extends ConsumerStatefulWidget {
-  const MonthlyAmountsScreen({super.key});
+  final bool isStandalone;
+
+  const MonthlyAmountsScreen({super.key, this.isStandalone = false});
 
   @override
   ConsumerState<MonthlyAmountsScreen> createState() =>
@@ -76,27 +78,55 @@ class _MonthlyAmountsScreenState extends ConsumerState<MonthlyAmountsScreen> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.monthlyAmountsReport),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: l10n.general),
-              Tab(text: l10n.clients),
-              Tab(text: l10n.suppliers),
-            ],
-            onTap: (index) {
-              setState(() {
-                _selectedClassification = [
-                  c.kClassificationGeneral,
-                  c.kClassificationClients,
-                  c.kClassificationSuppliers,
-                ][index];
-              });
-            },
-          ),
-        ),
+        appBar: widget.isStandalone
+            ? AppBar(
+                title: Text(l10n.monthlyAmountsReport),
+                bottom: TabBar(
+                  tabs: [
+                    Tab(text: l10n.general),
+                    Tab(text: l10n.clients),
+                    Tab(text: l10n.suppliers),
+                  ],
+                  onTap: (index) {
+                    setState(() {
+                      _selectedClassification = [
+                        c.kClassificationGeneral,
+                        c.kClassificationClients,
+                        c.kClassificationSuppliers,
+                      ][index];
+                    });
+                  },
+                ),
+              )
+            : null,
         body: Column(
           children: [
+            if (!widget.isStandalone)
+              Material(
+                color: Theme.of(context).colorScheme.surface,
+                elevation: 1,
+                child: TabBar(
+                  labelColor: Theme.of(context).colorScheme.onSurface,
+                  unselectedLabelColor: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  tabs: [
+                    Tab(text: l10n.general),
+                    Tab(text: l10n.clients),
+                    Tab(text: l10n.suppliers),
+                  ],
+                  onTap: (index) {
+                    setState(() {
+                      _selectedClassification = [
+                        c.kClassificationGeneral,
+                        c.kClassificationClients,
+                        c.kClassificationSuppliers,
+                      ][index];
+                    });
+                  },
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,

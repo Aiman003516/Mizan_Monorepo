@@ -11,7 +11,9 @@ import 'package:feature_reports/src/data/reports_service.dart';
 import 'package:feature_reports/src/data/export_service.dart';
 
 class AccountActivityScreen extends ConsumerStatefulWidget {
-  const AccountActivityScreen({super.key});
+  final bool isStandalone;
+
+  const AccountActivityScreen({super.key, this.isStandalone = false});
 
   @override
   ConsumerState<AccountActivityScreen> createState() =>
@@ -62,27 +64,55 @@ class _AccountActivityScreenState extends ConsumerState<AccountActivityScreen> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.accountActivity),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: l10n.general),
-              Tab(text: l10n.clients),
-              Tab(text: l10n.suppliers),
-            ],
-            onTap: (index) {
-              setState(() {
-                _selectedClassification = [
-                  c.kClassificationGeneral,
-                  c.kClassificationClients,
-                  c.kClassificationSuppliers,
-                ][index];
-              });
-            },
-          ),
-        ),
+        appBar: widget.isStandalone
+            ? AppBar(
+                title: Text(l10n.accountActivity),
+                bottom: TabBar(
+                  tabs: [
+                    Tab(text: l10n.general),
+                    Tab(text: l10n.clients),
+                    Tab(text: l10n.suppliers),
+                  ],
+                  onTap: (index) {
+                    setState(() {
+                      _selectedClassification = [
+                        c.kClassificationGeneral,
+                        c.kClassificationClients,
+                        c.kClassificationSuppliers,
+                      ][index];
+                    });
+                  },
+                ),
+              )
+            : null,
         body: Column(
           children: [
+            if (!widget.isStandalone)
+              Material(
+                color: Theme.of(context).colorScheme.surface,
+                elevation: 1,
+                child: TabBar(
+                  labelColor: Theme.of(context).colorScheme.onSurface,
+                  unselectedLabelColor: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  tabs: [
+                    Tab(text: l10n.general),
+                    Tab(text: l10n.clients),
+                    Tab(text: l10n.suppliers),
+                  ],
+                  onTap: (index) {
+                    setState(() {
+                      _selectedClassification = [
+                        c.kClassificationGeneral,
+                        c.kClassificationClients,
+                        c.kClassificationSuppliers,
+                      ][index];
+                    });
+                  },
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,

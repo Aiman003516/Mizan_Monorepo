@@ -9,7 +9,12 @@ import 'package:feature_products/src/presentation/all_products_list_widget.dart'
 import 'package:feature_products/src/presentation/product_import_screen.dart';
 
 class ProductsHubScreen extends ConsumerWidget {
-  const ProductsHubScreen({super.key});
+  final bool isStandalone;
+
+  const ProductsHubScreen({
+    super.key,
+    this.isStandalone = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,24 +22,50 @@ class ProductsHubScreen extends ConsumerWidget {
 
     return Scaffold(
       // ✅ NEW: Added AppBar to house the "Action" buttons
-      appBar: AppBar(
-        title: Text(l10n.productsTitle), // You can replace this with l10n.products later
-        actions: [
-          // ⬇️ THE IMPORT BUTTON
-          IconButton(
-            icon: const Icon(Icons.upload_file),
-            tooltip: 'Import from Excel/CSV',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ProductImportScreen(),
+      appBar: isStandalone
+          ? AppBar(
+              title: Text(l10n.productsTitle), // You can replace this with l10n.products later
+              actions: [
+                // ⬇️ THE IMPORT BUTTON
+                IconButton(
+                  icon: const Icon(Icons.upload_file),
+                  tooltip: 'Import from Excel/CSV',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const ProductImportScreen(),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
+              ],
+            )
+          : null,
+      body: Column(
+        children: [
+          if (!isStandalone)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.upload_file),
+                    label: const Text('Import from Excel/CSV'),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const ProductImportScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          const Expanded(child: AllProductsListWidget()),
         ],
       ),
-      body: const AllProductsListWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(

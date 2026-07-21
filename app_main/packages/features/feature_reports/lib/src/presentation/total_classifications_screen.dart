@@ -18,50 +18,54 @@ class TotalClassificationsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.totalClassifications),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
+          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
           IconButton(
             icon: Icon(Icons.picture_as_pdf, color: context.appColors.error),
             tooltip: l10n.exportToPDF,
             onPressed: () {},
           ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {},
-          ),
+          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
         ],
       ),
       body: Column(
         children: [
           Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 12.0,
+            ),
             child: Row(
               children: [
                 Expanded(
                   flex: 3,
-                  child: Text(l10n.classification,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text(
+                    l10n.classification,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text(l10n.debit,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center),
+                  child: Text(
+                    l10n.debit,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text(l10n.credit,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center),
+                  child: Text(
+                    l10n.credit,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 Expanded(
                   flex: 2,
-                  child: Text(l10n.total,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center),
+                  child: Text(
+                    l10n.total,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),
@@ -79,14 +83,16 @@ class TotalClassificationsScreen extends ConsumerWidget {
                   itemBuilder: (context, index) {
                     final summary = summaries[index];
                     final isDebitBalance = summary.netBalance >= 0;
-                    final balanceColor =
-                    isDebitBalance ? context.appColors.success : context.appColors.error;
+                    final balanceColor = isDebitBalance
+                        ? context.appColors.success
+                        : context.appColors.error;
 
                     return ListTile(
                       title: Text(summary.name),
-                      subtitle: Text('${l10n.currencyLabel} ${summary.currencyCode}',
-                          style:
-                          TextStyle(color: Theme.of(context).primaryColor)),
+                      subtitle: Text(
+                        '${l10n.currencyLabel} ${summary.currencyCode}',
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
                       trailing: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.5,
                         child: Row(
@@ -95,7 +101,9 @@ class TotalClassificationsScreen extends ConsumerWidget {
                               flex: 2,
                               child: Text(
                                 summary.totalDebit.toStringAsFixed(2),
-                                style: TextStyle(color: context.appColors.success),
+                                style: TextStyle(
+                                  color: context.appColors.success,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -103,7 +111,9 @@ class TotalClassificationsScreen extends ConsumerWidget {
                               flex: 2,
                               child: Text(
                                 summary.totalCredit.toStringAsFixed(2),
-                                style: TextStyle(color: context.appColors.error),
+                                style: TextStyle(
+                                  color: context.appColors.error,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -112,8 +122,9 @@ class TotalClassificationsScreen extends ConsumerWidget {
                               child: Text(
                                 summary.netBalance.abs().toStringAsFixed(2),
                                 style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: balanceColor),
+                                  fontWeight: FontWeight.bold,
+                                  color: balanceColor,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),

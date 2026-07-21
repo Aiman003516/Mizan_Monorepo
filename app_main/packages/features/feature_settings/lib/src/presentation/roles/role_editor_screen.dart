@@ -17,7 +17,7 @@ class RoleEditorScreen extends ConsumerStatefulWidget {
 class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  
+
   // Local state for the checklist
   final Set<AppPermission> _selectedPermissions = {};
   bool _isLoading = false;
@@ -38,31 +38,60 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
     super.dispose();
   }
 
-  // 📝 Helper to get human-readable labels
-  String _getPermissionLabel(AppPermission p) {
+  // 📝 Helper to get human-readable localized labels
+  String _getPermissionLabel(AppPermission p, AppLocalizations l10n) {
     switch (p) {
-      case AppPermission.viewDashboard: return "View Dashboard";
-      case AppPermission.viewFinancialReports: return "View Financial Reports";
-      case AppPermission.performSale: return "Perform Sales (POS)";
-      case AppPermission.voidTransaction: return "Void/Delete Transactions";
-      case AppPermission.processRefund: return "Process Refunds";
-      case AppPermission.viewSalesHistory: return "View Sales History";
-      case AppPermission.viewInventory: return "View Inventory";
-      case AppPermission.manageProducts: return "Add/Edit Products";
-      case AppPermission.adjustInventory: return "Stock Adjustments";
-      case AppPermission.manageStaff: return "Manage Staff & Roles";
-      case AppPermission.manageSettings: return "System Settings";
-      case AppPermission.switchTenant: return "Switch Business Branch";
+      case AppPermission.viewDashboard:
+        return l10n.permViewDashboard;
+      case AppPermission.viewFinancialReports:
+        return l10n.permViewFinancialReports;
+      case AppPermission.performSale:
+        return l10n.permPerformSale;
+      case AppPermission.voidTransaction:
+        return l10n.permVoidTransaction;
+      case AppPermission.processRefund:
+        return l10n.permProcessRefund;
+      case AppPermission.viewSalesHistory:
+        return l10n.permViewSalesHistory;
+      case AppPermission.viewInventory:
+        return l10n.permViewInventory;
+      case AppPermission.manageProducts:
+        return l10n.permManageProducts;
+      case AppPermission.adjustInventory:
+        return l10n.permAdjustInventory;
+      case AppPermission.manageStaff:
+        return l10n.permManageStaff;
+      case AppPermission.manageSettings:
+        return l10n.permManageSettings;
+      case AppPermission.switchTenant:
+        return l10n.permSwitchTenant;
     }
+  }
+
+  /// Shows a user-friendly dialog explaining this is a paid/online feature.
+  void _showPaidFeatureError(AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.paidFeatureTitle),
+        content: Text(l10n.paidFeatureMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(MaterialLocalizations.of(context).okButtonLabel),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _saveRole() async {
     final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
     if (_selectedPermissions.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.selectPermission)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.selectPermission)));
       return;
     }
 
@@ -71,7 +100,7 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
     try {
       final newRole = AppRole(
         // If editing, keep ID. If new, pass empty string (Repository will auto-id)
-        id: widget.roleToEdit?.id ?? '', 
+        id: widget.roleToEdit?.id ?? '',
         name: _nameController.text.trim(),
         permissions: _selectedPermissions.toList(),
         isSystemAdmin: false, // Custom roles are never System Admins
@@ -82,14 +111,31 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
       if (mounted) {
         Navigator.pop(context); // Close screen
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.roleSaved), backgroundColor: context.appColors.success),
+          SnackBar(
+            content: Text(l10n.roleSaved),
+            backgroundColor: context.appColors.success,
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving role: $e'), backgroundColor: context.appColors.error),
-        );
+        final errorStr = e.toString().toLowerCase();
+        // Check if this is an auth/subscription error — show friendly dialog
+        if (errorStr.contains('not logged in') ||
+            errorStr.contains('tenant id') ||
+            errorStr.contains('unauthorized') ||
+            errorStr.contains('unauthenticated') ||
+            errorStr.contains('permission denied')) {
+          _showPaidFeatureError(l10n);
+        } else {
+          // Other unexpected errors — show in snackbar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString()),
+              backgroundColor: context.appColors.error,
+            ),
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -125,40 +171,47 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
                       decoration: InputDecoration(
                         labelText: l10n.roleNameLabel,
                         hintText: l10n.roleNameHint,
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.badge),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.badge),
                       ),
-                      validator: (val) =>
-                          val == null || val.isEmpty ? 'Name is required' : null,
+                      validator: (val) => val == null || val.isEmpty
+                          ? l10n.nameIsRequired
+                          : null,
                     ),
                   ),
                   const Divider(),
-                  
+
                   // --- Permissions Section ---
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Permissions",
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        l10n.permissionsLabel,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                            ),
                       ),
                     ),
                   ),
-                  
+
                   Expanded(
                     child: ListView.separated(
                       itemCount: AppPermission.values.length,
                       separatorBuilder: (ctx, i) => const Divider(height: 1),
                       itemBuilder: (context, index) {
                         final permission = AppPermission.values[index];
-                        final isSelected = _selectedPermissions.contains(permission);
+                        final isSelected = _selectedPermissions.contains(
+                          permission,
+                        );
 
                         return CheckboxListTile(
-                          title: Text(_getPermissionLabel(permission)),
+                          title: Text(_getPermissionLabel(permission, l10n)),
                           value: isSelected,
                           onChanged: (bool? value) {
                             setState(() {

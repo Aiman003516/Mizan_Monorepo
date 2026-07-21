@@ -4,7 +4,7 @@ import 'package:core_ui/core_ui.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// 🎟️ Employee Sign-In Screen
 /// Allows employees to join an organization using an invite code.
@@ -40,7 +40,7 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
     final code = _codeController.text.trim();
     if (code.length != 6) {
       setState(() {
-        _errorMessage = 'Code must be 6 digits';
+        _errorMessage = l10n.codeMustBe6Digits;
         _inviteDetails = null;
       });
       return;
@@ -62,7 +62,7 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
           _errorMessage = null;
         } else {
           _inviteDetails = null;
-          _errorMessage = 'Invalid or expired invite code';
+          _errorMessage = l10n.invalidInviteCode;
         }
       });
     } catch (e) {
@@ -86,15 +86,15 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
 
     try {
       final staffRepo = ref.read(staffRepositoryProvider);
-      final currentUser = FirebaseAuth.instance.currentUser;
+      final currentUser = Supabase.instance.client.auth.currentUser;
 
       if (currentUser == null) {
-        throw Exception('Please sign in first');
+        throw Exception(l10n.pleaseSignInFirst);
       }
 
       await staffRepo.redeemInvite(
         code: _codeController.text.trim(),
-        userId: currentUser.uid,
+        userId: currentUser.id,
         displayName: _nameController.text.trim(),
         email: currentUser.email,
       );
@@ -144,7 +144,7 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Enter the invite code from your administrator',
+                  l10n.enterInviteCode,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -177,15 +177,18 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                             ),
                           )
                         : _inviteDetails != null
-                        ? Icon(Icons.check_circle, color: context.appColors.success)
+                        ? Icon(
+                            Icons.check_circle,
+                            color: context.appColors.success,
+                          )
                         : null,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the invite code';
+                      return l10n.pleaseEnterInviteCode;
                     }
                     if (value.length != 6) {
-                      return 'Code must be 6 digits';
+                      return l10n.codeMustBe6Digits;
                     }
                     return null;
                   },
@@ -215,13 +218,15 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                             size: 32,
                           ),
                           const SizedBox(height: 8),
-                          const Text(
-                            'Valid Invite Code!',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          Text(
+                            l10n.validInviteCodeTitle,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Role: ${_inviteDetails!['roleId'] ?? 'Staff'}',
+                            l10n.roleLabel(
+                              _inviteDetails!['roleId'] ?? 'Staff',
+                            ),
                             style: theme.textTheme.bodySmall,
                           ),
                         ],
@@ -241,7 +246,7 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your name';
+                        return l10n.pleaseEnterYourName;
                       }
                       return null;
                     },
@@ -304,7 +309,7 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'or',
+                        l10n.orText,
                         style: TextStyle(color: colorScheme.outline),
                       ),
                     ),
@@ -319,11 +324,11 @@ class _EmployeeSignInScreenState extends ConsumerState<EmployeeSignInScreen> {
                     // Navigate to create organization flow
                     Navigator.of(context).pop(false);
                   },
-                  child: const Padding(
-                    padding: EdgeInsets.all(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
                     child: Text(
-                      'Create New Organization',
-                      style: TextStyle(fontSize: 16),
+                      l10n.createNewOrganization,
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ),

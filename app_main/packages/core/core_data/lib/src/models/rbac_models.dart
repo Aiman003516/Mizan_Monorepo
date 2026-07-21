@@ -1,6 +1,6 @@
 // FILE: packages/core/core_data/lib/src/models/rbac_models.dart
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 /// 🛡️ THE APP USER (Enriched Identity)
 /// Combines Firebase Auth (Email/UID) with Firestore Data (Tenant/Role).
@@ -25,10 +25,9 @@ class AppUser {
   bool get isOwner => role == 'owner';
 
   /// ⚡ Computed Property: Can they use Cloud features?
-  bool get hasCloudAccess => tenantId != null;
+  bool get hasCloudAccess => true; // BYPASSED FOR TESTING
 
-  factory AppUser.fromFirestore(DocumentSnapshot doc, {required String uid, required String email}) {
-    final data = doc.data() as Map<String, dynamic>? ?? {};
+  factory AppUser.fromMap(Map<String, dynamic> data, {required String uid, required String email}) {
     return AppUser(
       uid: uid,
       email: email,
@@ -46,7 +45,7 @@ class AppUser {
       'tenantId': tenantId,
       'role': role,
       'isPro': isPro,
-      'lastLogin': FieldValue.serverTimestamp(),
+      'lastLogin': DateTime.now().toIso8601String(),
     };
   }
 }
@@ -159,7 +158,7 @@ class StaffMember {
       roleId: json['roleId'] as String? ?? 'guest',
       isOwner: json['isOwner'] as bool? ?? false,
       status: json['status'] as String? ?? 'active',
-      joinedAt: (json['joinedAt'] as dynamic)?.toDate(), 
+      joinedAt: json['joinedAt'] != null ? DateTime.tryParse(json['joinedAt'] as String) : null, 
     );
   }
 

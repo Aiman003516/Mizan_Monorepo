@@ -42,7 +42,9 @@ class CustomFieldsScreen extends ConsumerWidget {
                 subtitle: Text("Type: ${field.type.name} | Key: ${field.key}"),
                 trailing: IconButton(
                   icon: Icon(Icons.delete, color: context.appColors.error),
-                  onPressed: () => ref.read(customFieldsRepositoryProvider).deleteDefinition(tenantId, field.id),
+                  onPressed: () => ref
+                      .read(customFieldsRepositoryProvider)
+                      .deleteDefinition(tenantId, field.id),
                 ),
                 onTap: () => _showEditor(context, ref, field),
               );
@@ -55,10 +57,15 @@ class CustomFieldsScreen extends ConsumerWidget {
     );
   }
 
-  void _showEditor(BuildContext context, WidgetRef ref, CustomFieldDefinition? existing) {
+  void _showEditor(
+    BuildContext context,
+    WidgetRef ref,
+    CustomFieldDefinition? existing,
+  ) {
     showDialog(
       context: context,
-      builder: (ctx) => _FieldEditorDialog(tenantId: tenantId, existing: existing),
+      builder: (ctx) =>
+          _FieldEditorDialog(tenantId: tenantId, existing: existing),
     );
   }
 }
@@ -99,7 +106,9 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
           children: [
             TextFormField(
               controller: _labelCtrl,
-              decoration: const InputDecoration(labelText: "Display Label (e.g. Color)"),
+              decoration: const InputDecoration(
+                labelText: "Display Label (e.g. Color)",
+              ),
               validator: (v) => v!.isEmpty ? "Required" : null,
               onChanged: (val) {
                 // Auto-generate key if new
@@ -110,14 +119,19 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
             ),
             TextFormField(
               controller: _keyCtrl,
-              decoration: const InputDecoration(labelText: "Internal Key (e.g. color)"),
+              decoration: const InputDecoration(
+                labelText: "Internal Key (e.g. color)",
+              ),
               validator: (v) => v!.isEmpty ? "Required" : null,
             ),
             DropdownButtonFormField<CustomFieldType>(
               initialValue: _selectedType,
               decoration: const InputDecoration(labelText: "Data Type"),
               items: CustomFieldType.values.map((t) {
-                return DropdownMenuItem(value: t, child: Text(t.name.toUpperCase()));
+                return DropdownMenuItem(
+                  value: t,
+                  child: Text(t.name.toUpperCase()),
+                );
               }).toList(),
               onChanged: (val) => setState(() => _selectedType = val!),
             ),
@@ -125,7 +139,10 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
         ElevatedButton(
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
@@ -136,7 +153,9 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
                 targetTable: 'products', // Hardcoded for this screen
                 type: _selectedType,
               );
-              await ref.read(customFieldsRepositoryProvider).saveDefinition(widget.tenantId, newDef);
+              await ref
+                  .read(customFieldsRepositoryProvider)
+                  .saveDefinition(widget.tenantId, newDef);
               if (mounted) Navigator.pop(context);
             }
           },

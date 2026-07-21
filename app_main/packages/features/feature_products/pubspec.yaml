@@ -6,6 +6,7 @@ environment:
   sdk: ^3.0.0 # Adjusted for broader compatibility
 
 dependencies:
+  supabase_flutter: ^2.5.4
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
@@ -21,6 +22,8 @@ dependencies:
   # Local Dependencies
   core_database:
     path: ../../core/core_database
+  core_data:
+    path: ../../core/core_data
   core_l10n:
     path: ../../core/core_l10n
   core_ui:
@@ -31,5 +34,6 @@ dependencies:
     path: ../../shared/shared_services
 
 dev_dependencies:
+  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

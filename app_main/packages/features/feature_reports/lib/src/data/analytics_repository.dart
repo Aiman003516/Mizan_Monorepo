@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 
 final analyticsRepositoryProvider = Provider<AnalyticsRepository>((ref) {
-  final db = ref.watch(appDatabaseProvider); 
+  final db = ref.watch(appDatabaseProvider);
   return AnalyticsRepository(db);
 });
 
@@ -16,17 +16,22 @@ class AnalyticsRepository {
 
   // --- 1. SALES TREND (Bar/Line Chart) ---
   /// Returns total revenue grouped by day for the given range.
-  Future<List<DailySalesPoint>> getDailySalesStats(DateTime start, DateTime end) async {
-    
+  Future<List<DailySalesPoint>> getDailySalesStats(
+    DateTime start,
+    DateTime end,
+  ) async {
     // 🛡️ FIX: Removed the invalid '_db.transactions.totalAmount' reference.
     // We query the ORDERS table (which has the amount) and join with TRANSACTIONS (for the date).
-    
+
     final query = _db.select(_db.orders).join([
-      innerJoin(_db.transactions, _db.transactions.id.equalsExp(_db.orders.transactionId))
+      innerJoin(
+        _db.transactions,
+        _db.transactions.id.equalsExp(_db.orders.transactionId),
+      ),
     ]);
 
     query.where(_db.transactions.transactionDate.isBetweenValues(start, end));
-    
+
     final results = await query.map((row) {
       return {
         'date': row.readTable(_db.transactions).transactionDate,
@@ -36,14 +41,14 @@ class AnalyticsRepository {
 
     // Grouping Logic in Dart
     final Map<DateTime, double> groupedMap = {};
-    
+
     for (var row in results) {
       final date = row['date'] as DateTime;
       final amountCents = row['amount'] as int;
-      
+
       // Normalize to midnight (Day only)
       final dayKey = DateTime(date.year, date.month, date.day);
-      
+
       groupedMap[dayKey] = (groupedMap[dayKey] ?? 0) + (amountCents / 100.0);
     }
 
@@ -54,7 +59,7 @@ class AnalyticsRepository {
 
     // Sort by Date
     points.sort((a, b) => a.date.compareTo(b.date));
-    
+
     return points;
   }
 
@@ -65,7 +70,8 @@ class AnalyticsRepository {
     final categories = _db.categories;
 
     // Expression: SUM(quantity * priceAtSale)
-    final totalValueExpr = orderItems.quantity * orderItems.priceAtSale.cast<double>();
+    final totalValueExpr =
+        orderItems.quantity * orderItems.priceAtSale.cast<double>();
     final sumTotal = totalValueExpr.sum();
 
     final query = _db.selectOnly(orderItems).join([
@@ -81,15 +87,17 @@ class AnalyticsRepository {
     return results.map((row) {
       final categoryName = row.read(categories.name) ?? 'Unknown';
       final totalCents = row.read(sumTotal) ?? 0.0;
-      
+
       return CategoryShare(categoryName, totalCents / 100.0);
     }).toList();
   }
 
   // --- 3. TOP PRODUCTS (Leaderboard) ---
-  Future<List<ProductPerformance>> getTopSellingProducts({int limit = 5}) async {
+  Future<List<ProductPerformance>> getTopSellingProducts({
+    int limit = 5,
+  }) async {
     final orderItems = _db.orderItems;
-    
+
     // Sum Quantity
     final sumQty = orderItems.quantity.sum();
 

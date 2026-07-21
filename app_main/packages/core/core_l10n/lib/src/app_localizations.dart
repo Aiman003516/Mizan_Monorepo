@@ -98,6 +98,30 @@ abstract class AppLocalizations {
     Locale('en'),
   ];
 
+  /// No description provided for @allReportsAndTools.
+  ///
+  /// In en, this message translates to:
+  /// **'All Reports & Tools'**
+  String get allReportsAndTools;
+
+  /// No description provided for @businessInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Insights'**
+  String get businessInsights;
+
+  /// No description provided for @setupBusinessCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Business Cloud'**
+  String get setupBusinessCloud;
+
+  /// No description provided for @manageRoles.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Roles'**
+  String get manageRoles;
+
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:
@@ -293,7 +317,7 @@ abstract class AppLocalizations {
   /// No description provided for @balance.
   ///
   /// In en, this message translates to:
-  /// **'Balance:'**
+  /// **'Balance'**
   String get balance;
 
   /// No description provided for @phone.
@@ -612,7 +636,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Error loading categories:'**
-  String get errorLoadingCategories;
+  String errorLoadingCategories(String error);
 
   /// No description provided for @productName.
   ///
@@ -1853,7 +1877,7 @@ abstract class AppLocalizations {
   /// No description provided for @pleaseEnterValidAmount.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a valid amount greater than zero'**
+  /// **'Please enter a valid amount > 0'**
   String get pleaseEnterValidAmount;
 
   /// No description provided for @supplier.
@@ -2753,7 +2777,7 @@ abstract class AppLocalizations {
   /// No description provided for @taxId.
   ///
   /// In en, this message translates to:
-  /// **'Tax ID / VAT Number'**
+  /// **'Tax ID'**
   String get taxId;
 
   /// No description provided for @creditLimit.
@@ -2849,7 +2873,7 @@ abstract class AppLocalizations {
   /// No description provided for @invoiceCreated.
   ///
   /// In en, this message translates to:
-  /// **'Invoice created'**
+  /// **'Invoice created successfully'**
   String get invoiceCreated;
 
   /// No description provided for @noInvoicesYet.
@@ -2945,8 +2969,8 @@ abstract class AppLocalizations {
   /// No description provided for @customersWithBalances.
   ///
   /// In en, this message translates to:
-  /// **'customers with balances'**
-  String get customersWithBalances;
+  /// **'{count} customers with balances'**
+  String customersWithBalances(int count);
 
   /// No description provided for @vendors.
   ///
@@ -2981,7 +3005,7 @@ abstract class AppLocalizations {
   /// No description provided for @paymentTerms.
   ///
   /// In en, this message translates to:
-  /// **'Payment Terms'**
+  /// **'Payment Terms (e.g., Net 30)'**
   String get paymentTerms;
 
   /// No description provided for @noVendorsYet.
@@ -3035,7 +3059,7 @@ abstract class AppLocalizations {
   /// No description provided for @billCreated.
   ///
   /// In en, this message translates to:
-  /// **'Bill created'**
+  /// **'Bill created successfully'**
   String get billCreated;
 
   /// No description provided for @noBillsYet.
@@ -3083,8 +3107,8 @@ abstract class AppLocalizations {
   /// No description provided for @vendorsWithBalances.
   ///
   /// In en, this message translates to:
-  /// **'vendors with balances'**
-  String get vendorsWithBalances;
+  /// **'{count} vendors with balances'**
+  String vendorsWithBalances(int count);
 
   /// No description provided for @statementOfCashFlows.
   ///
@@ -5129,13 +5153,13 @@ abstract class AppLocalizations {
   /// No description provided for @vendorCreated.
   ///
   /// In en, this message translates to:
-  /// **'Vendor created'**
+  /// **'Vendor created successfully'**
   String get vendorCreated;
 
   /// No description provided for @vendorUpdated.
   ///
   /// In en, this message translates to:
-  /// **'Vendor updated'**
+  /// **'Vendor updated successfully'**
   String get vendorUpdated;
 
   /// No description provided for @vendorDetailTitle.
@@ -5171,13 +5195,13 @@ abstract class AppLocalizations {
   /// No description provided for @customerCreated.
   ///
   /// In en, this message translates to:
-  /// **'Customer created'**
+  /// **'Customer created successfully'**
   String get customerCreated;
 
   /// No description provided for @customerUpdated.
   ///
   /// In en, this message translates to:
-  /// **'Customer updated'**
+  /// **'Customer updated successfully'**
   String get customerUpdated;
 
   /// No description provided for @customerDetailTitle.
@@ -5201,7 +5225,7 @@ abstract class AppLocalizations {
   /// No description provided for @pleaseAddLineItem.
   ///
   /// In en, this message translates to:
-  /// **'Please add at least one line item'**
+  /// **'Please add at least one line item with an amount.'**
   String get pleaseAddLineItem;
 
   /// No description provided for @saveBtn.
@@ -5257,12 +5281,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Staff Management'**
   String get staffManagement;
-
-  /// No description provided for @manageRoles.
-  ///
-  /// In en, this message translates to:
-  /// **'Manage Roles'**
-  String get manageRoles;
 
   /// No description provided for @changeRole.
   ///
@@ -6973,6 +6991,1278 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save Account'**
   String get saveAccount;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign In'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @needAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Need an account? Sign Up'**
+  String get needAccount;
+
+  /// No description provided for @enterEmailAndPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter both email and password.'**
+  String get enterEmailAndPassword;
+
+  /// No description provided for @signUpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up to create your business'**
+  String get signUpSubtitle;
+
+  /// No description provided for @orSeparator.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get orSeparator;
+
+  /// No description provided for @paidFeatureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid Feature'**
+  String get paidFeatureTitle;
+
+  /// No description provided for @paidFeatureMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature requires an active subscription and account login. Please sign in and subscribe to access staff and roles management.'**
+  String get paidFeatureMessage;
+
+  /// No description provided for @signInToAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signInToAccess;
+
+  /// No description provided for @nameIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get nameIsRequired;
+
+  /// No description provided for @permissionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions'**
+  String get permissionsLabel;
+
+  /// No description provided for @permViewDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'View Dashboard'**
+  String get permViewDashboard;
+
+  /// No description provided for @permViewFinancialReports.
+  ///
+  /// In en, this message translates to:
+  /// **'View Financial Reports'**
+  String get permViewFinancialReports;
+
+  /// No description provided for @permPerformSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Perform Sales (POS)'**
+  String get permPerformSale;
+
+  /// No description provided for @permVoidTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Void/Delete Transactions'**
+  String get permVoidTransaction;
+
+  /// No description provided for @permProcessRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Refunds'**
+  String get permProcessRefund;
+
+  /// No description provided for @permViewSalesHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View Sales History'**
+  String get permViewSalesHistory;
+
+  /// No description provided for @permViewInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'View Inventory'**
+  String get permViewInventory;
+
+  /// No description provided for @permManageProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Add/Edit Products'**
+  String get permManageProducts;
+
+  /// No description provided for @permAdjustInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock Adjustments'**
+  String get permAdjustInventory;
+
+  /// No description provided for @permManageStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Staff & Roles'**
+  String get permManageStaff;
+
+  /// No description provided for @permManageSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'System Settings'**
+  String get permManageSettings;
+
+  /// No description provided for @permSwitchTenant.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Business Branch'**
+  String get permSwitchTenant;
+
+  /// No description provided for @manageSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Subscription'**
+  String get manageSubscription;
+
+  /// No description provided for @availablePlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Plans'**
+  String get availablePlans;
+
+  /// No description provided for @enterpriseMonthlyPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Enterprise (Monthly)'**
+  String get enterpriseMonthlyPlan;
+
+  /// No description provided for @enterpriseMonthlyPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'\$30 / month'**
+  String get enterpriseMonthlyPrice;
+
+  /// No description provided for @freeTierPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Tier'**
+  String get freeTierPlan;
+
+  /// No description provided for @freeTierPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'\$0 / forever'**
+  String get freeTierPrice;
+
+  /// No description provided for @featureCloudSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get featureCloudSync;
+
+  /// No description provided for @featureMultiUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-User'**
+  String get featureMultiUser;
+
+  /// No description provided for @featureWebAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Web Access'**
+  String get featureWebAccess;
+
+  /// No description provided for @featureLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Only'**
+  String get featureLocalOnly;
+
+  /// No description provided for @featureManualBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Backup'**
+  String get featureManualBackup;
+
+  /// No description provided for @currentPlanLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CURRENT PLAN'**
+  String get currentPlanLabel;
+
+  /// No description provided for @planStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: {status}'**
+  String planStatusLabel(String status);
+
+  /// No description provided for @planRenewsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Renews: {date}'**
+  String planRenewsLabel(String date);
+
+  /// No description provided for @planNeverExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get planNeverExpires;
+
+  /// No description provided for @buyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get buyButton;
+
+  /// No description provided for @subscriptionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions are not available while offline. Please sign in to manage your subscription.'**
+  String get subscriptionUnavailable;
+
+  /// No description provided for @confirmMockPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Purchase'**
+  String get confirmMockPurchase;
+
+  /// No description provided for @simulatePaymentFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Simulate payment for {planName}?'**
+  String simulatePaymentFor(String planName);
+
+  /// No description provided for @payNowMock.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay Now (Demo)'**
+  String get payNowMock;
+
+  /// No description provided for @mockPaymentSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'✅ Demo Payment Successful!'**
+  String get mockPaymentSuccess;
+
+  /// No description provided for @noStaffFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No staff found. Invite someone!'**
+  String get noStaffFound;
+
+  /// No description provided for @ownerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get ownerRole;
+
+  /// No description provided for @staffRoleAndEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Role: {roleId} • {email}'**
+  String staffRoleAndEmail(String roleId, String email);
+
+  /// No description provided for @removeStaffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name}?'**
+  String removeStaffTitle(String name);
+
+  /// No description provided for @removeStaffWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'They will lose access to this business immediately.'**
+  String get removeStaffWarning;
+
+  /// No description provided for @inviteStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Staff'**
+  String get inviteStaff;
+
+  /// No description provided for @stepSelectRole.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Select a Role'**
+  String get stepSelectRole;
+
+  /// No description provided for @chooseRoleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Role (e.g. Cashier)'**
+  String get chooseRoleHint;
+
+  /// No description provided for @errorLoadingRoles.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading roles: {error}'**
+  String errorLoadingRoles(String error);
+
+  /// No description provided for @generateInviteCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Invite Code'**
+  String get generateInviteCode;
+
+  /// No description provided for @stepShareCode.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Share Code'**
+  String get stepShareCode;
+
+  /// No description provided for @validFor24Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid for 24 hours'**
+  String get validFor24Hours;
+
+  /// No description provided for @shareViaApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share via WhatsApp / Telegram'**
+  String get shareViaApp;
+
+  /// No description provided for @inviteShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Join my business on Mizan!\n\n1. Download the App\n2. Sign In\n3. Select \'Join Business\' and enter code: {code}\n\n(Valid for 24 hours)'**
+  String inviteShareText(String code);
+
+  /// No description provided for @validInviteCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid Invite Code!'**
+  String get validInviteCodeTitle;
+
+  /// No description provided for @roleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role: {roleId}'**
+  String roleLabel(String roleId);
+
+  /// No description provided for @pleaseEnterYourName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your name'**
+  String get pleaseEnterYourName;
+
+  /// No description provided for @orText.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get orText;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Mizan App v{version}'**
+  String appVersion(String version);
+
+  /// No description provided for @invalidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid number'**
+  String get invalidNumber;
+
+  /// No description provided for @requiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get requiredField;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @redFlags.
+  ///
+  /// In en, this message translates to:
+  /// **'Red Flags'**
+  String get redFlags;
+
+  /// No description provided for @dsriDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Receivables/Sales'**
+  String get dsriDescription;
+
+  /// No description provided for @gmiDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Gross Margin'**
+  String get gmiDescription;
+
+  /// No description provided for @aqiDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Quality'**
+  String get aqiDescription;
+
+  /// No description provided for @sgiDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales Growth'**
+  String get sgiDescription;
+
+  /// No description provided for @depiDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Depreciation'**
+  String get depiDescription;
+
+  /// No description provided for @sgaiDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'SG&A Expenses'**
+  String get sgaiDescription;
+
+  /// No description provided for @tataDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Accruals'**
+  String get tataDescription;
+
+  /// No description provided for @lvgiDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Leverage'**
+  String get lvgiDescription;
+
+  /// No description provided for @whatIsMScore.
+  ///
+  /// In en, this message translates to:
+  /// **'What is the Beneish M-Score?'**
+  String get whatIsMScore;
+
+  /// No description provided for @mScoreDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The M-Score is a mathematical model created by Professor Messod Beneish that uses financial ratios to detect whether a company has manipulated its earnings.\n\nAn M-Score greater than -1.78 suggests a HIGH probability (76%) that the company is an earnings manipulator.'**
+  String get mScoreDescription;
+
+  /// No description provided for @dsriName.
+  ///
+  /// In en, this message translates to:
+  /// **'Days Sales in Receivables Index'**
+  String get dsriName;
+
+  /// No description provided for @dsriExpl.
+  ///
+  /// In en, this message translates to:
+  /// **'Measures if receivables grew faster than sales'**
+  String get dsriExpl;
+
+  /// No description provided for @gmiName.
+  ///
+  /// In en, this message translates to:
+  /// **'Gross Margin Index'**
+  String get gmiName;
+
+  /// No description provided for @gmiExpl.
+  ///
+  /// In en, this message translates to:
+  /// **'Detects deteriorating gross margins'**
+  String get gmiExpl;
+
+  /// No description provided for @aqiName.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Quality Index'**
+  String get aqiName;
+
+  /// No description provided for @aqiExpl.
+  ///
+  /// In en, this message translates to:
+  /// **'Identifies expense capitalization'**
+  String get aqiExpl;
+
+  /// No description provided for @sgiName.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales Growth Index'**
+  String get sgiName;
+
+  /// No description provided for @sgiExpl.
+  ///
+  /// In en, this message translates to:
+  /// **'High growth creates manipulation pressure'**
+  String get sgiExpl;
+
+  /// No description provided for @depiName.
+  ///
+  /// In en, this message translates to:
+  /// **'Depreciation Index'**
+  String get depiName;
+
+  /// No description provided for @depiExpl.
+  ///
+  /// In en, this message translates to:
+  /// **'Detects slowing depreciation rates'**
+  String get depiExpl;
+
+  /// No description provided for @sgaiName.
+  ///
+  /// In en, this message translates to:
+  /// **'SG&A Index'**
+  String get sgaiName;
+
+  /// No description provided for @sgaiExpl.
+  ///
+  /// In en, this message translates to:
+  /// **'Measures administrative efficiency'**
+  String get sgaiExpl;
+
+  /// No description provided for @tataName.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Accruals to Total Assets'**
+  String get tataName;
+
+  /// No description provided for @tataExpl.
+  ///
+  /// In en, this message translates to:
+  /// **'High accruals vs cash = low quality'**
+  String get tataExpl;
+
+  /// No description provided for @lvgiName.
+  ///
+  /// In en, this message translates to:
+  /// **'Leverage Index'**
+  String get lvgiName;
+
+  /// No description provided for @lvgiExpl.
+  ///
+  /// In en, this message translates to:
+  /// **'Increasing debt creates pressure'**
+  String get lvgiExpl;
+
+  /// No description provided for @famousCasesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'• Enron (2001): Would have had M-Score > -1.78\n• WorldCom (2002): High TATA due to expense capitalization\n• Satyam (2009): High DSRI from fictitious receivables\n\nThe M-Score correctly identified 76% of manipulators in backtesting studies.'**
+  String get famousCasesDesc;
+
+  /// No description provided for @mScoreThresholdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Threshold: > -1.78 indicates manipulation'**
+  String get mScoreThresholdLabel;
+
+  /// No description provided for @riskLevelHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'HIGH'**
+  String get riskLevelHigh;
+
+  /// No description provided for @riskLevelModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'MODERATE'**
+  String get riskLevelModerate;
+
+  /// No description provided for @riskLevelLow.
+  ///
+  /// In en, this message translates to:
+  /// **'LOW'**
+  String get riskLevelLow;
+
+  /// No description provided for @unitsLowercase.
+  ///
+  /// In en, this message translates to:
+  /// **'units'**
+  String get unitsLowercase;
+
+  /// No description provided for @flexibleBudgetResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Flexible Budget'**
+  String get flexibleBudgetResult;
+
+  /// No description provided for @varianceFormulas.
+  ///
+  /// In en, this message translates to:
+  /// **'• Static Budget = Fixed + (Variable × Planned Activity)\n• Flexible Budget = Fixed + (Variable × Actual Activity)\n• Volume Variance = Flexible - Static\n• Spending Variance = Actual - Flexible'**
+  String get varianceFormulas;
+
+  /// No description provided for @materialQtyPerUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Material Qty/Unit'**
+  String get materialQtyPerUnit;
+
+  /// No description provided for @laborHoursPerUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Labor Hours/Unit'**
+  String get laborHoursPerUnit;
+
+  /// No description provided for @perHrSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'\$/hr'**
+  String get perHrSuffix;
+
+  /// No description provided for @totalVarianceValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Variance: {amount}'**
+  String totalVarianceValue(String amount);
+
+  /// No description provided for @actualCostResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Actual Cost'**
+  String get actualCostResult;
+
+  /// No description provided for @priceVarianceResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Price Variance'**
+  String get priceVarianceResult;
+
+  /// No description provided for @quantityVarianceResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity Variance'**
+  String get quantityVarianceResult;
+
+  /// No description provided for @materialsFormulasTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Materials Formulas'**
+  String get materialsFormulasTitle;
+
+  /// No description provided for @materialsFormulasDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'• Price Variance = (Actual Price - Standard Price) × Actual Qty\n• Quantity Variance = (Actual Qty - Standard Qty) × Standard Price'**
+  String get materialsFormulasDesc;
+
+  /// No description provided for @rateVarianceResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Variance'**
+  String get rateVarianceResult;
+
+  /// No description provided for @efficiencyVarianceResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Efficiency Variance'**
+  String get efficiencyVarianceResult;
+
+  /// No description provided for @laborFormulasTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Labor Formulas'**
+  String get laborFormulasTitle;
+
+  /// No description provided for @laborFormulasDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'• Rate Variance = (Actual Rate - Standard Rate) × Actual Hours\n• Efficiency Variance = (Actual Hours - Std Hours) × Std Rate'**
+  String get laborFormulasDesc;
+
+  /// No description provided for @currentRatioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Ratio'**
+  String get currentRatioTitle;
+
+  /// No description provided for @debtEquityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt/Equity'**
+  String get debtEquityTitle;
+
+  /// No description provided for @netMarginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Margin'**
+  String get netMarginTitle;
+
+  /// No description provided for @roaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ROA'**
+  String get roaTitle;
+
+  /// No description provided for @ratioCol.
+  ///
+  /// In en, this message translates to:
+  /// **'Ratio'**
+  String get ratioCol;
+
+  /// No description provided for @valueCol.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get valueCol;
+
+  /// No description provided for @benchmarkCol.
+  ///
+  /// In en, this message translates to:
+  /// **'Benchmark'**
+  String get benchmarkCol;
+
+  /// No description provided for @statusCol.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get statusCol;
+
+  /// No description provided for @descriptionCol.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get descriptionCol;
+
+  /// No description provided for @totalVarianceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Variance'**
+  String get totalVarianceLabel;
+
+  /// No description provided for @enterpriseLicenseActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Enterprise License Active'**
+  String get enterpriseLicenseActive;
+
+  /// No description provided for @systemAdministrator.
+  ///
+  /// In en, this message translates to:
+  /// **'You are the System Administrator'**
+  String get systemAdministrator;
+
+  /// No description provided for @defineStaffPermissions.
+  ///
+  /// In en, this message translates to:
+  /// **'Define staff permissions'**
+  String get defineStaffPermissions;
+
+  /// No description provided for @viewPlansBilling.
+  ///
+  /// In en, this message translates to:
+  /// **'View plans & billing'**
+  String get viewPlansBilling;
+
+  /// No description provided for @manageStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Staff'**
+  String get manageStaff;
+
+  /// No description provided for @viewListInviteMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'View list & invite members'**
+  String get viewListInviteMembers;
+
+  /// No description provided for @activateBusinessLicense.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate Business License'**
+  String get activateBusinessLicense;
+
+  /// No description provided for @initializeSystemClaimOwnership.
+  ///
+  /// In en, this message translates to:
+  /// **'Initialize system & claim ownership'**
+  String get initializeSystemClaimOwnership;
+
+  /// No description provided for @notLoggedInWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ You are not logged in! Please Sign In first.'**
+  String get notLoggedInWarning;
+
+  /// No description provided for @systemActivatedWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'✅ System Activated! Welcome, Admin.'**
+  String get systemActivatedWelcome;
+
+  /// No description provided for @activationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'❌ Activation Failed: {error}'**
+  String activationFailed(String error);
+
+  /// No description provided for @premiumReportWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'🔒 Premium Report. Upgrade to Pro or Enterprise.'**
+  String get premiumReportWarning;
+
+  /// No description provided for @buyReportPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy \'\'{reportTitle}\'\' for \$4.99?'**
+  String buyReportPrompt(String reportTitle);
+
+  /// No description provided for @buyNowAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Now'**
+  String get buyNowAction;
+
+  /// No description provided for @installedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'✅ Installed {reportTitle}'**
+  String installedSuccessfully(String reportTitle);
+
+  /// No description provided for @noStandardReportsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No standard reports found online.'**
+  String get noStandardReportsFound;
+
+  /// No description provided for @installAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get installAction;
+
+  /// No description provided for @includedAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Included'**
+  String get includedAction;
+
+  /// No description provided for @buyPriceAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy \$4.99'**
+  String get buyPriceAction;
+
+  /// No description provided for @lockedAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get lockedAction;
+
+  /// No description provided for @retailBusinessTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Retail Business'**
+  String get retailBusinessTemplate;
+
+  /// No description provided for @serviceBusinessTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Service Business'**
+  String get serviceBusinessTemplate;
+
+  /// No description provided for @customersAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Customers (AR)'**
+  String get customersAr;
+
+  /// No description provided for @vendorsAp.
+  ///
+  /// In en, this message translates to:
+  /// **'Vendors (AP)'**
+  String get vendorsAp;
+
+  /// No description provided for @openingBalanceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening Balance (Owes You). Input 0 if no balance.'**
+  String get openingBalanceHint;
+
+  /// No description provided for @openingBalanceHintVendor.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening Balance (You Owe). Input 0 if no balance.'**
+  String get openingBalanceHintVendor;
+
+  /// No description provided for @emailOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Email (Optional)'**
+  String get emailOptional;
+
+  /// No description provided for @phoneOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (Optional)'**
+  String get phoneOptional;
+
+  /// No description provided for @addressOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Address (Optional)'**
+  String get addressOptional;
+
+  /// No description provided for @taxIdOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax ID / VAT Number (Optional)'**
+  String get taxIdOptional;
+
+  /// No description provided for @paymentTermsOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Terms (Optional)'**
+  String get paymentTermsOptional;
+
+  /// No description provided for @creditLimitOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit Limit (Optional)'**
+  String get creditLimitOptional;
+
+  /// No description provided for @notesOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (Optional)'**
+  String get notesOptional;
+
+  /// No description provided for @searchCustomers.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Customers...'**
+  String get searchCustomers;
+
+  /// No description provided for @searchVendors.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Vendors...'**
+  String get searchVendors;
+
+  /// No description provided for @customerDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Details'**
+  String get customerDetails;
+
+  /// No description provided for @vendorDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Vendor Details'**
+  String get vendorDetails;
+
+  /// No description provided for @contactInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Information'**
+  String get contactInfo;
+
+  /// No description provided for @noAddressProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No address provided'**
+  String get noAddressProvided;
+
+  /// No description provided for @noEmailProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No email provided'**
+  String get noEmailProvided;
+
+  /// No description provided for @noPhoneProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No phone provided'**
+  String get noPhoneProvided;
+
+  /// No description provided for @noTaxIdProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No Tax ID provided'**
+  String get noTaxIdProvided;
+
+  /// No description provided for @noNotesProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes provided'**
+  String get noNotesProvided;
+
+  /// No description provided for @noPaymentTermsProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No payment terms provided'**
+  String get noPaymentTermsProvided;
+
+  /// No description provided for @financialOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Overview'**
+  String get financialOverview;
+
+  /// No description provided for @currentBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Balance'**
+  String get currentBalance;
+
+  /// No description provided for @totalInvoiced.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Invoiced'**
+  String get totalInvoiced;
+
+  /// No description provided for @totalPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Paid'**
+  String get totalPaid;
+
+  /// No description provided for @recentInvoices.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Invoices'**
+  String get recentInvoices;
+
+  /// No description provided for @recentBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Bills'**
+  String get recentBills;
+
+  /// No description provided for @noRecentInvoices.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent invoices.'**
+  String get noRecentInvoices;
+
+  /// No description provided for @noRecentBills.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent bills.'**
+  String get noRecentBills;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// No description provided for @actions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get actions;
+
+  /// No description provided for @receivePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive Payment'**
+  String get receivePayment;
+
+  /// No description provided for @statement.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement'**
+  String get statement;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @unpaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpaid'**
+  String get unpaid;
+
+  /// No description provided for @partiallyPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Partially Paid'**
+  String get partiallyPaid;
+
+  /// No description provided for @vendor.
+  ///
+  /// In en, this message translates to:
+  /// **'Vendor'**
+  String get vendor;
+
+  /// No description provided for @addFirstCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the button below to add your first customer'**
+  String get addFirstCustomer;
+
+  /// No description provided for @noCustomersMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No customers match your search.'**
+  String get noCustomersMatch;
+
+  /// No description provided for @customerBalances.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Balances'**
+  String get customerBalances;
+
+  /// No description provided for @contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get contact;
+
+  /// No description provided for @addFirstVendor.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the button below to add your first vendor'**
+  String get addFirstVendor;
+
+  /// No description provided for @noVendorsMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No vendors match your search.'**
+  String get noVendorsMatch;
+
+  /// No description provided for @vendorBalances.
+  ///
+  /// In en, this message translates to:
+  /// **'Vendor Balances'**
+  String get vendorBalances;
+
+  /// No description provided for @outstandingBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Outstanding Balance'**
+  String get outstandingBalance;
+
+  /// No description provided for @quickLedgerAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Ledger Adjustment'**
+  String get quickLedgerAdjustment;
+
+  /// No description provided for @creating.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating...'**
+  String get creating;
+
+  /// No description provided for @qty.
+  ///
+  /// In en, this message translates to:
+  /// **'Qty'**
+  String get qty;
+
+  /// No description provided for @pleaseAddLineItemBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Please add at least one line item with an amount.'**
+  String get pleaseAddLineItemBill;
+
+  /// No description provided for @vendorInvoiceNumberOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Vendor Invoice # (Optional)'**
+  String get vendorInvoiceNumberOptional;
+
+  /// No description provided for @current0To30.
+  ///
+  /// In en, this message translates to:
+  /// **'Current\n(0-30)'**
+  String get current0To30;
+
+  /// No description provided for @days31To60.
+  ///
+  /// In en, this message translates to:
+  /// **'31-60\nDays'**
+  String get days31To60;
+
+  /// No description provided for @days61To90.
+  ///
+  /// In en, this message translates to:
+  /// **'61-90\nDays'**
+  String get days61To90;
+
+  /// No description provided for @days90Plus.
+  ///
+  /// In en, this message translates to:
+  /// **'90+\nDays'**
+  String get days90Plus;
+
+  /// No description provided for @days31To60Short.
+  ///
+  /// In en, this message translates to:
+  /// **'31-60'**
+  String get days31To60Short;
+
+  /// No description provided for @days61To90Short.
+  ///
+  /// In en, this message translates to:
+  /// **'61-90'**
+  String get days61To90Short;
+
+  /// No description provided for @days90PlusShort.
+  ///
+  /// In en, this message translates to:
+  /// **'90+'**
+  String get days90PlusShort;
+
+  /// No description provided for @adjustBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust Balance: {name}'**
+  String adjustBalance(String name);
+
+  /// No description provided for @charge.
+  ///
+  /// In en, this message translates to:
+  /// **'Charge (+)'**
+  String get charge;
+
+  /// No description provided for @receive.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive (-)'**
+  String get receive;
+
+  /// No description provided for @increasesDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Increases their debt to you'**
+  String get increasesDebt;
+
+  /// No description provided for @decreasesDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Decreases their debt (routes to Cash)'**
+  String get decreasesDebt;
+
+  /// No description provided for @saveAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Adjustment'**
+  String get saveAdjustment;
 }
 
 class _AppLocalizationsDelegate

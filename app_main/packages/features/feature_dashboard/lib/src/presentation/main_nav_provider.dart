@@ -15,6 +15,8 @@ enum MainPage {
   manageProducts,
   manageCategories,
   settings,
+  customers, // 🟢 NEW
+  vendors, // 🟢 NEW
 }
 
 final mainNavProvider = StateProvider<MainPage>((ref) {

@@ -47,7 +47,12 @@ final paymentMethodsProvider = StreamProvider<List<PaymentMethod>>((ref) {
 });
 
 class PosScreen extends ConsumerStatefulWidget {
-  const PosScreen({super.key});
+  final bool isStandalone;
+
+  const PosScreen({
+    super.key,
+    this.isStandalone = false,
+  });
 
   @override
   ConsumerState<PosScreen> createState() => _PosScreenState();
@@ -430,7 +435,7 @@ class _PosScreenState extends ConsumerState<PosScreen> {
               description: description,
               transactionDate: DateTime.now(),
               attachmentPath: const d.Value(null),
-              currencyCode: const d.Value('Local'),
+              currencyCode: d.Value(ref.read(defaultCurrencyProvider)),
               relatedTransactionId: const d.Value(null),
             ),
             entries: entries,
@@ -508,64 +513,134 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
         // ─── APP BAR ──────────────────────────────
-        appBar: AppBar(
-          title: _isSearching
-              ? TextField(
-                  controller: _searchController,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: l10n.searchProducts,
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(
-                      color: context.appColors.subtleText.withValues(alpha: 0.7),
+        appBar: widget.isStandalone
+            ? AppBar(
+                title: _isSearching
+                    ? TextField(
+                        controller: _searchController,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          hintText: l10n.searchProducts,
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(
+                            color: context.appColors.subtleText.withValues(alpha: 0.7),
+                          ),
+                        ),
+                        style: TextStyle(color: context.appColors.onSurface),
+                        onChanged: (value) {
+                          setState(() => _searchQuery = value);
+                        },
+                      )
+                    : Text(l10n.posTerminalTitle),
+                actions: [
+                  // Search
+                  IconButton(
+                    icon: Icon(_isSearching ? Icons.close : Icons.search),
+                    tooltip: l10n.searchProductTooltip,
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = !_isSearching;
+                        if (!_isSearching) {
+                          _searchQuery = '';
+                          _searchController.clear();
+                        }
+                      });
+                    },
+                  ),
+                  // Barcode Scanner
+                  IconButton(
+                    icon: const Icon(Icons.qr_code_scanner),
+                    tooltip: l10n.scanMode,
+                    onPressed: _openMobileScanner,
+                  ),
+                  // Parked Orders
+                  Badge(
+                    label: Text(parkCount.toString()),
+                    isLabelVisible: parkCount > 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.history),
+                      onPressed: _showParkedOrdersDialog,
+                      tooltip: l10n.recallOrderTooltip,
                     ),
                   ),
-                  style: TextStyle(color: context.appColors.onSurface),
-                  onChanged: (value) {
-                    setState(() => _searchQuery = value);
-                  },
-                )
-              : Text(l10n.posTerminalTitle),
-          actions: [
-            // Search
-            IconButton(
-              icon: Icon(_isSearching ? Icons.close : Icons.search),
-              tooltip: l10n.searchProductTooltip,
-              onPressed: () {
-                setState(() {
-                  _isSearching = !_isSearching;
-                  if (!_isSearching) {
-                    _searchQuery = '';
-                    _searchController.clear();
-                  }
-                });
-              },
-            ),
-            // Barcode Scanner
-            IconButton(
-              icon: const Icon(Icons.qr_code_scanner),
-              tooltip: l10n.scanMode,
-              onPressed: _openMobileScanner,
-            ),
-            // Parked Orders
-            Badge(
-              label: Text(parkCount.toString()),
-              isLabelVisible: parkCount > 0,
-              child: IconButton(
-                icon: const Icon(Icons.history),
-                onPressed: _showParkedOrdersDialog,
-                tooltip: l10n.recallOrderTooltip,
-              ),
-            ),
-            const SizedBox(width: 4),
-          ],
-        ),
+                  const SizedBox(width: 4),
+                ],
+              )
+            : null,
 
         // ─── BODY ─────────────────────────────────
         body: Stack(
           children: [
             Column(
               children: [
+                if (!widget.isStandalone)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 2,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        if (_isSearching)
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              autofocus: true,
+                              decoration: InputDecoration(
+                                hintText: l10n.searchProducts,
+                                border: InputBorder.none,
+                              ),
+                              onChanged: (value) {
+                                setState(() => _searchQuery = value);
+                              },
+                            ),
+                          )
+                        else
+                          Expanded(
+                            child: Text(
+                              l10n.posTerminalTitle,
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        IconButton(
+                          icon: Icon(_isSearching ? Icons.close : Icons.search),
+                          tooltip: l10n.searchProductTooltip,
+                          onPressed: () {
+                            setState(() {
+                              _isSearching = !_isSearching;
+                              if (!_isSearching) {
+                                _searchQuery = '';
+                                _searchController.clear();
+                              }
+                            });
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.qr_code_scanner),
+                          tooltip: l10n.scanMode,
+                          onPressed: _openMobileScanner,
+                        ),
+                        Badge(
+                          label: Text(parkCount.toString()),
+                          isLabelVisible: parkCount > 0,
+                          child: IconButton(
+                            icon: const Icon(Icons.history),
+                            onPressed: _showParkedOrdersDialog,
+                            tooltip: l10n.recallOrderTooltip,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 // ── Category Filter Chips ──
                 categoriesAsync.when(
                   data: (categories) => _buildCategoryChips(categories, l10n),

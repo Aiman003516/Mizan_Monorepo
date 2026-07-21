@@ -1,98 +1,102 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/rbac_models.dart';
 
 final staffRepositoryProvider = Provider<StaffRepository>((ref) {
-  return StaffRepository(FirebaseFirestore.instance);
+  return StaffRepository(Supabase.instance.client);
 });
 
-final staffStreamProvider = StreamProvider.autoDispose<List<StaffMember>>((
-  ref,
-) {
-  return ref.watch(staffRepositoryProvider).watchAllStaff();
+final staffStreamProvider = StreamProvider.autoDispose<List<StaffMember>>((ref) {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+  if (user == null) return Stream.value([]);
+  
+  return supabase
+      .from('user_profiles')
+      .stream(primaryKey: ['id'])
+      .eq('id', user.id)
+      .map((profiles) {
+        if (profiles.isEmpty) return null;
+        return profiles.first['tenant_id'] as String?;
+      })
+      .asyncExpand((tenantId) {
+        if (tenantId == null) return Stream.value(<StaffMember>[]);
+        return ref.watch(staffRepositoryProvider).watchAllStaff(tenantId);
+      });
 });
 
 class StaffRepository {
-  final FirebaseFirestore _firestore;
+  final SupabaseClient _supabase;
 
-  // 🛡️ Phase 4 Hardcoded Tenant.
-  static const String _tenantId = 'test_tenant_123';
+  StaffRepository(this._supabase);
 
-  StaffRepository(this._firestore);
+  Future<String> _getTenantId() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) throw Exception('Not logged in');
+    final res = await _supabase.from('user_profiles').select('tenant_id').eq('id', user.id).maybeSingle();
+    if (res == null || res['tenant_id'] == null) throw Exception('Tenant ID not found');
+    return res['tenant_id'] as String;
+  }
 
   /// 🕵️‍♂️ Watch all members of this tenant
-  Stream<List<StaffMember>> watchAllStaff() {
-    return _firestore
-        .collection('tenants')
-        .doc(_tenantId)
-        .collection('members')
-        .orderBy('joinedAt', descending: true) // Newest first
-        .snapshots()
+  Stream<List<StaffMember>> watchAllStaff(String tenantId) {
+    // In our schema, user_profiles acts as members table
+    return _supabase
+        .from('user_profiles')
+        .stream(primaryKey: ['id'])
+        .eq('tenant_id', tenantId)
         .map((snapshot) {
-          return snapshot.docs
-              .map((doc) => StaffMember.fromJson(doc.data()))
-              .toList();
+          return snapshot.map((doc) => StaffMember(
+            uid: doc['id'],
+            email: doc['email'] ?? '',
+            displayName: doc['display_name'] ?? 'Unknown',
+            roleId: doc['role'] ?? 'guest',
+            isOwner: doc['role'] == 'owner',
+            status: 'active',
+          )).toList();
         });
   }
 
   /// 🔄 Change a staff member's role
   Future<void> updateStaffRole(String uid, String newRoleId) async {
-    await _firestore
-        .collection('tenants')
-        .doc(_tenantId)
-        .collection('members')
-        .doc(uid)
-        .update({'roleId': newRoleId});
+    final tenantId = await _getTenantId();
+    await _supabase
+        .from('user_profiles')
+        .update({'role': newRoleId})
+        .eq('id', uid)
+        .eq('tenant_id', tenantId);
   }
 
   /// 🚫 Remove/Suspend a staff member
   Future<void> removeStaffMember(String uid) async {
-    // We don't delete the doc (to keep history), we just mark status/access.
-    // But for Phase 4, let's just delete the member record to revoke access.
-    await _firestore
-        .collection('tenants')
-        .doc(_tenantId)
-        .collection('members')
-        .doc(uid)
-        .delete();
+    final tenantId = await _getTenantId();
+    // For Phase 4, we just remove them from the tenant by setting tenant_id to null
+    await _supabase
+        .from('user_profiles')
+        .update({'tenant_id': null, 'role': 'guest'})
+        .eq('id', uid)
+        .eq('tenant_id', tenantId);
   }
 
   /// 🎟️ CREATE INVITE CODE
-  /// Generates a 6-digit code valid for 24 hours.
-  /// Returns the code string.
   Future<String> createInvite(String roleId) async {
-    // 1. Generate secure random 6-digit code
-    // (Simple math version for brevity, use crypto in high security)
-    final String code =
-        (100000 + DateTime.now().microsecondsSinceEpoch % 899999).toString();
-
+    final tenantId = await _getTenantId();
+    final String code = (100000 + DateTime.now().microsecondsSinceEpoch % 899999).toString();
     final expiresAt = DateTime.now().add(const Duration(hours: 24));
 
-    // 2. Save to Firestore
-    // Path: tenants/{id}/invites/{code}
-    await _firestore
-        .collection('tenants')
-        .doc(_tenantId)
-        .collection('invites')
-        .doc(code)
-        .set({
-          'code': code,
-          'roleId': roleId,
-          'createdAt': FieldValue.serverTimestamp(),
-          'expiresAt': Timestamp.fromDate(expiresAt),
-          'createdBy': _firestore
-              .collection('users')
-              .doc('current_user_placeholder')
-              .id, // Optional audit
-          'isUsed': false,
-        });
+    await _supabase.from('invites').insert({
+      'code': code,
+      'tenant_id': tenantId,
+      'role_id': roleId,
+      'expires_at': expiresAt.toIso8601String(),
+      'created_by': _supabase.auth.currentUser?.id,
+      'is_used': false,
+    });
 
     return code;
   }
 
   /// 🎟️ REDEEM INVITE CODE
-  /// Validates an invite code and adds the user to the organization.
-  /// Returns the roleId if successful, throws on error.
   Future<String> redeemInvite({
     required String code,
     required String userId,
@@ -100,82 +104,51 @@ class StaffRepository {
     String? email,
   }) async {
     // 1. Get the invite document
-    final inviteDoc = await _firestore
-        .collection('tenants')
-        .doc(_tenantId)
-        .collection('invites')
-        .doc(code)
-        .get();
+    final inviteDoc = await _supabase.from('invites').select().eq('code', code).maybeSingle();
 
-    if (!inviteDoc.exists) {
-      throw Exception('Invalid invite code');
-    }
+    if (inviteDoc == null) throw Exception('Invalid invite code');
+    if (inviteDoc['is_used'] == true) throw Exception('This invite code has already been used');
 
-    final inviteData = inviteDoc.data()!;
+    final expiresAt = DateTime.parse(inviteDoc['expires_at']);
+    if (DateTime.now().isAfter(expiresAt)) throw Exception('This invite code has expired');
 
-    // 2. Check if already used
-    if (inviteData['isUsed'] == true) {
-      throw Exception('This invite code has already been used');
-    }
+    final tenantId = inviteDoc['tenant_id'] as String;
+    final roleId = inviteDoc['role_id'] as String;
 
-    // 3. Check expiration
-    final expiresAt = (inviteData['expiresAt'] as Timestamp).toDate();
-    if (DateTime.now().isAfter(expiresAt)) {
-      throw Exception('This invite code has expired');
-    }
+    // 2. Add user to members collection (Update user_profiles)
+    await _supabase.from('user_profiles').upsert({
+      'id': userId,
+      'tenant_id': tenantId,
+      'display_name': displayName,
+      'email': email ?? '',
+      'role': roleId,
+    });
 
-    final roleId = inviteData['roleId'] as String;
-
-    // 4. Add user to members collection
-    await _firestore
-        .collection('tenants')
-        .doc(_tenantId)
-        .collection('members')
-        .doc(userId)
-        .set({
-          'uid': userId,
-          'displayName': displayName,
-          'email': email ?? '',
-          'roleId': roleId,
-          'joinedAt': FieldValue.serverTimestamp(),
-          'inviteCode': code,
-        });
-
-    // 5. Mark invite as used
-    await _firestore
-        .collection('tenants')
-        .doc(_tenantId)
-        .collection('invites')
-        .doc(code)
-        .update({
-          'isUsed': true,
-          'usedBy': userId,
-          'usedAt': FieldValue.serverTimestamp(),
-        });
+    // 3. Mark invite as used
+    await _supabase.from('invites').update({
+      'is_used': true,
+      'used_by': userId,
+      'used_at': DateTime.now().toIso8601String(),
+    }).eq('code', code);
 
     return roleId;
   }
 
   /// 🔍 VALIDATE INVITE CODE (without redeeming)
-  /// Returns invite details if valid, null if invalid
   Future<Map<String, dynamic>?> validateInviteCode(String code) async {
-    final inviteDoc = await _firestore
-        .collection('tenants')
-        .doc(_tenantId)
-        .collection('invites')
-        .doc(code)
-        .get();
+    final inviteDoc = await _supabase.from('invites').select().eq('code', code).maybeSingle();
 
-    if (!inviteDoc.exists) return null;
+    if (inviteDoc == null) return null;
+    if (inviteDoc['is_used'] == true) return null;
 
-    final data = inviteDoc.data()!;
-
-    // Check if valid
-    if (data['isUsed'] == true) return null;
-
-    final expiresAt = (data['expiresAt'] as Timestamp).toDate();
+    final expiresAt = DateTime.parse(inviteDoc['expires_at']);
     if (DateTime.now().isAfter(expiresAt)) return null;
 
-    return data;
+    // Map back to camelCase for UI compatibility if needed
+    return {
+      'roleId': inviteDoc['role_id'],
+      'tenantId': inviteDoc['tenant_id'],
+      'expiresAt': inviteDoc['expires_at'],
+    };
   }
 }

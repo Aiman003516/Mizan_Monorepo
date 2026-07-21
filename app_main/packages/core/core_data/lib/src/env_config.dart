@@ -21,6 +21,9 @@ class EnvConfig {
     defaultValue: false,
   );
 
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+
   // --- Third-Party Keys (Sensitive) ---
   // These return empty strings if not provided during build.
   static const String stripePublishableKey = String.fromEnvironment('STRIPE_KEY');
@@ -29,7 +32,10 @@ class EnvConfig {
 
   static const String googleWindowsClientSecret = String.fromEnvironment('GOOGLE_WINDOWS_CLIENT_SECRET');
 
+  static const String googleWebClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID');
+
   // --- Helper Checks ---
   static bool get hasStripeKey => stripePublishableKey.isNotEmpty;
   static bool get hasGoogleKeys => googleWindowsClientId.isNotEmpty && googleWindowsClientSecret.isNotEmpty;
+  static bool get hasGoogleWebClientId => googleWebClientId.isNotEmpty;
 }

@@ -19,6 +19,7 @@ import 'package:core_data/core_data.dart'; // For AppPermission
 import 'package:feature_transactions/feature_transactions.dart';
 import 'package:feature_products/feature_products.dart';
 import 'package:feature_reports/feature_reports.dart';
+import 'package:feature_contacts/feature_contacts.dart'; // 🟢 NEW
 
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -137,8 +138,28 @@ class DashboardScreen extends ConsumerWidget {
               leading: const Icon(Icons.dashboard),
               title: Text(l10n.dashboard), // "Dashboard"
               onTap: () {
-                // Close drawer (Already on dashboard)
                 Navigator.pop(context);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: Text(l10n.customersAr),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const CustomersTableScreen()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.store),
+              title: Text(l10n.vendorsAp),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => const VendorsTableScreen()),
+                );
               },
             ),
             // Add more drawer items here (e.g., Settings, Profile) as needed

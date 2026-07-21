@@ -6,6 +6,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  supabase_flutter: ^2.5.4
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
@@ -13,7 +14,6 @@ dependencies:
   local_auth: ^2.3.0
   url_launcher: ^6.3.2
   share_plus: ^10.0.0
-  firebase_auth: ^5.7.0
   image_picker: ^1.1.2 # Required for ImageSource enum
   
   # Local Dependencies
@@ -37,5 +37,6 @@ dependencies:
     path: ../feature_sync
 
 dev_dependencies:
+  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

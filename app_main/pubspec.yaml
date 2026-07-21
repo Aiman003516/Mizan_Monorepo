@@ -2,6 +2,7 @@ name: app_main
 environment:
   sdk: ">=3.9.2 <4.0.0"
 dev_dependencies:
+  supabase_flutter: ^2.5.4
   melos: ^7.3.0
 
 melos: 

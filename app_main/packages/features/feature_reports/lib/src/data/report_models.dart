@@ -139,11 +139,7 @@ class ReportColumn {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'key': key,
-    'label': label,
-    'type': type,
-  };
+  Map<String, dynamic> toJson() => {'key': key, 'label': label, 'type': type};
 }
 
 /// 🎛️ PARAMETER DEFINITION
@@ -167,11 +163,7 @@ class ReportParameter {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'key': key,
-    'label': label,
-    'type': type,
-  };
+  Map<String, dynamic> toJson() => {'key': key, 'label': label, 'type': type};
 }
 
 /// 📜 THE REPORT TEMPLATE

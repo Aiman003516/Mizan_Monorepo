@@ -242,7 +242,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
       ),
       _buildRatioDataRow(
         l10n: l10n,
-        title: 'Working Capital',
+        title: l10n.workingCapital,
         value: ratios.workingCapital.toDouble(),
         format: RatioFormat.currency,
         description: l10n.formulaWorkingCapital,
@@ -450,6 +450,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
   }
 
   Widget _buildRatioDataTable(BuildContext context, List<DataRow> rows) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       elevation: 2,
       child: SingleChildScrollView(
@@ -459,12 +460,12 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
           headingTextStyle: Theme.of(
             context,
           ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-          columns: const [
-            DataColumn(label: Text('Ratio')),
-            DataColumn(label: Text('Value')),
-            DataColumn(label: Text('Benchmark')),
-            DataColumn(label: Text('Status')),
-            DataColumn(label: Text('Description')),
+          columns: [
+            DataColumn(label: Text(l10n.ratioCol)),
+            DataColumn(label: Text(l10n.valueCol)),
+            DataColumn(label: Text(l10n.benchmarkCol)),
+            DataColumn(label: Text(l10n.statusCol)),
+            DataColumn(label: Text(l10n.descriptionCol)),
           ],
           rows: rows,
         ),

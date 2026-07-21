@@ -1,6 +1,6 @@
 // FILE: packages/core/core_data/lib/src/models/billing_models.dart
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 enum SubscriptionPlan {
   free,
@@ -41,7 +41,7 @@ class TenantSubscription {
       tenantId: id,
       plan: _parsePlan(json['plan']),
       status: _parseStatus(json['status']),
-      currentPeriodEnd: (json['currentPeriodEnd'] as Timestamp?)?.toDate(),
+      currentPeriodEnd: json['currentPeriodEnd'] != null ? DateTime.tryParse(json['currentPeriodEnd'] as String) : null,
       isLifetimePro: json['isLifetimePro'] as bool? ?? false,
       stripeCustomerId: json['stripeCustomerId'] as String?,
     );
@@ -52,9 +52,7 @@ class TenantSubscription {
     return {
       'plan': plan.name,
       'status': status.name,
-      'currentPeriodEnd': currentPeriodEnd != null 
-          ? Timestamp.fromDate(currentPeriodEnd!) 
-          : null,
+      'currentPeriodEnd': currentPeriodEnd?.toIso8601String(),
       'isLifetimePro': isLifetimePro,
       'stripeCustomerId': stripeCustomerId,
     };

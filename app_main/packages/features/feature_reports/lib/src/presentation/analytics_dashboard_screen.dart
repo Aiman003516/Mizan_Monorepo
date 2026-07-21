@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -10,36 +11,39 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text("Business Insights")),
+      appBar: AppBar(title: Text(l10n.businessInsights)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // --- SECTION 1: SALES TREND ---
-            Text("Sales Trend (Last 30 Days)", style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 250,
-              child: _SalesLineChart(ref: ref),
+            Text(
+              "Sales Trend (Last 30 Days)",
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            
+            const SizedBox(height: 16),
+            SizedBox(height: 250, child: _SalesLineChart(ref: ref)),
+
             const SizedBox(height: 32),
 
             // --- SECTION 2: CATEGORY SHARE ---
-            Text("Sales by Category", style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 250,
-              child: _CategoryPieChart(ref: ref),
+            Text(
+              "Sales by Category",
+              style: Theme.of(context).textTheme.titleMedium,
             ),
+            const SizedBox(height: 16),
+            SizedBox(height: 250, child: _CategoryPieChart(ref: ref)),
 
             const SizedBox(height: 32),
 
             // --- SECTION 3: TOP PRODUCTS ---
-            Text("Top 5 Products", style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              "Top 5 Products",
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 16),
             _TopProductsList(ref: ref),
           ],
@@ -60,14 +64,17 @@ class _SalesLineChart extends ConsumerWidget {
 
     return dataAsync.when(
       data: (points) {
-        if (points.isEmpty) return const Center(child: Text("No sales data yet."));
-        
+        if (points.isEmpty)
+          return const Center(child: Text("No sales data yet."));
+
         // Normalize Data for Chart
         final spots = points.asMap().entries.map((e) {
           return FlSpot(e.key.toDouble(), e.value.amount);
         }).toList();
 
-        final maxAmount = points.map((e) => e.amount).reduce((a, b) => a > b ? a : b);
+        final maxAmount = points
+            .map((e) => e.amount)
+            .reduce((a, b) => a > b ? a : b);
 
         return LineChart(
           LineChartData(
@@ -80,17 +87,29 @@ class _SalesLineChart extends ConsumerWidget {
                     // Show date every 5 days roughly
                     final index = value.toInt();
                     if (index >= 0 && index < points.length && index % 5 == 0) {
-                      return Text(DateFormat('MM/dd').format(points[index].date), style: const TextStyle(fontSize: 10));
+                      return Text(
+                        DateFormat('MM/dd').format(points[index].date),
+                        style: const TextStyle(fontSize: 10),
+                      );
                     }
                     return const SizedBox.shrink();
                   },
                 ),
               ),
-              leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
             ),
-            borderData: FlBorderData(show: true, border: Border.all(color: context.appColors.primary)),
+            borderData: FlBorderData(
+              show: true,
+              border: Border.all(color: context.appColors.primary),
+            ),
             lineBarsData: [
               LineChartBarData(
                 spots: spots,
@@ -99,7 +118,10 @@ class _SalesLineChart extends ConsumerWidget {
                 barWidth: 3,
                 dotData: const FlDotData(show: false),
                 // ignore: deprecated_member_use
-                belowBarData: BarAreaData(show: true, color: context.appColors.info.withValues(alpha: 0.1)),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: context.appColors.info.withValues(alpha: 0.1),
+                ),
               ),
             ],
             maxY: maxAmount * 1.2, // Add headroom
@@ -123,9 +145,13 @@ class _CategoryPieChart extends ConsumerWidget {
 
     return dataAsync.when(
       data: (categories) {
-        if (categories.isEmpty) return const Center(child: Text("No category data."));
+        if (categories.isEmpty)
+          return const Center(child: Text("No category data."));
 
-        final total = categories.fold(0.0, (sum, item) => sum + item.totalRevenue);
+        final total = categories.fold(
+          0.0,
+          (sum, item) => sum + item.totalRevenue,
+        );
 
         return Row(
           children: [
@@ -136,13 +162,19 @@ class _CategoryPieChart extends ConsumerWidget {
                     final index = e.key;
                     final item = e.value;
                     final isLarge = item.totalRevenue / total > 0.15;
-                    
+
                     return PieChartSectionData(
                       color: Colors.primaries[index % Colors.primaries.length],
                       value: item.totalRevenue,
-                      title: isLarge ? '${(item.totalRevenue / total * 100).toStringAsFixed(0)}%' : '',
+                      title: isLarge
+                          ? '${(item.totalRevenue / total * 100).toStringAsFixed(0)}%'
+                          : '',
                       radius: 50,
-                      titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.appColors.onPrimary),
+                      titleStyle: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: context.appColors.onPrimary,
+                      ),
                     );
                   }).toList(),
                   centerSpaceRadius: 40,
@@ -162,9 +194,17 @@ class _CategoryPieChart extends ConsumerWidget {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Row(
                     children: [
-                      Container(width: 12, height: 12, color: Colors.primaries[index % Colors.primaries.length]),
+                      Container(
+                        width: 12,
+                        height: 12,
+                        color:
+                            Colors.primaries[index % Colors.primaries.length],
+                      ),
                       const SizedBox(width: 8),
-                      Text("${item.categoryName} (\$${item.totalRevenue.toStringAsFixed(0)})", style: const TextStyle(fontSize: 12)),
+                      Text(
+                        "${item.categoryName} (\$${item.totalRevenue.toStringAsFixed(0)})",
+                        style: const TextStyle(fontSize: 12),
+                      ),
                     ],
                   ),
                 );
@@ -197,10 +237,16 @@ class _TopProductsList extends ConsumerWidget {
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
                 backgroundColor: context.appColors.primary,
-                child: Icon(Icons.emoji_events, color: context.appColors.warning),
+                child: Icon(
+                  Icons.emoji_events,
+                  color: context.appColors.warning,
+                ),
               ),
               title: Text(p.productName),
-              trailing: Text("${p.quantitySold.toStringAsFixed(0)} sold", style: const TextStyle(fontWeight: FontWeight.bold)),
+              trailing: Text(
+                "${p.quantitySold.toStringAsFixed(0)} sold",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             );
           }).toList(),
         );

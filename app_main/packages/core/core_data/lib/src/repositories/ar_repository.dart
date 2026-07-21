@@ -1,7 +1,10 @@
 import 'package:core_database/core_database.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:collection/collection.dart';
+import 'package:uuid/uuid.dart';
 
+const _uuid = Uuid();
 // Providers
 final arRepositoryProvider = Provider<ARRepository>((ref) {
   final db = ref.watch(appDatabaseProvider);
@@ -114,23 +117,66 @@ class ARRepository {
     String? receivableAccountId,
     String? notes,
     bool isOnHold = false,
+    int openingBalance = 0,
   }) async {
-    final companion = CustomersCompanion.insert(
-      name: name,
-      email: Value(email),
-      phone: Value(phone),
-      address: Value(address),
-      taxId: Value(taxId),
-      creditLimit: Value(creditLimit),
-      receivableAccountId: Value(receivableAccountId),
-      notes: Value(notes),
-      isOnHold: Value(isOnHold),
-    );
+    return await _db.transaction(() async {
+      // Pre-generate UUID so we can use it as both the PK and in FK references
+      final customerUuid = _uuid.v4();
 
-    final id = await _db.into(_db.customers).insert(companion);
-    return (await (_db.select(
-      _db.customers,
-    )..where((t) => t.id.equals(id.toString()))).getSingle());
+      final companion = CustomersCompanion.insert(
+        id: Value(customerUuid),
+        name: name,
+        email: Value(email),
+        phone: Value(phone),
+        address: Value(address),
+        taxId: Value(taxId),
+        creditLimit: Value(creditLimit),
+        receivableAccountId: Value(receivableAccountId),
+        notes: Value(notes),
+        isOnHold: Value(isOnHold),
+        balance: Value(openingBalance),
+      );
+
+      await _db.into(_db.customers).insert(companion);
+
+      if (openingBalance != 0) {
+        final accountsList = await _db.select(_db.accounts).get();
+        final arAccount = accountsList.firstWhereOrNull(
+            (a) => a.name == 'Accounts Receivable' || a.name.contains('Receivable'))
+            ?? accountsList.firstWhereOrNull((a) => a.type == 'asset');
+        final equityAccount = accountsList.firstWhereOrNull(
+            (a) => a.name == 'Equity' || a.name.contains('Equity'))
+            ?? accountsList.firstWhereOrNull((a) => a.type == 'equity');
+
+        if (arAccount == null || equityAccount == null) {
+          throw Exception('Required system accounts (Accounts Receivable or Equity) are missing from the database.');
+        }
+
+        // Pre-generate transaction UUID for FK references
+        final txnUuid = _uuid.v4();
+        final txnCompanion = TransactionsCompanion.insert(
+          id: Value(txnUuid),
+          transactionDate: DateTime.now(),
+          description: 'Opening Balance for $name',
+        );
+        await _db.into(_db.transactions).insert(txnCompanion);
+
+        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
+          transactionId: txnUuid, // ✅ UUID string, not int rowid
+          accountId: arAccount.id,
+          amount: openingBalance,
+        ));
+
+        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
+          transactionId: txnUuid, // ✅ UUID string, not int rowid
+          accountId: equityAccount.id,
+          amount: -openingBalance,
+        ));
+      }
+
+      // Use the pre-generated UUID — no need to re-query by rowid
+      return (await (_db.select(_db.customers)..where((t) => t.id.equals(customerUuid))).getSingle());
+    });
   }
 
   /// Update customer
@@ -156,6 +202,72 @@ class ARRepository {
 
     await (_db.update(_db.customers)..where((t) => t.id.equals(customerId)))
         .write(CustomersCompanion(balance: Value(totalOutstanding)));
+  }
+
+  // ==================== INVOICES ====================
+
+  /// Record Quick Ledger Adjustment
+  Future<void> recordQuickAdjustment({
+    required String customerId,
+    required int amount,
+    required bool isCharge,
+    String? notes,
+  }) async {
+    await _db.transaction(() async {
+      final customer = await getCustomer(customerId);
+      if (customer == null) return;
+
+      final accountsList = await _db.select(_db.accounts).get();
+      final arAccount = accountsList.firstWhereOrNull(
+          (a) => a.name == 'Accounts Receivable' || a.name.contains('Receivable'))
+          ?? accountsList.firstWhereOrNull((a) => a.type == 'asset');
+      final cashAccount = accountsList.firstWhereOrNull(
+          (a) => a.name == 'Cash' || a.name.contains('Cash'))
+          ?? accountsList.firstWhereOrNull((a) => a.type == 'asset');
+
+      if (arAccount == null || cashAccount == null) {
+        throw Exception('Required system accounts (Accounts Receivable or Cash) are missing from the database.');
+      }
+
+      // Pre-generate transaction UUID for FK references
+      final txnUuid = _uuid.v4();
+      final txnCompanion = TransactionsCompanion.insert(
+        id: Value(txnUuid),
+        transactionDate: DateTime.now(),
+        description: notes ?? (isCharge ? 'Quick Charge for ${customer.name}' : 'Payment Received from ${customer.name}'),
+      );
+      await _db.into(_db.transactions).insert(txnCompanion);
+
+      if (isCharge) {
+        // Customer owes us more: Debit AR (positive), Credit Cash (negative)
+        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
+          transactionId: txnUuid, // ✅ UUID string, not int rowid
+          accountId: arAccount.id,
+          amount: amount,
+        ));
+        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
+          transactionId: txnUuid, // ✅ UUID string, not int rowid
+          accountId: cashAccount.id,
+          amount: -amount,
+        ));
+      } else {
+        // Customer pays us: Debit Cash (positive), Credit AR (negative)
+        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
+          transactionId: txnUuid, // ✅ UUID string, not int rowid
+          accountId: cashAccount.id,
+          amount: amount,
+        ));
+        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
+          transactionId: txnUuid, // ✅ UUID string, not int rowid
+          accountId: arAccount.id,
+          amount: -amount,
+        ));
+      }
+
+      final newBalance = customer.balance + (isCharge ? amount : -amount);
+      await (_db.update(_db.customers)..where((t) => t.id.equals(customerId)))
+          .write(CustomersCompanion(balance: Value(newBalance)));
+    });
   }
 
   // ==================== INVOICES ====================
@@ -196,11 +308,33 @@ class ARRepository {
 
   /// Generate next invoice number
   Future<String> generateInvoiceNumber() async {
-    final count = await _db
-        .customSelect('SELECT COUNT(*) as cnt FROM invoices')
-        .getSingle();
-    final num = (count.read<int?>('cnt') ?? 0) + 1;
-    return 'INV-${num.toString().padLeft(4, '0')}';
+    final now = DateTime.now();
+    final yearStr = now.year.toString();
+    final monthStr = now.month.toString().padLeft(2, '0');
+    final prefix = 'INV-$yearStr-$monthStr-';
+
+    final result = await _db.customSelect(
+      '''
+      SELECT invoice_number 
+      FROM invoices 
+      WHERE invoice_number LIKE ? 
+      ORDER BY invoice_number DESC 
+      LIMIT 1
+      ''',
+      variables: [Variable<String>('$prefix%')],
+    ).getSingleOrNull();
+
+    int nextNum = 1;
+    if (result != null) {
+      final lastNumber = result.read<String>('invoice_number');
+      final parts = lastNumber.split('-');
+      if (parts.length >= 4) {
+        final lastSeq = int.tryParse(parts[3]) ?? 0;
+        nextNum = lastSeq + 1;
+      }
+    }
+
+    return '$prefix${nextNum.toString().padLeft(4, '0')}';
   }
 
   /// Create a new invoice
@@ -209,6 +343,7 @@ class ARRepository {
     required DateTime invoiceDate,
     required DateTime dueDate,
     required List<InvoiceItemData> items,
+    required String currencyCode,
     String? notes,
   }) async {
     return await _db.transaction(() async {
@@ -227,6 +362,7 @@ class ARRepository {
         dueDate: dueDate,
         subtotal: subtotal,
         totalAmount: subtotal, // No tax for now
+        currencyCode: Value(currencyCode),
       );
 
       // Get the generated ID from insert

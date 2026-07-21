@@ -21,19 +21,7 @@ export 'src/data/report_templates_repository.dart';
 export 'src/presentation/report_marketplace_screen.dart';
 export 'src/presentation/reports_hub_screen.dart';
 
-// Accounts Receivable
-export 'src/presentation/ar/customers_list_screen.dart';
-export 'src/presentation/ar/customer_form_screen.dart';
-export 'src/presentation/ar/customer_detail_screen.dart';
-export 'src/presentation/ar/invoice_form_screen.dart';
-export 'src/presentation/ar/ar_aging_report_screen.dart';
 
-// Accounts Payable
-export 'src/presentation/ap/vendors_list_screen.dart';
-export 'src/presentation/ap/vendor_form_screen.dart';
-export 'src/presentation/ap/vendor_detail_screen.dart';
-export 'src/presentation/ap/bill_form_screen.dart';
-export 'src/presentation/ap/ap_aging_report_screen.dart';
 
 // Phase D: Enhanced Reports
 export 'src/presentation/cash_flow_screen.dart';

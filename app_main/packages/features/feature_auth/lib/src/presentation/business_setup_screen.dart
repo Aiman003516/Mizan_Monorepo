@@ -2,6 +2,7 @@
 
 import 'package:feature_auth/src/data/auth_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -54,8 +55,9 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text("Setup Business Cloud")),
+      appBar: AppBar(title: Text(l10n.setupBusinessCloud)),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Form(

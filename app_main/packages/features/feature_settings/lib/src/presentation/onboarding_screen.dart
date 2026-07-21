@@ -21,17 +21,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final TextEditingController _customSymbolCtrl = TextEditingController();
   bool _isCustomCurrency = false;
   String _selectedCurrency = 'USD';
+  bool _isLoading = false;
 
   AppLocalizations get l10n => AppLocalizations.of(context)!;
 
-  final List<Map<String, String>> _commonCurrencies = [
-    {'code': 'USD', 'symbol': '\$', 'name': 'US Dollar'},
-    {'code': 'SAR', 'symbol': 'ر.س', 'name': 'Saudi Riyal'},
-    {'code': 'YER', 'symbol': '﷼', 'name': 'Yemeni Rial'},
-    {'code': 'AED', 'symbol': 'د.إ', 'name': 'UAE Dirham'},
-    {'code': 'EUR', 'symbol': '€', 'name': 'Euro'},
-    {'code': 'CUSTOM', 'symbol': '?', 'name': 'Custom / Other'},
-  ];
+  List<Map<String, String>> get _commonCurrencies {
+    final isAr = ref.read(localeControllerProvider)?.languageCode == 'ar';
+    return [
+      {'code': 'USD', 'symbol': '\$', 'name': isAr ? 'دولار أمريكي' : 'US Dollar'},
+      {'code': 'SAR', 'symbol': isAr ? 'ر.س' : 'SAR', 'name': isAr ? 'ريال سعودي' : 'Saudi Riyal'},
+      {'code': 'YER', 'symbol': '﷼', 'name': isAr ? 'ريال يمني' : 'Yemeni Rial'},
+      {'code': 'AED', 'symbol': isAr ? 'د.إ' : 'AED', 'name': isAr ? 'درهم إماراتي' : 'UAE Dirham'},
+      {'code': 'EUR', 'symbol': '€', 'name': isAr ? 'يورو' : 'Euro'},
+      {'code': 'CUSTOM', 'symbol': '?', 'name': isAr ? 'مخصص / آخر' : 'Custom / Other'},
+    ];
+  }
 
   @override
   void dispose() {
@@ -79,7 +83,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
                   // 🌍 SECTION 1: LANGUAGE
-                  _buildSectionHeader("\u200E1. ${l10n.language}", Icons.language),
+                  _buildSectionHeader(
+                    l10n.language,
+                    Icons.language,
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -107,7 +114,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   const SizedBox(height: 32),
 
                   // 🎨 SECTION 2: THEME
-                  _buildSectionHeader("\u200E2. ${l10n.light} / ${l10n.dark}", Icons.palette),
+                  _buildSectionHeader(
+                    "${l10n.light} / ${l10n.dark}",
+                    Icons.palette,
+                  ),
                   const SizedBox(height: 16),
                   SegmentedButton<ThemeMode>(
                     segments: [
@@ -137,7 +147,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   const SizedBox(height: 32),
 
                   // 💰 SECTION 3: CURRENCY
-                  _buildSectionHeader("\u200E3. ${l10n.currencyOptions}", Icons.monetization_on),
+                  _buildSectionHeader(
+                    l10n.currencyOptions,
+                    Icons.monetization_on,
+                  ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     initialValue: _selectedCurrency,
@@ -148,8 +161,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     items: _commonCurrencies.map((c) {
                       return DropdownMenuItem(
                         value: c['code'],
-                        child: Text(
-                          "${c['code']} - ${c['name']} (${c['symbol']})",
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(c['symbol']!, style: const TextStyle(fontWeight: FontWeight.bold, fontFamilyFallback: ['packages/core_ui/SaudiRiyal'])),
+                              const SizedBox(width: 12),
+                              Text(c['code']!),
+                              const Text(' - '),
+                              Text(c['name']!),
+                            ],
+                          ),
                         ),
                       );
                     }).toList(),
@@ -193,6 +216,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           flex: 1,
                           child: TextField(
                             controller: _customSymbolCtrl,
+                            style: const TextStyle(fontFamilyFallback: ['packages/core_ui/SaudiRiyal']),
                             decoration: InputDecoration(
                               labelText: l10n.currencySymbolLabel,
                               border: const OutlineInputBorder(),
@@ -213,11 +237,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 width: double.infinity,
                 height: 56,
                 child: FilledButton(
-                  onPressed: () => _completeOnboarding(ref),
-                  child: Text(
-                    l10n.getStarted,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  onPressed: _isLoading ? null : () => _completeOnboarding(ref),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        )
+                      : Text(
+                          l10n.getStarted,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -243,51 +276,79 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _completeOnboarding(WidgetRef ref) async {
-    // 1. Validate Currency
-    String finalCode = _selectedCurrency;
-    String finalSymbol = '\$';
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (_isCustomCurrency) {
-      if (_customCodeCtrl.text.isEmpty || _customSymbolCtrl.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please enter currency details")),
+    try {
+      // 1. Validate Currency
+      String finalCode = _selectedCurrency;
+      String finalSymbol = '\$';
+
+      if (_isCustomCurrency) {
+        if (_customCodeCtrl.text.isEmpty || _customSymbolCtrl.text.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please enter currency details")),
+          );
+          setState(() { _isLoading = false; });
+          return;
+        }
+        finalCode = _customCodeCtrl.text.toUpperCase();
+        finalSymbol = _customSymbolCtrl.text;
+      } else {
+        final cur = _commonCurrencies.firstWhere(
+          (c) => c['code'] == _selectedCurrency,
         );
-        return;
+        finalCode = cur['code']!;
+        finalSymbol = cur['symbol']!;
       }
-      finalCode = _customCodeCtrl.text.toUpperCase();
-      finalSymbol = _customSymbolCtrl.text;
-    } else {
-      final cur = _commonCurrencies.firstWhere(
-        (c) => c['code'] == _selectedCurrency,
-      );
-      finalCode = cur['code']!;
-      finalSymbol = cur['symbol']!;
-    }
 
-    // 2. Save to Preferences
-    final prefs = ref.read(preferencesRepositoryProvider);
-    await prefs.setDefaultCurrencyCode(finalCode);
-    await prefs.setCurrencySymbol(finalSymbol);
+      // 2. Save to Preferences
+      final prefs = ref.read(preferencesRepositoryProvider);
+      await prefs.setDefaultCurrencyCode(finalCode);
+      await prefs.setCurrencySymbol(finalSymbol);
 
-    // 3. Mark as Complete
-    await prefs.completeFirstRun();
+      // 3. Ensure currency exists in database to prevent Dropdown AssertionErrors
+      final currencyService = ref.read(currencyServiceProvider);
+      try {
+        final existingCurrencies = await currencyService.getAllCurrencies();
+        if (!existingCurrencies.any((c) => c.code == finalCode)) {
+          await currencyService.addCurrency(
+            code: finalCode,
+            name: _isCustomCurrency
+                ? 'Custom Currency'
+                : _commonCurrencies.firstWhere(
+                    (c) => c['code'] == finalCode,
+                  )['name']!,
+            symbol: finalSymbol,
+          );
+        }
+      } catch (e) {
+        debugPrint("Error adding currency to DB: $e");
+      }
 
-    // 4. Show feature tutorial, then trigger App Rebuild
-    if (mounted) {
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => OnboardingTutorialScreen(
-            onComplete: () {
-              Navigator.of(context).pop();
-              // Trigger App Rebuild (via main.dart)
-              ref.read(onboardingCompletedProvider.notifier).state = true;
-            },
+      // 4. Mark as Complete
+      await prefs.completeFirstRun();
+
+      // 4. Show feature tutorial, then trigger App Rebuild
+      if (mounted) {
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (builderContext) => OnboardingTutorialScreen(
+              onComplete: () {
+                // Trigger App Rebuild via ProviderScope to avoid 'ref disposed' error
+                ProviderScope.containerOf(builderContext).read(onboardingCompletedProvider.notifier).state = true;
+              },
+            ),
           ),
-        ),
-      );
-    } else {
-      // Fallback if widget unmounted
-      ref.read(onboardingCompletedProvider.notifier).state = true;
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 }

@@ -1,29 +1,36 @@
-// FILE: packages/features/feature_reports/lib/src/data/report_templates_repository.dart
-
 import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:core_database/core_database.dart';
 import 'package:drift/drift.dart'; // For Variable
 import 'package:feature_reports/src/data/report_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ReportTemplatesRepository {
-  final FirebaseFirestore _firestore;
+  final SupabaseClient _supabase;
   final AppDatabase _localDb;
 
-  ReportTemplatesRepository(this._firestore, this._localDb);
+  ReportTemplatesRepository(this._supabase, this._localDb);
 
   /// 📥 FETCH MARKETPLACE (From Cloud)
   Stream<List<ReportTemplate>> watchStandardReports() {
-    return _firestore
-        .collection('report_templates')
-        .where('isPublic', isEqualTo: true) 
-        .snapshots()
+    return _supabase
+        .from('report_templates')
+        .stream(primaryKey: ['id'])
+        .eq('is_public', true)
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => ReportTemplate.fromJson(doc.data(), doc.id))
-          .toList();
-    });
+          return snapshot
+              .map(
+                (doc) => ReportTemplate.fromJson({
+                  'title': doc['title'],
+                  'description': doc['description'],
+                  'sqlQuery': doc['sql_query'],
+                  'isPremium': doc['is_premium'],
+                  'columns': doc['columns'] ?? [],
+                  'parameters': doc['parameters'] ?? [],
+                }, doc['id']),
+              )
+              .toList();
+        });
   }
 
   /// 💿 FETCH INSTALLED (From Local SQLite)
@@ -49,26 +56,32 @@ class ReportTemplatesRepository {
 
   /// 💾 INSTALL ACTION (Cloud -> Local)
   Future<void> installReport(ReportTemplate template) async {
-    await _localDb.into(_localDb.localReportTemplates).insertOnConflictUpdate(
-      LocalReportTemplatesCompanion.insert(
-        id: Value(template.id),
-        title: template.title,
-        description: template.description,
-        sqlQuery: template.sqlQuery,
-        columnsJson: jsonEncode(template.columns.map((e) => e.toJson()).toList()),
-        parametersJson: jsonEncode(template.parameters.map((e) => e.toJson()).toList()),
-        isPremium: Value(template.isPremium),
-        createdAt: Value(DateTime.now()),
-        lastUpdated: Value(DateTime.now()),
-      ),
-    );
+    await _localDb
+        .into(_localDb.localReportTemplates)
+        .insertOnConflictUpdate(
+          LocalReportTemplatesCompanion.insert(
+            id: Value(template.id),
+            title: template.title,
+            description: template.description,
+            sqlQuery: template.sqlQuery,
+            columnsJson: jsonEncode(
+              template.columns.map((e) => e.toJson()).toList(),
+            ),
+            parametersJson: jsonEncode(
+              template.parameters.map((e) => e.toJson()).toList(),
+            ),
+            isPremium: Value(template.isPremium),
+            createdAt: Value(DateTime.now()),
+            lastUpdated: Value(DateTime.now()),
+          ),
+        );
   }
 
   /// 🗑️ UNINSTALL ACTION
   Future<void> deleteReport(String id) async {
-    await (_localDb.delete(_localDb.localReportTemplates)
-          ..where((tbl) => tbl.id.equals(id)))
-        .go();
+    await (_localDb.delete(
+      _localDb.localReportTemplates,
+    )..where((tbl) => tbl.id.equals(id))).go();
   }
 
   /// ⚙️ EXECUTE ENGINE (Local SQLite)
@@ -77,9 +90,10 @@ class ReportTemplatesRepository {
     Map<String, dynamic> params,
   ) async {
     String finalSql = sql;
-    
+
     // Sort keys by length desc to avoid replacing @start before @startDate
-    final keys = params.keys.toList()..sort((a, b) => b.length.compareTo(a.length));
+    final keys = params.keys.toList()
+      ..sort((a, b) => b.length.compareTo(a.length));
 
     for (final key in keys) {
       final placeholder = '@$key';
@@ -87,11 +101,11 @@ class ReportTemplatesRepository {
         final val = params[key];
         String sqlVal;
         if (val is DateTime) {
-           sqlVal = '${val.millisecondsSinceEpoch}'; 
+          sqlVal = '${val.millisecondsSinceEpoch}';
         } else if (val is String) {
-           sqlVal = "'${val.replaceAll("'", "''")}'"; 
+          sqlVal = "'${val.replaceAll("'", "''")}'";
         } else {
-           sqlVal = '$val';
+          sqlVal = '$val';
         }
         finalSql = finalSql.replaceAll(placeholder, sqlVal);
       }
@@ -107,9 +121,11 @@ class ReportTemplatesRepository {
   }
 }
 
-final reportTemplatesRepositoryProvider = Provider<ReportTemplatesRepository>((ref) {
+final reportTemplatesRepositoryProvider = Provider<ReportTemplatesRepository>((
+  ref,
+) {
   return ReportTemplatesRepository(
-    FirebaseFirestore.instance,
+    Supabase.instance.client,
     ref.watch(appDatabaseProvider),
   );
 });

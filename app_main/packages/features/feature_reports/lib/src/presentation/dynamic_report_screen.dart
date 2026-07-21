@@ -14,7 +14,8 @@ class DynamicReportScreen extends ConsumerStatefulWidget {
   const DynamicReportScreen({super.key, required this.template});
 
   @override
-  ConsumerState<DynamicReportScreen> createState() => _DynamicReportScreenState();
+  ConsumerState<DynamicReportScreen> createState() =>
+      _DynamicReportScreenState();
 }
 
 class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
@@ -43,10 +44,9 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
     });
 
     try {
-      final data = await ref.read(reportTemplatesRepositoryProvider).runReportQuery(
-        widget.template.sqlQuery,
-        _paramValues,
-      );
+      final data = await ref
+          .read(reportTemplatesRepositoryProvider)
+          .runReportQuery(widget.template.sqlQuery, _paramValues);
       setState(() {
         _results = data;
       });
@@ -91,12 +91,17 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _error != null
-                    ? Center(child: Text("Error: $_error", style: TextStyle(color: context.appColors.error)))
-                    : _results == null
-                        ? const Center(child: Text("Set parameters and run report."))
-                        : _results!.isEmpty
-                            ? const Center(child: Text("No data found for these criteria."))
-                            : _buildDataTable(),
+                ? Center(
+                    child: Text(
+                      "Error: $_error",
+                      style: TextStyle(color: context.appColors.error),
+                    ),
+                  )
+                : _results == null
+                ? const Center(child: Text("Set parameters and run report."))
+                : _results!.isEmpty
+                ? const Center(child: Text("No data found for these criteria."))
+                : _buildDataTable(),
           ),
         ],
       ),
@@ -154,13 +159,17 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
                 if (rawVal != null) {
                   if (col.type == 'currency') {
                     // Try parsing if int/double
-                     if (rawVal is num) {
-                       // Simple format, normally use SharedUI formatter
-                       displayVal = NumberFormat.simpleCurrency().format(rawVal / 100); 
-                     }
+                    if (rawVal is num) {
+                      // Simple format, normally use SharedUI formatter
+                      displayVal = NumberFormat.simpleCurrency().format(
+                        rawVal / 100,
+                      );
+                    }
                   } else if (col.type == 'date' && rawVal is int) {
                     // Drift stores dates as int (millis) sometimes
-                    displayVal = DateFormat.yMMMd().format(DateTime.fromMillisecondsSinceEpoch(rawVal));
+                    displayVal = DateFormat.yMMMd().format(
+                      DateTime.fromMillisecondsSinceEpoch(rawVal),
+                    );
                   }
                 }
 

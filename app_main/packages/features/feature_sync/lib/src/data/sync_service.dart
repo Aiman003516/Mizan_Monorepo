@@ -116,6 +116,56 @@ class SyncService {
     }
   }
 
+  /// ⚙️ SILENT BACKGROUND BACKUP (Called by Workmanager)
+  static Future<void> performSilentBackup() async {
+    File? backupFile;
+    AppDatabase? db;
+    try {
+      final client = await AuthRepository.getSilentDriveClient();
+      if (client == null) throw Exception("Silent Auth Failed");
+      final driveApi = drive.DriveApi(client);
+
+      db = AppDatabase();
+      final tempDir = await getTemporaryDirectory();
+      final backupPath = p.join(tempDir.path, _backupFileName);
+      backupFile = File(backupPath);
+
+      if (await backupFile.exists()) {
+        await backupFile.delete();
+      }
+
+      await db.customStatement('VACUUM INTO ?', [backupPath]);
+
+      final response = await driveApi.files.list(
+        spaces: 'appDataFolder',
+        q: "name='$_backupFileName'",
+        $fields: 'files(id, name)',
+      );
+
+      final fileToUpload = drive.File()..name = _backupFileName;
+      final media = drive.Media(backupFile.openRead(), await backupFile.length());
+
+      if (response.files != null && response.files!.isNotEmpty) {
+        final fileId = response.files!.first.id!;
+        await driveApi.files.update(fileToUpload, fileId, uploadMedia: media);
+      } else {
+        fileToUpload.parents = ['appDataFolder'];
+        await driveApi.files.create(fileToUpload, uploadMedia: media);
+      }
+      print("✅ Silent Background Backup Succeeded!");
+    } catch (e) {
+      print("❌ Silent Background Backup Failed: $e");
+      rethrow;
+    } finally {
+      try {
+        if (backupFile != null && await backupFile.exists()) {
+          await backupFile.delete();
+        }
+      } catch (_) {}
+      await db?.close();
+    }
+  }
+
   Future<void> restoreDatabase() async {
     // ⚡ SET SPECIFIC STATE
     _ref.read(syncStatusProvider.notifier).state = SyncStatus.restoreInProgress;

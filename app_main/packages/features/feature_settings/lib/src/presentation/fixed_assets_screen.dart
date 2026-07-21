@@ -1,7 +1,6 @@
 // Fixed Assets Dashboard Screen - Comprehensive view with metrics and visualizations
 import 'package:flutter/material.dart';
 import 'package:core_l10n/app_localizations.dart';
-import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feature_settings/src/data/fixed_assets_repository.dart';
 import 'package:core_data/core_data.dart';
@@ -54,11 +53,11 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
   String _getStatusLabel(String status) {
     switch (status) {
       case 'ACTIVE':
-        return 'Active';
+        return l10n.activeLabel;
       case 'DISPOSED':
-        return 'Disposed';
+        return l10n.disposedLabel;
       case 'FULLY_DEPRECIATED':
-        return 'Fully Depreciated';
+        return l10n.fullDeprLabel;
       default:
         return status;
     }
@@ -67,11 +66,11 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
   String _getMethodLabel(String method) {
     switch (method) {
       case 'STRAIGHT_LINE':
-        return 'Straight-Line';
+        return l10n.straightLine;
       case 'DECLINING_BALANCE':
-        return 'Declining Balance';
+        return l10n.decliningBalance;
       case 'UNITS_OF_ACTIVITY':
-        return 'Units of Activity';
+        return l10n.unitsOfActivity;
       default:
         return method;
     }
@@ -83,13 +82,13 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fixed Assets'),
+        title: Text(l10n.fixedAssetsTitle),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'All Assets'),
-            Tab(text: 'By Category'),
-            Tab(text: 'Schedule'),
+          tabs: [
+            Tab(text: l10n.allAssetsTab),
+            Tab(text: l10n.byCategoryTab),
+            Tab(text: l10n.scheduleTab),
           ],
         ),
       ),
@@ -101,7 +100,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddAssetDialog,
         icon: const Icon(Icons.add),
-        label: const Text('Add Asset'),
+        label: Text(l10n.addAsset),
       ),
     );
   }
@@ -157,7 +156,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
                 children: [
                   Expanded(
                     child: _buildStatusCard(
-                      'Active',
+                      l10n.activeLabel,
                       activeCount,
                       Colors.green,
                       Icons.check_circle,
@@ -166,7 +165,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
                   const SizedBox(width: 8),
                   Expanded(
                     child: _buildStatusCard(
-                      'Full Depr.',
+                      l10n.fullDeprLabel,
                       fullyDepreciatedCount,
                       Colors.orange,
                       Icons.pending,
@@ -175,7 +174,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
                   const SizedBox(width: 8),
                   Expanded(
                     child: _buildStatusCard(
-                      'Disposed',
+                      l10n.disposedLabel,
                       disposedCount,
                       Colors.grey,
                       Icons.cancel,
@@ -220,7 +219,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Net Book Value',
+                      l10n.netBookValueLabel,
                       style: TextStyle(color: Colors.grey[600], fontSize: 13),
                     ),
                     const SizedBox(height: 4),
@@ -265,13 +264,13 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildMiniStat('Total Cost', _formatCurrency(totalCost)),
+                _buildMiniStat(l10n.totalCostLabel, _formatCurrency(totalCost)),
                 _buildMiniStat(
-                  'Depreciated',
+                  l10n.depreciatedLabel,
                   _formatCurrency(totalDepreciation),
                 ),
                 _buildMiniStat(
-                  'Progress',
+                  l10n.progressLabel,
                   '${depreciationPercent.toStringAsFixed(1)}%',
                 ),
               ],
@@ -393,7 +392,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'Book Value',
+                        l10n.bookValueLabel,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey[500],
                         ),
@@ -421,7 +420,9 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${depreciationPercent.toStringAsFixed(0)}% depreciated',
+                    l10n.percentDepreciated(
+                      depreciationPercent.toStringAsFixed(0),
+                    ),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   Chip(
@@ -485,7 +486,9 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
               ),
             ),
             title: Text(_getMethodLabel(method)),
-            subtitle: Text('Book Value: ${_formatCurrency(methodTotal)}'),
+            subtitle: Text(
+              '${l10n.bookValueLabel}: ${_formatCurrency(methodTotal)}',
+            ),
             children: methodAssets.map((asset) {
               return ListTile(
                 title: Text(asset.name),
@@ -515,7 +518,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
             Icon(Icons.event_available, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
-              'No Scheduled Depreciation',
+              l10n.noScheduledDepreciation,
               style: TextStyle(color: Colors.grey[600], fontSize: 16),
             ),
           ],
@@ -543,7 +546,10 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
             ),
             title: Text(asset.name),
             subtitle: Text(
-              'Monthly: ${_formatCurrency(monthlyDepreciation)} • $monthsRemaining months left',
+              l10n.monthlyDepreciationInfo(
+                _formatCurrency(monthlyDepreciation),
+                monthsRemaining,
+              ),
             ),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -556,7 +562,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  'Book Value',
+                  l10n.bookValueLabel,
                   style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                 ),
               ],
@@ -576,14 +582,14 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
           Icon(Icons.business, size: 64, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
-            'No Fixed Assets',
+            l10n.noFixedAssets,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
           ),
           const SizedBox(height: 8),
           Text(
-            'Add equipment, vehicles, or property to track depreciation',
+            l10n.addFixedAssetsDescription,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
@@ -668,7 +674,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
 
               // Depreciation Progress
               Text(
-                'Depreciation Progress',
+                l10n.progressLabel,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 12),
@@ -683,27 +689,27 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                '${depreciationPercent.toStringAsFixed(1)}% depreciated',
+                l10n.percentDepreciated(depreciationPercent.toStringAsFixed(1)),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: 24),
 
               // Value Details
-              _buildDetailCard(context, 'Value Information', [
+              _buildDetailCard(context, l10n.valueInformationTitle, [
                 _buildDetailRow(
-                  'Acquisition Cost',
+                  l10n.acquisitionCostLabel,
                   _formatCurrency(asset.acquisitionCost),
                 ),
                 _buildDetailRow(
-                  'Salvage Value',
+                  l10n.salvageValueLabel,
                   _formatCurrency(asset.salvageValue),
                 ),
                 _buildDetailRow(
-                  'Accumulated Depreciation',
+                  l10n.accumulatedDepreciationLabel,
                   _formatCurrency(asset.totalDepreciation),
                 ),
                 _buildDetailRow(
-                  'Net Book Value',
+                  l10n.netBookValueLabel,
                   _formatCurrency(bookValue),
                   highlight: true,
                 ),
@@ -711,22 +717,22 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
               const SizedBox(height: 16),
 
               // Depreciation Details
-              _buildDetailCard(context, 'Depreciation Settings', [
+              _buildDetailCard(context, l10n.depreciationSettingsTitle, [
                 _buildDetailRow(
-                  'Method',
+                  l10n.methodLabel,
                   _getMethodLabel(asset.depreciationMethod),
                 ),
                 _buildDetailRow(
-                  'Useful Life',
-                  '${asset.usefulLifeMonths} months',
+                  l10n.usefulLifeLabel,
+                  l10n.usefulLifeMonths(asset.usefulLifeMonths),
                 ),
                 _buildDetailRow(
-                  'Acquisition Date',
+                  l10n.addAssetAcquisitionDate,
                   _dateFormat.format(asset.acquisitionDate),
                 ),
                 if (asset.currentPeriodDepreciation > 0)
                   _buildDetailRow(
-                    'Current Period',
+                    l10n.currentPeriodLabel,
                     _formatCurrency(asset.currentPeriodDepreciation),
                   ),
               ]),
@@ -740,7 +746,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
                       child: OutlinedButton.icon(
                         onPressed: () => _runDepreciation(asset),
                         icon: const Icon(Icons.calculate),
-                        label: const Text('Run Depreciation'),
+                        label: Text(l10n.runDepreciationButton),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -748,7 +754,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
                       child: OutlinedButton.icon(
                         onPressed: () => _disposeAsset(asset),
                         icon: const Icon(Icons.sell),
-                        label: const Text('Dispose'),
+                        label: Text(l10n.disposeButton),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.orange,
                         ),
@@ -862,15 +868,15 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
     Navigator.pop(context);
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Asset disposal feature coming soon')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.assetDisposalComingSoon)));
     }
   }
 
   void _showAddAssetDialog() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Add Asset feature coming soon')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.addAssetComingSoon)));
   }
 }

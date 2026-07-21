@@ -9,6 +9,18 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get allReportsAndTools => 'جميع التقارير والأدوات';
+
+  @override
+  String get businessInsights => 'رؤى الأعمال';
+
+  @override
+  String get setupBusinessCloud => 'إعداد سحابة الأعمال';
+
+  @override
+  String get manageRoles => 'إدارة الأدوار';
+
+  @override
   String get settings => 'الإعدادات';
 
   @override
@@ -107,7 +119,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get type => 'النوع:';
 
   @override
-  String get balance => 'الرصيد:';
+  String get balance => 'الرصيد';
 
   @override
   String get phone => 'الهاتف';
@@ -271,7 +283,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectCategory => 'اختر صنف';
 
   @override
-  String get errorLoadingCategories => 'خطأ في تحميل الأصناف:';
+  String errorLoadingCategories(String error) {
+    return 'خطأ في تحميل الأصناف:';
+  }
 
   @override
   String get productName => 'اسم المنتج';
@@ -915,7 +929,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectSupplier => 'اختر المورد';
 
   @override
-  String get makePayment => 'إجراء دفعة';
+  String get makePayment => 'سداد دفعة';
 
   @override
   String get payFromAccount => 'الدفع من حساب';
@@ -924,7 +938,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get payToAccount => 'الدفع إلى حساب';
 
   @override
-  String get pleaseEnterValidAmount => 'الرجاء إدخال مبلغ صحيح أكبر من صفر';
+  String get pleaseEnterValidAmount => 'الرجاء إدخال مبلغ صحيح أكبر من 0';
 
   @override
   String get supplier => 'المورد';
@@ -1408,13 +1422,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get taxId => 'الرقم الضريبي';
 
   @override
-  String get creditLimit => 'حد الائتمان';
+  String get creditLimit => 'الحد الائتماني';
 
   @override
   String get notes => 'ملاحظات';
 
   @override
-  String get noCustomersYet => 'لا يوجد عملاء حتى الآن';
+  String get noCustomersYet => 'لا يوجد عملاء بعد';
 
   @override
   String get tapToAddFirstCustomer => 'اضغط على الزر أدناه لإضافة أول عميل';
@@ -1429,7 +1443,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get invoices => 'الفواتير';
 
   @override
-  String get newInvoice => 'فاتورة بيع جديدة';
+  String get newInvoice => 'فاتورة جديدة';
 
   @override
   String get invoiceDate => 'تاريخ الفاتورة';
@@ -1438,10 +1452,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dueDate => 'تاريخ الاستحقاق';
 
   @override
-  String get lineItems => 'بنود الفاتورة';
+  String get lineItems => 'عناصر الفاتورة';
 
   @override
-  String get addItem => 'إضافة بند';
+  String get addItem => 'إضافة عنصر';
 
   @override
   String get unitPrice => 'سعر الوحدة';
@@ -1450,13 +1464,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get subtotal => 'المجموع الفرعي';
 
   @override
-  String get createInvoice => 'إنشاء الفاتورة';
+  String get createInvoice => 'إنشاء فاتورة';
 
   @override
-  String get invoiceCreated => 'تم إنشاء الفاتورة';
+  String get invoiceCreated => 'تم إنشاء الفاتورة بنجاح';
 
   @override
-  String get noInvoicesYet => 'لا توجد فواتير حتى الآن';
+  String get noInvoicesYet => 'لا توجد فواتير بعد';
 
   @override
   String get paid => 'مدفوعة';
@@ -1480,7 +1494,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get totalReceivables => 'إجمالي الذمم المدينة';
 
   @override
-  String get current => 'حالية';
+  String get current => 'حالي';
 
   @override
   String get days31to60 => '٣١-٦٠ يوم';
@@ -1495,13 +1509,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get byCustomer => 'حسب العميل';
 
   @override
-  String get noOutstandingReceivables => 'لا توجد مستحقات معلقة';
+  String get noOutstandingReceivables => 'لا توجد ذمم مدينة غير مسددة';
 
   @override
-  String get allInvoicesPaid => 'جميع الفواتير مدفوعة!';
+  String get allInvoicesPaid => 'تم سداد جميع الفواتير!';
 
   @override
-  String get customersWithBalances => 'عملاء لديهم أرصدة';
+  String customersWithBalances(int count) {
+    return '$count عملاء لديهم أرصدة';
+  }
 
   @override
   String get vendors => 'الموردين';
@@ -1522,7 +1538,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentTerms => 'شروط الدفع';
 
   @override
-  String get noVendorsYet => 'لا يوجد موردين حتى الآن';
+  String get noVendorsYet => 'لا يوجد موردين بعد';
 
   @override
   String get tapToAddFirstVendor => 'اضغط على الزر أدناه لإضافة أول مورد';
@@ -1531,10 +1547,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get weOwe => 'ندين';
 
   @override
-  String get bills => 'الفواتير';
+  String get bills => 'فواتير المشتريات';
 
   @override
-  String get newBill => 'فاتورة شراء جديدة';
+  String get newBill => 'فاتورة مشتريات جديدة';
 
   @override
   String get billDate => 'تاريخ الفاتورة';
@@ -1543,19 +1559,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get vendorInvoice => 'رقم فاتورة المورد';
 
   @override
-  String get createBill => 'إنشاء فاتورة';
+  String get createBill => 'إنشاء فاتورة مشتريات';
 
   @override
-  String get billCreated => 'تم إنشاء الفاتورة';
+  String get billCreated => 'تم إنشاء فاتورة المشتريات بنجاح';
 
   @override
-  String get noBillsYet => 'لا توجد فواتير حتى الآن';
+  String get noBillsYet => 'لا توجد فواتير مشتريات بعد';
 
   @override
   String get pending => 'معلقة';
 
   @override
-  String get apAgingReport => 'تقرير أعمار الذمم الدائنة';
+  String get apAgingReport => 'تقرير أعمار الديون (الذمم الدائنة)';
 
   @override
   String get totalPayables => 'إجمالي الذمم الدائنة';
@@ -1564,13 +1580,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get byVendor => 'حسب المورد';
 
   @override
-  String get noOutstandingPayables => 'لا توجد ذمم دائنة معلقة';
+  String get noOutstandingPayables => 'لا توجد ذمم دائنة غير مسددة';
 
   @override
-  String get allBillsPaid => 'جميع الفواتير مدفوعة!';
+  String get allBillsPaid => 'تم سداد جميع الفواتير!';
 
   @override
-  String get vendorsWithBalances => 'موردين لديهم أرصدة';
+  String vendorsWithBalances(int count) {
+    return '$count موردين لديهم أرصدة';
+  }
 
   @override
   String get statementOfCashFlows => 'قائمة التدفقات النقدية';
@@ -2641,10 +2659,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get editVendorForm => 'تعديل مورد';
 
   @override
-  String get vendorCreated => 'تم إنشاء المورد';
+  String get vendorCreated => 'تم إنشاء المورد بنجاح';
 
   @override
-  String get vendorUpdated => 'تم تحديث المورد';
+  String get vendorUpdated => 'تم تحديث المورد بنجاح';
 
   @override
   String get vendorDetailTitle => 'المورد';
@@ -2662,10 +2680,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get editCustomerForm => 'تعديل عميل';
 
   @override
-  String get customerCreated => 'تم إنشاء العميل';
+  String get customerCreated => 'تم إنشاء العميل بنجاح';
 
   @override
-  String get customerUpdated => 'تم تحديث العميل';
+  String get customerUpdated => 'تم تحديث العميل بنجاح';
 
   @override
   String get customerDetailTitle => 'العميل';
@@ -2677,7 +2695,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get preventsNewInvoices => 'يمنع إنشاء فواتير/طلبات جديدة';
 
   @override
-  String get pleaseAddLineItem => 'الرجاء إضافة بند واحد على الأقل';
+  String get pleaseAddLineItem =>
+      'الرجاء إضافة عنصر واحد على الأقل مع تحديد المبلغ.';
 
   @override
   String get saveBtn => 'حفظ';
@@ -2705,9 +2724,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get staffManagement => 'إدارة الموظفين';
-
-  @override
-  String get manageRoles => 'إدارة الأدوار';
 
   @override
   String get changeRole => 'تغيير الدور';
@@ -3647,4 +3663,685 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get saveAccount => 'حفظ الحساب';
+
+  @override
+  String get password => 'كلمة المرور';
+
+  @override
+  String get createAccount => 'إنشاء حساب';
+
+  @override
+  String get alreadyHaveAccount => 'لديك حساب بالفعل؟ تسجيل الدخول';
+
+  @override
+  String get needAccount => 'ليس لديك حساب؟ إنشاء حساب';
+
+  @override
+  String get enterEmailAndPassword =>
+      'يرجى إدخال البريد الإلكتروني وكلمة المرور.';
+
+  @override
+  String get signUpSubtitle => 'قم بالتسجيل لإنشاء نشاطك التجاري';
+
+  @override
+  String get orSeparator => 'أو';
+
+  @override
+  String get paidFeatureTitle => 'ميزة مدفوعة';
+
+  @override
+  String get paidFeatureMessage =>
+      'هذه الميزة تتطلب اشتراكاً نشطاً وتسجيل دخول. يرجى تسجيل الدخول والاشتراك للوصول إلى إدارة الموظفين والأدوار.';
+
+  @override
+  String get signInToAccess => 'تسجيل الدخول';
+
+  @override
+  String get nameIsRequired => 'الاسم مطلوب';
+
+  @override
+  String get permissionsLabel => 'الصلاحيات';
+
+  @override
+  String get permViewDashboard => 'عرض لوحة التحكم';
+
+  @override
+  String get permViewFinancialReports => 'عرض التقارير المالية';
+
+  @override
+  String get permPerformSale => 'إجراء المبيعات (نقطة البيع)';
+
+  @override
+  String get permVoidTransaction => 'إلغاء/حذف المعاملات';
+
+  @override
+  String get permProcessRefund => 'معالجة المسترجعات';
+
+  @override
+  String get permViewSalesHistory => 'عرض سجل المبيعات';
+
+  @override
+  String get permViewInventory => 'عرض المخزون';
+
+  @override
+  String get permManageProducts => 'إضافة/تعديل المنتجات';
+
+  @override
+  String get permAdjustInventory => 'تعديل المخزون';
+
+  @override
+  String get permManageStaff => 'إدارة الموظفين والأدوار';
+
+  @override
+  String get permManageSettings => 'إعدادات النظام';
+
+  @override
+  String get permSwitchTenant => 'تبديل فرع النشاط التجاري';
+
+  @override
+  String get manageSubscription => 'إدارة الاشتراك';
+
+  @override
+  String get availablePlans => 'الخطط المتاحة';
+
+  @override
+  String get enterpriseMonthlyPlan => 'خطة المؤسسات (شهري)';
+
+  @override
+  String get enterpriseMonthlyPrice => '30دولار / شهرياً';
+
+  @override
+  String get freeTierPlan => 'الخطة المجانية';
+
+  @override
+  String get freeTierPrice => 'مجاناً للأبد';
+
+  @override
+  String get featureCloudSync => 'مزامنة سحابية';
+
+  @override
+  String get featureMultiUser => 'متعدد المستخدمين';
+
+  @override
+  String get featureWebAccess => 'وصول عبر الإنترنت';
+
+  @override
+  String get featureLocalOnly => 'محلي فقط';
+
+  @override
+  String get featureManualBackup => 'نسخ احتياطي يدوي';
+
+  @override
+  String get currentPlanLabel => 'الخطة الحالية';
+
+  @override
+  String planStatusLabel(String status) {
+    return 'الحالة: $status';
+  }
+
+  @override
+  String planRenewsLabel(String date) {
+    return 'التجديد: $date';
+  }
+
+  @override
+  String get planNeverExpires => 'لا ينتهي';
+
+  @override
+  String get buyButton => 'شراء';
+
+  @override
+  String get subscriptionUnavailable =>
+      'الاشتراكات غير متاحة دون اتصال بالإنترنت. يرجى تسجيل الدخول لإدارة اشتراكك.';
+
+  @override
+  String get confirmMockPurchase => 'تأكيد الشراء';
+
+  @override
+  String simulatePaymentFor(String planName) {
+    return 'محاكاة الدفع لـ $planName؟';
+  }
+
+  @override
+  String get payNowMock => 'دفع الآن (تجريبي)';
+
+  @override
+  String get mockPaymentSuccess => '✅ تم الدفع بنجاح!';
+
+  @override
+  String get noStaffFound => 'No staff found. Invite someone!';
+
+  @override
+  String get ownerRole => 'Owner';
+
+  @override
+  String staffRoleAndEmail(String roleId, String email) {
+    return 'Role: $roleId • $email';
+  }
+
+  @override
+  String removeStaffTitle(String name) {
+    return 'Remove $name?';
+  }
+
+  @override
+  String get removeStaffWarning =>
+      'They will lose access to this business immediately.';
+
+  @override
+  String get inviteStaff => 'Invite Staff';
+
+  @override
+  String get stepSelectRole => '1. Select a Role';
+
+  @override
+  String get chooseRoleHint => 'Choose Role (e.g. Cashier)';
+
+  @override
+  String errorLoadingRoles(String error) {
+    return 'Error loading roles: $error';
+  }
+
+  @override
+  String get generateInviteCode => 'Generate Invite Code';
+
+  @override
+  String get stepShareCode => '2. Share Code';
+
+  @override
+  String get validFor24Hours => 'Valid for 24 hours';
+
+  @override
+  String get shareViaApp => 'Share via WhatsApp / Telegram';
+
+  @override
+  String inviteShareText(String code) {
+    return 'Join my business on Mizan!\n\n1. Download the App\n2. Sign In\n3. Select \'Join Business\' and enter code: $code\n\n(Valid for 24 hours)';
+  }
+
+  @override
+  String get validInviteCodeTitle => 'Valid Invite Code!';
+
+  @override
+  String roleLabel(String roleId) {
+    return 'Role: $roleId';
+  }
+
+  @override
+  String get pleaseEnterYourName => 'Please enter your name';
+
+  @override
+  String get orText => 'or';
+
+  @override
+  String appVersion(String version) {
+    return 'Mizan App v$version';
+  }
+
+  @override
+  String get invalidNumber => 'Invalid number';
+
+  @override
+  String get requiredField => 'هذا الحقل مطلوب';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String get redFlags => 'Red Flags';
+
+  @override
+  String get dsriDescription => 'Receivables/Sales';
+
+  @override
+  String get gmiDescription => 'Gross Margin';
+
+  @override
+  String get aqiDescription => 'Asset Quality';
+
+  @override
+  String get sgiDescription => 'Sales Growth';
+
+  @override
+  String get depiDescription => 'Depreciation';
+
+  @override
+  String get sgaiDescription => 'SG&A Expenses';
+
+  @override
+  String get tataDescription => 'Accruals';
+
+  @override
+  String get lvgiDescription => 'Leverage';
+
+  @override
+  String get whatIsMScore => 'What is the Beneish M-Score?';
+
+  @override
+  String get mScoreDescription =>
+      'The M-Score is a mathematical model created by Professor Messod Beneish that uses financial ratios to detect whether a company has manipulated its earnings.\n\nAn M-Score greater than -1.78 suggests a HIGH probability (76%) that the company is an earnings manipulator.';
+
+  @override
+  String get dsriName => 'Days Sales in Receivables Index';
+
+  @override
+  String get dsriExpl => 'Measures if receivables grew faster than sales';
+
+  @override
+  String get gmiName => 'Gross Margin Index';
+
+  @override
+  String get gmiExpl => 'Detects deteriorating gross margins';
+
+  @override
+  String get aqiName => 'Asset Quality Index';
+
+  @override
+  String get aqiExpl => 'Identifies expense capitalization';
+
+  @override
+  String get sgiName => 'Sales Growth Index';
+
+  @override
+  String get sgiExpl => 'High growth creates manipulation pressure';
+
+  @override
+  String get depiName => 'Depreciation Index';
+
+  @override
+  String get depiExpl => 'Detects slowing depreciation rates';
+
+  @override
+  String get sgaiName => 'SG&A Index';
+
+  @override
+  String get sgaiExpl => 'Measures administrative efficiency';
+
+  @override
+  String get tataName => 'Total Accruals to Total Assets';
+
+  @override
+  String get tataExpl => 'High accruals vs cash = low quality';
+
+  @override
+  String get lvgiName => 'Leverage Index';
+
+  @override
+  String get lvgiExpl => 'Increasing debt creates pressure';
+
+  @override
+  String get famousCasesDesc =>
+      '• Enron (2001): Would have had M-Score > -1.78\n• WorldCom (2002): High TATA due to expense capitalization\n• Satyam (2009): High DSRI from fictitious receivables\n\nThe M-Score correctly identified 76% of manipulators in backtesting studies.';
+
+  @override
+  String get mScoreThresholdLabel =>
+      'Threshold: > -1.78 indicates manipulation';
+
+  @override
+  String get riskLevelHigh => 'HIGH';
+
+  @override
+  String get riskLevelModerate => 'MODERATE';
+
+  @override
+  String get riskLevelLow => 'LOW';
+
+  @override
+  String get unitsLowercase => 'units';
+
+  @override
+  String get flexibleBudgetResult => 'Flexible Budget';
+
+  @override
+  String get varianceFormulas =>
+      '• Static Budget = Fixed + (Variable × Planned Activity)\n• Flexible Budget = Fixed + (Variable × Actual Activity)\n• Volume Variance = Flexible - Static\n• Spending Variance = Actual - Flexible';
+
+  @override
+  String get materialQtyPerUnit => 'Material Qty/Unit';
+
+  @override
+  String get laborHoursPerUnit => 'Labor Hours/Unit';
+
+  @override
+  String get perHrSuffix => '\$/hr';
+
+  @override
+  String totalVarianceValue(String amount) {
+    return 'Total Variance: $amount';
+  }
+
+  @override
+  String get actualCostResult => 'Actual Cost';
+
+  @override
+  String get priceVarianceResult => 'Price Variance';
+
+  @override
+  String get quantityVarianceResult => 'Quantity Variance';
+
+  @override
+  String get materialsFormulasTitle => 'Materials Formulas';
+
+  @override
+  String get materialsFormulasDesc =>
+      '• Price Variance = (Actual Price - Standard Price) × Actual Qty\n• Quantity Variance = (Actual Qty - Standard Qty) × Standard Price';
+
+  @override
+  String get rateVarianceResult => 'Rate Variance';
+
+  @override
+  String get efficiencyVarianceResult => 'Efficiency Variance';
+
+  @override
+  String get laborFormulasTitle => 'Labor Formulas';
+
+  @override
+  String get laborFormulasDesc =>
+      '• Rate Variance = (Actual Rate - Standard Rate) × Actual Hours\n• Efficiency Variance = (Actual Hours - Std Hours) × Std Rate';
+
+  @override
+  String get currentRatioTitle => 'Current Ratio';
+
+  @override
+  String get debtEquityTitle => 'Debt/Equity';
+
+  @override
+  String get netMarginTitle => 'Net Margin';
+
+  @override
+  String get roaTitle => 'ROA';
+
+  @override
+  String get ratioCol => 'Ratio';
+
+  @override
+  String get valueCol => 'Value';
+
+  @override
+  String get benchmarkCol => 'Benchmark';
+
+  @override
+  String get statusCol => 'Status';
+
+  @override
+  String get descriptionCol => 'الوصف';
+
+  @override
+  String get totalVarianceLabel => 'إجمالي الانحراف';
+
+  @override
+  String get enterpriseLicenseActive => 'رخصة المؤسسة نشطة';
+
+  @override
+  String get systemAdministrator => 'أنت مسؤول النظام';
+
+  @override
+  String get defineStaffPermissions => 'تحديد صلاحيات الموظفين';
+
+  @override
+  String get viewPlansBilling => 'عرض الخطط والفواتير';
+
+  @override
+  String get manageStaff => 'إدارة الموظفين';
+
+  @override
+  String get viewListInviteMembers => 'عرض القائمة ودعوة الأعضاء';
+
+  @override
+  String get activateBusinessLicense => 'تفعيل رخصة العمل';
+
+  @override
+  String get initializeSystemClaimOwnership =>
+      'تهيئة النظام والمطالبة بالملكية';
+
+  @override
+  String get notLoggedInWarning =>
+      '⚠️ أنت غير مسجل الدخول! الرجاء تسجيل الدخول أولاً.';
+
+  @override
+  String get systemActivatedWelcome =>
+      '✅ تم تفعيل النظام! مرحباً بك، أيها المسؤول.';
+
+  @override
+  String activationFailed(String error) {
+    return '❌ فشل التفعيل: $error';
+  }
+
+  @override
+  String get premiumReportWarning =>
+      '🔒 تقرير مميز. قم بالترقية إلى Pro أو Enterprise.';
+
+  @override
+  String buyReportPrompt(String reportTitle) {
+    return 'شراء \'\'$reportTitle\'\' مقابل \$4.99؟';
+  }
+
+  @override
+  String get buyNowAction => 'Buy Now';
+
+  @override
+  String installedSuccessfully(String reportTitle) {
+    return '✅ Installed $reportTitle';
+  }
+
+  @override
+  String get noStandardReportsFound => 'No standard reports found online.';
+
+  @override
+  String get installAction => 'Install';
+
+  @override
+  String get includedAction => 'Included';
+
+  @override
+  String get buyPriceAction => 'Buy \$4.99';
+
+  @override
+  String get lockedAction => 'Locked';
+
+  @override
+  String get retailBusinessTemplate => 'Retail Business';
+
+  @override
+  String get serviceBusinessTemplate => 'Service Business';
+
+  @override
+  String get customersAr => 'العملاء (AR)';
+
+  @override
+  String get vendorsAp => 'الموردين (AP)';
+
+  @override
+  String get openingBalanceHint =>
+      'الرصيد الافتتاحي. أدخل 0 إذا لم يكن هناك رصيد.';
+
+  @override
+  String get openingBalanceHintVendor =>
+      'الرصيد الافتتاحي. أدخل 0 إذا لم يكن هناك رصيد.';
+
+  @override
+  String get emailOptional => 'البريد الإلكتروني (اختياري)';
+
+  @override
+  String get phoneOptional => 'الهاتف (اختياري)';
+
+  @override
+  String get addressOptional => 'العنوان (اختياري)';
+
+  @override
+  String get taxIdOptional => 'الرقم الضريبي (اختياري)';
+
+  @override
+  String get paymentTermsOptional => 'شروط الدفع (اختياري)';
+
+  @override
+  String get creditLimitOptional => 'الحد الائتماني (اختياري)';
+
+  @override
+  String get notesOptional => 'ملاحظات (اختياري)';
+
+  @override
+  String get searchCustomers => 'البحث عن العملاء...';
+
+  @override
+  String get searchVendors => 'البحث عن الموردين...';
+
+  @override
+  String get customerDetails => 'تفاصيل العميل';
+
+  @override
+  String get vendorDetails => 'تفاصيل المورد';
+
+  @override
+  String get contactInfo => 'معلومات الاتصال';
+
+  @override
+  String get noAddressProvided => 'لم يتم توفير عنوان';
+
+  @override
+  String get noEmailProvided => 'لم يتم توفير بريد إلكتروني';
+
+  @override
+  String get noPhoneProvided => 'لم يتم توفير هاتف';
+
+  @override
+  String get noTaxIdProvided => 'لم يتم توفير رقم ضريبي';
+
+  @override
+  String get noNotesProvided => 'لا توجد ملاحظات';
+
+  @override
+  String get noPaymentTermsProvided => 'لم يتم توفير شروط دفع';
+
+  @override
+  String get financialOverview => 'نظرة مالية عامة';
+
+  @override
+  String get currentBalance => 'الرصيد الحالي';
+
+  @override
+  String get totalInvoiced => 'إجمالي الفواتير';
+
+  @override
+  String get totalPaid => 'إجمالي المدفوعات';
+
+  @override
+  String get recentInvoices => 'أحدث الفواتير';
+
+  @override
+  String get recentBills => 'أحدث فواتير المشتريات';
+
+  @override
+  String get noRecentInvoices => 'لا توجد فواتير حديثة.';
+
+  @override
+  String get noRecentBills => 'لا توجد فواتير مشتريات حديثة.';
+
+  @override
+  String get viewAll => 'عرض الكل';
+
+  @override
+  String get actions => 'الإجراءات';
+
+  @override
+  String get receivePayment => 'استلام دفعة';
+
+  @override
+  String get statement => 'كشف حساب';
+
+  @override
+  String get edit => 'تعديل';
+
+  @override
+  String get status => 'الحالة';
+
+  @override
+  String get unpaid => 'غير مدفوعة';
+
+  @override
+  String get partiallyPaid => 'مدفوعة جزئياً';
+
+  @override
+  String get vendor => 'مورد';
+
+  @override
+  String get addFirstCustomer => 'اضغط على الزر أدناه لإضافة أول عميل';
+
+  @override
+  String get noCustomersMatch => 'لا يوجد عملاء يطابقون بحثك.';
+
+  @override
+  String get customerBalances => 'أرصدة العملاء';
+
+  @override
+  String get contact => 'جهة الاتصال';
+
+  @override
+  String get addFirstVendor => 'اضغط على الزر أدناه لإضافة أول مورد';
+
+  @override
+  String get noVendorsMatch => 'لا يوجد موردين يطابقون بحثك.';
+
+  @override
+  String get vendorBalances => 'أرصدة الموردين';
+
+  @override
+  String get outstandingBalance => 'الرصيد المعلق';
+
+  @override
+  String get quickLedgerAdjustment => 'تعديل سريع للرصيد';
+
+  @override
+  String get creating => 'جاري الإنشاء...';
+
+  @override
+  String get qty => 'الكمية';
+
+  @override
+  String get pleaseAddLineItemBill =>
+      'الرجاء إضافة عنصر واحد على الأقل مع تحديد المبلغ.';
+
+  @override
+  String get vendorInvoiceNumberOptional => 'رقم فاتورة المورد (اختياري)';
+
+  @override
+  String get current0To30 => 'حالي\n(0-30)';
+
+  @override
+  String get days31To60 => '31-60\nيوم';
+
+  @override
+  String get days61To90 => '61-90\nيوم';
+
+  @override
+  String get days90Plus => '90+\nيوم';
+
+  @override
+  String get days31To60Short => '31-60';
+
+  @override
+  String get days61To90Short => '61-90';
+
+  @override
+  String get days90PlusShort => '90+';
+
+  @override
+  String adjustBalance(String name) {
+    return 'تعديل الرصيد: $name';
+  }
+
+  @override
+  String get charge => 'زيادة الدين (+)';
+
+  @override
+  String get receive => 'استلام دفعة (-)';
+
+  @override
+  String get increasesDebt => 'يزيد من دينهم لك';
+
+  @override
+  String get decreasesDebt => 'يقلل من دينهم (يُضاف إلى النقدية)';
+
+  @override
+  String get saveAdjustment => 'حفظ التعديل';
 }

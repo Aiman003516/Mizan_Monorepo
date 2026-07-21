@@ -10,8 +10,7 @@ import 'package:googleapis_auth/googleapis_auth.dart' as auth;
 import 'package:googleapis_auth/auth_io.dart' as auth_io;
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:core_data/core_data.dart';
 import 'package:uuid/uuid.dart';
 
@@ -22,39 +21,54 @@ const _scopes = ['https://www.googleapis.com/auth/drive.appdata'];
 /// 🧠 THE IDENTITY ENGINE (Hybrid: Drive + SaaS)
 class AuthRepository {
   final FlutterSecureStorage _secureStorage;
-  final FirebaseAuth _firebaseAuth;
-  final FirebaseFirestore _firestore;
+  final SupabaseClient _supabase;
 
-  AuthRepository(this._secureStorage, this._firebaseAuth, this._firestore);
+  AuthRepository(this._secureStorage, this._supabase);
 
   static const _windowsRefreshTokenKey = 'windows_refresh_token';
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: _scopes);
-
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: _scopes,
+    serverClientId: EnvConfig.hasGoogleWebClientId ? EnvConfig.googleWebClientId : null,
+  );
   auth.AuthClient? _client;
   GoogleSignInAccount? _googleUser;
 
   GoogleSignInAccount? get currentGoogleUser => _googleUser;
-  User? get currentFirebaseUser => _firebaseAuth.currentUser;
+  User? get currentSupabaseUser => _supabase.auth.currentUser;
 
-  // --- 🛡️ SAAS IDENTITY LOGIC (New for Phase 4) ---
+  // --- 🛡️ SAAS IDENTITY LOGIC ---
 
-  /// Listens to the enriched AppUser profile (Firestore + Auth)
+  /// Listens to the enriched AppUser profile (Supabase Auth + user_profiles table)
   Stream<AppUser?> watchCurrentUser() {
-    return _firebaseAuth.authStateChanges().switchMap((firebaseUser) {
-      if (firebaseUser == null) return Stream.value(null);
+    return _supabase.auth.onAuthStateChange.switchMap((authState) {
+      final user = authState.session?.user;
+      if (user == null) return Stream.value(null);
 
-      // Listen to the User's Profile Document in Firestore
-      return _firestore
-          .collection('users')
-          .doc(firebaseUser.uid)
-          .snapshots()
-          .map((snapshot) {
-            // If the user doc exists, map it. If not, create a basic shell.
-            return AppUser.fromFirestore(
-              snapshot,
-              uid: firebaseUser.uid,
-              email: firebaseUser.email ?? '',
+      // Listen to the User's Profile Document in Supabase Postgres
+      return _supabase
+          .from('user_profiles')
+          .stream(primaryKey: ['id'])
+          .eq('id', user.id)
+          .map((maps) {
+            if (maps.isEmpty) {
+              return AppUser(
+                uid: user.id,
+                email: user.email ?? '',
+                displayName: user.userMetadata?['full_name'] ?? 'Unknown',
+                role: 'owner',
+                tenantId: null,
+                isPro: false,
+              );
+            }
+            final data = maps.first;
+            return AppUser(
+              uid: user.id,
+              email: data['email'] ?? user.email ?? '',
+              displayName: data['display_name'] ?? user.userMetadata?['full_name'] ?? 'Unknown',
+              role: data['role'] ?? 'owner',
+              tenantId: data['tenant_id'],
+              isPro: data['is_pro'] ?? false,
             );
           });
     });
@@ -66,43 +80,50 @@ class AuthRepository {
     required String taxId,
     required String phone,
   }) async {
-    final user = _firebaseAuth.currentUser;
+    final user = _supabase.auth.currentUser;
     if (user == null) throw Exception("User must be logged in");
 
-    // 1. Generate ID (Slugify Name + Random suffix)
-    final slug = businessName.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '-');
-    final suffix = const Uuid().v4().substring(0, 4);
-    final tenantId = '$slug-$suffix';
+    // 1. Generate ID (Supabase uses UUID)
+    final tenantId = const Uuid().v4();
 
-    final batch = _firestore.batch();
-
-    // 2. Define References
-    final tenantRef = _firestore.collection('tenants').doc(tenantId);
-    final userRef = _firestore.collection('users').doc(user.uid);
-
-    // 3. Set Tenant Data
-    batch.set(tenantRef, {
+    // 2. Insert Tenant
+    await _supabase.from('tenants').insert({
+      'id': tenantId,
       'name': businessName,
-      'taxId': taxId,
+      'tax_id': taxId,
       'phone': phone,
-      'ownerUid': user.uid,
-      'createdAt': FieldValue.serverTimestamp(),
-      'subscriptionStatus': 'trial', 
+      'owner_uid': user.id,
+      'subscription_status': 'trial', 
       'currency': 'USD', 
     });
 
-    // 4. Link User to Tenant (The Promotion)
-    batch.set(userRef, {
-      'tenantId': tenantId,
+    // 3. Link User to Tenant (The Promotion)
+    await _supabase.from('user_profiles').upsert({
+      'id': user.id,
+      'tenant_id': tenantId,
       'role': 'owner',
       'email': user.email,
-      'displayName': user.displayName,
-      'updatedAt': FieldValue.serverTimestamp(),
-      'isPro': true, // Auto-upgrade for trial/owner
-    }, SetOptions(merge: true));
+      'display_name': user.userMetadata?['full_name'] ?? user.email,
+      'is_pro': true,
+    });
+  }
 
-    // 5. Commit atomically
-    await batch.commit();
+  // --- 🔒 EMAIL & PHONE AUTH LOGIC ---
+
+  Future<void> signInWithEmail(String email, String password) async {
+    await _supabase.auth.signInWithPassword(email: email, password: password);
+  }
+
+  Future<void> signUpWithEmail(String email, String password) async {
+    await _supabase.auth.signUp(email: email, password: password);
+  }
+
+  Future<void> signInWithPhone(String phone, String password) async {
+    await _supabase.auth.signInWithPassword(phone: phone, password: password);
+  }
+
+  Future<void> signUpWithPhone(String phone, String password) async {
+    await _supabase.auth.signUp(phone: phone, password: password);
   }
 
   // --- ☁️ DRIVE AUTH LOGIC (Existing Backup System) ---
@@ -121,15 +142,16 @@ class AuthRepository {
         }
         _googleUser = user;
 
-        // B. Firebase Sign In (Hybrid Link)
+        // B. Supabase Sign In (Hybrid Link)
         final googleAuth = await user.authentication;
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-        
-        await _firebaseAuth.signInWithCredential(credential);
-        print("✅ [Auth] Firebase Sign-In Successful: ${_firebaseAuth.currentUser?.uid}");
+        if (googleAuth.idToken != null && googleAuth.accessToken != null) {
+          await _supabase.auth.signInWithIdToken(
+            provider: OAuthProvider.google,
+            idToken: googleAuth.idToken!,
+            accessToken: googleAuth.accessToken!,
+          );
+        }
+        print("✅ [Auth] Supabase Sign-In Successful: ${_supabase.auth.currentUser?.id}");
 
         // C. Create Drive Client
         final authHeaders = await user.authHeaders;
@@ -174,9 +196,7 @@ class AuthRepository {
           );
 
           _googleUser = null;
-          // Note: Windows Firebase Auth fallback logic would go here if needed.
-          // For now, Windows acts as a "Data Terminal" using sync, 
-          // relying on Android to set up the account initially if using Firebase.
+          // Note: Windows Supabase Auth fallback logic would go here if needed.
           return auth.authenticatedClient(http.Client(), credentials);
         });
       }
@@ -198,14 +218,16 @@ class AuthRepository {
         if (user == null) return null;
         _googleUser = user;
 
-        // Ensure Firebase is also signed in silently
-        if (_firebaseAuth.currentUser == null) {
+        // Ensure Supabase is also signed in silently
+        if (_supabase.auth.currentUser == null) {
            final googleAuth = await user.authentication;
-           final credential = GoogleAuthProvider.credential(
-             accessToken: googleAuth.accessToken,
-             idToken: googleAuth.idToken,
-           );
-           await _firebaseAuth.signInWithCredential(credential);
+           if (googleAuth.idToken != null && googleAuth.accessToken != null) {
+              await _supabase.auth.signInWithIdToken(
+                provider: OAuthProvider.google,
+                idToken: googleAuth.idToken!,
+                accessToken: googleAuth.accessToken!,
+              );
+           }
         }
 
         final authHeaders = await user.authHeaders;
@@ -255,16 +277,17 @@ class AuthRepository {
       return _client;
     } catch (e) {
       print('Error during silent sign-in: $e');
-      await signOut();
+      _client = null;
+      _googleUser = null;
       return null;
     }
   }
 
   Future<void> signOut() async {
     try {
+      await _supabase.auth.signOut();
       if (Platform.isAndroid) {
         await _googleSignIn.signOut();
-        await _firebaseAuth.signOut();
       } else if (Platform.isWindows) {
         await _secureStorage.delete(key: _windowsRefreshTokenKey);
       }
@@ -294,6 +317,30 @@ class AuthRepository {
     }
     return false;
   }
+
+  /// Helper to get an authenticated Drive client silently (for background workers)
+  static Future<auth.AuthClient?> getSilentDriveClient() async {
+    final googleSignIn = GoogleSignIn(
+      scopes: _scopes,
+      serverClientId: EnvConfig.hasGoogleWebClientId ? EnvConfig.googleWebClientId : null,
+    );
+    final user = await googleSignIn.signInSilently();
+    if (user == null) return null;
+
+    final authHeaders = await user.authHeaders;
+    return auth.authenticatedClient(
+      http.Client(),
+      auth.AccessCredentials(
+        auth.AccessToken(
+          'Bearer',
+          authHeaders['Authorization']!.substring(7),
+          DateTime.now().toUtc().add(const Duration(hours: 1)),
+        ),
+        null,
+        _scopes,
+      ),
+    );
+  }
 }
 
 // 💉 PROVIDERS
@@ -301,8 +348,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   // Inject all dependencies explicitly
   return AuthRepository(
     ref.watch(flutterSecureStorageProvider),
-    FirebaseAuth.instance,
-    FirebaseFirestore.instance,
+    Supabase.instance.client,
   );
 });
 

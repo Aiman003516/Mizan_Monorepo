@@ -68,6 +68,7 @@ class _InstalledReportsTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final stream = ref
         .watch(reportTemplatesRepositoryProvider)
         .watchInstalledReports();
@@ -82,10 +83,10 @@ class _InstalledReportsTab extends ConsumerWidget {
 
         if (reports.isEmpty) {
           // ✅ This will now work because EmptyStateWidget accepts 'title'
-          return const EmptyStateWidget(
+          return EmptyStateWidget(
             icon: Icons.folder_open,
-            title: "No Installed Reports",
-            message: "Go to the Marketplace to download standard reports.",
+            title: l10n.noInstalledReports,
+            message: l10n.goToMarketplaceHint,
           );
         }
 
@@ -99,7 +100,10 @@ class _InstalledReportsTab extends ConsumerWidget {
               title: Text(report.title),
               subtitle: Text(report.description),
               trailing: IconButton(
-                icon: Icon(Icons.delete_outline, color: context.appColors.error),
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: context.appColors.error,
+                ),
                 onPressed: () => ref
                     .read(reportTemplatesRepositoryProvider)
                     .deleteReport(report.id),
@@ -128,6 +132,7 @@ class _MarketplaceTab extends ConsumerWidget {
     WidgetRef ref,
     ReportTemplate report,
     AppUser? user,
+    AppLocalizations l10n,
   ) async {
     // 1. Check Logic: "Who Gets What"
     bool canInstall = false;
@@ -153,11 +158,13 @@ class _MarketplaceTab extends ConsumerWidget {
 
     // 2. Execution
     if (!canInstall) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("🔒 Premium Report. Upgrade to Pro or Enterprise."),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.premiumReportWarning),
+          ),
+        );
+      }
       return;
     }
 
@@ -166,16 +173,16 @@ class _MarketplaceTab extends ConsumerWidget {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text("Purchase Report"),
-          content: Text("Buy '${report.title}' for \$4.99?"),
+          title: Text(l10n.purchaseReportTitle),
+          content: Text(l10n.buyReportPrompt(report.title)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text("Cancel"),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text("Buy Now"),
+              child: Text(l10n.buyNowAction),
             ),
           ],
         ),
@@ -187,7 +194,7 @@ class _MarketplaceTab extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text("Processing Payment...")));
+        ).showSnackBar(SnackBar(content: Text(l10n.processingPayment)));
       }
       await Future.delayed(const Duration(seconds: 2));
     }
@@ -197,14 +204,15 @@ class _MarketplaceTab extends ConsumerWidget {
     // 3. Install
     await ref.read(reportTemplatesRepositoryProvider).installReport(report);
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("✅ Installed ${report.title}")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.installedSuccessfully(report.title))),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final stream = ref
         .watch(reportTemplatesRepositoryProvider)
         .watchStandardReports();
@@ -220,10 +228,10 @@ class _MarketplaceTab extends ConsumerWidget {
 
         if (reports.isEmpty) {
           // ✅ This will now work
-          return const EmptyStateWidget(
+          return EmptyStateWidget(
             icon: Icons.cloud_off,
-            title: "Marketplace Unavailable",
-            message: "No standard reports found online.",
+            title: l10n.marketplaceUnavailable,
+            message: l10n.noStandardReportsFound,
           );
         }
 
@@ -235,21 +243,21 @@ class _MarketplaceTab extends ConsumerWidget {
             final user = userAsync.value;
 
             // Determine Button Style
-            String label = "Install";
+            String label = l10n.installAction;
             IconData icon = Icons.download;
             Color color = context.appColors.info;
 
             if (report.isPremium) {
               if (user?.hasCloudAccess == true) {
-                label = "Included";
+                label = l10n.includedAction;
                 icon = Icons.check_circle;
                 color = context.appColors.success;
               } else if (user?.isPro == true) {
-                label = "Buy \$4.99";
+                label = l10n.buyPriceAction;
                 icon = Icons.shopping_cart;
                 color = context.appColors.primary;
               } else {
-                label = "Locked";
+                label = l10n.lockedAction;
                 icon = Icons.lock;
                 color = context.appColors.subtleText;
               }
@@ -260,7 +268,7 @@ class _MarketplaceTab extends ConsumerWidget {
               title: Text(report.title),
               subtitle: Text(report.description),
               trailing: ElevatedButton.icon(
-                onPressed: () => _handleInstall(context, ref, report, user),
+                onPressed: () => _handleInstall(context, ref, report, user, l10n),
                 icon: Icon(icon, size: 16),
                 label: Text(label),
                 style: ElevatedButton.styleFrom(

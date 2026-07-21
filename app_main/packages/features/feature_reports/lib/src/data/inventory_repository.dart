@@ -27,7 +27,7 @@ class ProductVelocity {
     required this.quantitySold,
     required this.totalRevenue,
   });
-  
+
   // Velocity Score: Simple Ratio for sorting
   double get score => quantitySold;
 }
@@ -49,12 +49,26 @@ class InventoryRepository {
   /// Aggregates OrderItems to find top sellers in the given [range].
   Future<List<ProductVelocity>> getProductVelocity(DateTimeRange range) async {
     // 1. Get all OrderItems within range
-    final query = _db.select(_db.orderItems).join([
-      innerJoin(_db.orders, _db.orders.id.equalsExp(_db.orderItems.orderId)),
-      innerJoin(_db.transactions, _db.transactions.id.equalsExp(_db.orders.transactionId)),
-      innerJoin(_db.products, _db.products.id.equalsExp(_db.orderItems.productId)),
-    ])
-      ..where(_db.transactions.transactionDate.isBetweenValues(range.start, range.end));
+    final query =
+        _db.select(_db.orderItems).join([
+          innerJoin(
+            _db.orders,
+            _db.orders.id.equalsExp(_db.orderItems.orderId),
+          ),
+          innerJoin(
+            _db.transactions,
+            _db.transactions.id.equalsExp(_db.orders.transactionId),
+          ),
+          innerJoin(
+            _db.products,
+            _db.products.id.equalsExp(_db.orderItems.productId),
+          ),
+        ])..where(
+          _db.transactions.transactionDate.isBetweenValues(
+            range.start,
+            range.end,
+          ),
+        );
 
     final rows = await query.get();
 
@@ -72,7 +86,8 @@ class InventoryRepository {
           productName: product.name,
           currentStock: product.quantityOnHand,
           quantitySold: existing.quantitySold + item.quantity,
-          totalRevenue: existing.totalRevenue + (item.quantity * item.priceAtSale),
+          totalRevenue:
+              existing.totalRevenue + (item.quantity * item.priceAtSale),
         );
       } else {
         map[product.id] = ProductVelocity(
@@ -86,10 +101,10 @@ class InventoryRepository {
     }
 
     final list = map.values.toList();
-    
+
     // 3. Sort by Quantity Sold (Descending)
     list.sort((a, b) => b.quantitySold.compareTo(a.quantitySold));
-    
+
     return list;
   }
 }

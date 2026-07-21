@@ -6,7 +6,7 @@ export 'src/company_profile_controller.dart';
 export 'package:core_database/core_database.dart';
 export 'src/env_config.dart';
 export 'src/bootstrap.dart';
-export 'src/firebase_options_selector.dart';
+
 export 'src/models/rbac_models.dart';
 export 'src/services/permission_service.dart';
 export 'src/services/saas_seeding_service.dart';
@@ -21,8 +21,8 @@ export 'src/services/ghost_money_service.dart';
 export 'src/account_templates.dart';
 export 'src/services/journal_entry_service.dart';
 export 'src/services/currency_service.dart';
+export 'src/providers/currency_providers.dart';
 export 'src/services/accruals_service.dart';
-// Phase 3: Fixed Assets & Inventory
 export 'src/services/depreciation_service.dart';
 export 'src/services/inventory_costing_service.dart';
 // Phase 8: Accounts Receivable

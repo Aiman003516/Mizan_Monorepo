@@ -157,6 +157,7 @@ class Invoices extends MizanTable {
     #id,
     onDelete: KeyAction.setNull,
   )(); // Link to journal entry
+  TextColumn get currencyCode => text().withDefault(const Constant('USD'))();
   // Wave 2: Recurring Invoices
   BoolColumn get isRecurring => boolean().withDefault(const Constant(false))();
   TextColumn get recurrenceInterval =>
@@ -255,6 +256,7 @@ class Bills extends MizanTable {
     #id,
     onDelete: KeyAction.setNull,
   )(); // Link to journal entry
+  TextColumn get currencyCode => text().withDefault(const Constant('USD'))();
 }
 
 @DataClassName('BillItem')
@@ -546,7 +548,7 @@ class Transactions extends MizanTable {
   TextColumn get description => text()();
   DateTimeColumn get transactionDate => dateTime()();
   TextColumn get attachmentPath => text().nullable()();
-  TextColumn get currencyCode => text().withDefault(const Constant('Local'))();
+  TextColumn get currencyCode => text().withDefault(const Constant('USD'))();
   TextColumn get relatedTransactionId => text().nullable().references(
     Transactions,
     #id,
@@ -700,7 +702,7 @@ class AppDatabase extends _$AppDatabase {
 
   // ⭐️ BUMPED VERSION: 29 -> 30 (Full Expansion)
   @override
-  int get schemaVersion => 30;
+  int get schemaVersion => 31;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -845,6 +847,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(comments);
         await m.createTable(userRoles);
       }
+      // Currency Support (Version 31)
+      if (from < 31) {
+        await m.addColumn(invoices, invoices.currencyCode);
+        await m.addColumn(bills, bills.currencyCode);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
@@ -858,7 +865,7 @@ class AppDatabase extends _$AppDatabase {
     )..where((t) => t.name.equals(kCashAccountName))).get();
     if (existing.isNotEmpty) return;
 
-    await into(accounts).insert(
+    final initialAccounts = [
       AccountsCompanion.insert(
         name: kCashAccountName,
         type: 'asset',
@@ -867,18 +874,22 @@ class AppDatabase extends _$AppDatabase {
         lastUpdated: Value(now),
         phoneNumber: const Value(null),
       ),
-    );
-    await into(accounts).insert(
       AccountsCompanion.insert(
-        name: kSalesRevenueAccountName,
-        type: 'revenue',
+        name: 'Accounts Payable',
+        type: 'liability',
         initialBalance: 0,
         createdAt: Value(now),
         lastUpdated: Value(now),
         phoneNumber: const Value(null),
       ),
-    );
-    await into(accounts).insert(
+      AccountsCompanion.insert(
+        name: 'Accounts Receivable',
+        type: 'asset',
+        initialBalance: 0,
+        createdAt: Value(now),
+        lastUpdated: Value(now),
+        phoneNumber: const Value(null),
+      ),
       AccountsCompanion.insert(
         name: kEquityAccountName,
         type: 'equity',
@@ -887,18 +898,14 @@ class AppDatabase extends _$AppDatabase {
         lastUpdated: Value(now),
         phoneNumber: const Value(null),
       ),
-    );
-    await into(accounts).insert(
       AccountsCompanion.insert(
-        name: kInventoryAccountName,
-        type: 'asset',
+        name: kSalesRevenueAccountName,
+        type: 'revenue',
         initialBalance: 0,
         createdAt: Value(now),
         lastUpdated: Value(now),
         phoneNumber: const Value(null),
       ),
-    );
-    await into(accounts).insert(
       AccountsCompanion.insert(
         name: kCogsAccountName,
         type: 'expense',
@@ -907,7 +914,11 @@ class AppDatabase extends _$AppDatabase {
         lastUpdated: Value(now),
         phoneNumber: const Value(null),
       ),
-    );
+    ];
+
+    for (var account in initialAccounts) {
+      await into(accounts).insert(account, mode: InsertMode.insertOrIgnore);
+    }
   }
 
   Future<void> _createInitialClassifications() async {
@@ -942,16 +953,8 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> _createInitialCurrencies() async {
     final now = DateTime.now();
-    await into(currencies).insert(
-      CurrenciesCompanion.insert(
-        code: 'Local',
-        name: 'Local Currency',
-        symbol: const Value(null),
-        createdAt: Value(now),
-        lastUpdated: Value(now),
-      ),
-      mode: InsertMode.insertOrIgnore,
-    );
+    // Note: 'Local' currency removed — the user chooses their base currency
+    // during onboarding, stored in SharedPreferences as 'default_currency_code'.
 
     await into(currencies).insert(
       CurrenciesCompanion.insert(
@@ -969,6 +972,39 @@ class AppDatabase extends _$AppDatabase {
         code: 'SAR',
         name: 'Saudi Riyal',
         symbol: const Value('﷼'),
+        createdAt: Value(now),
+        lastUpdated: Value(now),
+      ),
+      mode: InsertMode.insertOrIgnore,
+    );
+
+    await into(currencies).insert(
+      CurrenciesCompanion.insert(
+        code: 'YER',
+        name: 'Yemeni Rial',
+        symbol: const Value('﷼'),
+        createdAt: Value(now),
+        lastUpdated: Value(now),
+      ),
+      mode: InsertMode.insertOrIgnore,
+    );
+
+    await into(currencies).insert(
+      CurrenciesCompanion.insert(
+        code: 'AED',
+        name: 'UAE Dirham',
+        symbol: const Value('د.إ'),
+        createdAt: Value(now),
+        lastUpdated: Value(now),
+      ),
+      mode: InsertMode.insertOrIgnore,
+    );
+
+    await into(currencies).insert(
+      CurrenciesCompanion.insert(
+        code: 'EUR',
+        name: 'Euro',
+        symbol: const Value('€'),
         createdAt: Value(now),
         lastUpdated: Value(now),
       ),

@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
+import 'package:core_data/core_data.dart';
 import 'package:feature_accounts/src/presentation/accounts_list_provider.dart';
 import 'package:feature_accounts/src/presentation/add_account_screen.dart';
 import 'package:feature_accounts/src/presentation/account_ledger_screen.dart';
 import 'package:feature_reports/feature_reports.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 /// A widget that displays accounts in a hierarchical tree structure
 class HierarchicalAccountsList extends ConsumerStatefulWidget {
@@ -22,10 +24,10 @@ class HierarchicalAccountsList extends ConsumerStatefulWidget {
 class _HierarchicalAccountsListState
     extends ConsumerState<HierarchicalAccountsList> {
   final Set<String> _expandedAccounts = {};
-  final _currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
-
   String _formatBalance(double balance) {
-    return _currencyFormat.format(balance);
+    final currencyCode = ref.watch(currentCurrencyCodeProvider);
+    final symbol = CurrencyFormatter.getCurrencySymbol(currencyCode);
+    return NumberFormat.currency(symbol: '$symbol ', decimalDigits: 2).format(balance);
   }
 
   @override

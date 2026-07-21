@@ -10,6 +10,7 @@ import 'package:core_database/src/initial_constants.dart' as c;
 import 'dart:async';
 import 'package:async/async.dart';
 import 'package:drift/drift.dart' as d;
+import 'package:core_data/core_data.dart';
 
 /// The placeholder database provider for this feature.
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -53,19 +54,21 @@ final filteredTransactionDetailsProvider =
       return service.watchTransactionDetailsFiltered(filter: filter);
     });
 
-final allAccountSummariesProvider = StreamProvider<Map<String, AccountSummary>>(
-  (ref) {
-    final service = ref.watch(reportsServiceProvider);
-    return service.watchAllAccountSummaries().map((summaries) {
-      final localCurrencySummaries = summaries.where(
-        (s) => s.currencyCode == 'Local',
-      );
-      return {
-        for (var summary in localCurrencySummaries) summary.accountId: summary,
-      };
-    });
-  },
-);
+final allAccountSummariesProvider = StreamProvider<Map<String, AccountSummary>>((
+  ref,
+) {
+  final service = ref.watch(reportsServiceProvider);
+  // Use the user's configured base currency code — not the legacy 'Local' sentinel
+  final baseCurrency = ref.watch(defaultCurrencyProvider);
+  return service.watchAllAccountSummaries().map((summaries) {
+    final localCurrencySummaries = summaries.where(
+      (s) => s.currencyCode == baseCurrency || s.currencyCode == 'Local',
+    );
+    return {
+      for (var summary in localCurrencySummaries) summary.accountId: summary,
+    };
+  });
+});
 
 // Local class definitions (kept as requested)
 class PnlLine {

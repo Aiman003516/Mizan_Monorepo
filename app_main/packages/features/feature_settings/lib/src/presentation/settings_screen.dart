@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // ⚡ FIXED: Added missing import
+import 'package:supabase_flutter/supabase_flutter.dart';
 // Add import
 
 // Local Imports
@@ -40,7 +40,9 @@ class SettingsScreen extends ConsumerWidget {
             onPressed: () => Navigator.of(context).pop(false),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: context.appColors.error),
+            style: FilledButton.styleFrom(
+              backgroundColor: context.appColors.error,
+            ),
             child: Text(l10n.restore),
             onPressed: () => Navigator.of(context).pop(true),
           ),
@@ -340,16 +342,22 @@ class SettingsScreen extends ConsumerWidget {
                   return Column(
                     children: [
                       ListTile(
-                        leading: Icon(Icons.verified, color: context.appColors.info),
-                        title: Text("Enterprise License Active"),
-                        subtitle: Text("You are the System Administrator"),
+                        leading: Icon(
+                          Icons.verified,
+                          color: context.appColors.info,
+                        ),
+                        title: Text(l10n.enterpriseLicenseActive),
+                        subtitle: Text(l10n.systemAdministrator),
                       ),
 
                       // 🌟 NEW: Roles Management Button (Only for Admins)
                       ListTile(
-                        leading: Icon(Icons.badge, color: context.appColors.secondary),
-                        title: const Text("Manage Roles"),
-                        subtitle: const Text("Define staff permissions"),
+                        leading: Icon(
+                          Icons.badge,
+                          color: context.appColors.secondary,
+                        ),
+                        title: Text(l10n.manageRoles),
+                        subtitle: Text(l10n.defineStaffPermissions),
                         trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           Navigator.push(
@@ -367,8 +375,8 @@ class SettingsScreen extends ConsumerWidget {
                           Icons.credit_card,
                           color: context.appColors.warning,
                         ),
-                        title: const Text("Manage Subscription"),
-                        subtitle: const Text("View plans & billing"),
+                        title: Text(l10n.manageSubscription),
+                        subtitle: Text(l10n.viewPlansBilling),
                         trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           Navigator.push(
@@ -381,9 +389,12 @@ class SettingsScreen extends ConsumerWidget {
                       ),
 
                       ListTile(
-                        leading: Icon(Icons.group, color: context.appColors.primary),
-                        title: const Text("Manage Staff"),
-                        subtitle: const Text("View list & invite members"),
+                        leading: Icon(
+                          Icons.group,
+                          color: context.appColors.primary,
+                        ),
+                        title: Text(l10n.manageStaff),
+                        subtitle: Text(l10n.viewListInviteMembers),
                         trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           Navigator.push(
@@ -401,23 +412,24 @@ class SettingsScreen extends ConsumerWidget {
                 // Scenario B: User is a Guest (New Buyer)
                 // Show the interactive "Activate" button to run the Genesis Script.
                 return ListTile(
-                  leading: Icon(Icons.rocket_launch, color: context.appColors.success),
-                  title: const Text("Activate Business License"),
-                  subtitle: const Text("Initialize system & claim ownership"),
+                  leading: Icon(
+                    Icons.rocket_launch,
+                    color: context.appColors.success,
+                  ),
+                  title: Text(l10n.activateBusinessLicense),
+                  subtitle: Text(l10n.initializeSystemClaimOwnership),
                   onTap: () async {
                     // 🔍 DEBUGGING: Check who is logged in
-                    final user = FirebaseAuth.instance.currentUser;
+                    final user = Supabase.instance.client.auth.currentUser;
                     print(
                       "🕵️‍♂️ [DEBUG] Current User: ${user?.email ?? 'NULL (Guest)'}",
                     );
-                    print("🕵️‍♂️ [DEBUG] UID: ${user?.uid}");
+                    print("🕵️‍♂️ [DEBUG] UID: ${user?.id}");
 
                     if (user == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text(
-                            "⚠️ You are not logged in! Please Sign In first.",
-                          ),
+                          content: Text(l10n.notLoggedInWarning),
                           backgroundColor: context.appColors.warning,
                         ),
                       );
@@ -428,14 +440,12 @@ class SettingsScreen extends ConsumerWidget {
                       // 👑 RUN THE CLEAN GENESIS
                       await ref
                           .read(saasSeedingServiceProvider)
-                          .activateSystemForBuyer();
+                          .activateSystemForBuyer('test_tenant_123');
 
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text(
-                              "✅ System Activated! Welcome, Admin.",
-                            ),
+                            content: Text(l10n.systemActivatedWelcome),
                             backgroundColor: context.appColors.success,
                           ),
                         );
@@ -444,7 +454,7 @@ class SettingsScreen extends ConsumerWidget {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text("❌ Activation Failed: $e"),
+                            content: Text(l10n.activationFailed(e.toString())),
                             backgroundColor: context.appColors.error,
                           ),
                         );
@@ -490,6 +500,18 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const Icon(Icons.arrow_forward_ios, size: 16),
                 ],
+              ),
+            ),
+          ),
+        ),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
+          child: Center(
+            child: Text(
+              l10n.appVersion('1.0.0'),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.outline,
               ),
             ),
           ),

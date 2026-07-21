@@ -3,10 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
 
 import 'package:core_data/core_data.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 import 'package:feature_reports/feature_reports.dart';
 import 'package:feature_transactions/feature_transactions.dart';
@@ -25,7 +27,7 @@ class AccountLedgerScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${l10n.account}: ${account.name}'),
+        title: null,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -56,23 +58,58 @@ class AccountLedgerScreen extends ConsumerWidget {
           final totalBalance =
               (account.initialBalance / 100.0) + netTransactions;
 
-          return Column(
-            children: [
-              _buildBalanceCard(context, l10n, totalBalance),
-              Expanded(
-                child: accountDetails.isEmpty
-                    ? Center(
+          // Resolve account currency — fall back to user's configured base currency.
+          final baseCurrencyCode = ref.read(defaultCurrencyProvider);
+          final baseCurrencySymbol =
+              ref.read(preferencesRepositoryProvider).getCurrencySymbol();
+
+          String accountCurrency = baseCurrencyCode;
+          if (account.customAttributes != null) {
+            try {
+              final attrs = jsonDecode(account.customAttributes!);
+              final stored = attrs['currency'] as String?;
+              if (stored != null && stored != 'Local') {
+                accountCurrency = stored;
+              }
+            } catch (_) {}
+          }
+          final currencySymbol = accountCurrency == baseCurrencyCode
+              ? baseCurrencySymbol
+              : CurrencyFormatter.getCurrencySymbol(accountCurrency);
+
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 0.0),
+                  child: Text(
+                    '${l10n.account}: ${account.name}',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: _buildBalanceCard(context, l10n, totalBalance, currencySymbol),
+              ),
+              accountDetails.isEmpty
+                  ? SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
                         child: Text(
                           l10n.noTransactionsYet,
                           style: TextStyle(color: context.appColors.subtleText),
                         ),
-                      )
-                    : ListView.separated(
-                        itemCount: accountDetails.length,
-                        separatorBuilder: (context, index) =>
-                            const Divider(height: 1),
-                        itemBuilder: (context, index) {
-                          final detail = accountDetails[index];
+                      ),
+                    )
+                  : SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          if (index.isOdd) return const Divider(height: 1);
+                          final detailIndex = index ~/ 2;
+                          final detail = accountDetails[detailIndex];
                           final isDebit = detail.entryAmount > 0;
                           return ListTile(
                             leading: CircleAvatar(
@@ -121,8 +158,9 @@ class AccountLedgerScreen extends ConsumerWidget {
                             ),
                           );
                         },
+                        childCount: accountDetails.length * 2 - 1,
                       ),
-              ),
+                    ),
             ],
           );
         },
@@ -148,6 +186,7 @@ class AccountLedgerScreen extends ConsumerWidget {
     BuildContext context,
     AppLocalizations l10n,
     double totalBalance,
+    String currencySymbol,
   ) {
     return Container(
       width: double.infinity,
@@ -172,7 +211,7 @@ class AccountLedgerScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            totalBalance.toStringAsFixed(2),
+            '$currencySymbol ${totalBalance.toStringAsFixed(2)}',
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,

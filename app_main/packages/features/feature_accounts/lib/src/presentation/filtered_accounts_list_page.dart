@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
+import 'dart:convert';
+import 'package:shared_ui/shared_ui.dart';
 import 'package:core_l10n/app_localizations.dart';
-
 import 'package:feature_transactions/feature_transactions.dart';
 import 'package:feature_reports/feature_reports.dart';
 import 'package:shared_services/shared_services.dart';
@@ -173,7 +174,6 @@ class FilteredAccountsListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final defaultCurrency = ref.watch(defaultCurrencyProvider);
 
     final searchQuery = ref.watch(mainDashboardSearchProvider);
 
@@ -230,108 +230,171 @@ class FilteredAccountsListPage extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredBalances.length,
-                      itemBuilder: (context, index) {
-                        final balanceData = filteredBalances[index];
-                        final account = balanceData.account;
-                        final totalBalance = balanceData.totalCombinedBalance;
-
-                        final bool isSupplier =
-                            classificationFilter == kClassificationSuppliers;
-                        final bool isOwed = totalBalance < -0.001;
-                        final bool showPaymentButton = isSupplier && isOwed;
-
-                        final bool isDebitNature =
-                            classificationFilter == kClassificationClients;
-
-                        Color totalBalanceColor;
-                        if (totalBalance == 0) {
-                          totalBalanceColor = context.appColors.subtleText;
-                        } else if (isDebitNature) {
-                          totalBalanceColor = totalBalance > 0
-                              ? context.appColors.error
-                              : context.appColors.success;
-                        } else {
-                          totalBalanceColor = totalBalance < 0
-                              ? context.appColors.error
-                              : context.appColors.success;
-                        }
-
-                        final breakdownSummaries =
-                            balanceData.currencySummaries;
-
-                        return ListTile(
-                          title: Text(account.name),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${totalBalance.abs().toStringAsFixed(2)} $defaultCurrency',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: totalBalanceColor,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              if (breakdownSummaries.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4.0),
-                                  child: Wrap(
-                                    spacing: 8.0,
-                                    runSpacing: 4.0,
-                                    children: breakdownSummaries.map((summary) {
-                                      Color color;
-                                      if (summary.netBalance == 0) {
-                                        color = context.appColors.subtleText;
-                                      } else if (isDebitNature) {
-                                        color = summary.netBalance > 0
-                                            ? context.appColors.error
-                                            : context.appColors.success;
-                                      } else {
-                                        color = summary.netBalance < 0
-                                            ? context.appColors.error
-                                            : context.appColors.success;
-                                      }
-                                      return Text(
-                                        '(${summary.netBalance.abs().toStringAsFixed(2)} ${summary.currencyCode})',
-                                        style: TextStyle(
-                                          color: color,
-                                          fontSize: 12,
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                            ],
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowColor: WidgetStateProperty.all(
+                            Theme.of(context).colorScheme.surfaceContainerHighest,
                           ),
-                          trailing: showPaymentButton
-                              ? FilledButton(
-                                  child: Text(l10n.pay),
-                                  onPressed: () {
+                          dataRowColor: WidgetStateProperty.resolveWith<Color?>(
+                            (Set<WidgetState> states) {
+                              return null;
+                            },
+                          ),
+                          columns: [
+                            DataColumn(label: Text(l10n.accountNameHint)),
+                            DataColumn(label: Text(l10n.debitBalance)),
+                            DataColumn(label: Text(l10n.creditBalance)),
+                            DataColumn(label: Text(l10n.actions)),
+                          ],
+                          rows: filteredBalances.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final balanceData = entry.value;
+                            final account = balanceData.account;
+                            final totalBalance = balanceData.totalCombinedBalance;
+
+                            final bool isSupplier =
+                                classificationFilter == kClassificationSuppliers;
+                            final bool isOwed = totalBalance < -0.001;
+                            final bool showPaymentButton = isSupplier && isOwed;
+
+                            final breakdownSummaries = balanceData.currencySummaries;
+                            
+                            final baseCurrencyCode = ref.read(defaultCurrencyProvider);
+                            final baseCurrencySymbol =
+                                ref.read(preferencesRepositoryProvider).getCurrencySymbol();
+
+                            String accountCurrency = baseCurrencyCode;
+                            if (account.customAttributes != null) {
+                              try {
+                                final attrs = jsonDecode(account.customAttributes!);
+                                final stored = attrs['currency'] as String?;
+                                if (stored != null && stored != 'Local') {
+                                  accountCurrency = stored;
+                                }
+                              } catch (_) {}
+                            }
+                            final displaySymbol = accountCurrency == baseCurrencyCode
+                                ? baseCurrencySymbol
+                                : CurrencyFormatter.getCurrencySymbol(accountCurrency);
+
+                            final isGray = index % 2 == 0;
+                            final rowColor = isGray
+                                ? Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3)
+                                : Theme.of(context).colorScheme.surface;
+
+                            return DataRow(
+                              color: WidgetStateProperty.all(rowColor),
+                              cells: [
+                                DataCell(
+                                  Text(account.name),
+                                  onTap: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder: (context) => MakePaymentScreen(
-                                          supplierAccount: account,
-                                          amountOwed: totalBalance.abs(),
-                                        ),
+                                        builder: (context) =>
+                                            AccountLedgerScreen(account: account),
                                       ),
                                     );
                                   },
-                                )
-                              : null,
-                          onTap: showPaymentButton
-                              ? null
-                              : () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          AccountLedgerScreen(account: account),
-                                    ),
-                                  );
-                                },
-                        );
-                      },
+                                ),
+                                DataCell(
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        totalBalance >= 0
+                                            ? '${totalBalance.toStringAsFixed(2)} $displaySymbol'
+                                            : '0.00 $displaySymbol',
+                                        style: TextStyle(
+                                          color: totalBalance > 0 ? Colors.green : null,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      if (breakdownSummaries.isNotEmpty)
+                                        ...breakdownSummaries.map((summary) {
+                                          return Text(
+                                            summary.netBalance > 0
+                                                ? '${summary.netBalance.toStringAsFixed(2)} ${summary.currencyCode}'
+                                                : '',
+                                            style: const TextStyle(
+                                              color: Colors.green,
+                                              fontSize: 10,
+                                            ),
+                                          );
+                                        }).where((w) => (w.data ?? '').isNotEmpty),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            AccountLedgerScreen(account: account),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                DataCell(
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        totalBalance < 0
+                                            ? '${totalBalance.abs().toStringAsFixed(2)} $displaySymbol'
+                                            : '0.00 $displaySymbol',
+                                        style: TextStyle(
+                                          color: totalBalance < 0 ? Colors.red : null,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      if (breakdownSummaries.isNotEmpty)
+                                        ...breakdownSummaries.map((summary) {
+                                          return Text(
+                                            summary.netBalance < 0
+                                                ? '${summary.netBalance.abs().toStringAsFixed(2)} ${summary.currencyCode}'
+                                                : '',
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 10,
+                                            ),
+                                          );
+                                        }).where((w) => (w.data ?? '').isNotEmpty),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            AccountLedgerScreen(account: account),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                DataCell(
+                                  showPaymentButton
+                                      ? FilledButton(
+                                          child: Text(l10n.pay),
+                                          onPressed: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) => MakePaymentScreen(
+                                                  supplierAccount: account,
+                                                  amountOwed: totalBalance.abs(),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        )
+                                      : const SizedBox.shrink(),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ),
                   ),
                 ],

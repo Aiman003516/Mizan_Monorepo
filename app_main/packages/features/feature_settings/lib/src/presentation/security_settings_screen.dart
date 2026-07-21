@@ -61,9 +61,7 @@ class _SecuritySettingsScreenState
     final messenger = ScaffoldMessenger.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.securityOptions),
-      ),
+      appBar: AppBar(title: Text(l10n.securityOptions)),
       body: ListView(
         children: [
           SwitchListTile(
@@ -86,22 +84,25 @@ class _SecuritySettingsScreenState
                   _isPasscodeEnabled = false;
                   _isBiometricsEnabled = false;
                 });
-                messenger.showSnackBar(SnackBar(
-                  content: Text(l10n.passcodeRemoved),
-                ));
+                messenger.showSnackBar(
+                  SnackBar(content: Text(l10n.passcodeRemoved)),
+                );
               }
             },
           ),
           ListTile(
             leading: const Icon(Icons.vpn_key),
             title: Text(l10n.setChangePasscode),
-            subtitle:
-            _isPasscodeEnabled ? const Text('********') : Text(l10n.notSet),
+            subtitle: _isPasscodeEnabled
+                ? const Text('********')
+                : Text(l10n.notSet),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () async {
-              await Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const SetPasscodeScreen(),
-              ));
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SetPasscodeScreen(),
+                ),
+              );
               _loadSettings();
             },
           ),
@@ -113,11 +114,11 @@ class _SecuritySettingsScreenState
               onChanged: !_isPasscodeEnabled
                   ? null
                   : (bool value) async {
-                await repo.setBiometricsEnabled(value);
-                setState(() {
-                  _isBiometricsEnabled = value;
-                });
-              },
+                      await repo.setBiometricsEnabled(value);
+                      setState(() {
+                        _isBiometricsEnabled = value;
+                      });
+                    },
             ),
         ],
       ),

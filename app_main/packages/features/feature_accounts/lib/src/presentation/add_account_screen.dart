@@ -3,10 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_accounts/src/data/accounts_repository.dart';
-import 'package:core_database/core_database.dart';
-import 'package:drift/drift.dart' as d;
 import 'package:feature_accounts/src/data/classifications_repository.dart';
-import 'package:core_data/src/services/currency_service.dart';
+import 'package:core_data/core_data.dart';
+import 'package:shared_ui/shared_ui.dart';
+import 'package:drift/drift.dart' as d;
+import 'dart:convert';
 
 class AddAccountScreen extends ConsumerStatefulWidget {
   final Account? accountToEdit;
@@ -21,10 +22,12 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   final _debitBalanceController = TextEditingController();
   final _creditBalanceController = TextEditingController();
   final _phoneNumberController = TextEditingController();
+  final _exchangeRateController = TextEditingController(text: '1.0');
 
   String _selectedAccountType = 'asset';
   Classification? _selectedClassification;
-  String _selectedCurrency = 'Local';
+  String _selectedCurrency = 'USD'; // will be updated in initState
+  String _baseCurrency = 'USD';     // will be updated in initState
   bool _isLoading = false;
   Map<String, double> _exchangeRates = {};
 
@@ -32,18 +35,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
 
   AppLocalizations get l10n => AppLocalizations.of(context)!;
 
-  String _getLocalizedClassification(String dbName) {
-    switch (dbName.toLowerCase()) {
-      case 'clients':
-        return l10n.clients;
-      case 'suppliers':
-        return l10n.suppliers;
-      case 'general':
-        return l10n.general;
-      default:
-        return dbName;
-    }
-  }
+
 
   @override
   void initState() {
@@ -57,14 +49,24 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       final customAttrs = account.customAttributes;
       if (customAttrs != null && customAttrs.isNotEmpty) {
         try {
-          // It's saved as a stringified JSON representation from Drift or a JSON string.
-          // Since it might be stored via `customAttributes.toString()` which produces `{key: value}`,
-          // we should ideally use jsonDecode if it's true JSON, but due to earlier bugs, we'll try to parse it safely.
-          final String attrsStr = customAttrs as String;
-          if (attrsStr.startsWith('{') && attrsStr.endsWith('}')) {
-            // Very simple parsing for the legacy format or JSON format
-            // If it's proper JSON, jsonDecode would work, but we will use regex or simple split for safety if it's Dart's .toString()
-            // Assuming it's simple JSON-like for currency
+          final String attrsStr = customAttrs;
+          // Attempt proper JSON decode first
+          try {
+            final Map<String, dynamic> json = jsonDecode(attrsStr);
+            if (json.containsKey('currency')) {
+              _selectedCurrency = json['currency'] as String;
+            }
+            if (json.containsKey('exchangeRate')) {
+              _exchangeRateController.text = json['exchangeRate'].toString();
+            }
+            if (json.containsKey('foreignDebitBalance') && json.containsKey('foreignCreditBalance')) {
+              final double fDebit = (json['foreignDebitBalance'] as num).toDouble();
+              final double fCredit = (json['foreignCreditBalance'] as num).toDouble();
+              _debitBalanceController.text = fDebit.toStringAsFixed(2);
+              _creditBalanceController.text = fCredit.toStringAsFixed(2);
+            }
+          } catch (_) {
+            // Fallback for legacy string format
             if (attrsStr.contains('"currency":"')) {
               final currencyMatch = RegExp(
                 r'"currency":"([^"]+)"',
@@ -86,14 +88,16 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         }
       }
 
-      // Set initial balance based on sign
-      final balance = account.initialBalance / 100.0;
-      if (balance >= 0) {
-        _debitBalanceController.text = balance.toStringAsFixed(2);
-        _creditBalanceController.text = '0.00';
-      } else {
-        _debitBalanceController.text = '0.00';
-        _creditBalanceController.text = balance.abs().toStringAsFixed(2);
+      if (_debitBalanceController.text.isEmpty && _creditBalanceController.text.isEmpty) {
+        // Fallback to initialBalance if foreign balances not found in customAttributes
+        final balance = account.initialBalance / 100.0;
+        if (balance >= 0) {
+          _debitBalanceController.text = balance.toStringAsFixed(2);
+          _creditBalanceController.text = '0.00';
+        } else {
+          _debitBalanceController.text = '0.00';
+          _creditBalanceController.text = balance.abs().toStringAsFixed(2);
+        }
       }
 
       _phoneNumberController.text = account.phoneNumber ?? '';
@@ -108,8 +112,8 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         );
       }
     } else {
-      _debitBalanceController.text = '0.00';
-      _creditBalanceController.text = '0.00';
+      _debitBalanceController.text = '';
+      _creditBalanceController.text = '';
     }
 
     _debitBalanceController.addListener(() {
@@ -120,17 +124,51 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
     });
   }
 
+  String _getCurrencySymbol(String code) {
+    // Use the user's stored symbol for the base/default currency;
+    // for others, delegate to the shared formatter.
+    if (code == _baseCurrency) {
+      return ref.read(preferencesRepositoryProvider).getCurrencySymbol();
+    }
+    return CurrencyFormatter.getCurrencySymbol(code);
+  }
+
+  String _getLocalizedCurrencyName(String code, String fallbackName) {
+    final isAr = ref.read(localeControllerProvider)?.languageCode == 'ar';
+    switch (code.toUpperCase()) {
+      case 'USD': return isAr ? 'دولار أمريكي' : 'US Dollar';
+      case 'SAR': return isAr ? 'ريال سعودي' : 'Saudi Riyal';
+      case 'YER': return isAr ? 'ريال يمني' : 'Yemeni Rial';
+      case 'AED': return isAr ? 'درهم إماراتي' : 'UAE Dirham';
+      case 'EUR': return isAr ? 'يورو' : 'Euro';
+      case 'CUSTOM': return isAr ? 'مخصص / آخر' : 'Custom / Other';
+      default: return fallbackName;
+    }
+  }
+
   Future<void> _loadCurrencies() async {
+    // Read the user's configured base currency from preferences first
+    final prefCode = ref.read(defaultCurrencyProvider);
+    setState(() {
+      _baseCurrency = prefCode;
+      if (widget.accountToEdit == null) {
+        _selectedCurrency = prefCode;
+      }
+    });
+
+    // Then try to load the full list from DB for multi-currency accounts
     try {
       final currencyService = ref.read(currencyServiceProvider);
       final currencies = await currencyService.getAllCurrencies();
-      if (currencies.isNotEmpty) {
-        setState(() {
-          _selectedCurrency = currencies.first.code;
-        });
+      if (currencies.isNotEmpty && mounted) {
+        final dbCodes = currencies.map((c) => c.code).toList();
+        // Only update selectedCurrency if creating new and DB has matching code
+        if (widget.accountToEdit == null && dbCodes.contains(prefCode)) {
+          setState(() => _selectedCurrency = prefCode);
+        }
       }
     } catch (_) {
-      // Use default
+      // Use preference-based default already set above
     }
   }
 
@@ -140,6 +178,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
     _debitBalanceController.dispose();
     _creditBalanceController.dispose();
     _phoneNumberController.dispose();
+    _exchangeRateController.dispose();
     super.dispose();
   }
 
@@ -150,26 +189,34 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       });
       try {
         final name = _nameController.text;
-        final debitBalance =
-            double.tryParse(_debitBalanceController.text) ?? 0.0;
-        final creditBalance =
-            double.tryParse(_creditBalanceController.text) ?? 0.0;
+        final foreignDebit = double.tryParse(_debitBalanceController.text) ?? 0.0;
+        final foreignCredit = double.tryParse(_creditBalanceController.text) ?? 0.0;
         final phoneNumber = _phoneNumberController.text.isNotEmpty
             ? _phoneNumberController.text
             : null;
-        final classificationId = _selectedClassification?.id;
+        String? classificationId = _selectedClassification?.id;
+        if (classificationId == null) {
+          classificationId = await ref.read(accountsRepositoryProvider).getClassificationIdByName(kClassificationGeneral);
+        }
+        final exchangeRate = double.tryParse(_exchangeRateController.text) ?? 1.0;
 
-        // Calculate net balance (debit - credit)
-        final netBalance = debitBalance - creditBalance;
-        final int balanceCents = (netBalance * 100).round();
+        // Calculate foreign net balance
+        final foreignNetBalance = foreignDebit - foreignCredit;
+        
+        // Base currency balance for the main ledger
+        final double baseNetBalance = foreignNetBalance * exchangeRate;
+        final int balanceCents = (baseNetBalance * 100).round();
 
         // Build custom attributes for multi-currency support
         final customAttributes = {
           'currency': _selectedCurrency,
-          'debitBalance': debitBalance,
-          'creditBalance': creditBalance,
+          'exchangeRate': exchangeRate,
+          'foreignDebitBalance': foreignDebit,
+          'foreignCreditBalance': foreignCredit,
+          'foreignNetBalance': foreignNetBalance,
           'exchangeRates': _exchangeRates,
         };
+        final customAttributesStr = jsonEncode(customAttributes);
 
         if (widget.accountToEdit == null) {
           await ref
@@ -177,10 +224,10 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
               .createAccount(
                 name: name,
                 type: _selectedAccountType,
-                initialBalance: netBalance,
+                initialBalance: baseNetBalance,
                 phoneNumber: phoneNumber,
                 classificationId: classificationId,
-                customAttributes: customAttributes.toString(),
+                customAttributes: customAttributesStr,
               );
         } else {
           final updatedAccount = widget.accountToEdit!.copyWith(
@@ -189,7 +236,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
             initialBalance: balanceCents,
             phoneNumber: d.Value(phoneNumber),
             classificationId: d.Value(classificationId),
-            customAttributes: d.Value(customAttributes.toString()),
+            customAttributes: d.Value(customAttributesStr),
           );
           await ref
               .read(accountsRepositoryProvider)
@@ -227,8 +274,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       context: context,
       builder: (context) {
         String fromCurrency = _selectedCurrency;
-        String toCurrency = '';
-        double rate = 1.0;
+
         final fromController = TextEditingController(text: fromCurrency);
         final toController = TextEditingController();
         final rateController = TextEditingController(text: '1.0');
@@ -330,11 +376,9 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final classificationsAsync = ref.watch(classificationsStreamProvider);
     final translatedAccountTypes = _getTranslatedAccountTypes(l10n);
 
-    if (widget.accountToEdit != null &&
-        _selectedClassification?.name == 'Loading...') {
+    if (widget.accountToEdit != null && _selectedClassification?.name == 'Loading...') {
       _selectedClassification = _selectedClassification?.copyWith(
         name: l10n.loading,
       );
@@ -422,8 +466,14 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                           items: currencies.map((Currency currency) {
                             return DropdownMenuItem<String>(
                               value: currency.code,
-                              child: Text(
-                                '${currency.code} - ${currency.name}',
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                textDirection: TextDirection.ltr,
+                                children: [
+                                  Text(currency.code),
+                                  const Text(' - '),
+                                  Text(_getLocalizedCurrencyName(currency.code, currency.name)),
+                                ],
                               ),
                             );
                           }).toList(),
@@ -439,50 +489,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Classification
-                    classificationsAsync.when(
-                      data: (classifications) {
-                        final validIds = classifications
-                            .map((c) => c.id)
-                            .toSet();
-                        String? selectedId = _selectedClassification?.id;
-                        if (selectedId != null &&
-                            !validIds.contains(selectedId)) {
-                          selectedId = null;
-                        }
 
-                        return DropdownButtonFormField<String>(
-                          value: selectedId,
-                          hint: Text(l10n.classificationOptional),
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                          ),
-                          items: classifications.map((Classification cls) {
-                            return DropdownMenuItem<String>(
-                              value: cls.id,
-                              child: Text(
-                                _getLocalizedClassification(cls.name),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newId) {
-                            setState(() {
-                              if (newId == null) {
-                                _selectedClassification = null;
-                              } else {
-                                _selectedClassification = classifications
-                                    .firstWhere((c) => c.id == newId);
-                              }
-                            });
-                          },
-                        );
-                      },
-                      error: (err, stack) =>
-                          Text('${l10n.errorLoadingClassifications} $err'),
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                    ),
-                    const SizedBox(height: 16),
 
                     // Phone Number
                     TextFormField(
@@ -521,7 +528,8 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                         Icons.arrow_upward,
                                         color: Colors.green,
                                       ),
-                                      prefixText: '\$ ',
+                                      prefixText: '${_getCurrencySymbol(_selectedCurrency)} ',
+                                      hintText: '0.00',
                                     ),
                                     keyboardType:
                                         const TextInputType.numberWithOptions(
@@ -554,7 +562,8 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                         Icons.arrow_downward,
                                         color: Colors.red,
                                       ),
-                                      prefixText: '\$ ',
+                                      prefixText: '${_getCurrencySymbol(_selectedCurrency)} ',
+                                      hintText: '0.00',
                                     ),
                                     keyboardType:
                                         const TextInputType.numberWithOptions(
@@ -602,7 +611,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                     ),
                                   ),
                                   Text(
-                                    '\$${((double.tryParse(_debitBalanceController.text) ?? 0.0) - (double.tryParse(_creditBalanceController.text) ?? 0.0)).toStringAsFixed(2)}',
+                                    '$_selectedCurrency ${((double.tryParse(_debitBalanceController.text) ?? 0.0) - (double.tryParse(_creditBalanceController.text) ?? 0.0)).toStringAsFixed(2)}',
                                     style: TextStyle(
                                       color: Theme.of(
                                         context,
@@ -618,6 +627,81 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                         ),
                       ),
                     ),
+                    if (_selectedCurrency != _baseCurrency) ...[
+                      const SizedBox(height: 16),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.exchangeRateShort,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _exchangeRateController,
+                                decoration: InputDecoration(
+                                  labelText: l10n.exchangeRateShort,
+                                  border: const OutlineInputBorder(),
+                                  helperText: '1 $_selectedCurrency = ? $_baseCurrency',
+                                  prefixIcon: const Icon(Icons.currency_exchange),
+                                ),
+                                keyboardType: const TextInputType.numberWithOptions(
+                                  decimal: true,
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,6}'),
+                                  ),
+                                ],
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return l10n.pleaseEnterRate;
+                                  }
+                                  if (double.tryParse(value) == null ||
+                                      double.parse(value) <= 0) {
+                                    return l10n.pleaseEnterValidRate;
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) => setState(() {}),
+                              ),
+                              const SizedBox(height: 16),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surfaceVariant,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Base Equivalent',
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      '$_baseCurrency ${(((double.tryParse(_debitBalanceController.text) ?? 0.0) - (double.tryParse(_creditBalanceController.text) ?? 0.0)) * (double.tryParse(_exchangeRateController.text) ?? 1.0)).toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 16),
 
                     // Exchange Rates Section

@@ -24,33 +24,54 @@ import 'tools/financial_ratios_screen.dart';
 import 'budget_screen.dart';
 
 class ReportsHubScreen extends ConsumerWidget {
-  const ReportsHubScreen({super.key});
+  final bool isStandalone;
+
+  const ReportsHubScreen({super.key, this.isStandalone = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.reportsAndAnalytics),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.storefront),
-            tooltip: l10n.reportMarketplaceTooltip,
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const ReportMarketplaceScreen(),
-              ),
-            ),
-          ),
-        ],
-      ),
+      appBar: isStandalone
+          ? AppBar(
+              title: Text(l10n.reportsAndAnalytics),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.storefront),
+                  tooltip: l10n.reportMarketplaceTooltip,
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ReportMarketplaceScreen(),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : null,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (!isStandalone)
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.storefront),
+                    label: Text(l10n.reportMarketplaceTooltip),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ReportMarketplaceScreen(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             // SECTION 1: FINANCIAL STATEMENTS
             _buildSectionHeader(
               context,
@@ -62,47 +83,63 @@ class ReportsHubScreen extends ConsumerWidget {
                 title: l10n.profitAndLoss, // String (Correct)
                 icon: Icons.show_chart,
                 color: Colors.blue,
-                onTap: () => _nav(context, const ProfitAndLossScreen()),
+                onTap: () => _nav(
+                  context,
+                  const ProfitAndLossScreen(isStandalone: true),
+                ),
               ),
               _ReportCard(
                 title: l10n.balanceSheet, // String (Correct)
                 icon: Icons.account_balance_wallet,
                 color: Colors.indigo,
-                onTap: () => _nav(context, const BalanceSheetScreen()),
+                onTap: () =>
+                    _nav(context, const BalanceSheetScreen(isStandalone: true)),
               ),
               _ReportCard(
                 title: l10n.trialBalance, // String (Correct)
                 icon: Icons.scale,
                 color: Colors.teal,
-                onTap: () => _nav(context, const TrialBalanceScreen()),
+                onTap: () =>
+                    _nav(context, const TrialBalanceScreen(isStandalone: true)),
               ),
               _ReportCard(
                 // ✅ FIX: Use 'accountActivity' instead of 'generalLedger' (which doesn't exist)
                 title: l10n.accountActivity,
                 icon: Icons.menu_book,
                 color: Colors.blueGrey,
-                onTap: () => _nav(context, const AccountActivityScreen()),
+                onTap: () => _nav(
+                  context,
+                  const AccountActivityScreen(isStandalone: true),
+                ),
               ),
             ]),
 
             const SizedBox(height: 24),
 
             // SECTION 2: PERFORMANCE & SALES
-            _buildSectionHeader(context, l10n.performanceSection, Icons.bar_chart),
+            _buildSectionHeader(
+              context,
+              l10n.performanceSection,
+              Icons.bar_chart,
+            ),
             _buildGrid(context, [
               _ReportCard(
                 // ✅ FIX: Use 'totalAmountsReport' (String) instead of 'totalAmounts' (Function)
                 title: l10n.totalAmountsReport,
                 icon: Icons.pie_chart,
                 color: Colors.orange,
-                onTap: () => _nav(context, const TotalAmountsScreen()),
+                onTap: () =>
+                    _nav(context, const TotalAmountsScreen(isStandalone: true)),
               ),
               _ReportCard(
                 // ✅ FIX: Use 'monthlyAmountsReport' (String) instead of 'monthlyAmounts' (Function)
                 title: l10n.monthlyAmountsReport,
                 icon: Icons.calendar_month,
                 color: Colors.deepOrange,
-                onTap: () => _nav(context, const MonthlyAmountsScreen()),
+                onTap: () => _nav(
+                  context,
+                  const MonthlyAmountsScreen(isStandalone: true),
+                ),
               ),
               _ReportCard(
                 // ✅ FIX: Use localized string instead of hardcoded
@@ -116,7 +153,11 @@ class ReportsHubScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // SECTION 3: ANALYSIS TOOLS
-            _buildSectionHeader(context, l10n.analysisToolsSection, Icons.analytics),
+            _buildSectionHeader(
+              context,
+              l10n.analysisToolsSection,
+              Icons.analytics,
+            ),
             _buildGrid(context, [
               _ReportCard(
                 title: l10n.cvpAnalysisTitle,

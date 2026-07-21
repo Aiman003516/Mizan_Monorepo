@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:core_data/src/services/standard_costing_service.dart';
 
 /// Standard Costing Screen - Variance Analysis Calculator
@@ -111,18 +112,19 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Standard Costing'),
+        title: Text(l10n.standardCosting),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
-          tabs: const [
-            Tab(text: 'Standards', icon: Icon(Icons.settings)),
-            Tab(text: 'Materials', icon: Icon(Icons.inventory_2)),
-            Tab(text: 'Labor', icon: Icon(Icons.people)),
-            Tab(text: 'Overhead', icon: Icon(Icons.factory)),
+          tabs: [
+            Tab(text: l10n.standardsTab, icon: Icon(Icons.settings)),
+            Tab(text: l10n.materialsTab, icon: Icon(Icons.inventory_2)),
+            Tab(text: l10n.laborTab, icon: Icon(Icons.people)),
+            Tab(text: l10n.overheadTab, icon: Icon(Icons.factory)),
           ],
         ),
       ),
@@ -139,6 +141,7 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
   }
 
   Widget _buildStandardsTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -160,38 +163,46 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
                       Icon(Icons.assignment, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
-                        'Standard Cost Card',
+                        l10n.standardCostCard,
                         style: theme.textTheme.titleMedium,
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   _buildInputRow2(
-                    'Material Qty/Unit',
+                    l10n.materialQtyPerUnit,
                     _stdMaterialQtyController,
-                    'units',
+                    l10n.unitsLowercase,
                   ),
                   _buildInputRow2(
-                    'Material Price',
+                    l10n.materialPrice,
                     _stdMaterialPriceController,
-                    '\$/unit',
+                    l10n.perUnitSuffix,
                   ),
                   _buildInputRow2(
-                    'Labor Hours/Unit',
+                    l10n.laborHoursPerUnit,
                     _stdLaborHoursController,
-                    'hrs',
+                    l10n.hrsSuffix,
                   ),
                   _buildInputRow2(
-                    'Labor Rate',
+                    l10n.laborRate,
                     _stdLaborRateController,
-                    '\$/hr',
+                    l10n.perHrSuffix,
                   ),
-                  _buildInputRow2('VOH Rate', _stdVOHRateController, '\$/hr'),
-                  _buildInputRow2('Budgeted FOH', _budgetedFOHController, '\$'),
                   _buildInputRow2(
-                    'Normal Capacity',
+                    l10n.vohRate,
+                    _stdVOHRateController,
+                    l10n.perHrSuffix,
+                  ),
+                  _buildInputRow2(
+                    l10n.budgetedFoh,
+                    _budgetedFOHController,
+                    '\$',
+                  ),
+                  _buildInputRow2(
+                    l10n.normalCapacity,
                     _normalCapacityController,
-                    'hrs',
+                    l10n.hrsSuffix,
                   ),
                 ],
               ),
@@ -211,39 +222,39 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
                       Icon(Icons.precision_manufacturing, color: Colors.orange),
                       const SizedBox(width: 8),
                       Text(
-                        'Actual Production',
+                        l10n.actualProduction,
                         style: theme.textTheme.titleMedium,
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   _buildInputRow2(
-                    'Units Produced',
+                    l10n.unitsProduced,
                     _unitsProducedController,
                     '',
                   ),
                   _buildInputRow2(
-                    'Material Used',
+                    l10n.materialUsed,
                     _actualMaterialQtyController,
-                    'units',
+                    l10n.unitsLowercase,
                   ),
                   _buildInputRow2(
-                    'Material Price',
+                    l10n.materialPrice,
                     _actualMaterialPriceController,
-                    '\$/unit',
+                    l10n.perUnitSuffix,
                   ),
                   _buildInputRow2(
-                    'Labor Hours',
+                    l10n.laborHours,
                     _actualLaborHoursController,
-                    'hrs',
+                    l10n.hrsSuffix,
                   ),
                   _buildInputRow2(
-                    'Labor Rate',
+                    l10n.laborRate,
                     _actualLaborRateController,
-                    '\$/hr',
+                    l10n.perHrSuffix,
                   ),
-                  _buildInputRow2('Actual VOH', _actualVOHController, '\$'),
-                  _buildInputRow2('Actual FOH', _actualFOHController, '\$'),
+                  _buildInputRow2(l10n.actualVoh, _actualVOHController, '\$'),
+                  _buildInputRow2(l10n.actualFoh, _actualFOHController, '\$'),
                 ],
               ),
             ),
@@ -287,6 +298,7 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
   }
 
   Widget _buildSummaryBanner(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     final report = _report!;
     final isNetFavorable = report.isNetFavorable;
     final color = isNetFavorable ? Colors.green : Colors.red;
@@ -308,14 +320,16 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Total Variance: ${_formatCurrency(report.totalVariance)}',
+                    l10n.totalVarianceValue(
+                      _formatCurrency(report.totalVariance),
+                    ),
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: color,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    isNetFavorable ? 'Net Favorable' : 'Net Unfavorable',
+                    isNetFavorable ? l10n.netFavorable : l10n.netUnfavorable,
                     style: TextStyle(color: color),
                   ),
                 ],
@@ -328,8 +342,9 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
   }
 
   Widget _buildMaterialsTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     if (_report == null) {
-      return const Center(child: Text('Enter data to see analysis'));
+      return Center(child: Text(l10n.enterFinancialData));
     }
 
     final mv = _report!.materialVariance;
@@ -340,7 +355,7 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
         children: [
           _buildVarianceHeader(
             theme,
-            'Direct Materials Variance',
+            l10n.directMaterialsVariance,
             Icons.inventory_2,
             mv.totalVariance,
             mv.totalVariance < 0,
@@ -353,11 +368,19 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _buildComparisonRow('Standard Cost', mv.standardCost, theme),
-                  _buildComparisonRow('Actual Cost', mv.actualCost, theme),
+                  _buildComparisonRow(
+                    l10n.standardCost,
+                    mv.standardCost,
+                    theme,
+                  ),
+                  _buildComparisonRow(
+                    l10n.actualCostResult,
+                    mv.actualCost,
+                    theme,
+                  ),
                   const Divider(),
                   _buildComparisonRow(
-                    'Total Variance',
+                    l10n.totalVarianceLabel,
                     mv.totalVariance,
                     theme,
                     highlight: true,
@@ -376,19 +399,19 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Variance Breakdown',
+                    l10n.varianceBreakdown,
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 16),
                   _buildVarianceRow(
-                    'Price Variance',
+                    l10n.priceVarianceResult,
                     '(AP - SP) × AQ',
                     mv.priceVariance,
                     mv.priceVarianceFavorable,
                   ),
                   const SizedBox(height: 12),
                   _buildVarianceRow(
-                    'Quantity Variance',
+                    l10n.quantityVarianceResult,
                     '(AQ - SQ) × SP',
                     mv.quantityVariance,
                     mv.quantityVarianceFavorable,
@@ -400,9 +423,8 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
           const SizedBox(height: 16),
 
           // Formula Card
-          _buildFormulaCard(theme, 'Materials Formulas', [
-            'Price Variance = (Actual Price - Standard Price) × Actual Qty',
-            'Quantity Variance = (Actual Qty - Standard Qty) × Standard Price',
+          _buildFormulaCard(theme, l10n.materialsFormulasTitle, [
+            l10n.materialsFormulasDesc,
           ]),
         ],
       ),
@@ -410,8 +432,9 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
   }
 
   Widget _buildLaborTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     if (_report == null) {
-      return const Center(child: Text('Enter data to see analysis'));
+      return Center(child: Text(l10n.enterFinancialData));
     }
 
     final lv = _report!.laborVariance;
@@ -422,7 +445,7 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
         children: [
           _buildVarianceHeader(
             theme,
-            'Direct Labor Variance',
+            l10n.directLaborVariance,
             Icons.people,
             lv.totalVariance,
             lv.totalVariance < 0,
@@ -435,11 +458,19 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _buildComparisonRow('Standard Cost', lv.standardCost, theme),
-                  _buildComparisonRow('Actual Cost', lv.actualCost, theme),
+                  _buildComparisonRow(
+                    l10n.standardCost,
+                    lv.standardCost,
+                    theme,
+                  ),
+                  _buildComparisonRow(
+                    l10n.actualCostResult,
+                    lv.actualCost,
+                    theme,
+                  ),
                   const Divider(),
                   _buildComparisonRow(
-                    'Total Variance',
+                    l10n.totalVarianceLabel,
                     lv.totalVariance,
                     theme,
                     highlight: true,
@@ -458,19 +489,19 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Variance Breakdown',
+                    l10n.varianceBreakdown,
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 16),
                   _buildVarianceRow(
-                    'Rate Variance',
+                    l10n.rateVarianceResult,
                     '(AR - SR) × AH',
                     lv.rateVariance,
                     lv.rateVarianceFavorable,
                   ),
                   const SizedBox(height: 12),
                   _buildVarianceRow(
-                    'Efficiency Variance',
+                    l10n.efficiencyVarianceResult,
                     '(AH - SH) × SR',
                     lv.efficiencyVariance,
                     lv.efficiencyVarianceFavorable,
@@ -481,9 +512,8 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
           ),
           const SizedBox(height: 16),
 
-          _buildFormulaCard(theme, 'Labor Formulas', [
-            'Rate Variance = (Actual Rate - Standard Rate) × Actual Hours',
-            'Efficiency Variance = (Actual Hours - Std Hours) × Std Rate',
+          _buildFormulaCard(theme, l10n.laborFormulasTitle, [
+            l10n.laborFormulasDesc,
           ]),
         ],
       ),
@@ -491,8 +521,9 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
   }
 
   Widget _buildOverheadTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     if (_report == null) {
-      return const Center(child: Text('Enter data to see analysis'));
+      return Center(child: Text(l10n.enterFinancialData));
     }
 
     final ov = _report!.overheadVariance;
@@ -503,7 +534,7 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
         children: [
           _buildVarianceHeader(
             theme,
-            'Manufacturing Overhead Variance',
+            l10n.manufacturingOverheadVariance,
             Icons.factory,
             ov.totalVariance,
             ov.isOverApplied,
@@ -517,25 +548,25 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
               child: Column(
                 children: [
                   _buildComparisonRow(
-                    'Applied Overhead',
+                    l10n.appliedOverhead,
                     ov.standardOverhead,
                     theme,
                   ),
                   _buildComparisonRow(
-                    'Actual Overhead',
+                    l10n.actualOverhead,
                     ov.actualOverhead,
                     theme,
                   ),
                   const Divider(),
                   _buildComparisonRow(
-                    'Total Variance',
+                    l10n.totalVarianceLabel,
                     ov.totalVariance,
                     theme,
                     highlight: true,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    ov.isOverApplied ? 'Overapplied' : 'Underapplied',
+                    ov.isOverApplied ? l10n.overapplied : l10n.underapplied,
                     style: TextStyle(
                       color: ov.isOverApplied ? Colors.green : Colors.red,
                       fontWeight: FontWeight.bold,
@@ -554,17 +585,20 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Variable Overhead', style: theme.textTheme.titleMedium),
+                  Text(
+                    l10n.variableOverhead,
+                    style: theme.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 16),
                   _buildVarianceRow(
-                    'Spending Variance',
+                    l10n.spendingVariance,
                     'Actual VOH - (AH × SR)',
                     ov.variableSpendingVariance,
                     ov.variableSpendingVariance < 0,
                   ),
                   const SizedBox(height: 12),
                   _buildVarianceRow(
-                    'Efficiency Variance',
+                    l10n.efficiencyVarianceResult,
                     '(AH - SH) × SR',
                     ov.variableEfficiencyVariance,
                     ov.variableEfficiencyVariance < 0,
@@ -582,17 +616,17 @@ class _StandardCostingScreenState extends State<StandardCostingScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Fixed Overhead', style: theme.textTheme.titleMedium),
+                  Text(l10n.fixedOverhead, style: theme.textTheme.titleMedium),
                   const SizedBox(height: 16),
                   _buildVarianceRow(
-                    'Budget Variance',
+                    l10n.budgetVariance,
                     'Actual FOH - Budgeted FOH',
                     ov.fixedBudgetVariance,
                     ov.fixedBudgetVariance < 0,
                   ),
                   const SizedBox(height: 12),
                   _buildVarianceRow(
-                    'Volume Variance',
+                    l10n.volumeVariance,
                     'Budgeted FOH - Applied FOH',
                     ov.fixedVolumeVariance,
                     ov.fixedVolumeVariance < 0,

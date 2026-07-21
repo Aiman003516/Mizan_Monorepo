@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 import '../data/reports_service.dart';
+import 'package:core_l10n/app_localizations.dart';
 
 /// Provider for financial ratios
 final financialRatiosProvider = FutureProvider<FinancialRatios>((ref) async {
@@ -81,6 +82,7 @@ class FinancialRatiosWidget extends ConsumerWidget {
     final ratiosAsync = ref.watch(financialRatiosProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return ratiosAsync.when(
       loading: () => const Card(
@@ -105,7 +107,7 @@ class FinancialRatiosWidget extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Financial Ratios',
+                    l10n.financialRatiosTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -121,7 +123,7 @@ class FinancialRatiosWidget extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: _RatioTile(
-                      label: 'Current Ratio',
+                      label: l10n.currentRatioTitle,
                       value: ratios.currentRatio.toStringAsFixed(2),
                       icon: Icons.account_balance_wallet,
                       isGood: ratios.currentRatio >= 1.5,
@@ -130,7 +132,7 @@ class FinancialRatiosWidget extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _RatioTile(
-                      label: 'Debt/Equity',
+                      label: l10n.debtEquityTitle,
                       value: ratios.debtToEquity.toStringAsFixed(2),
                       icon: Icons.balance,
                       isGood: ratios.debtToEquity < 2,
@@ -143,7 +145,7 @@ class FinancialRatiosWidget extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: _RatioTile(
-                      label: 'Net Margin',
+                      label: l10n.netMarginTitle,
                       value: '${ratios.netProfitMargin.toStringAsFixed(1)}%',
                       icon: Icons.trending_up,
                       isGood: ratios.netProfitMargin > 0,
@@ -152,7 +154,7 @@ class FinancialRatiosWidget extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _RatioTile(
-                      label: 'ROA',
+                      label: l10n.roaTitle,
                       value: '${ratios.returnOnAssets.toStringAsFixed(1)}%',
                       icon: Icons.pie_chart,
                       isGood: ratios.returnOnAssets > 0,
@@ -174,7 +176,10 @@ class FinancialRatiosWidget extends ConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Working Capital', style: theme.textTheme.bodyMedium),
+                    Text(
+                      l10n.workingCapital,
+                      style: theme.textTheme.bodyMedium,
+                    ),
                     Text(
                       '\$${ratios.workingCapital.toStringAsFixed(0)}',
                       style: theme.textTheme.titleMedium?.copyWith(

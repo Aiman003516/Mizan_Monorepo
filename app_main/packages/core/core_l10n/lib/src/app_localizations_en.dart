@@ -9,6 +9,18 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get allReportsAndTools => 'All Reports & Tools';
+
+  @override
+  String get businessInsights => 'Business Insights';
+
+  @override
+  String get setupBusinessCloud => 'Setup Business Cloud';
+
+  @override
+  String get manageRoles => 'Manage Roles';
+
+  @override
   String get settings => 'Settings';
 
   @override
@@ -107,7 +119,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get type => 'Type:';
 
   @override
-  String get balance => 'Balance:';
+  String get balance => 'Balance';
 
   @override
   String get phone => 'Phone';
@@ -271,7 +283,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectCategory => 'Select a Category';
 
   @override
-  String get errorLoadingCategories => 'Error loading categories:';
+  String errorLoadingCategories(String error) {
+    return 'Error loading categories:';
+  }
 
   @override
   String get productName => 'Product Name';
@@ -925,8 +939,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get payToAccount => 'Pay To Account';
 
   @override
-  String get pleaseEnterValidAmount =>
-      'Please enter a valid amount greater than zero';
+  String get pleaseEnterValidAmount => 'Please enter a valid amount > 0';
 
   @override
   String get supplier => 'Supplier';
@@ -1407,7 +1420,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get address => 'Address';
 
   @override
-  String get taxId => 'Tax ID / VAT Number';
+  String get taxId => 'Tax ID';
 
   @override
   String get creditLimit => 'Credit Limit';
@@ -1456,7 +1469,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createInvoice => 'Create Invoice';
 
   @override
-  String get invoiceCreated => 'Invoice created';
+  String get invoiceCreated => 'Invoice created successfully';
 
   @override
   String get noInvoicesYet => 'No invoices yet';
@@ -1504,7 +1517,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allInvoicesPaid => 'All invoices are paid!';
 
   @override
-  String get customersWithBalances => 'customers with balances';
+  String customersWithBalances(int count) {
+    return '$count customers with balances';
+  }
 
   @override
   String get vendors => 'Vendors';
@@ -1522,7 +1537,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vendorName => 'Vendor Name';
 
   @override
-  String get paymentTerms => 'Payment Terms';
+  String get paymentTerms => 'Payment Terms (e.g., Net 30)';
 
   @override
   String get noVendorsYet => 'No vendors yet';
@@ -1550,7 +1565,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createBill => 'Create Bill';
 
   @override
-  String get billCreated => 'Bill created';
+  String get billCreated => 'Bill created successfully';
 
   @override
   String get noBillsYet => 'No bills yet';
@@ -1574,7 +1589,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allBillsPaid => 'All bills are paid!';
 
   @override
-  String get vendorsWithBalances => 'vendors with balances';
+  String vendorsWithBalances(int count) {
+    return '$count vendors with balances';
+  }
 
   @override
   String get statementOfCashFlows => 'Statement of Cash Flows';
@@ -2648,10 +2665,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editVendorForm => 'Edit Vendor';
 
   @override
-  String get vendorCreated => 'Vendor created';
+  String get vendorCreated => 'Vendor created successfully';
 
   @override
-  String get vendorUpdated => 'Vendor updated';
+  String get vendorUpdated => 'Vendor updated successfully';
 
   @override
   String get vendorDetailTitle => 'Vendor';
@@ -2669,10 +2686,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editCustomerForm => 'Edit Customer';
 
   @override
-  String get customerCreated => 'Customer created';
+  String get customerCreated => 'Customer created successfully';
 
   @override
-  String get customerUpdated => 'Customer updated';
+  String get customerUpdated => 'Customer updated successfully';
 
   @override
   String get customerDetailTitle => 'Customer';
@@ -2684,7 +2701,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preventsNewInvoices => 'Prevents new invoices/orders';
 
   @override
-  String get pleaseAddLineItem => 'Please add at least one line item';
+  String get pleaseAddLineItem =>
+      'Please add at least one line item with an amount.';
 
   @override
   String get saveBtn => 'Save';
@@ -2712,9 +2730,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get staffManagement => 'Staff Management';
-
-  @override
-  String get manageRoles => 'Manage Roles';
 
   @override
   String get changeRole => 'Change Role';
@@ -3645,4 +3660,684 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveAccount => 'Save Account';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account? Sign In';
+
+  @override
+  String get needAccount => 'Need an account? Sign Up';
+
+  @override
+  String get enterEmailAndPassword => 'Please enter both email and password.';
+
+  @override
+  String get signUpSubtitle => 'Sign up to create your business';
+
+  @override
+  String get orSeparator => 'OR';
+
+  @override
+  String get paidFeatureTitle => 'Paid Feature';
+
+  @override
+  String get paidFeatureMessage =>
+      'This feature requires an active subscription and account login. Please sign in and subscribe to access staff and roles management.';
+
+  @override
+  String get signInToAccess => 'Sign In';
+
+  @override
+  String get nameIsRequired => 'Name is required';
+
+  @override
+  String get permissionsLabel => 'Permissions';
+
+  @override
+  String get permViewDashboard => 'View Dashboard';
+
+  @override
+  String get permViewFinancialReports => 'View Financial Reports';
+
+  @override
+  String get permPerformSale => 'Perform Sales (POS)';
+
+  @override
+  String get permVoidTransaction => 'Void/Delete Transactions';
+
+  @override
+  String get permProcessRefund => 'Process Refunds';
+
+  @override
+  String get permViewSalesHistory => 'View Sales History';
+
+  @override
+  String get permViewInventory => 'View Inventory';
+
+  @override
+  String get permManageProducts => 'Add/Edit Products';
+
+  @override
+  String get permAdjustInventory => 'Stock Adjustments';
+
+  @override
+  String get permManageStaff => 'Manage Staff & Roles';
+
+  @override
+  String get permManageSettings => 'System Settings';
+
+  @override
+  String get permSwitchTenant => 'Switch Business Branch';
+
+  @override
+  String get manageSubscription => 'Manage Subscription';
+
+  @override
+  String get availablePlans => 'Available Plans';
+
+  @override
+  String get enterpriseMonthlyPlan => 'Enterprise (Monthly)';
+
+  @override
+  String get enterpriseMonthlyPrice => '\$30 / month';
+
+  @override
+  String get freeTierPlan => 'Free Tier';
+
+  @override
+  String get freeTierPrice => '\$0 / forever';
+
+  @override
+  String get featureCloudSync => 'Cloud Sync';
+
+  @override
+  String get featureMultiUser => 'Multi-User';
+
+  @override
+  String get featureWebAccess => 'Web Access';
+
+  @override
+  String get featureLocalOnly => 'Local Only';
+
+  @override
+  String get featureManualBackup => 'Manual Backup';
+
+  @override
+  String get currentPlanLabel => 'CURRENT PLAN';
+
+  @override
+  String planStatusLabel(String status) {
+    return 'Status: $status';
+  }
+
+  @override
+  String planRenewsLabel(String date) {
+    return 'Renews: $date';
+  }
+
+  @override
+  String get planNeverExpires => 'Never';
+
+  @override
+  String get buyButton => 'Buy';
+
+  @override
+  String get subscriptionUnavailable =>
+      'Subscriptions are not available while offline. Please sign in to manage your subscription.';
+
+  @override
+  String get confirmMockPurchase => 'Confirm Purchase';
+
+  @override
+  String simulatePaymentFor(String planName) {
+    return 'Simulate payment for $planName?';
+  }
+
+  @override
+  String get payNowMock => 'Pay Now (Demo)';
+
+  @override
+  String get mockPaymentSuccess => '✅ Demo Payment Successful!';
+
+  @override
+  String get noStaffFound => 'No staff found. Invite someone!';
+
+  @override
+  String get ownerRole => 'Owner';
+
+  @override
+  String staffRoleAndEmail(String roleId, String email) {
+    return 'Role: $roleId • $email';
+  }
+
+  @override
+  String removeStaffTitle(String name) {
+    return 'Remove $name?';
+  }
+
+  @override
+  String get removeStaffWarning =>
+      'They will lose access to this business immediately.';
+
+  @override
+  String get inviteStaff => 'Invite Staff';
+
+  @override
+  String get stepSelectRole => '1. Select a Role';
+
+  @override
+  String get chooseRoleHint => 'Choose Role (e.g. Cashier)';
+
+  @override
+  String errorLoadingRoles(String error) {
+    return 'Error loading roles: $error';
+  }
+
+  @override
+  String get generateInviteCode => 'Generate Invite Code';
+
+  @override
+  String get stepShareCode => '2. Share Code';
+
+  @override
+  String get validFor24Hours => 'Valid for 24 hours';
+
+  @override
+  String get shareViaApp => 'Share via WhatsApp / Telegram';
+
+  @override
+  String inviteShareText(String code) {
+    return 'Join my business on Mizan!\n\n1. Download the App\n2. Sign In\n3. Select \'Join Business\' and enter code: $code\n\n(Valid for 24 hours)';
+  }
+
+  @override
+  String get validInviteCodeTitle => 'Valid Invite Code!';
+
+  @override
+  String roleLabel(String roleId) {
+    return 'Role: $roleId';
+  }
+
+  @override
+  String get pleaseEnterYourName => 'Please enter your name';
+
+  @override
+  String get orText => 'or';
+
+  @override
+  String appVersion(String version) {
+    return 'Mizan App v$version';
+  }
+
+  @override
+  String get invalidNumber => 'Invalid number';
+
+  @override
+  String get requiredField => 'This field is required';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String get redFlags => 'Red Flags';
+
+  @override
+  String get dsriDescription => 'Receivables/Sales';
+
+  @override
+  String get gmiDescription => 'Gross Margin';
+
+  @override
+  String get aqiDescription => 'Asset Quality';
+
+  @override
+  String get sgiDescription => 'Sales Growth';
+
+  @override
+  String get depiDescription => 'Depreciation';
+
+  @override
+  String get sgaiDescription => 'SG&A Expenses';
+
+  @override
+  String get tataDescription => 'Accruals';
+
+  @override
+  String get lvgiDescription => 'Leverage';
+
+  @override
+  String get whatIsMScore => 'What is the Beneish M-Score?';
+
+  @override
+  String get mScoreDescription =>
+      'The M-Score is a mathematical model created by Professor Messod Beneish that uses financial ratios to detect whether a company has manipulated its earnings.\n\nAn M-Score greater than -1.78 suggests a HIGH probability (76%) that the company is an earnings manipulator.';
+
+  @override
+  String get dsriName => 'Days Sales in Receivables Index';
+
+  @override
+  String get dsriExpl => 'Measures if receivables grew faster than sales';
+
+  @override
+  String get gmiName => 'Gross Margin Index';
+
+  @override
+  String get gmiExpl => 'Detects deteriorating gross margins';
+
+  @override
+  String get aqiName => 'Asset Quality Index';
+
+  @override
+  String get aqiExpl => 'Identifies expense capitalization';
+
+  @override
+  String get sgiName => 'Sales Growth Index';
+
+  @override
+  String get sgiExpl => 'High growth creates manipulation pressure';
+
+  @override
+  String get depiName => 'Depreciation Index';
+
+  @override
+  String get depiExpl => 'Detects slowing depreciation rates';
+
+  @override
+  String get sgaiName => 'SG&A Index';
+
+  @override
+  String get sgaiExpl => 'Measures administrative efficiency';
+
+  @override
+  String get tataName => 'Total Accruals to Total Assets';
+
+  @override
+  String get tataExpl => 'High accruals vs cash = low quality';
+
+  @override
+  String get lvgiName => 'Leverage Index';
+
+  @override
+  String get lvgiExpl => 'Increasing debt creates pressure';
+
+  @override
+  String get famousCasesDesc =>
+      '• Enron (2001): Would have had M-Score > -1.78\n• WorldCom (2002): High TATA due to expense capitalization\n• Satyam (2009): High DSRI from fictitious receivables\n\nThe M-Score correctly identified 76% of manipulators in backtesting studies.';
+
+  @override
+  String get mScoreThresholdLabel =>
+      'Threshold: > -1.78 indicates manipulation';
+
+  @override
+  String get riskLevelHigh => 'HIGH';
+
+  @override
+  String get riskLevelModerate => 'MODERATE';
+
+  @override
+  String get riskLevelLow => 'LOW';
+
+  @override
+  String get unitsLowercase => 'units';
+
+  @override
+  String get flexibleBudgetResult => 'Flexible Budget';
+
+  @override
+  String get varianceFormulas =>
+      '• Static Budget = Fixed + (Variable × Planned Activity)\n• Flexible Budget = Fixed + (Variable × Actual Activity)\n• Volume Variance = Flexible - Static\n• Spending Variance = Actual - Flexible';
+
+  @override
+  String get materialQtyPerUnit => 'Material Qty/Unit';
+
+  @override
+  String get laborHoursPerUnit => 'Labor Hours/Unit';
+
+  @override
+  String get perHrSuffix => '\$/hr';
+
+  @override
+  String totalVarianceValue(String amount) {
+    return 'Total Variance: $amount';
+  }
+
+  @override
+  String get actualCostResult => 'Actual Cost';
+
+  @override
+  String get priceVarianceResult => 'Price Variance';
+
+  @override
+  String get quantityVarianceResult => 'Quantity Variance';
+
+  @override
+  String get materialsFormulasTitle => 'Materials Formulas';
+
+  @override
+  String get materialsFormulasDesc =>
+      '• Price Variance = (Actual Price - Standard Price) × Actual Qty\n• Quantity Variance = (Actual Qty - Standard Qty) × Standard Price';
+
+  @override
+  String get rateVarianceResult => 'Rate Variance';
+
+  @override
+  String get efficiencyVarianceResult => 'Efficiency Variance';
+
+  @override
+  String get laborFormulasTitle => 'Labor Formulas';
+
+  @override
+  String get laborFormulasDesc =>
+      '• Rate Variance = (Actual Rate - Standard Rate) × Actual Hours\n• Efficiency Variance = (Actual Hours - Std Hours) × Std Rate';
+
+  @override
+  String get currentRatioTitle => 'Current Ratio';
+
+  @override
+  String get debtEquityTitle => 'Debt/Equity';
+
+  @override
+  String get netMarginTitle => 'Net Margin';
+
+  @override
+  String get roaTitle => 'ROA';
+
+  @override
+  String get ratioCol => 'Ratio';
+
+  @override
+  String get valueCol => 'Value';
+
+  @override
+  String get benchmarkCol => 'Benchmark';
+
+  @override
+  String get statusCol => 'Status';
+
+  @override
+  String get descriptionCol => 'Description';
+
+  @override
+  String get totalVarianceLabel => 'Total Variance';
+
+  @override
+  String get enterpriseLicenseActive => 'Enterprise License Active';
+
+  @override
+  String get systemAdministrator => 'You are the System Administrator';
+
+  @override
+  String get defineStaffPermissions => 'Define staff permissions';
+
+  @override
+  String get viewPlansBilling => 'View plans & billing';
+
+  @override
+  String get manageStaff => 'Manage Staff';
+
+  @override
+  String get viewListInviteMembers => 'View list & invite members';
+
+  @override
+  String get activateBusinessLicense => 'Activate Business License';
+
+  @override
+  String get initializeSystemClaimOwnership =>
+      'Initialize system & claim ownership';
+
+  @override
+  String get notLoggedInWarning =>
+      '⚠️ You are not logged in! Please Sign In first.';
+
+  @override
+  String get systemActivatedWelcome => '✅ System Activated! Welcome, Admin.';
+
+  @override
+  String activationFailed(String error) {
+    return '❌ Activation Failed: $error';
+  }
+
+  @override
+  String get premiumReportWarning =>
+      '🔒 Premium Report. Upgrade to Pro or Enterprise.';
+
+  @override
+  String buyReportPrompt(String reportTitle) {
+    return 'Buy \'\'$reportTitle\'\' for \$4.99?';
+  }
+
+  @override
+  String get buyNowAction => 'Buy Now';
+
+  @override
+  String installedSuccessfully(String reportTitle) {
+    return '✅ Installed $reportTitle';
+  }
+
+  @override
+  String get noStandardReportsFound => 'No standard reports found online.';
+
+  @override
+  String get installAction => 'Install';
+
+  @override
+  String get includedAction => 'Included';
+
+  @override
+  String get buyPriceAction => 'Buy \$4.99';
+
+  @override
+  String get lockedAction => 'Locked';
+
+  @override
+  String get retailBusinessTemplate => 'Retail Business';
+
+  @override
+  String get serviceBusinessTemplate => 'Service Business';
+
+  @override
+  String get customersAr => 'Customers (AR)';
+
+  @override
+  String get vendorsAp => 'Vendors (AP)';
+
+  @override
+  String get openingBalanceHint =>
+      'Opening Balance (Owes You). Input 0 if no balance.';
+
+  @override
+  String get openingBalanceHintVendor =>
+      'Opening Balance (You Owe). Input 0 if no balance.';
+
+  @override
+  String get emailOptional => 'Email (Optional)';
+
+  @override
+  String get phoneOptional => 'Phone (Optional)';
+
+  @override
+  String get addressOptional => 'Address (Optional)';
+
+  @override
+  String get taxIdOptional => 'Tax ID / VAT Number (Optional)';
+
+  @override
+  String get paymentTermsOptional => 'Payment Terms (Optional)';
+
+  @override
+  String get creditLimitOptional => 'Credit Limit (Optional)';
+
+  @override
+  String get notesOptional => 'Notes (Optional)';
+
+  @override
+  String get searchCustomers => 'Search Customers...';
+
+  @override
+  String get searchVendors => 'Search Vendors...';
+
+  @override
+  String get customerDetails => 'Customer Details';
+
+  @override
+  String get vendorDetails => 'Vendor Details';
+
+  @override
+  String get contactInfo => 'Contact Information';
+
+  @override
+  String get noAddressProvided => 'No address provided';
+
+  @override
+  String get noEmailProvided => 'No email provided';
+
+  @override
+  String get noPhoneProvided => 'No phone provided';
+
+  @override
+  String get noTaxIdProvided => 'No Tax ID provided';
+
+  @override
+  String get noNotesProvided => 'No notes provided';
+
+  @override
+  String get noPaymentTermsProvided => 'No payment terms provided';
+
+  @override
+  String get financialOverview => 'Financial Overview';
+
+  @override
+  String get currentBalance => 'Current Balance';
+
+  @override
+  String get totalInvoiced => 'Total Invoiced';
+
+  @override
+  String get totalPaid => 'Total Paid';
+
+  @override
+  String get recentInvoices => 'Recent Invoices';
+
+  @override
+  String get recentBills => 'Recent Bills';
+
+  @override
+  String get noRecentInvoices => 'No recent invoices.';
+
+  @override
+  String get noRecentBills => 'No recent bills.';
+
+  @override
+  String get viewAll => 'View All';
+
+  @override
+  String get actions => 'Actions';
+
+  @override
+  String get receivePayment => 'Receive Payment';
+
+  @override
+  String get statement => 'Statement';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get unpaid => 'Unpaid';
+
+  @override
+  String get partiallyPaid => 'Partially Paid';
+
+  @override
+  String get vendor => 'Vendor';
+
+  @override
+  String get addFirstCustomer =>
+      'Tap the button below to add your first customer';
+
+  @override
+  String get noCustomersMatch => 'No customers match your search.';
+
+  @override
+  String get customerBalances => 'Customer Balances';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String get addFirstVendor => 'Tap the button below to add your first vendor';
+
+  @override
+  String get noVendorsMatch => 'No vendors match your search.';
+
+  @override
+  String get vendorBalances => 'Vendor Balances';
+
+  @override
+  String get outstandingBalance => 'Outstanding Balance';
+
+  @override
+  String get quickLedgerAdjustment => 'Quick Ledger Adjustment';
+
+  @override
+  String get creating => 'Creating...';
+
+  @override
+  String get qty => 'Qty';
+
+  @override
+  String get pleaseAddLineItemBill =>
+      'Please add at least one line item with an amount.';
+
+  @override
+  String get vendorInvoiceNumberOptional => 'Vendor Invoice # (Optional)';
+
+  @override
+  String get current0To30 => 'Current\n(0-30)';
+
+  @override
+  String get days31To60 => '31-60\nDays';
+
+  @override
+  String get days61To90 => '61-90\nDays';
+
+  @override
+  String get days90Plus => '90+\nDays';
+
+  @override
+  String get days31To60Short => '31-60';
+
+  @override
+  String get days61To90Short => '61-90';
+
+  @override
+  String get days90PlusShort => '90+';
+
+  @override
+  String adjustBalance(String name) {
+    return 'Adjust Balance: $name';
+  }
+
+  @override
+  String get charge => 'Charge (+)';
+
+  @override
+  String get receive => 'Receive (-)';
+
+  @override
+  String get increasesDebt => 'Increases their debt to you';
+
+  @override
+  String get decreasesDebt => 'Decreases their debt (routes to Cash)';
+
+  @override
+  String get saveAdjustment => 'Save Adjustment';
 }

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // --- Core Packages ---
@@ -18,6 +18,8 @@ import 'package:core_ui/core_ui.dart'; // 🟢 NEW: AppTheme
 import 'package:local_auth/local_auth.dart'; // 🟢 NEW: Biometrics
 import 'package:window_manager/window_manager.dart'; // 🟢 Window Management
 
+import 'package:workmanager/workmanager.dart'; // 🟢 NEW: Background Sync
+
 // --- Feature Aliases ---
 import 'package:feature_transactions/feature_transactions.dart'
     as transactions_ui;
@@ -27,6 +29,23 @@ import 'src/app_localizations_provider.dart' as app_l10n;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Background Sync Worker (Only needed on Mobile usually)
+  if (Platform.isAndroid || Platform.isIOS) {
+    Workmanager().initialize(
+      callbackDispatcher, // The top level function from feature_sync
+      isInDebugMode: true, // If enabled it will post a notification whenever the task is running
+    );
+    // Register the task to run periodically when connected
+    Workmanager().registerPeriodicTask(
+      "1",
+      "silentBackupTask",
+      frequency: const Duration(hours: 1), // Minimum is usually 15 mins on Android
+      constraints: Constraints(
+        networkType: NetworkType.connected, // Only run when internet is available
+      ),
+    );
+  }
 
   // 🖥️ WINDOWS: Initialize window manager for size/position retention
   if (Platform.isWindows) {
@@ -59,7 +78,10 @@ Future<void> main() async {
     });
   }
 
-  await Firebase.initializeApp(options: MizanFirebaseConfig.currentPlatform);
+  await Supabase.initialize(
+    url: EnvConfig.supabaseUrl,
+    anonKey: EnvConfig.supabaseAnonKey,
+  );
 
   final overrides = await Bootstrap.init();
 

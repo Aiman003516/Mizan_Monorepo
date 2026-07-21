@@ -208,7 +208,10 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.discountRateLabel, style: theme.textTheme.titleMedium),
+                  Text(
+                    l10n.discountRateLabel,
+                    style: theme.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -367,9 +370,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
   Widget _buildResultsTab(ThemeData theme) {
     final l10n = AppLocalizations.of(context)!;
     if (_npvResult == null) {
-      return Center(
-        child: Text(l10n.enterDataCalculator),
-      );
+      return Center(child: Text(l10n.enterDataCalculator));
     }
 
     final requiredReturn =
@@ -492,7 +493,9 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                 const SizedBox(width: 8),
                 Icon(
                   isGood ? Icons.check_circle : Icons.cancel,
-                  color: isGood ? context.appColors.success : context.appColors.error,
+                  color: isGood
+                      ? context.appColors.success
+                      : context.appColors.error,
                 ),
               ],
             ),
@@ -501,7 +504,9 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
               value,
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: isGood ? context.appColors.success : context.appColors.error,
+                color: isGood
+                    ? context.appColors.success
+                    : context.appColors.error,
               ),
             ),
             const SizedBox(height: 8),
@@ -548,7 +553,9 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
     final isAccept = acceptCount > rejectCount;
 
     return Card(
-      color: isAccept ? context.appColors.success.withValues(alpha: 0.1) : context.appColors.error.withValues(alpha: 0.1),
+      color: isAccept
+          ? context.appColors.success.withValues(alpha: 0.1)
+          : context.appColors.error.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -556,14 +563,18 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
             Icon(
               isAccept ? Icons.thumb_up : Icons.thumb_down,
               size: 48,
-              color: isAccept ? context.appColors.success : context.appColors.error,
+              color: isAccept
+                  ? context.appColors.success
+                  : context.appColors.error,
             ),
             const SizedBox(height: 16),
             Text(
               'RECOMMENDATION: $recommendation',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: isAccept ? context.appColors.success : context.appColors.error,
+                color: isAccept
+                    ? context.appColors.success
+                    : context.appColors.error,
               ),
             ),
             const SizedBox(height: 8),
@@ -580,9 +591,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
   Widget _buildSensitivityTab(ThemeData theme) {
     final l10n = AppLocalizations.of(context)!;
     if (_sensitivityPoints == null || _sensitivityPoints!.isEmpty) {
-      return Center(
-        child: Text(l10n.enterDataCalculator),
-      );
+      return Center(child: Text(l10n.enterDataCalculator));
     }
 
     // Find where NPV crosses zero (IRR)
@@ -593,10 +602,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.npvSensitivity,
-            style: theme.textTheme.titleLarge,
-          ),
+          Text(l10n.npvSensitivity, style: theme.textTheme.titleLarge),
           const SizedBox(height: 8),
           Text(
             'Shows how NPV changes as the discount rate varies',
@@ -621,13 +627,17 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                   return DataRow(
                     cells: [
                       DataCell(
-                        Text('${(point.discountRate * 100).toStringAsFixed(0)}%'),
+                        Text(
+                          '${(point.discountRate * 100).toStringAsFixed(0)}%',
+                        ),
                       ),
                       DataCell(
                         Text(
                           '\$${point.npv.toStringAsFixed(0)}',
                           style: TextStyle(
-                            color: isPositive ? context.appColors.success : context.appColors.error,
+                            color: isPositive
+                                ? context.appColors.success
+                                : context.appColors.error,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -640,12 +650,18 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                           ),
                           decoration: BoxDecoration(
                             color: isPositive
-                                ? context.appColors.success.withValues(alpha: 0.15)
-                                : context.appColors.error.withValues(alpha: 0.15),
+                                ? context.appColors.success.withValues(
+                                    alpha: 0.15,
+                                  )
+                                : context.appColors.error.withValues(
+                                    alpha: 0.15,
+                                  ),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            isPositive ? l10n.acceptDecision : l10n.rejectDecision,
+                            isPositive
+                                ? l10n.acceptDecision
+                                : l10n.rejectDecision,
                             style: TextStyle(
                               color: isPositive
                                   ? context.appColors.success

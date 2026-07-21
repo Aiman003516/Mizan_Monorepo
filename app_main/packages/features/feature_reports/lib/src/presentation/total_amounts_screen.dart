@@ -12,7 +12,9 @@ import 'package:feature_reports/src/data/export_service.dart';
 import 'package:shared_services/shared_services.dart';
 
 class TotalAmountsScreen extends ConsumerStatefulWidget {
-  const TotalAmountsScreen({super.key});
+  final bool isStandalone;
+
+  const TotalAmountsScreen({super.key, this.isStandalone = false});
 
   @override
   ConsumerState<TotalAmountsScreen> createState() => _TotalAmountsScreenState();
@@ -74,27 +76,57 @@ class _TotalAmountsScreenState extends ConsumerState<TotalAmountsScreen> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.totalAmountsReport),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: l10n.general),
-              Tab(text: l10n.clients),
-              Tab(text: l10n.suppliers),
-            ],
-            onTap: (index) {
-              setState(() {
-                _selectedClassification = [
-                  c.kClassificationGeneral,
-                  c.kClassificationClients,
-                  c.kClassificationSuppliers,
-                ][index];
-              });
-            },
-          ),
-        ),
+        appBar: widget.isStandalone
+            ? AppBar(
+                title: Text(l10n.totalAmountsReport),
+                bottom: TabBar(
+                  tabs: [
+                    Tab(text: l10n.general),
+                    Tab(text: l10n.clients),
+                    Tab(text: l10n.suppliers),
+                  ],
+                  onTap: (index) {
+                    setState(() {
+                      _selectedClassification = [
+                        c.kClassificationGeneral,
+                        c.kClassificationClients,
+                        c.kClassificationSuppliers,
+                      ][index];
+                    });
+                  },
+                ),
+              )
+            : null,
         body: Column(
           children: [
+            if (!widget.isStandalone)
+              Material(
+                color: Theme.of(context).colorScheme.surface,
+                elevation: 1,
+                child: TabBar(
+                  // Explicit colors for body placement — the TabBarTheme uses
+                  // onPrimary (white) for AppBar use; here we need onSurface.
+                  labelColor: Theme.of(context).colorScheme.onSurface,
+                  unselectedLabelColor: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  tabs: [
+                    Tab(text: l10n.general),
+                    Tab(text: l10n.clients),
+                    Tab(text: l10n.suppliers),
+                  ],
+                  onTap: (index) {
+                    setState(() {
+                      _selectedClassification = [
+                        c.kClassificationGeneral,
+                        c.kClassificationClients,
+                        c.kClassificationSuppliers,
+                      ][index];
+                    });
+                  },
+                ),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
@@ -102,13 +134,18 @@ class _TotalAmountsScreenState extends ConsumerState<TotalAmountsScreen> {
               ),
               child: SegmentedButton<ReportFilter>(
                 style: SegmentedButton.styleFrom(
-                  // ignore: deprecated_member_use
-                  backgroundColor: context.appColors.onPrimary.withValues(
-                    alpha: 0.1,
-                  ),
-                  foregroundColor: context.appColors.onPrimary,
-                  selectedBackgroundColor: context.appColors.onPrimary,
-                  selectedForegroundColor: Theme.of(context).primaryColor,
+                  // Use surface-appropriate colors — onPrimary (white) was
+                  // designed for AppBar context and is invisible on light surface.
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest,
+                  foregroundColor: Theme.of(context).colorScheme.onSurface,
+                  selectedBackgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primary,
+                  selectedForegroundColor: Theme.of(
+                    context,
+                  ).colorScheme.onPrimary,
                 ),
                 segments: [
                   ButtonSegment(

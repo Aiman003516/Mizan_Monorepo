@@ -24,7 +24,7 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
   final _userNameController = TextEditingController();
   final _addressController = TextEditingController();
   final _taxIDController = TextEditingController();
-  
+
   String? _selectedImagePath;
   bool _isLoading = false;
 
@@ -38,7 +38,7 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     _userNameController.text = profile.userName;
     _addressController.text = profile.companyAddress;
     _taxIDController.text = profile.taxID;
-    
+
     // Attempt to load existing image path if your model supports it
     // Update `.imagePath` to your exact property name if it differs
     _selectedImagePath = profile.imagePath;
@@ -55,11 +55,13 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
 
   Future<void> _handlePickImage() async {
     final imageService = ref.read(imagePickerServiceProvider);
-    
+
     try {
       // Using the service you already built which handles Android/iOS/Windows perfectly
-      final pickedPath = await imageService.pickAndCopyImage(ImageSource.gallery);
-      
+      final pickedPath = await imageService.pickAndCopyImage(
+        ImageSource.gallery,
+      );
+
       if (pickedPath != null && mounted) {
         setState(() {
           _selectedImagePath = pickedPath;
@@ -87,18 +89,22 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
-    setState(() { _isLoading = true; });
+    setState(() {
+      _isLoading = true;
+    });
 
     try {
-      // Update this call to include `imagePath: _selectedImagePath` 
+      // Update this call to include `imagePath: _selectedImagePath`
       // if your companyProfileProvider supports it.
-      await ref.read(companyProfileProvider.notifier).saveProfile(
-        companyName: _companyNameController.text.trim(),
-        userName: _userNameController.text.trim(),
-        companyAddress: _addressController.text.trim(),
-        taxID: _taxIDController.text.trim(),
-        imagePath: _selectedImagePath,
-      );
+      await ref
+          .read(companyProfileProvider.notifier)
+          .saveProfile(
+            companyName: _companyNameController.text.trim(),
+            userName: _userNameController.text.trim(),
+            companyAddress: _addressController.text.trim(),
+            taxID: _taxIDController.text.trim(),
+            imagePath: _selectedImagePath,
+          );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -120,7 +126,9 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
       }
     } finally {
       if (mounted) {
-        setState(() { _isLoading = false; });
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -206,8 +214,10 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: context.appColors.onPrimary))
+                          strokeWidth: 2,
+                          color: context.appColors.onPrimary,
+                        ),
+                      )
                     : const Icon(Icons.save),
                 label: Text(l10n.saveProfile),
                 onPressed: _isLoading ? null : _saveProfile,

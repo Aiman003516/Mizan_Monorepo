@@ -201,7 +201,10 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
                       ),
                       Text(
                         _getMethodLabel(asset.depreciationMethod),
-                        style: TextStyle(color: context.appColors.subtleText, fontSize: 12),
+                        style: TextStyle(
+                          color: context.appColors.subtleText,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -212,7 +215,9 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
                       l10n.fullyDepreciated,
                       style: const TextStyle(fontSize: 11),
                     ),
-                    backgroundColor: context.appColors.warning.withValues(alpha: 0.2),
+                    backgroundColor: context.appColors.warning.withValues(
+                      alpha: 0.2,
+                    ),
                     labelStyle: TextStyle(color: context.appColors.warning),
                     visualDensity: VisualDensity.compact,
                   )
@@ -254,7 +259,10 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(color: context.appColors.subtleText, fontSize: 11)),
+          Text(
+            label,
+            style: TextStyle(color: context.appColors.subtleText, fontSize: 11),
+          ),
           Text(
             value,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -325,7 +333,10 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: context.appColors.error,
+          ),
         );
       }
     }
@@ -373,7 +384,10 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: context.appColors.error,
+          ),
         );
       }
     } finally {

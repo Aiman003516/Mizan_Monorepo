@@ -6,6 +6,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  supabase_flutter: ^2.5.4
   flutter:
     sdk: flutter
   
@@ -13,6 +14,8 @@ dependencies:
   flutter_riverpod: ^2.6.1
 
   # Local Dependencies
+  core_ui:
+    path: ../../core/core_ui
   core_l10n:
     path: ../../core/core_l10n
   core_data:
@@ -21,3 +24,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter:
+  fonts:
+    - family: SaudiRiyal
+      fonts:
+        - asset: assets/fonts/SaudiRiyal.ttf

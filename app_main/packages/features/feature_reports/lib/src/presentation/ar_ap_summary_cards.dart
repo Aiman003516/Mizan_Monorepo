@@ -128,7 +128,11 @@ class _SummaryCard extends StatelessWidget {
         ],
       ),
       child: isLoading
-          ? Center(child: CircularProgressIndicator(color: context.appColors.onPrimary))
+          ? Center(
+              child: CircularProgressIndicator(
+                color: context.appColors.onPrimary,
+              ),
+            )
           : error != null
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +141,9 @@ class _SummaryCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Error',
-                  style: TextStyle(color: context.appColors.onPrimary.withValues(alpha: 0.8)),
+                  style: TextStyle(
+                    color: context.appColors.onPrimary.withValues(alpha: 0.8),
+                  ),
                 ),
               ],
             )
@@ -188,7 +194,9 @@ class _SummaryCard extends StatelessWidget {
                       Text(
                         'Current',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: context.appColors.onPrimary.withValues(alpha: 0.8),
+                          color: context.appColors.onPrimary.withValues(
+                            alpha: 0.8,
+                          ),
                         ),
                       ),
                       Text(

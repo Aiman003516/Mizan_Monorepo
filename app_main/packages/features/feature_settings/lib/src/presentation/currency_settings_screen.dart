@@ -73,7 +73,9 @@ class _CurrencySettingsScreenState
                 ),
                 TextFormField(
                   controller: _symbolController,
-                  decoration: InputDecoration(labelText: l10n.currencySymbolHint),
+                  decoration: InputDecoration(
+                    labelText: l10n.currencySymbolHint,
+                  ),
                 ),
               ],
             ),
@@ -91,12 +93,12 @@ class _CurrencySettingsScreenState
                     await ref
                         .read(currenciesRepositoryProvider)
                         .createCurrency(
-                      code: _codeController.text.trim().toUpperCase(),
-                      name: _nameController.text.trim(),
-                      symbol: _symbolController.text.trim().isNotEmpty
-                          ? _symbolController.text.trim()
-                          : null,
-                    );
+                          code: _codeController.text.trim().toUpperCase(),
+                          name: _nameController.text.trim(),
+                          symbol: _symbolController.text.trim().isNotEmpty
+                              ? _symbolController.text.trim()
+                              : null,
+                        );
                     if (mounted) Navigator.of(context).pop();
                   } catch (e) {
                     if (mounted) {
@@ -123,15 +125,11 @@ class _CurrencySettingsScreenState
     final defaultCurrencyCode = ref.watch(defaultCurrencyProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.currencyOptions),
-      ),
+      appBar: AppBar(title: Text(l10n.currencyOptions)),
       body: currenciesAsync.when(
         data: (currencies) {
           if (currencies.isEmpty) {
-            return Center(
-              child: Text(l10n.noCurrenciesFound),
-            );
+            return Center(child: Text(l10n.noCurrenciesFound));
           }
           return ListView.builder(
             itemCount: currencies.length,
@@ -153,15 +151,15 @@ class _CurrencySettingsScreenState
                         .setCurrency(newCode); // Use correct method name
                   }
                 },
-                secondary:
-                defaultCurrencyCode == currency.code
+                secondary: defaultCurrencyCode == currency.code
                     ? Icon(Icons.check_circle, color: context.appColors.success)
                     : null,
               );
             },
           );
         },
-        error: (err, stack) => Center(child: Text('${l10n.error} ${err.toString()}')),
+        error: (err, stack) =>
+            Center(child: Text('${l10n.error} ${err.toString()}')),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton(

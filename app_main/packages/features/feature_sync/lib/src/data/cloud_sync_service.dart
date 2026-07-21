@@ -1,31 +1,29 @@
-// FILE: packages/features/feature_sync/lib/src/data/cloud_sync_service.dart
-
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart' hide Order, Transaction;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:core_data/core_data.dart';
-import 'package:feature_auth/feature_auth.dart'; // 👈 Import Auth
+import 'package:feature_auth/feature_auth.dart'; 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide Column;
 
 /// 🔄 THE HYBRID SYNC ENGINE (Engine B - Phase 4.3 Billing Enforcer)
 class CloudSyncService {
   final AppDatabase _localDb;
-  final FirebaseFirestore _firestore;
+  final SupabaseClient _supabase;
   final PreferencesRepository _prefs;
-  final String? _currentTenantId; // If null, Sync is DISABLED (Free Tier)
+  final String? _currentTenantId;
 
   StreamSubscription? _outgoingSyncSub;
-  final List<StreamSubscription> _incomingSyncSubs = [];
+  final List<RealtimeChannel> _incomingChannels = [];
   Timer? _debounceTimer;
   bool _isSyncing = false;
 
   CloudSyncService({
     required AppDatabase localDb,
-    required FirebaseFirestore firestore,
+    required SupabaseClient supabase,
     required PreferencesRepository prefs,
     String? tenantId,
   })  : _localDb = localDb,
-        _firestore = firestore,
+        _supabase = supabase,
         _prefs = prefs,
         _currentTenantId = tenantId;
 
@@ -40,7 +38,6 @@ class CloudSyncService {
     _localDb.inventoryCostLayers.actualTableName,
   ];
 
-  /// 🛡️ THE ENFORCER: Only start if we have a valid Tenant ID
   void startSync() {
     if (_currentTenantId == null) {
       print('🔒 [Billing Enforcer] Cloud Sync Disabled (Free Tier / No Tenant).');
@@ -57,26 +54,16 @@ class CloudSyncService {
   void stopSync() {
     _outgoingSyncSub?.cancel();
     _debounceTimer?.cancel();
-    for (final sub in _incomingSyncSubs) {
-      sub.cancel();
+    for (final channel in _incomingChannels) {
+      _supabase.removeChannel(channel);
     }
-    _incomingSyncSubs.clear();
+    _incomingChannels.clear();
     print('🛑 [CloudSync] Engine Stopped');
   }
 
-  // --- ⚡ STRICT CONSISTENCY (The Blocking Sync) ---
-
   Future<void> runImmediateSync() async {
-    // 🛡️ ENFORCER CHECK
-    if (_currentTenantId == null) {
-      print('⚠️ [CloudSync] Skipping Immediate Sync (No Tenant ID)');
-      return;
-    }
-
-    if (_isSyncing) {
-      print('⏳ [CloudSync] Sync already in progress.');
-      return;
-    }
+    if (_currentTenantId == null) return;
+    if (_isSyncing) return;
 
     _isSyncing = true; 
     _debounceTimer?.cancel(); 
@@ -105,8 +92,6 @@ class CloudSyncService {
     }
   }
 
-  // --- 📤 OUTBOUND (Local -> Cloud) ---
-  
   void _startOutgoingSync() {
     _outgoingSyncSub = _localDb.tableUpdates().listen((events) {
       _debounceTimer?.cancel();
@@ -118,7 +103,6 @@ class CloudSyncService {
   }
 
   Future<bool> _processTable(String tableName, {required bool updatePrefs}) async {
-    // 🛡️ ENFORCER CHECK
     if (_currentTenantId == null) return false;
 
     List<Map<String, dynamic>> rowsToPush = [];
@@ -142,7 +126,7 @@ class CloudSyncService {
     }
 
     if (rowsToPush.isNotEmpty) {
-      await _pushToFirestore(tableName, rowsToPush);
+      await _pushToSupabase(tableName, rowsToPush);
       return true;
     }
     return false;
@@ -167,12 +151,14 @@ class CloudSyncService {
     return results.map((row) => (row as dynamic).toJson()).cast<Map<String, dynamic>>().toList();
   }
 
-  Future<void> _pushToFirestore(
-      String collectionName, List<Map<String, dynamic>> rows) async {
-    
-    // 🛡️ ENFORCER CHECK
+  String _getRemoteTableName(String localTableName) {
+    return 'synced_$localTableName';
+  }
+
+  Future<void> _pushToSupabase(String tableName, List<Map<String, dynamic>> rows) async {
     if (_currentTenantId == null) return;
 
+    final remoteName = _getRemoteTableName(tableName);
     const int batchSize = 500;
     int chunks = (rows.length / batchSize).ceil();
 
@@ -181,24 +167,8 @@ class CloudSyncService {
       final end = (start + batchSize < rows.length) ? start + batchSize : rows.length;
       final chunk = rows.sublist(start, end);
 
-      final batch = _firestore.batch();
-
-      for (final row in chunk) {
-        final docId = row['id'];
-        if (docId == null) continue;
-
-        final docRef = _firestore
-            .collection('tenants')
-            .doc(_currentTenantId)
-            .collection(collectionName)
-            .doc(docId);
-
-        final data = Map<String, dynamic>.from(row);
-        batch.set(docRef, data, SetOptions(merge: true));
-      }
-
       try {
-        await batch.commit();
+        await _supabase.from(remoteName).upsert(chunk);
         print('☁️ [CloudSync] Pushed Batch ${i + 1}/$chunks (${chunk.length} items)');
       } catch (e) {
         print('❌ [CloudSync] Batch Push Failed: $e');
@@ -207,42 +177,59 @@ class CloudSyncService {
     }
   }
 
-  // --- 📥 INBOUND (Cloud -> Local) ---
-  
-  void _startIncomingSync() {
+  void _startIncomingSync() async {
+    if (_currentTenantId == null) return;
+    
+    // 1. Initial catch-up
+    final lastSync = _prefs.getLastSyncTime();
+    for (final tableName in _allSyncableTables) {
+      final remoteName = _getRemoteTableName(tableName);
+      try {
+        final missedData = await _supabase
+          .from(remoteName)
+          .select()
+          .eq('tenant_id', _currentTenantId!)
+          .gte('last_updated', lastSync.toIso8601String());
+          
+        if (missedData.isNotEmpty) {
+           await _upsertLocal(tableName, missedData);
+        }
+      } catch (e) {
+        print('Catch-up sync failed for $tableName: $e');
+      }
+    }
+    await _prefs.setLastSyncTime(DateTime.now());
+
+    // 2. Realtime listener
     for (final tableName in _allSyncableTables) {
       _monitorRemoteCollection(tableName);
     }
   }
 
   void _monitorRemoteCollection(String tableName) {
-    // 🛡️ ENFORCER CHECK
     if (_currentTenantId == null) return;
 
-    final lastSync = _prefs.getLastSyncTime();
-    
-    final stream = _firestore
-        .collection('tenants')
-        .doc(_currentTenantId)
-        .collection(tableName)
-        .where('lastUpdated', isGreaterThan: lastSync.toIso8601String())
-        .snapshots();
-
-    final sub = stream.listen((snapshot) async {
-      if (snapshot.docs.isNotEmpty) {
-        print('📥 [CloudSync] Received ${snapshot.docs.length} updates for $tableName');
-        await _upsertLocal(tableName, snapshot.docs);
-        await _prefs.setLastSyncTime(DateTime.now());
+    final remoteName = _getRemoteTableName(tableName);
+    final channel = _supabase.channel('public:$remoteName').onPostgresChanges(
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: remoteName,
+      filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'tenant_id', value: _currentTenantId),
+      callback: (payload) async {
+        if (payload.newRecord != null) {
+          print('📥 [CloudSync] Received realtime update for $remoteName');
+          await _upsertLocal(tableName, [payload.newRecord!]);
+          await _prefs.setLastSyncTime(DateTime.now());
+        }
       }
-    });
+    ).subscribe();
 
-    _incomingSyncSubs.add(sub);
+    _incomingChannels.add(channel);
   }
 
-  Future<void> _upsertLocal(String tableName, List<QueryDocumentSnapshot> docs) async {
+  Future<void> _upsertLocal(String tableName, List<Map<String, dynamic>> docs) async {
     await _localDb.transaction(() async {
-      for (final doc in docs) {
-        final data = doc.data() as Map<String, dynamic>;
+      for (final data in docs) {
         try {
           if (tableName == _localDb.transactions.actualTableName) {
              await _localDb.into(_localDb.transactions).insertOnConflictUpdate(Transaction.fromJson(data));
@@ -272,27 +259,21 @@ class CloudSyncService {
 // 💉 REVISED PROVIDER
 final cloudSyncServiceProvider = Provider<CloudSyncService>((ref) {
   final db = ref.watch(appDatabaseProvider); 
-  final firestore = FirebaseFirestore.instance;
+  final supabase = Supabase.instance.client;
   final prefs = ref.watch(preferencesRepositoryProvider);
   
-  // 🛡️ REACTION: Watch the User Stream!
-  // This causes the Provider to re-build (and restart the service) whenever:
-  // 1. User logs in/out
-  // 2. User upgrades to Enterprise (tenantId appears)
   final userAsync = ref.watch(currentUserStreamProvider);
   final user = userAsync.value;
 
-  // Determine Tenant ID
   final String? tenantId = (user?.hasCloudAccess == true) ? user?.tenantId : null;
 
   final service = CloudSyncService(
     localDb: db, 
-    firestore: firestore,
+    supabase: supabase,
     prefs: prefs, 
     tenantId: tenantId, 
   );
 
-  // Auto-Start (Service internal logic will abort if tenantId is null)
   service.startSync();
 
   ref.onDispose(() {

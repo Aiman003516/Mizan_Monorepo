@@ -6,6 +6,7 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_reports/feature_reports.dart'; // FIX: Import feature_reports
 import 'package:feature_transactions/src/presentation/order_details_screen.dart';
 import 'package:feature_transactions/src/presentation/order_history_provider.dart';
+import 'package:core_data/core_data.dart';
 
 class OrderHistoryScreen extends ConsumerWidget {
   const OrderHistoryScreen({super.key});
@@ -55,7 +56,7 @@ class OrderHistoryScreen extends ConsumerWidget {
                           accountId: '',
                           accountName: '',
                           accountType: '',
-                          currencyCode: 'Local',
+                          currencyCode: ref.read(defaultCurrencyProvider),
                           currencyRate: 1.0,
                         ),
                       );

@@ -76,12 +76,16 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium
-                                        ?.copyWith(color: context.appColors.success),
+                                        ?.copyWith(
+                                          color: context.appColors.success,
+                                        ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     l10n.noGhostMoneyToReconcile,
-                                    style: TextStyle(color: context.appColors.subtleText),
+                                    style: TextStyle(
+                                      color: context.appColors.subtleText,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -148,7 +152,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        '${s.entryCount} ${s.entryCount == 1 ? 'entry' : 'entries'}',
+                                        '${s.entryCount} ${s.entryCount == 1 ? l10n.entryLabel : l10n.entriesLabel}',
                                         style: TextStyle(
                                           color: context.appColors.subtleText,
                                           fontSize: 12,
@@ -177,7 +181,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: Text(
-                'Recent Entries',
+                l10n.recentEntries,
                 style: Theme.of(
                   context,
                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -211,7 +215,9 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                           : context.appColors.error.withValues(alpha: 0.1),
                       child: Icon(
                         isPositive ? Icons.add : Icons.remove,
-                        color: isPositive ? context.appColors.success : context.appColors.error,
+                        color: isPositive
+                            ? context.appColors.success
+                            : context.appColors.error,
                         size: 20,
                       ),
                     ),
@@ -222,7 +228,10 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                     ),
                     trailing: Text(
                       _dateFormat.format(entry.createdAt),
-                      style: TextStyle(fontSize: 11, color: context.appColors.subtleText),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: context.appColors.subtleText,
+                      ),
                     ),
                     onTap: () => _reconcileEntry(entry.id),
                   );
@@ -250,21 +259,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Ghost money represents tiny rounding differences that occur '
-                'during financial calculations.\n',
-              ),
-              Text(l10n.examplesLabel, style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('• Splitting a bill 3 ways (100 ÷ 3)'),
-              Text('• Currency exchange rate conversions'),
-              Text('• Percentage-based tax calculations'),
-              Text('\n'),
-              Text(
-                'These small differences typically accumulate to just a few '
-                'cents and can be periodically written off or allocated.',
-              ),
-            ],
+            children: [Text(l10n.ghostMoneyDialogContent)],
           ),
         ),
         actions: [
@@ -284,9 +279,11 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
       builder: (context) => AlertDialog(
         title: Text(l10n.reconcileAmount(summary.currency)),
         content: Text(
-          'Write off ${_formatAmount(summary.totalAmount)} in ghost money?\n\n'
-          'This will create a journal entry to clear ${summary.entryCount} '
-          '${summary.entryCount == 1 ? 'entry' : 'entries'}.',
+          l10n.writeOffConfirmation(
+            _formatAmount(summary.totalAmount),
+            summary.entryCount,
+            summary.entryCount == 1 ? l10n.entryLabel : l10n.entriesLabel,
+          ),
         ),
         actions: [
           TextButton(
@@ -322,7 +319,10 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: context.appColors.error,
+          ),
         );
       }
     }
@@ -345,7 +345,10 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: context.appColors.error,
+          ),
         );
       }
     }

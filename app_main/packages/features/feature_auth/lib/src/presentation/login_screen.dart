@@ -8,16 +8,50 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_auth/src/presentation/auth_controller.dart';
 
-class LoginScreen extends ConsumerWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
 
-    // 🔒 FIX 1: Decoupled Asset Strategy (Phase 2)
-    // We strictly use the high-fidelity, full-bleed asset for the UI.
-    // This ensures the logo is large and crisp, unrelated to the Android Icon system.
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  bool _isSignUp = false;
+  bool _obscurePassword = true;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final l10n = AppLocalizations.of(context)!;
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.enterEmailAndPassword),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+
+    if (_isSignUp) {
+      ref.read(authControllerProvider.notifier).signUpWithEmail(email, password);
+    } else {
+      ref.read(authControllerProvider.notifier).signInWithEmail(email, password);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     const String logoAsset = 'assets/images/mizan_full.png';
 
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
@@ -44,27 +78,19 @@ class LoginScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.signIn),
         backgroundColor: colorScheme.surface,
         elevation: 0,
       ),
       backgroundColor: colorScheme.surface,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Spacer(),
-              
-              // 🖼️ BRAND LOGO
-              // Uses 'mizan_full.png' so it fills the 120 height perfectly.
-              Image.asset(
-                logoAsset, 
-                height: 120,
-              ),
-              
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
+              Image.asset(logoAsset, height: 100),
+              const SizedBox(height: 32),
               Text(
                 l10n.welcomeToMizan,
                 style: textTheme.headlineMedium?.copyWith(
@@ -74,88 +100,156 @@ class LoginScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                l10n.signInToSync,
+                _isSignUp ? l10n.signUpSubtitle : l10n.signInToSync,
                 style: textTheme.titleMedium?.copyWith(
                   // ignore: deprecated_member_use
                   color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 textAlign: TextAlign.center,
               ),
-              const Spacer(),
-              const Spacer(),
-              
-              // 🔒 FIX 2: THE LAYOUT LOCK (Phase 3)
-              // We wrap the logic in a SizedBox of height 52.
-              // This guarantees the column never shrinks, preventing the "Jump".
+              const SizedBox(height: 48),
+
+              // Email Field
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: l10n.email,
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: 16),
+
+              // Password Field
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                  labelText: l10n.password,
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                obscureText: _obscurePassword,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _submit(),
+              ),
+              const SizedBox(height: 24),
+
+              // Sign In / Sign Up Button
               SizedBox(
-                height: 52, 
+                height: 56,
                 width: double.infinity,
                 child: authState.status == AuthStatus.loading
                     ? const Center(
-                        // We center the loader inside the 52px box
                         child: SizedBox(
-                          height: 24, // Smaller, tighter loader
+                          height: 24,
                           width: 24,
                           child: CircularProgressIndicator(strokeWidth: 2.5),
                         ),
                       )
-                    : Container(
-                        // The Button (Already 52px via decoration, but explicitly safe here)
-                        decoration: BoxDecoration(
-                          color: context.appColors.onPrimary,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: const Color(0xFFDADCE0),
-                            width: 1,
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              // ignore: deprecated_member_use
-                              color: context.appColors.onSurface.withValues(alpha: 0.05),
-                              offset: const Offset(0, 1),
-                              blurRadius: 2,
-                            ),
-                          ],
                         ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              ref.read(authControllerProvider.notifier).signIn();
-                            },
-                            borderRadius: BorderRadius.circular(4),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: SvgPicture.asset(
-                                      'assets/images/google.svg',
-                                      height: 18,
-                                      width: 18,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      l10n.signInWithGoogle,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF3C4043),
-                                        fontFamily: 'Roboto',
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 34), 
-                                ],
-                              ),
-                            ),
-                          ),
+                        onPressed: _submit,
+                        child: Text(
+                          _isSignUp ? l10n.createAccount : l10n.signIn,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Toggle Auth Mode
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _isSignUp = !_isSignUp;
+                  });
+                },
+                child: Text(
+                  _isSignUp ? l10n.alreadyHaveAccount : l10n.needAccount,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(child: Divider(color: colorScheme.outlineVariant)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      l10n.orSeparator,
+                      style: textTheme.bodySmall?.copyWith(color: colorScheme.outline),
+                    ),
+                  ),
+                  Expanded(child: Divider(color: colorScheme.outlineVariant)),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Google Button
+              Container(
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant,
+                    width: 1,
+                  ),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      ref.read(authControllerProvider.notifier).signIn();
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/google.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            l10n.signInWithGoogle,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface,
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 24),
             ],

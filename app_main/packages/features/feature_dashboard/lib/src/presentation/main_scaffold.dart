@@ -13,6 +13,7 @@ import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_products/feature_products.dart';
 import 'package:feature_reports/feature_reports.dart';
 import 'package:feature_settings/feature_settings.dart';
+import 'package:feature_contacts/feature_contacts.dart';
 import 'package:feature_transactions/feature_transactions.dart';
 import 'package:feature_sync/feature_sync.dart';
 import 'package:feature_dashboard/src/presentation/main_nav_provider.dart';
@@ -126,6 +127,10 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         return Text(l10n.balanceSheetReport);
       case MainPage.reportTrialBalance:
         return Text(l10n.trialBalanceReport);
+      case MainPage.customers:
+        return Text(l10n.customersAr);
+      case MainPage.vendors:
+        return Text(l10n.vendorsAp);
     }
   }
 
@@ -262,7 +267,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                 ? profile.userName 
                 : (isOnline ? l10n.online : isOffline ? l10n.offlineMode : l10n.syncDisabled),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.8),
+              color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -317,10 +322,8 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
       }
     });
 
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        key: _scaffoldKey,
+    final scaffold = Scaffold(
+      key: _scaffoldKey,
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.menu),
@@ -371,6 +374,23 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                       MainPage.orderHistory;
                 },
               ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.people),
+                title: Text(l10n.customersAr),
+                onTap: () {
+                  Navigator.pop(context);
+                  ref.read(mainNavProvider.notifier).state = MainPage.customers;
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.store),
+                title: Text(l10n.vendorsAp),
+                onTap: () {
+                  Navigator.pop(context);
+                  ref.read(mainNavProvider.notifier).state = MainPage.vendors;
+                },
+              ),
 
               const Divider(),
               Padding(
@@ -382,7 +402,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               ),
               ListTile(
                 leading: const Icon(Icons.dashboard_customize),
-                title: const Text("All Reports & Tools"),
+                title: Text(l10n.allReportsAndTools),
                 onTap: () {
                   Navigator.pop(context);
                   ref.read(mainNavProvider.notifier).state =
@@ -548,8 +568,17 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
           MainPage.reportProfitAndLoss => const ProfitAndLossScreen(),
           MainPage.reportBalanceSheet => const BalanceSheetScreen(),
           MainPage.reportTrialBalance => const TrialBalanceScreen(),
+          MainPage.customers => const CustomersTableScreen(),
+          MainPage.vendors => const VendorsTableScreen(),
         },
-      ),
-    );
+      );
+
+    // Wrap in DefaultTabController ONLY when on the dashboard so the AppBar
+    // TabBar and body TabBarView share one controller, without conflicting
+    // with inner TabControllers on report screens (which have their own).
+    if (isDashboard) {
+      return DefaultTabController(length: 3, child: scaffold);
+    }
+    return scaffold;
   }
 }

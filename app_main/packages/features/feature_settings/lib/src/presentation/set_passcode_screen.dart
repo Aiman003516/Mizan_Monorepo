@@ -45,28 +45,30 @@ class _SetPasscodeScreenState extends ConsumerState<SetPasscodeScreen> {
       await repo.setPasscode(pin);
       await repo.setPasscodeEnabled(true);
 
-      messenger.showSnackBar(SnackBar(
-        content: Text(l10n.passcodeSetSuccess),
-        backgroundColor: context.appColors.success,
-      ));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.passcodeSetSuccess),
+          backgroundColor: context.appColors.success,
+        ),
+      );
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      messenger.showSnackBar(SnackBar(
-        content: Text('${l10n.failedToSavePasscode} $e'),
-        backgroundColor: context.appColors.error,
-      ));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('${l10n.failedToSavePasscode} $e'),
+          backgroundColor: context.appColors.error,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.setPasscode),
-      ),
+      appBar: AppBar(title: Text(l10n.setPasscode)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -119,12 +121,13 @@ class _SetPasscodeScreenState extends ConsumerState<SetPasscodeScreen> {
               FilledButton.icon(
                 icon: _isLoading
                     ? SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: context.appColors.onPrimary,
-                    ))
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: context.appColors.onPrimary,
+                        ),
+                      )
                     : const Icon(Icons.save),
                 label: Text(l10n.savePasscode),
                 onPressed: _isLoading ? null : _savePasscode,

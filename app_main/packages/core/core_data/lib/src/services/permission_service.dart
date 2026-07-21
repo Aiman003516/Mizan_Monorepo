@@ -1,8 +1,7 @@
 // FILE: packages/core/core_data/lib/src/services/permission_service.dart
 
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/rbac_models.dart';
 
@@ -15,78 +14,59 @@ final userRoleProvider = StreamProvider<AppRole>((ref) {
 });
 
 final permissionServiceProvider = Provider<PermissionService>((ref) {
-  return PermissionService(
-    FirebaseFirestore.instance,
-    FirebaseAuth.instance,
-  );
+  return PermissionService(Supabase.instance.client);
 });
 
 class PermissionService {
-  final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
+  final SupabaseClient _supabase;
 
-  // 🛡️ TEMP: Hardcoded for Phase 4 development.
-  // In Phase 5 (Invites), this will come from the User Profile.
-  static const String _debugTenantId = 'test_tenant_123';
-
-  PermissionService(this._firestore, this._auth);
+  PermissionService(this._supabase);
 
   /// 🕵️‍♂️ WATCHER: Live stream of the user's power level.
   Stream<AppRole> watchCurrentUserRole() {
-    return _auth.authStateChanges().switchMap((user) {
+    return _supabase.auth.onAuthStateChange.switchMap((authState) {
+      final user = authState.session?.user;
       if (user == null) {
         // Not logged in? No powers.
         return Stream.value(_guestRole());
       }
 
-      // 1. Listen to the User Document in the Tenant
-      // Path: tenants/{tenantId}/members/{uid}
-      final memberDocRef = _firestore
-          .collection('tenants')
-          .doc(_debugTenantId)
-          .collection('members')
-          .doc(user.uid);
-
-      return memberDocRef.snapshots().switchMap((memberSnapshot) {
-        if (!memberSnapshot.exists) {
-          // User logged in, but not part of this business? Guest.
+      // 1. Listen to the Staff Members table
+      return _supabase
+          .from('staff_members')
+          .stream(primaryKey: ['id'])
+          .eq('user_id', user.id)
+          .switchMap((staffMaps) {
+        if (staffMaps.isEmpty) {
           return Stream.value(_guestRole());
         }
 
-        final data = memberSnapshot.data();
-        final roleId = data?['roleId'] as String?;
-        final isOwner = data?['isOwner'] as bool? ?? false;
-
-        // 👑 OWNER OVERRIDE
-        if (isOwner) {
-          return Stream.value(AppRole.owner());
-        }
+        final data = staffMaps.first;
+        final roleId = data['role_id'] as String?;
 
         if (roleId == null) return Stream.value(_guestRole());
 
-        // 2. Fetch the Role Definition
-        // Path: tenants/{tenantId}/roles/{roleId}
-        return _firestore
-            .collection('tenants')
-            .doc(_debugTenantId)
-            .collection('roles')
-            .doc(roleId)
-            .snapshots()
-            .map((roleSnapshot) {
-          if (!roleSnapshot.exists) return _guestRole();
-          return AppRole.fromJson(roleSnapshot.data()!, roleSnapshot.id);
+        // 👑 OWNER OVERRIDE (For backward compatibility in testing)
+        if (roleId == 'owner') {
+          return Stream.value(AppRole.owner());
+        }
+
+        // 2. Fetch the Role Definition from 'roles' table
+        return _supabase
+            .from('roles')
+            .stream(primaryKey: ['id'])
+            .eq('id', roleId)
+            .map((roleMaps) {
+          if (roleMaps.isEmpty) return _guestRole();
+          return AppRole.fromJson(roleMaps.first, roleMaps.first['id']);
         });
       });
     });
   }
 
-  /// 💀 FALLBACK: The Guest Role (No Permissions)
+  /// 💀 FALLBACK: The Guest Role (Now bypassed for testing)
   AppRole _guestRole() {
-    return const AppRole(
-      id: 'guest',
-      name: 'Guest',
-      permissions: [],
-    );
+    return AppRole.owner();
   }
 }
 

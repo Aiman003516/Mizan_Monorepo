@@ -14,9 +14,7 @@ class RolesListScreen extends ConsumerWidget {
     final rolesAsync = ref.watch(rolesStreamProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage Roles'),
-      ),
+      appBar: AppBar(title: Text(l10n.manageRoles)),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
@@ -42,15 +40,17 @@ class RolesListScreen extends ConsumerWidget {
                 ),
                 title: Text(role.name),
                 subtitle: Text(
-                  role.isSystemAdmin 
-                    ? 'Full System Access' 
-                    : '${role.permissions.length} Permissions'
+                  role.isSystemAdmin
+                      ? 'Full System Access'
+                      : '${role.permissions.length} Permissions',
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
                   if (role.isSystemAdmin) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('System Admin role cannot be edited.')),
+                      const SnackBar(
+                        content: Text('System Admin role cannot be edited.'),
+                      ),
                     );
                     return;
                   }
@@ -62,7 +62,7 @@ class RolesListScreen extends ConsumerWidget {
                   );
                 },
                 onLongPress: () {
-                   // Optional: Add Delete Logic here
+                  // Optional: Add Delete Logic here
                 },
               );
             },

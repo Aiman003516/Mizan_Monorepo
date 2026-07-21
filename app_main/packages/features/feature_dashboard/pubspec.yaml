@@ -6,6 +6,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  supabase_flutter: ^2.5.4
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
@@ -40,9 +41,12 @@ dependencies:
     path: ../feature_sync
   feature_transactions:
     path: ../feature_transactions
+  feature_contacts:
+    path: ../feature_contacts
   flutter_speed_dial: ^7.0.0
   fl_chart: ^0.66.2
 
 dev_dependencies:
+  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

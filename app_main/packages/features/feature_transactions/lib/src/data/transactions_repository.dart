@@ -269,7 +269,7 @@ class TransactionsRepository {
               createdAt: d.Value(now),
               lastUpdated: d.Value(now),
               tenantId: d.Value(tenantId), // 👈 INJECTED
-              createdByUserId: d.Value(_authRepo.currentFirebaseUser?.uid),
+              createdByUserId: d.Value(_authRepo.currentSupabaseUser?.id),
             ),
           );
 
@@ -372,7 +372,7 @@ class TransactionsRepository {
               createdAt: d.Value(now),
               lastUpdated: d.Value(now),
               tenantId: d.Value(tenantId), // 👈 INJECTED
-              createdByUserId: d.Value(_authRepo.currentFirebaseUser?.uid),
+              createdByUserId: d.Value(_authRepo.currentSupabaseUser?.id),
             ),
           );
 
@@ -439,7 +439,7 @@ class TransactionsRepository {
     required DateTime transactionDate,
     required List<TransactionEntriesCompanion> entries,
     String? attachmentPath,
-    String currencyCode = 'Local',
+    String currencyCode = 'USD', // Callers should pass ref.read(defaultCurrencyProvider)
     String? relatedTransactionId,
   }) {
     _enforcePeriodLock(transactionDate);
@@ -461,7 +461,7 @@ class TransactionsRepository {
               lastUpdated: d.Value(now),
               relatedTransactionId: d.Value(relatedTransactionId),
               tenantId: d.Value(tenantId), // 👈 INJECTED
-              createdByUserId: d.Value(_authRepo.currentFirebaseUser?.uid),
+              createdByUserId: d.Value(_authRepo.currentSupabaseUser?.id),
             ),
           );
 
@@ -484,6 +484,7 @@ class TransactionsRepository {
     required String description,
     required DateTime transactionDate,
     required List<TransactionEntriesCompanion> entries,
+    String currencyCode = 'USD', // Callers should pass ref.read(defaultCurrencyProvider)
   }) async {
     _enforcePeriodLock(transactionDate);
 
@@ -505,8 +506,9 @@ class TransactionsRepository {
               id: d.Value(newTransactionId),
               description: description,
               transactionDate: transactionDate,
+              currencyCode: d.Value(currencyCode),
               tenantId: d.Value(tenantId), // 👈 INJECTED
-              createdByUserId: d.Value(_authRepo.currentFirebaseUser?.uid),
+              createdByUserId: d.Value(_authRepo.currentSupabaseUser?.id),
             ),
           );
       for (final entry in entries) {
@@ -550,7 +552,7 @@ class TransactionsRepository {
               createdAt: d.Value(now),
               lastUpdated: d.Value(now),
               tenantId: d.Value(tenantId), // 👈 INJECTED
-              createdByUserId: d.Value(_authRepo.currentFirebaseUser?.uid),
+              createdByUserId: d.Value(_authRepo.currentSupabaseUser?.id),
             ),
           );
 
@@ -692,7 +694,7 @@ class TransactionsRepository {
               createdAt: d.Value(now),
               lastUpdated: d.Value(now),
               tenantId: d.Value(tenantId), // 👈 INJECTED
-              createdByUserId: d.Value(_authRepo.currentFirebaseUser?.uid),
+              createdByUserId: d.Value(_authRepo.currentSupabaseUser?.id),
             ),
           );
 

@@ -178,9 +178,18 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                   ),
                   const SizedBox(height: 16),
                   _buildInputRow(l10n.revenueInput, _currentRevenueController),
-                  _buildInputRow(l10n.receivablesInput, _currentReceivablesController),
-                  _buildInputRow(l10n.grossProfitInput, _currentGrossProfitController),
-                  _buildInputRow(l10n.totalAssetsInput, _currentTotalAssetsController),
+                  _buildInputRow(
+                    l10n.receivablesInput,
+                    _currentReceivablesController,
+                  ),
+                  _buildInputRow(
+                    l10n.grossProfitInput,
+                    _currentGrossProfitController,
+                  ),
+                  _buildInputRow(
+                    l10n.totalAssetsInput,
+                    _currentTotalAssetsController,
+                  ),
                   _buildInputRow(
                     l10n.currentAssetsInput,
                     _currentCurrentAssetsController,
@@ -191,7 +200,10 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                     _currentDepreciationController,
                   ),
                   _buildInputRow(l10n.sgaExpenseInput, _currentSGAController),
-                  _buildInputRow(l10n.netIncomeInput, _currentNetIncomeController),
+                  _buildInputRow(
+                    l10n.netIncomeInput,
+                    _currentNetIncomeController,
+                  ),
                   _buildInputRow(l10n.cashFromOps, _currentCFOController),
                   _buildInputRow(l10n.longTermDebt, _currentLTDebtController),
                   _buildInputRow(l10n.currentLiabilities, _currentCLController),
@@ -212,20 +224,35 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                     children: [
                       Icon(Icons.history, color: context.appColors.subtleText),
                       const SizedBox(width: 8),
-                      Text(l10n.priorPeriod, style: theme.textTheme.titleMedium),
+                      Text(
+                        l10n.priorPeriod,
+                        style: theme.textTheme.titleMedium,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   _buildInputRow(l10n.revenueInput, _priorRevenueController),
-                  _buildInputRow(l10n.receivablesInput, _priorReceivablesController),
-                  _buildInputRow(l10n.grossProfitInput, _priorGrossProfitController),
-                  _buildInputRow(l10n.totalAssetsInput, _priorTotalAssetsController),
+                  _buildInputRow(
+                    l10n.receivablesInput,
+                    _priorReceivablesController,
+                  ),
+                  _buildInputRow(
+                    l10n.grossProfitInput,
+                    _priorGrossProfitController,
+                  ),
+                  _buildInputRow(
+                    l10n.totalAssetsInput,
+                    _priorTotalAssetsController,
+                  ),
                   _buildInputRow(
                     l10n.currentAssetsInput,
                     _priorCurrentAssetsController,
                   ),
                   _buildInputRow(l10n.ppeInput, _priorPPEController),
-                  _buildInputRow(l10n.depreciationInput, _priorDepreciationController),
+                  _buildInputRow(
+                    l10n.depreciationInput,
+                    _priorDepreciationController,
+                  ),
                   _buildInputRow(l10n.sgaExpenseInput, _priorSGAController),
                   _buildInputRow(l10n.longTermDebt, _priorLTDebtController),
                   _buildInputRow(l10n.currentLiabilities, _priorCLController),
@@ -257,6 +284,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
   }
 
   Widget _buildQuickResultBanner(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     final result = _result!;
     final Color color;
     final IconData icon;
@@ -281,7 +309,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
       child: ListTile(
         leading: Icon(icon, color: color, size: 32),
         title: Text(
-          'M-Score: ${result.mScore.toStringAsFixed(2)}',
+          l10n.mScoreValue(result.mScore.toStringAsFixed(2)),
           style: TextStyle(fontWeight: FontWeight.bold, color: color),
         ),
         subtitle: Text(
@@ -339,7 +367,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'M-Score: ${result.mScore.toStringAsFixed(3)}',
+                    l10n.mScoreValue(result.mScore.toStringAsFixed(3)),
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: riskColor,
@@ -347,7 +375,13 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${result.riskLevel} Risk of Earnings Manipulation',
+                    l10n.riskOfEarningsManipulation(
+                      result.riskLevel == 'HIGH'
+                          ? l10n.riskLevelHigh
+                          : result.riskLevel == 'MODERATE'
+                          ? l10n.riskLevelModerate
+                          : l10n.riskLevelLow,
+                    ),
                     style: theme.textTheme.titleMedium,
                   ),
                   if (result.isProbableManipulator) ...[
@@ -373,7 +407,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                   ],
                   const SizedBox(height: 16),
                   Text(
-                    'Threshold: > -1.78 indicates manipulation',
+                    l10n.mScoreThresholdLabel,
                     style: theme.textTheme.bodySmall,
                   ),
                 ],
@@ -389,7 +423,10 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.componentIndices, style: theme.textTheme.titleMedium),
+                  Text(
+                    l10n.componentIndices,
+                    style: theme.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 16),
                   _buildIndexRow(
                     'DSRI',
@@ -397,13 +434,33 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                     1.031,
                     'Receivables/Sales',
                   ),
-                  _buildIndexRow('GMI', result.gmi, 1.041, 'Gross Margin'),
-                  _buildIndexRow('AQI', result.aqi, 1.254, 'Asset Quality'),
-                  _buildIndexRow('SGI', result.sgi, 1.134, 'Sales Growth'),
-                  _buildIndexRow('DEPI', result.depi, 1.077, 'Depreciation'),
-                  _buildIndexRow('SGAI', result.sgai, 1.0, 'SG&A Expenses'),
-                  _buildIndexRow('TATA', result.tata, 0.018, 'Accruals'),
-                  _buildIndexRow('LVGI', result.lvgi, 1.111, 'Leverage'),
+                  _buildIndexRow('GMI', result.gmi, 1.041, l10n.gmiDescription),
+                  _buildIndexRow('AQI', result.aqi, 1.254, l10n.aqiDescription),
+                  _buildIndexRow('SGI', result.sgi, 1.134, l10n.sgiDescription),
+                  _buildIndexRow(
+                    'DEPI',
+                    result.depi,
+                    1.077,
+                    l10n.depiDescription,
+                  ),
+                  _buildIndexRow(
+                    'SGAI',
+                    result.sgai,
+                    1.0,
+                    l10n.sgaiDescription,
+                  ),
+                  _buildIndexRow(
+                    'TATA',
+                    result.tata,
+                    0.018,
+                    l10n.tataDescription,
+                  ),
+                  _buildIndexRow(
+                    'LVGI',
+                    result.lvgi,
+                    1.111,
+                    l10n.lvgiDescription,
+                  ),
                 ],
               ),
             ),
@@ -424,7 +481,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                         Icon(Icons.flag, color: context.appColors.error),
                         const SizedBox(width: 8),
                         Text(
-                          'Red Flags (${result.redFlags.length})',
+                          '${l10n.redFlags} (${result.redFlags.length})',
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: context.appColors.error,
                           ),
@@ -471,7 +528,9 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
     String description,
   ) {
     final isAboveThreshold = value > threshold;
-    final color = isAboveThreshold ? context.appColors.error : context.appColors.success;
+    final color = isAboveThreshold
+        ? context.appColors.error
+        : context.appColors.success;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -517,18 +576,9 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'What is the Beneish M-Score?',
-                    style: theme.textTheme.titleLarge,
-                  ),
+                  Text(l10n.whatIsMScore, style: theme.textTheme.titleLarge),
                   const SizedBox(height: 12),
-                  const Text(
-                    'The M-Score is a mathematical model created by Professor '
-                    'Messod Beneish that uses financial ratios to detect '
-                    'whether a company has manipulated its earnings.\n\n'
-                    'An M-Score greater than -1.78 suggests a HIGH probability '
-                    '(76%) that the company is an earnings manipulator.',
-                  ),
+                  Text(l10n.mScoreDescription),
                 ],
               ),
             ),
@@ -569,50 +619,18 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Index Explanations',
+                    l10n.indexExplanations,
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 12),
-                  _buildExplanationRow(
-                    'DSRI',
-                    'Days Sales in Receivables Index',
-                    'Measures if receivables grew faster than sales',
-                  ),
-                  _buildExplanationRow(
-                    'GMI',
-                    'Gross Margin Index',
-                    'Detects deteriorating gross margins',
-                  ),
-                  _buildExplanationRow(
-                    'AQI',
-                    'Asset Quality Index',
-                    'Identifies expense capitalization',
-                  ),
-                  _buildExplanationRow(
-                    'SGI',
-                    'Sales Growth Index',
-                    'High growth creates manipulation pressure',
-                  ),
-                  _buildExplanationRow(
-                    'DEPI',
-                    'Depreciation Index',
-                    'Detects slowing depreciation rates',
-                  ),
-                  _buildExplanationRow(
-                    'SGAI',
-                    'SG&A Index',
-                    'Measures administrative efficiency',
-                  ),
-                  _buildExplanationRow(
-                    'TATA',
-                    'Total Accruals to Total Assets',
-                    'High accruals vs cash = low quality',
-                  ),
-                  _buildExplanationRow(
-                    'LVGI',
-                    'Leverage Index',
-                    'Increasing debt creates pressure',
-                  ),
+                  _buildExplanationRow('DSRI', l10n.dsriName, l10n.dsriExpl),
+                  _buildExplanationRow('GMI', l10n.gmiName, l10n.gmiExpl),
+                  _buildExplanationRow('AQI', l10n.aqiName, l10n.aqiExpl),
+                  _buildExplanationRow('SGI', l10n.sgiName, l10n.sgiExpl),
+                  _buildExplanationRow('DEPI', l10n.depiName, l10n.depiExpl),
+                  _buildExplanationRow('SGAI', l10n.sgaiName, l10n.sgaiExpl),
+                  _buildExplanationRow('TATA', l10n.tataName, l10n.tataExpl),
+                  _buildExplanationRow('LVGI', l10n.lvgiName, l10n.lvgiExpl),
                 ],
               ),
             ),
@@ -634,7 +652,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Famous Cases',
+                        l10n.famousCases,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.onTertiaryContainer,
@@ -644,11 +662,7 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    '• Enron (2001): Would have had M-Score > -1.78\n'
-                    '• WorldCom (2002): High TATA due to expense capitalization\n'
-                    '• Satyam (2009): High DSRI from fictitious receivables\n\n'
-                    'The M-Score correctly identified 76% of manipulators in '
-                    'backtesting studies.',
+                    l10n.famousCasesDesc,
                     style: TextStyle(
                       color: theme.colorScheme.onTertiaryContainer,
                     ),
@@ -682,7 +696,10 @@ class _FraudDetectionScreenState extends State<FraudDetectionScreen>
                 Text(name, style: const TextStyle(fontWeight: FontWeight.w500)),
                 Text(
                   description,
-                  style: TextStyle(fontSize: 12, color: context.appColors.primary),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: context.appColors.primary,
+                  ),
                 ),
               ],
             ),

@@ -97,9 +97,7 @@ class _BankReconciliationScreenState
 
     if (selectedTxnIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.selectTransactionsToReconcile),
-        ),
+        SnackBar(content: Text(l10n.selectTransactionsToReconcile)),
       );
       return;
     }

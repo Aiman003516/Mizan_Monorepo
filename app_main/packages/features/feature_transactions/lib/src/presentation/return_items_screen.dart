@@ -6,6 +6,7 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_reports/feature_reports.dart'; // FIX: Import feature_reports
 import 'package:feature_transactions/src/data/transactions_repository.dart';
 import 'package:core_database/src/initial_constants.dart' as c;
+import 'package:core_data/core_data.dart';
 
 class ReturnItemsScreen extends ConsumerStatefulWidget {
   final Order order;
@@ -108,7 +109,7 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
             originalSalesAccountId: salesAccountId,
             itemsToReturn: returnMap,
             totalRefundAmount: totalRefundAmount,
-            currencyCode: widget.entries.firstOrNull?.currencyCode ?? 'Local',
+            currencyCode: widget.entries.firstOrNull?.currencyCode ?? ref.read(defaultCurrencyProvider),
             returnDescription: l10n.partialReturnFor(widget.order.id.substring(0, 8)),
           );
 

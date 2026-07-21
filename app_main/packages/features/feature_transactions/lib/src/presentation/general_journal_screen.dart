@@ -53,6 +53,8 @@ class GeneralJournalScreen extends ConsumerStatefulWidget {
 class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
+  late final TextEditingController _currencyCodeController;
+  final _exchangeRateController = TextEditingController(text: '1.0');
   DateTime _transactionDate = DateTime.now();
   late final List<JournalEntryLine> _lines = [
     JournalEntryLine()..account = widget.initialAccount,
@@ -66,6 +68,10 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize with the user's real base currency — not 'Local'
+    _currencyCodeController = TextEditingController(
+      text: ref.read(defaultCurrencyProvider),
+    );
     _descriptionController.addListener(_validateForm);
     for (var line in _lines) {
       line.debitController.addListener(_calculateTotals);
@@ -76,6 +82,8 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
   @override
   void dispose() {
     _descriptionController.dispose();
+    _currencyCodeController.dispose();
+    _exchangeRateController.dispose();
     for (var line in _lines) {
       line.dispose();
     }
@@ -175,12 +183,14 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
         // FIX: Convert to Cents (Int) for Database
         final int amountCents = (amountDouble * 100).round();
 
+        final double exRate = double.tryParse(_exchangeRateController.text) ?? 1.0;
+
         entries.add(
           TransactionEntriesCompanion.insert(
             accountId: line.account!.id,
             amount: amountCents, // Pass Int
             transactionId: 'TEMP', // Will be replaced by repo
-            currencyRate: const d.Value(1.0),
+            currencyRate: d.Value(exRate),
           ),
         );
       }
@@ -198,12 +208,17 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
       }
 
       try {
+        final currencyCode = _currencyCodeController.text.trim().isEmpty
+            ? ref.read(defaultCurrencyProvider)
+            : _currencyCodeController.text.trim().toUpperCase();
+
         await ref
             .read(transactionsRepositoryProvider)
             .createJournalTransaction(
               description: _descriptionController.text,
               transactionDate: _transactionDate,
               entries: entries,
+              currencyCode: currencyCode,
             );
 
         scaffoldMessenger.showSnackBar(
@@ -241,8 +256,9 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
       ),
       body: Form(
         key: _formKey,
-        child: Column(
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -272,6 +288,32 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                       text: DateFormat.yMd().format(_transactionDate),
                     ),
                     onTap: () => _selectDate(context),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _currencyCodeController,
+                          decoration: InputDecoration(
+                            labelText: 'Currency Code', // Ideally from l10n
+                            border: const OutlineInputBorder(),
+                            hintText: 'e.g. USD',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _exchangeRateController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Exchange Rate', // Ideally from l10n
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -311,11 +353,12 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                 ],
               ),
             ),
-            Expanded(
-              child: allAccountsAsync.when(
-                data: (accounts) {
-                  return ListView.builder(
-                    itemCount: _lines.length,
+            allAccountsAsync.when(
+              data: (accounts) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _lines.length,
                     itemBuilder: (context, index) {
                       final line = _lines[index];
                       return Padding(
@@ -391,10 +434,9 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                     },
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, s) => Text(e.toString()),
+                loading: () => const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator())),
+                error: (e, s) => Padding(padding: const EdgeInsets.all(16.0), child: Text(e.toString())),
               ),
-            ),
             const Divider(height: 1),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -435,6 +477,14 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                       ),
                     ],
                   ),
+                  if (!isBalanced && _totalDebits > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Transaction is unbalanced by ${_balance.abs().toStringAsFixed(2)}',
+                        style: TextStyle(color: context.appColors.error, fontSize: 12),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -450,6 +500,7 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

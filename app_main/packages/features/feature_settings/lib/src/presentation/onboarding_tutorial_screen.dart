@@ -22,6 +22,7 @@ class _OnboardingTutorialScreenState
     extends ConsumerState<OnboardingTutorialScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _isLoading = false;
 
   final List<OnboardingPage> _pages = const [
     OnboardingPage(
@@ -94,10 +95,21 @@ class _OnboardingTutorialScreenState
   }
 
   void _completeTutorial() async {
+    setState(() {
+      _isLoading = true;
+    });
+    // Yield to the UI thread to ensure spinner renders before provider triggers massive rebuild
+    await Future.delayed(const Duration(milliseconds: 100));
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('tutorial_seen', true);
+    if (!mounted) return;
     ref.read(tutorialSeenProvider.notifier).state = true;
     widget.onComplete();
+
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -177,15 +189,21 @@ class _OnboardingTutorialScreenState
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: Text(
-                    _currentPage == _pages.length - 1
-                        ? (isArabic ? 'ابدأ الآن' : 'Get Started')
-                        : (isArabic ? 'التالي' : 'Next'),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                        )
+                      : Text(
+                          _currentPage == _pages.length - 1
+                              ? (isArabic ? 'ابدأ الآن' : 'Get Started')
+                              : (isArabic ? 'التالي' : 'Next'),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),

@@ -46,7 +46,7 @@ class JournalEntryService {
     required DateTime date,
     required List<JournalLine> lines,
     String? attachmentPath,
-    String currencyCode = 'Local',
+    String currencyCode = 'USD', // Callers should pass ref.read(defaultCurrencyProvider)
     bool isAdjustment = false,
   }) async {
     // Validate: must have at least 2 lines
@@ -114,7 +114,7 @@ class JournalEntryService {
     required String creditAccountId,
     required int amount,
     String? attachmentPath,
-    String currencyCode = 'Local',
+    String currencyCode = 'USD', // Callers should pass ref.read(defaultCurrencyProvider)
   }) async {
     return createCompoundEntry(
       description: description,

@@ -6,6 +6,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  supabase_flutter: ^2.5.4
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -13,6 +14,7 @@ dependencies:
   intl: ^0.20.2 # Match your app's version
 
 dev_dependencies:
+  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter
 

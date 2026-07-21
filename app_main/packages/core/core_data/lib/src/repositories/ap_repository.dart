@@ -1,7 +1,10 @@
 import 'package:core_database/core_database.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:collection/collection.dart';
+import 'package:uuid/uuid.dart';
 
+const _uuid = Uuid();
 // Providers
 final apRepositoryProvider = Provider<APRepository>((ref) {
   final db = ref.watch(appDatabaseProvider);
@@ -106,23 +109,66 @@ class APRepository {
     String? payableAccountId,
     String? paymentTerms,
     String? notes,
+    int openingBalance = 0,
   }) async {
-    final companion = VendorsCompanion.insert(
-      name: name,
-      email: Value(email),
-      phone: Value(phone),
-      address: Value(address),
-      taxId: Value(taxId),
-      payableAccountId: Value(payableAccountId),
-      paymentTerms: Value(paymentTerms),
-      notes: Value(notes),
-    );
+    return await _db.transaction(() async {
+      // Pre-generate UUID so we can use it as both the PK and in FK references
+      final vendorUuid = _uuid.v4();
 
-    await _db.into(_db.vendors).insert(companion);
-    return (await (_db.select(_db.vendors)
-          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
-          ..limit(1))
-        .getSingle());
+      final companion = VendorsCompanion.insert(
+        id: Value(vendorUuid),
+        name: name,
+        email: Value(email),
+        phone: Value(phone),
+        address: Value(address),
+        taxId: Value(taxId),
+        payableAccountId: Value(payableAccountId),
+        paymentTerms: Value(paymentTerms),
+        notes: Value(notes),
+        balance: Value(openingBalance),
+      );
+
+      await _db.into(_db.vendors).insert(companion);
+
+      if (openingBalance != 0) {
+        final accountsList = await _db.select(_db.accounts).get();
+        final apAccount = accountsList.firstWhereOrNull(
+            (a) => a.name == 'Accounts Payable' || a.name.contains('Payable'))
+            ?? accountsList.firstWhereOrNull((a) => a.type == 'liability');
+
+        final equityAccount = accountsList.firstWhereOrNull(
+            (a) => a.name == 'Equity' || a.name.contains('Equity'))
+            ?? accountsList.firstWhereOrNull((a) => a.type == 'equity');
+
+        if (apAccount == null || equityAccount == null) {
+          throw Exception('Required system accounts (Accounts Payable or Equity) are missing from the database.');
+        }
+
+        // Pre-generate transaction UUID for FK references
+        final txnUuid = _uuid.v4();
+        final txnCompanion = TransactionsCompanion.insert(
+          id: Value(txnUuid),
+          transactionDate: DateTime.now(),
+          description: 'Opening Balance for $name',
+        );
+        await _db.into(_db.transactions).insert(txnCompanion);
+
+        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
+          transactionId: txnUuid, // ✅ UUID string, not int rowid
+          accountId: apAccount.id,
+          amount: -openingBalance, // Liabilities are increased with credits (-)
+        ));
+
+        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
+          transactionId: txnUuid, // ✅ UUID string, not int rowid
+          accountId: equityAccount.id,
+          amount: openingBalance,
+        ));
+      }
+
+      // Use the pre-generated UUID — no need to re-query by rowid
+      return (await (_db.select(_db.vendors)..where((t) => t.id.equals(vendorUuid))).getSingle());
+    });
   }
 
   /// Update vendor
@@ -169,11 +215,33 @@ class APRepository {
 
   /// Generate next bill number
   Future<String> generateBillNumber() async {
-    final count = await _db
-        .customSelect('SELECT COUNT(*) as cnt FROM bills')
-        .getSingle();
-    final num = (count.read<int>('cnt')) + 1;
-    return 'BILL-${num.toString().padLeft(4, '0')}';
+    final now = DateTime.now();
+    final yearStr = now.year.toString();
+    final monthStr = now.month.toString().padLeft(2, '0');
+    final prefix = 'BILL-$yearStr-$monthStr-';
+
+    final result = await _db.customSelect(
+      '''
+      SELECT bill_number 
+      FROM bills 
+      WHERE bill_number LIKE ? 
+      ORDER BY bill_number DESC 
+      LIMIT 1
+      ''',
+      variables: [Variable<String>('$prefix%')],
+    ).getSingleOrNull();
+
+    int nextNum = 1;
+    if (result != null) {
+      final lastNumber = result.read<String>('bill_number');
+      final parts = lastNumber.split('-');
+      if (parts.length >= 4) {
+        final lastSeq = int.tryParse(parts[3]) ?? 0;
+        nextNum = lastSeq + 1;
+      }
+    }
+
+    return '$prefix${nextNum.toString().padLeft(4, '0')}';
   }
 
   /// Create a new bill
@@ -182,6 +250,7 @@ class APRepository {
     required DateTime billDate,
     required DateTime dueDate,
     required List<BillItemData> items,
+    required String currencyCode,
     String? vendorBillNumber,
     String? notes,
   }) async {
@@ -203,6 +272,7 @@ class APRepository {
         totalAmount: subtotal, // No tax for now
         vendorBillNumber: Value(vendorBillNumber),
         notes: Value(notes),
+        currencyCode: Value(currencyCode),
       );
 
       await _db.into(_db.bills).insert(companion);

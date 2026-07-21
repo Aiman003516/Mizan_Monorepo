@@ -12,9 +12,9 @@ class BuyNowScreen extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.couldNotOpenPurchasePage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.couldNotOpenPurchasePage)));
       }
     }
   }
@@ -26,9 +26,7 @@ class BuyNowScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.upgradeToPro),
-      ),
+      appBar: AppBar(title: Text(l10n.upgradeToPro)),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -78,7 +76,10 @@ class BuyNowScreen extends StatelessWidget {
               ),
               child: Text(
                 l10n.purchaseFullVersion,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],

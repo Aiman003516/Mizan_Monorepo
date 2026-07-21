@@ -1,83 +1,74 @@
 // FILE: packages/core/core_data/lib/src/services/saas_seeding_service.dart
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import '../models/rbac_models.dart';
 
 final saasSeedingServiceProvider = Provider<SaasSeedingService>((ref) {
   return SaasSeedingService(
-    FirebaseFirestore.instance,
-    FirebaseAuth.instance,
+    Supabase.instance.client,
   );
 });
 
 class SaasSeedingService {
-  final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
+  final SupabaseClient _supabase;
 
-  // 🛡️ ARCHITECT NOTE: In Phase 5, this will be dynamic (User ID or UUID).
-  // For now, we use a fixed ID to ensure all your devices sync to the same place.
-  static const String _tenantId = 'test_tenant_123';
-
-  SaasSeedingService(this._firestore, this._auth);
+  SaasSeedingService(this._supabase);
 
   /// 👑 ACTIVATION PROTOCOL
   /// This runs ONCE when the buyer sets up their system.
   /// It creates the 'Owner' role and assigns the current user to it.
-  Future<void> activateSystemForBuyer() async {
-    final user = _auth.currentUser;
+  Future<void> activateSystemForBuyer(String tenantId) async {
+    final user = _supabase.auth.currentUser;
     if (user == null) {
       throw Exception("⛔ Authentication required to activate system.");
     }
 
     print("🚀 [SaaS] Activating Business License for: ${user.email}");
 
-    final batch = _firestore.batch();
+    final trialEnd = DateTime.now().add(const Duration(days: 14)).toIso8601String();
 
-    // 1. Define the ONE True Role: The Owner
-    // We do NOT create Cashiers/Managers here. That is for the Admin to do later.
+    // 1. Initialize Tenant Meta-Data & Billing Fields
+    await _supabase.from('tenants').upsert({
+      'id': tenantId,
+      'created_at': DateTime.now().toIso8601String(),
+      'owner_uid': user.id,
+      'subscription_status': 'active', // Maps to plan status
+      'currency': 'USD',
+    });
+
+    // 2. Insert the owner role to the roles table
+    final ownerRoleId = const Uuid().v4();
     final ownerRole = AppRole(
-      id: 'owner',
+      id: ownerRoleId,
       name: 'System Administrator', // Professional Name
-      permissions: [], // isSystemAdmin = true, so explicit permissions aren't needed
+      permissions: [], 
       isSystemAdmin: true,
     );
 
-    // 2. Prepare Database Paths
-    final tenantRef = _firestore.collection('tenants').doc(_tenantId);
-    final rolesRef = tenantRef.collection('roles');
-    // ignore: unused_local_variable
-    final membersRef = tenantRef.collection('members');
+    await _supabase.from('roles').upsert({
+      'id': ownerRole.id,
+      'tenant_id': tenantId,
+      'name': ownerRole.name,
+      'permissions': ownerRole.permissions,
+      'is_system_admin': ownerRole.isSystemAdmin,
+    });
 
-    // 3. Write the Owner Role
-    batch.set(rolesRef.doc(ownerRole.id), ownerRole.toJson());
+    // 3. Promote User (Link user profile to tenant)
+    await _supabase.from('user_profiles').upsert({
+      'id': user.id,
+      'tenant_id': tenantId,
+      'email': user.email,
+    });
 
+    // 4. Assign Owner Role in Staff Members
+    await _supabase.from('staff_members').insert({
+      'tenant_id': tenantId,
+      'user_id': user.id,
+      'role_id': ownerRoleId,
+    });
 
-    final trialEnd = DateTime.now().add(const Duration(days: 14));
-
-    // 4. Assign the Buyer (You) as the Owner
-      batch.set(tenantRef, {
-            'createdAt': FieldValue.serverTimestamp(),
-            'createdBy': user.uid,
-            
-            // Billing Fields
-            'plan': 'enterpriseMonthly', 
-            'status': 'active',
-            'currentPeriodEnd': Timestamp.fromDate(trialEnd),
-            'isLifetimePro': false,
-            'stripeCustomerId': null,
-          }, SetOptions(merge: true));
-
-    // 5. Initialize Tenant Meta-Data (Optional but Professional)
-    batch.set(tenantRef, {
-      'createdAt': FieldValue.serverTimestamp(),
-      'createdBy': user.uid,
-      'status': 'active',
-      'plan': 'enterprise_v1',
-    }, SetOptions(merge: true));
-
-    await batch.commit();
     print("✅ [SaaS] System Activated. You are now the System Admin.");
   }
 }

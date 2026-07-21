@@ -78,6 +78,35 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> signInWithEmail(String email, String password) async {
+    state = AuthState(status: AuthStatus.loading);
+    try {
+      await _authRepository.signInWithEmail(email, password);
+      // Supabase signInWithEmail doesn't return the Google Drive client.
+      // But it does sign the user into Supabase.
+      state = AuthState(status: AuthStatus.authenticated_online);
+    } catch (e) {
+      state = AuthState(
+        status: AuthStatus.unauthenticated,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
+  Future<void> signUpWithEmail(String email, String password) async {
+    state = AuthState(status: AuthStatus.loading);
+    try {
+      await _authRepository.signUpWithEmail(email, password);
+      // After sign up, they are signed in (Supabase auto-logins after signup if email confirmations are disabled)
+      state = AuthState(status: AuthStatus.authenticated_online);
+    } catch (e) {
+      state = AuthState(
+        status: AuthStatus.unauthenticated,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
   Future<void> signOut() async {
     await _authRepository.signOut();
     state = AuthState(status: AuthStatus.unauthenticated);

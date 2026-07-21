@@ -6,12 +6,15 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  supabase_flutter: ^2.5.4
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
   googleapis: 15.0.0
   path: ^1.9.1
   path_provider: ^2.1.5
+  workmanager: ^0.9.0
+  connectivity_plus: ^6.0.3
 
   # Local Dependencies
   core_database:
@@ -26,13 +29,12 @@ dependencies:
     path: ../../core/core_data
     
   # --- Cloud Capabilities ---
-  cloud_firestore: ^5.0.0  # <--- NEW: The Sync Engine needs this
-  firebase_auth: ^5.0.0    # <--- NEW: To know WHO is syncing    
   
   # Feature Dependencies
   feature_auth:
     path: ../feature_auth
 
 dev_dependencies:
+  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

@@ -6,6 +6,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  supabase_flutter: ^2.5.4
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
@@ -23,6 +24,8 @@ dependencies:
     path: ../../core/core_data
   shared_services:
     path: ../../shared/shared_services
+  shared_ui:
+    path: ../../shared/shared_ui
   intl: ^0.20.2
 
   # Feature Dependencies
@@ -32,5 +35,6 @@ dependencies:
     path: ../feature_transactions
 
 dev_dependencies:
+  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

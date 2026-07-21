@@ -1,5 +1,9 @@
 {
   "@@locale": "en",
+  "allReportsAndTools": "All Reports & Tools",
+  "businessInsights": "Business Insights",
+  "setupBusinessCloud": "Setup Business Cloud",
+  "manageRoles": "Manage Roles",
   "settings": "Settings",
   "accountTypeAsset": "Asset",
   "accountTypeLiability": "Liability",
@@ -40,7 +44,7 @@
     }
   },
   "type": "Type:",
-  "balance": "Balance:",
+  "balance": "Balance",
   "phone": "Phone",
   "errorLoadingAccounts": "Error loading accounts",
   "errorLoadingBalances": "Error loading balances:",
@@ -392,7 +396,7 @@
   "makePayment": "Make Payment",
   "payFromAccount": "Pay From Account",
   "payToAccount": "Pay To Account",
-  "pleaseEnterValidAmount": "Please enter a valid amount greater than zero",
+  "pleaseEnterValidAmount": "Please enter a valid amount > 0",
   "supplier": "Supplier",
   "pleaseSelectSupplier": "Please select a supplier",
   "profitAndLossReport": "Profit & Loss Statement",
@@ -620,7 +624,7 @@
   "customerName": "Customer Name",
   "email": "Email",
   "address": "Address",
-  "taxId": "Tax ID / VAT Number",
+  "taxId": "Tax ID",
   "creditLimit": "Credit Limit",
   "notes": "Notes",
   "noCustomersYet": "No customers yet",
@@ -636,7 +640,7 @@
   "unitPrice": "Unit Price",
   "subtotal": "Subtotal",
   "createInvoice": "Create Invoice",
-  "invoiceCreated": "Invoice created",
+  "invoiceCreated": "Invoice created successfully",
   "noInvoicesYet": "No invoices yet",
   "paid": "Paid",
   "partial": "Partial",
@@ -652,13 +656,13 @@
   "byCustomer": "By Customer",
   "noOutstandingReceivables": "No Outstanding Receivables",
   "allInvoicesPaid": "All invoices are paid!",
-  "customersWithBalances": "customers with balances",
+  "customersWithBalances": "{count} customers with balances",
   "vendors": "Vendors",
   "addVendor": "Add Vendor",
   "newVendor": "New Vendor",
   "editVendor": "Edit Vendor",
   "vendorName": "Vendor Name",
-  "paymentTerms": "Payment Terms",
+  "paymentTerms": "Payment Terms (e.g., Net 30)",
   "noVendorsYet": "No vendors yet",
   "tapToAddFirstVendor": "Tap the button below to add your first vendor",
   "weOwe": "We Owe",
@@ -667,7 +671,7 @@
   "billDate": "Bill Date",
   "vendorInvoice": "Vendor Invoice #",
   "createBill": "Create Bill",
-  "billCreated": "Bill created",
+  "billCreated": "Bill created successfully",
   "noBillsYet": "No bills yet",
   "pending": "Pending",
   "apAgingReport": "AP Aging Report",
@@ -675,7 +679,7 @@
   "byVendor": "By Vendor",
   "noOutstandingPayables": "No Outstanding Payables",
   "allBillsPaid": "All bills are paid!",
-  "vendorsWithBalances": "vendors with balances",
+  "vendorsWithBalances": "{count} vendors with balances",
   "statementOfCashFlows": "Statement of Cash Flows",
   "cashFlowsFromOperating": "Cash Flows from Operating Activities",
   "cashFlowsFromInvesting": "Cash Flows from Investing Activities",
@@ -1173,19 +1177,19 @@
   "addVendorBtn": "Add Vendor",
   "newVendorForm": "New Vendor",
   "editVendorForm": "Edit Vendor",
-  "vendorCreated": "Vendor created",
-  "vendorUpdated": "Vendor updated",
+  "vendorCreated": "Vendor created successfully",
+  "vendorUpdated": "Vendor updated successfully",
   "vendorDetailTitle": "Vendor",
   "customersTitle": "Customers",
   "addCustomerBtn": "Add Customer",
   "newCustomerForm": "New Customer",
   "editCustomerForm": "Edit Customer",
-  "customerCreated": "Customer created",
-  "customerUpdated": "Customer updated",
+  "customerCreated": "Customer created successfully",
+  "customerUpdated": "Customer updated successfully",
   "customerDetailTitle": "Customer",
   "putCustomerOnHold": "Put Customer On Hold",
   "preventsNewInvoices": "Prevents new invoices/orders",
-  "pleaseAddLineItem": "Please add at least one line item",
+  "pleaseAddLineItem": "Please add at least one line item with an amount.",
   "saveBtn": "Save",
   "cancelBtn": "Cancel",
   "createBtn": "Create",
@@ -1195,7 +1199,6 @@
   "bookBalanceLabel": "Book Balance:",
   "entryReconciled": "Entry reconciled",
   "staffManagement": "Staff Management",
-  "manageRoles": "Manage Roles",
   "changeRole": "Change Role",
   "removeAccess": "Remove Access",
   "roleSaved": "Role saved successfully!",
@@ -1678,5 +1681,339 @@
   "netBalance": "Net Balance",
   "exchangeRates": "Exchange Rates",
   "noExchangeRates": "No rates added",
-  "saveAccount": "Save Account"
+  "saveAccount": "Save Account",
+  "password": "Password",
+  "createAccount": "Create Account",
+  "alreadyHaveAccount": "Already have an account? Sign In",
+  "needAccount": "Need an account? Sign Up",
+  "enterEmailAndPassword": "Please enter both email and password.",
+  "signUpSubtitle": "Sign up to create your business",
+  "orSeparator": "OR",
+  "paidFeatureTitle": "Paid Feature",
+  "paidFeatureMessage": "This feature requires an active subscription and account login. Please sign in and subscribe to access staff and roles management.",
+  "signInToAccess": "Sign In",
+  "nameIsRequired": "Name is required",
+  "permissionsLabel": "Permissions",
+  "permViewDashboard": "View Dashboard",
+  "permViewFinancialReports": "View Financial Reports",
+  "permPerformSale": "Perform Sales (POS)",
+  "permVoidTransaction": "Void/Delete Transactions",
+  "permProcessRefund": "Process Refunds",
+  "permViewSalesHistory": "View Sales History",
+  "permViewInventory": "View Inventory",
+  "permManageProducts": "Add/Edit Products",
+  "permAdjustInventory": "Stock Adjustments",
+  "permManageStaff": "Manage Staff & Roles",
+  "permManageSettings": "System Settings",
+  "permSwitchTenant": "Switch Business Branch",
+  "manageSubscription": "Manage Subscription",
+  "availablePlans": "Available Plans",
+  "enterpriseMonthlyPlan": "Enterprise (Monthly)",
+  "enterpriseMonthlyPrice": "$30 / month",
+  "freeTierPlan": "Free Tier",
+  "freeTierPrice": "$0 / forever",
+  "featureCloudSync": "Cloud Sync",
+  "featureMultiUser": "Multi-User",
+  "featureWebAccess": "Web Access",
+  "featureLocalOnly": "Local Only",
+  "featureManualBackup": "Manual Backup",
+  "currentPlanLabel": "CURRENT PLAN",
+  "planStatusLabel": "Status: {status}",
+  "@planStatusLabel": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "planRenewsLabel": "Renews: {date}",
+  "@planRenewsLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "planNeverExpires": "Never",
+  "buyButton": "Buy",
+  "subscriptionUnavailable": "Subscriptions are not available while offline. Please sign in to manage your subscription.",
+  "confirmMockPurchase": "Confirm Purchase",
+  "simulatePaymentFor": "Simulate payment for {planName}?",
+  "@simulatePaymentFor": {
+    "placeholders": {
+      "planName": {
+        "type": "String"
+      }
+    }
+  },
+  "payNowMock": "Pay Now (Demo)",
+  "mockPaymentSuccess": "✅ Demo Payment Successful!",
+  "noStaffFound": "No staff found. Invite someone!",
+  "ownerRole": "Owner",
+  "staffRoleAndEmail": "Role: {roleId} • {email}",
+  "@staffRoleAndEmail": {
+    "placeholders": {
+      "roleId": {
+        "type": "String"
+      },
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "removeStaffTitle": "Remove {name}?",
+  "@removeStaffTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removeStaffWarning": "They will lose access to this business immediately.",
+  "inviteStaff": "Invite Staff",
+  "stepSelectRole": "1. Select a Role",
+  "chooseRoleHint": "Choose Role (e.g. Cashier)",
+  "errorLoadingRoles": "Error loading roles: {error}",
+  "@errorLoadingRoles": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "generateInviteCode": "Generate Invite Code",
+  "stepShareCode": "2. Share Code",
+  "validFor24Hours": "Valid for 24 hours",
+  "shareViaApp": "Share via WhatsApp / Telegram",
+  "inviteShareText": "Join my business on Mizan!\n\n1. Download the App\n2. Sign In\n3. Select 'Join Business' and enter code: {code}\n\n(Valid for 24 hours)",
+  "@inviteShareText": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "validInviteCodeTitle": "Valid Invite Code!",
+  "roleLabel": "Role: {roleId}",
+  "@roleLabel": {
+    "placeholders": {
+      "roleId": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseEnterYourName": "Please enter your name",
+  "orText": "or",
+  "appVersion": "Mizan App v{version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidNumber": "Invalid number",
+  "@errorLoadingCategories": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "requiredField": "This field is required",
+  "category": "Category",
+  "redFlags": "Red Flags",
+  "dsriDescription": "Receivables/Sales",
+  "gmiDescription": "Gross Margin",
+  "aqiDescription": "Asset Quality",
+  "sgiDescription": "Sales Growth",
+  "depiDescription": "Depreciation",
+  "sgaiDescription": "SG&A Expenses",
+  "tataDescription": "Accruals",
+  "lvgiDescription": "Leverage",
+  "whatIsMScore": "What is the Beneish M-Score?",
+  "mScoreDescription": "The M-Score is a mathematical model created by Professor Messod Beneish that uses financial ratios to detect whether a company has manipulated its earnings.\n\nAn M-Score greater than -1.78 suggests a HIGH probability (76%) that the company is an earnings manipulator.",
+  "dsriName": "Days Sales in Receivables Index",
+  "dsriExpl": "Measures if receivables grew faster than sales",
+  "gmiName": "Gross Margin Index",
+  "gmiExpl": "Detects deteriorating gross margins",
+  "aqiName": "Asset Quality Index",
+  "aqiExpl": "Identifies expense capitalization",
+  "sgiName": "Sales Growth Index",
+  "sgiExpl": "High growth creates manipulation pressure",
+  "depiName": "Depreciation Index",
+  "depiExpl": "Detects slowing depreciation rates",
+  "sgaiName": "SG&A Index",
+  "sgaiExpl": "Measures administrative efficiency",
+  "tataName": "Total Accruals to Total Assets",
+  "tataExpl": "High accruals vs cash = low quality",
+  "lvgiName": "Leverage Index",
+  "lvgiExpl": "Increasing debt creates pressure",
+  "famousCasesDesc": "• Enron (2001): Would have had M-Score > -1.78\n• WorldCom (2002): High TATA due to expense capitalization\n• Satyam (2009): High DSRI from fictitious receivables\n\nThe M-Score correctly identified 76% of manipulators in backtesting studies.",
+  "mScoreThresholdLabel": "Threshold: > -1.78 indicates manipulation",
+  "riskLevelHigh": "HIGH",
+  "riskLevelModerate": "MODERATE",
+  "riskLevelLow": "LOW",
+  "unitsLowercase": "units",
+  "flexibleBudgetResult": "Flexible Budget",
+  "varianceFormulas": "• Static Budget = Fixed + (Variable × Planned Activity)\n• Flexible Budget = Fixed + (Variable × Actual Activity)\n• Volume Variance = Flexible - Static\n• Spending Variance = Actual - Flexible",
+  "materialQtyPerUnit": "Material Qty/Unit",
+  "laborHoursPerUnit": "Labor Hours/Unit",
+  "perHrSuffix": "$/hr",
+  "totalVarianceValue": "Total Variance: {amount}",
+  "@totalVarianceValue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "actualCostResult": "Actual Cost",
+  "priceVarianceResult": "Price Variance",
+  "quantityVarianceResult": "Quantity Variance",
+  "materialsFormulasTitle": "Materials Formulas",
+  "materialsFormulasDesc": "• Price Variance = (Actual Price - Standard Price) × Actual Qty\n• Quantity Variance = (Actual Qty - Standard Qty) × Standard Price",
+  "rateVarianceResult": "Rate Variance",
+  "efficiencyVarianceResult": "Efficiency Variance",
+  "laborFormulasTitle": "Labor Formulas",
+  "laborFormulasDesc": "• Rate Variance = (Actual Rate - Standard Rate) × Actual Hours\n• Efficiency Variance = (Actual Hours - Std Hours) × Std Rate",
+  "currentRatioTitle": "Current Ratio",
+  "debtEquityTitle": "Debt/Equity",
+  "netMarginTitle": "Net Margin",
+  "roaTitle": "ROA",
+  "ratioCol": "Ratio",
+  "valueCol": "Value",
+  "benchmarkCol": "Benchmark",
+  "statusCol": "Status",
+  "descriptionCol": "Description",
+  "totalVarianceLabel": "Total Variance",
+  "enterpriseLicenseActive": "Enterprise License Active",
+  "systemAdministrator": "You are the System Administrator",
+  "defineStaffPermissions": "Define staff permissions",
+  "viewPlansBilling": "View plans & billing",
+  "manageStaff": "Manage Staff",
+  "viewListInviteMembers": "View list & invite members",
+  "activateBusinessLicense": "Activate Business License",
+  "initializeSystemClaimOwnership": "Initialize system & claim ownership",
+  "notLoggedInWarning": "⚠️ You are not logged in! Please Sign In first.",
+  "systemActivatedWelcome": "✅ System Activated! Welcome, Admin.",
+  "activationFailed": "❌ Activation Failed: {error}",
+  "@activationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premiumReportWarning": "🔒 Premium Report. Upgrade to Pro or Enterprise.",
+  "buyReportPrompt": "Buy ''{reportTitle}'' for $4.99?",
+  "@buyReportPrompt": {
+    "placeholders": {
+      "reportTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "buyNowAction": "Buy Now",
+  "installedSuccessfully": "✅ Installed {reportTitle}",
+  "@installedSuccessfully": {
+    "placeholders": {
+      "reportTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "noStandardReportsFound": "No standard reports found online.",
+  "installAction": "Install",
+  "includedAction": "Included",
+  "buyPriceAction": "Buy $4.99",
+  "lockedAction": "Locked",
+  "retailBusinessTemplate": "Retail Business",
+  "serviceBusinessTemplate": "Service Business",
+  "customersAr": "Customers (AR)",
+  "vendorsAp": "Vendors (AP)",
+  "openingBalanceHint": "Opening Balance (Owes You). Input 0 if no balance.",
+  "openingBalanceHintVendor": "Opening Balance (You Owe). Input 0 if no balance.",
+  "emailOptional": "Email (Optional)",
+  "phoneOptional": "Phone (Optional)",
+  "addressOptional": "Address (Optional)",
+  "taxIdOptional": "Tax ID / VAT Number (Optional)",
+  "paymentTermsOptional": "Payment Terms (Optional)",
+  "creditLimitOptional": "Credit Limit (Optional)",
+  "notesOptional": "Notes (Optional)",
+  "searchCustomers": "Search Customers...",
+  "searchVendors": "Search Vendors...",
+  "customerDetails": "Customer Details",
+  "vendorDetails": "Vendor Details",
+  "contactInfo": "Contact Information",
+  "noAddressProvided": "No address provided",
+  "noEmailProvided": "No email provided",
+  "noPhoneProvided": "No phone provided",
+  "noTaxIdProvided": "No Tax ID provided",
+  "noNotesProvided": "No notes provided",
+  "noPaymentTermsProvided": "No payment terms provided",
+  "financialOverview": "Financial Overview",
+  "currentBalance": "Current Balance",
+  "totalInvoiced": "Total Invoiced",
+  "totalPaid": "Total Paid",
+  "recentInvoices": "Recent Invoices",
+  "recentBills": "Recent Bills",
+  "noRecentInvoices": "No recent invoices.",
+  "noRecentBills": "No recent bills.",
+  "viewAll": "View All",
+  "actions": "Actions",
+  "receivePayment": "Receive Payment",
+  "statement": "Statement",
+  "edit": "Edit",
+  "status": "Status",
+  "unpaid": "Unpaid",
+  "partiallyPaid": "Partially Paid",
+  "vendor": "Vendor",
+  "addFirstCustomer": "Tap the button below to add your first customer",
+  "noCustomersMatch": "No customers match your search.",
+  "customerBalances": "Customer Balances",
+  "contact": "Contact",
+  "addFirstVendor": "Tap the button below to add your first vendor",
+  "noVendorsMatch": "No vendors match your search.",
+  "vendorBalances": "Vendor Balances",
+  "outstandingBalance": "Outstanding Balance",
+  "quickLedgerAdjustment": "Quick Ledger Adjustment",
+  "creating": "Creating...",
+  "qty": "Qty",
+  "pleaseAddLineItemBill": "Please add at least one line item with an amount.",
+  "vendorInvoiceNumberOptional": "Vendor Invoice # (Optional)",
+  "@customersWithBalances": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "current0To30": "Current\n(0-30)",
+  "days31To60": "31-60\nDays",
+  "days61To90": "61-90\nDays",
+  "days90Plus": "90+\nDays",
+  "days31To60Short": "31-60",
+  "days61To90Short": "61-90",
+  "days90PlusShort": "90+",
+  "@vendorsWithBalances": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adjustBalance": "Adjust Balance: {name}",
+  "@adjustBalance": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "charge": "Charge (+)",
+  "receive": "Receive (-)",
+  "increasesDebt": "Increases their debt to you",
+  "decreasesDebt": "Decreases their debt (routes to Cash)",
+  "saveAdjustment": "Save Adjustment"
 }

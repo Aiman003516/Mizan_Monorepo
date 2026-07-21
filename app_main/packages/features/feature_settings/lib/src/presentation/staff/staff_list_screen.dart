@@ -23,7 +23,9 @@ class StaffListScreen extends ConsumerWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const InviteStaffScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const InviteStaffScreen(),
+                ),
               );
             },
           ),
@@ -32,7 +34,7 @@ class StaffListScreen extends ConsumerWidget {
       body: staffAsync.when(
         data: (staffList) {
           if (staffList.isEmpty) {
-            return const Center(child: Text("No staff found. Invite someone!"));
+            return Center(child: Text(l10n.noStaffFound));
           }
           return ListView.separated(
             itemCount: staffList.length,
@@ -41,15 +43,21 @@ class StaffListScreen extends ConsumerWidget {
               final member = staffList[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: member.isOwner ? context.appColors.secondary : context.appColors.info,
+                  backgroundColor: member.isOwner
+                      ? context.appColors.secondary
+                      : context.appColors.info,
                   child: Text(
-                    member.displayName.isNotEmpty ? member.displayName[0].toUpperCase() : '?',
+                    member.displayName.isNotEmpty
+                        ? member.displayName[0].toUpperCase()
+                        : '?',
                     style: TextStyle(color: context.appColors.onPrimary),
                   ),
                 ),
                 title: Text(member.displayName),
                 subtitle: Text(
-                  member.isOwner ? 'Owner' : 'Role: ${member.roleId} • ${member.email}',
+                  member.isOwner
+                      ? l10n.ownerRole
+                      : l10n.staffRoleAndEmail(member.roleId, member.email),
                 ),
                 trailing: member.isOwner
                     ? Icon(Icons.star, color: context.appColors.warning)
@@ -61,7 +69,10 @@ class StaffListScreen extends ConsumerWidget {
                           ),
                           PopupMenuItem(
                             value: 'remove',
-                            child: Text(l10n.removeAccess, style: TextStyle(color: context.appColors.error)),
+                            child: Text(
+                              l10n.removeAccess,
+                              style: TextStyle(color: context.appColors.error),
+                            ),
                           ),
                         ],
                         onSelected: (value) {
@@ -81,19 +92,28 @@ class StaffListScreen extends ConsumerWidget {
   }
 
   void _confirmRemove(BuildContext context, WidgetRef ref, StaffMember member) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("Remove ${member.displayName}?"),
-        content: const Text("They will lose access to this business immediately."),
+        title: Text(l10n.removeStaffTitle(member.displayName)),
+        content: Text(l10n.removeStaffWarning),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancelBtn),
+          ),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await ref.read(staffRepositoryProvider).removeStaffMember(member.uid);
+              await ref
+                  .read(staffRepositoryProvider)
+                  .removeStaffMember(member.uid);
             },
-            child: Text("Remove", style: TextStyle(color: context.appColors.error)),
+            child: Text(
+              l10n.remove,
+              style: TextStyle(color: context.appColors.error),
+            ),
           ),
         ],
       ),
