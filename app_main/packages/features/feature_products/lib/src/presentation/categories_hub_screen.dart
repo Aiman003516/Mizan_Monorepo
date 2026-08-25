@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_products/src/data/categories_repository.dart';
-
-
+import 'package:feature_products/src/presentation/all_products_stream_provider.dart';
+import 'package:feature_products/src/presentation/products_hub_screen.dart';
 
 import 'dart:io';
 import 'package:shared_ui/shared_ui.dart';
@@ -19,6 +19,15 @@ class CategoriesHubScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final categoriesAsync = ref.watch(categoriesStreamProvider);
+    final productsAsync = ref.watch(allProductsStreamProvider);
+    final productCounts = <String, int>{};
+    for (final product in productsAsync.valueOrNull ?? const <Product>[]) {
+      productCounts.update(
+        product.categoryId,
+        (count) => count + 1,
+        ifAbsent: () => 1,
+      );
+    }
 
     final searchQuery = ref.watch(mainDashboardSearchProvider);
 
@@ -32,64 +41,100 @@ class CategoriesHubScreen extends ConsumerWidget {
 
           if (filteredList.isEmpty) {
             return Center(
-              child: Text(searchQuery.isEmpty
-                  ? l10n.noCategoriesYet
-                  : l10n.noResultsFound(searchQuery)),
+              child: Text(
+                searchQuery.isEmpty
+                    ? l10n.noCategoriesYet
+                    : l10n.noResultsFound(searchQuery),
+              ),
             );
           }
 
           return ListView.builder(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 96),
             itemCount: filteredList.length,
             itemBuilder: (context, index) {
               final category = filteredList[index];
               final imagePath = category.imagePath;
+              final productCount = productCounts[category.id] ?? 0;
 
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: context.appColors.primary,
-                  child: imagePath != null && imagePath.isNotEmpty
-                      ? ClipOval(
-                          child: Image.file(
-                            File(imagePath),
-                            fit: BoxFit.cover,
-                            width: 40,
-                            height: 40,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.error_outline, size: 20),
-                          ),
-                        )
-                      : const Icon(Icons.category, size: 20),
-                ),
-                title: Text(category.name),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () {
-                        _showAddEditDialog(context, ref, category: category);
-                      },
+              return Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: context.appColors.primary,
+                    child: imagePath != null && imagePath.isNotEmpty
+                        ? ClipOval(
+                            child: Image.file(
+                              File(imagePath),
+                              fit: BoxFit.cover,
+                              width: 40,
+                              height: 40,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.error_outline, size: 20),
+                            ),
+                          )
+                        : const Icon(Icons.category, size: 20),
+                  ),
+                  title: Text(
+                    category.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    l10n.productsCount(productCount),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-                    IconButton(
-                      icon: Icon(Icons.delete,
-                          color: Theme.of(context).colorScheme.error),
-                      onPressed: () {
-                        ref
-                            .read(categoriesRepositoryProvider)
-                            .deleteCategory(category.id);
-                        ref
-                            .read(imagePickerServiceProvider)
-                            .deleteImage(category.imagePath);
-                      },
-                    ),
-                  ],
+                  ),
+                  onTap: productCount == 0
+                      ? null
+                      : () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ProductsHubScreen(
+                                isStandalone: true,
+                                initialCategoryId: category.id,
+                              ),
+                            ),
+                          );
+                        },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: l10n.editCategory,
+                        icon: const Icon(Icons.edit_outlined),
+                        onPressed: () {
+                          _showAddEditDialog(context, ref, category: category);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        onPressed: () {
+                          ref
+                              .read(categoriesRepositoryProvider)
+                              .deleteCategory(category.id);
+                          ref
+                              .read(imagePickerServiceProvider)
+                              .deleteImage(category.imagePath);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
           );
         },
-        error: (err, stack) =>
-            Center(child: Text('${l10n.error} ${err.toString()}')),
+        error: (_, __) => Center(
+          child: Text(
+            l10n.errorLoadingData,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -102,8 +147,11 @@ class CategoriesHubScreen extends ConsumerWidget {
     );
   }
 
-  void _showAddEditDialog(BuildContext context, WidgetRef ref,
-      {Category? category}) {
+  void _showAddEditDialog(
+    BuildContext context,
+    WidgetRef ref, {
+    Category? category,
+  }) {
     showDialog(
       context: context,
       builder: (context) {
@@ -222,10 +270,7 @@ class _AddEditCategoryDialogState
             await imageService.deleteImage(_originalImagePath);
           }
         } else {
-          await repo.createCategory(
-            name: newName,
-            imagePath: _imagePath,
-          );
+          await repo.createCategory(name: newName, imagePath: _imagePath);
         }
 
         if (mounted) {
@@ -233,9 +278,9 @@ class _AddEditCategoryDialogState
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${l10n.failedToSave} $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.failedToSave)));
         }
       }
     }
@@ -280,10 +325,7 @@ class _AddEditCategoryDialogState
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.cancel),
         ),
-        FilledButton(
-          onPressed: _save,
-          child: Text(l10n.save),
-        ),
+        FilledButton(onPressed: _save, child: Text(l10n.save)),
       ],
     );
   }

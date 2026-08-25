@@ -27,7 +27,12 @@ class CustomerDetailScreen extends ConsumerWidget {
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
         appBar: AppBar(title: Text(l10n.customerDetailTitle)),
-        body: Center(child: Text('Error: $e')),
+        body: Center(
+          child: Text(
+            l10n.errorLoadingInvoices,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ),
       ),
       data: (customers) {
         final customer = customers.firstWhere(
@@ -55,13 +60,17 @@ class CustomerDetailScreen extends ConsumerWidget {
           currencyCode: currencyCode,
           outstandingBalanceLabel: l10n.outstandingBalance,
           quickAdjustmentLabel: l10n.quickLedgerAdjustment,
-          onEdit: () {
-            Navigator.of(context).push(
+          onEdit: () async {
+            final updated = await Navigator.of(context).push<bool>(
               MaterialPageRoute(
                 builder: (context) =>
                     CustomerFormScreen(customerId: customer.id),
               ),
             );
+            if (updated == true) {
+              ref.invalidate(customersStreamProvider);
+              ref.invalidate(customerInvoicesProvider(customer.id));
+            }
           },
           onNewDocument: () async {
             final created = await Navigator.of(context).push<bool>(
@@ -89,6 +98,7 @@ class CustomerDetailScreen extends ConsumerWidget {
           documentsCount: invoicesAsync.valueOrNull?.length ?? 0,
           isLoadingDocuments: invoicesAsync.isLoading,
           documentsError: invoicesAsync.hasError ? invoicesAsync.error : null,
+          documentsErrorLabel: l10n.errorLoadingInvoices,
           hasDocuments: (invoicesAsync.valueOrNull?.length ?? 0) > 0,
           noDocumentsMessage: l10n.noInvoicesYet,
           noDocumentsIcon: Icons.receipt_long_outlined,

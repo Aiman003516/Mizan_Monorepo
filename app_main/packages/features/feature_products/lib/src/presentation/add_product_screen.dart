@@ -28,20 +28,24 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   @override
   void initState() {
     super.initState();
-    _nameController =
-        TextEditingController(text: widget.productToEdit?.name ?? '');
-    _barcodeController =
-        TextEditingController(text: widget.productToEdit?.barcode ?? '');
+    _nameController = TextEditingController(
+      text: widget.productToEdit?.name ?? '',
+    );
+    _barcodeController = TextEditingController(
+      text: widget.productToEdit?.barcode ?? '',
+    );
     _selectedCategoryId = widget.productToEdit?.categoryId;
     _imagePath = widget.productToEdit?.imagePath;
 
     // --- CRITICAL FIX ---
     // Convert Cents (Int) to Double String (e.g. 1050 -> "10.50")
     if (widget.productToEdit != null) {
-      final double priceDouble =
-          CurrencyFormatter.centsToDouble(widget.productToEdit!.price);
-      _priceController =
-          TextEditingController(text: priceDouble.toStringAsFixed(2));
+      final double priceDouble = CurrencyFormatter.centsToDouble(
+        widget.productToEdit!.price,
+      );
+      _priceController = TextEditingController(
+        text: priceDouble.toStringAsFixed(2),
+      );
     } else {
       _priceController = TextEditingController();
     }
@@ -56,27 +60,32 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       if (_selectedCategoryId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text(AppLocalizations.of(context)!.pleaseSelectCategory)),
+            content: Text(AppLocalizations.of(context)!.pleaseSelectCategory),
+          ),
         );
         return;
       }
 
       final name = _nameController.text;
-      final priceDouble =
-          double.parse(_priceController.text); // User inputs 10.50
+      final priceDouble = double.parse(
+        _priceController.text,
+      ); // User inputs 10.50
       // Note: The Repository now handles the conversion to Cents. We pass Double.
 
-      final barcode =
-          _barcodeController.text.isEmpty ? null : _barcodeController.text;
+      final barcode = _barcodeController.text.isEmpty
+          ? null
+          : _barcodeController.text;
 
       try {
         if (widget.productToEdit != null) {
-          await ref.read(productsRepositoryProvider).updateProduct(
+          await ref
+              .read(productsRepositoryProvider)
+              .updateProduct(
                 widget.productToEdit!,
                 newName: name,
                 newPrice: priceDouble,
@@ -85,7 +94,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 newImagePath: _imagePath,
               );
         } else {
-          await ref.read(productsRepositoryProvider).createProduct(
+          await ref
+              .read(productsRepositoryProvider)
+              .createProduct(
                 name: name,
                 price: priceDouble,
                 categoryId: _selectedCategoryId!,
@@ -93,11 +104,15 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 imagePath: _imagePath,
               );
         }
-        if (mounted) Navigator.pop(context);
+        if (mounted) Navigator.pop(context, true);
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Error: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.failedToSaveProduct),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
         }
       }
     }
@@ -106,17 +121,19 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final currencySymbol =
-        ref.watch(preferencesRepositoryProvider).getCurrencySymbol();
+    final currencySymbol = ref
+        .watch(preferencesRepositoryProvider)
+        .getCurrencySymbol();
 
     // (Keep your existing UI scaffold/layout code here)
     // ...
     // Ensure your TextFormField for price looks like this:
     return Scaffold(
       appBar: AppBar(
-          title: Text(widget.productToEdit == null
-              ? l10n.addProduct
-              : l10n.editProduct)),
+        title: Text(
+          widget.productToEdit == null ? l10n.addProduct : l10n.editProduct,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -136,8 +153,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   labelText: l10n.price,
                   prefixText: '$currencySymbol ', // dynamic currency symbol
                 ),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 validator: (v) {
                   if (v == null || v.isEmpty) return l10n.requiredField;
                   if (double.tryParse(v) == null) return l10n.invalidNumber;
@@ -177,10 +195,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                 },
               ),
               const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _save,
-                child: Text(l10n.saveProduct),
-              )
+              ElevatedButton(onPressed: _save, child: Text(l10n.saveProduct)),
             ],
           ),
         ),

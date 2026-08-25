@@ -113,7 +113,10 @@ class _CustomersTableScreenState extends ConsumerState<CustomersTableScreen> {
             children: [
               Icon(Icons.error_outline, size: 48, color: colorScheme.error),
               const SizedBox(height: 16),
-              Text('Error: $error'),
+              Text(
+                l10n.errorLoadingData,
+                style: TextStyle(color: colorScheme.error),
+              ),
             ],
           ),
         ),

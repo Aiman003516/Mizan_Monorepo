@@ -986,7 +986,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get totalCost => 'التكلفة الإجمالية';
 
   @override
-  String get costPerItem => 'التكلفة';
+  String get costPerItem => 'تكلفة الوحدة';
 
   @override
   String get totalPayable => 'إجمالي المستحقات';
@@ -3201,6 +3201,41 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get searchProducts => 'البحث عن منتجات...';
+
+  @override
+  String get adjustStock => 'تعديل المخزون';
+
+  @override
+  String get addStock => 'إضافة إلى المخزون';
+
+  @override
+  String get removeStock => 'خصم من المخزون';
+
+  @override
+  String get quantityToAdd => 'الكمية المراد إضافتها';
+
+  @override
+  String get quantityToRemove => 'الكمية المراد خصمها';
+
+  @override
+  String get currentStock => 'المخزون الحالي';
+
+  @override
+  String get lowStock => 'مخزون منخفض';
+
+  @override
+  String get stockUpdated => 'تم تحديث المخزون بنجاح';
+
+  @override
+  String get stockUpdateFailed => 'تعذر تحديث المخزون';
+
+  @override
+  String get invalidQuantity => 'أدخل كمية موجبة صحيحة';
+
+  @override
+  String productsCount(int count) {
+    return '$count منتجات';
+  }
 
   @override
   String get outOfStock => 'غير متوفر';

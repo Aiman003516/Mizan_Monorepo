@@ -24,7 +24,12 @@ class VendorDetailScreen extends ConsumerWidget {
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
         appBar: AppBar(title: Text(l10n.vendorDetailTitle)),
-        body: Center(child: Text('Error: $e')),
+        body: Center(
+          child: Text(
+            l10n.errorLoadingBills,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ),
       ),
       data: (vendors) {
         final vendor = vendors.firstWhere(
@@ -48,12 +53,16 @@ class VendorDetailScreen extends ConsumerWidget {
           balance: vendor.balance,
           currencyCode: currencyCode,
           outstandingBalanceLabel: l10n.outstandingBalance,
-          onEdit: () {
-            Navigator.of(context).push(
+          onEdit: () async {
+            final updated = await Navigator.of(context).push<bool>(
               MaterialPageRoute(
                 builder: (context) => VendorFormScreen(vendorId: vendor.id),
               ),
             );
+            if (updated == true) {
+              ref.invalidate(vendorsStreamProvider);
+              ref.invalidate(vendorBillsProvider(vendor.id));
+            }
           },
           onNewDocument: () async {
             final created = await Navigator.of(context).push<bool>(
@@ -71,6 +80,7 @@ class VendorDetailScreen extends ConsumerWidget {
           documentsCount: billsAsync.valueOrNull?.length ?? 0,
           isLoadingDocuments: billsAsync.isLoading,
           documentsError: billsAsync.hasError ? billsAsync.error : null,
+          documentsErrorLabel: l10n.errorLoadingBills,
           hasDocuments: (billsAsync.valueOrNull?.length ?? 0) > 0,
           noDocumentsMessage: l10n.noBillsYet,
           noDocumentsIcon: Icons.receipt_outlined,

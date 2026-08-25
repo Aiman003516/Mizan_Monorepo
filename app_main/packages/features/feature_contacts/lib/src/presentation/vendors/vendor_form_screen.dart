@@ -151,7 +151,7 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${l10n.error} $e'),
+            content: Text(l10n.errorLoadingData),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

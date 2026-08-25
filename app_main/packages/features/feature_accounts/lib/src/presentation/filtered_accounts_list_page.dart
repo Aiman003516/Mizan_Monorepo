@@ -234,9 +234,22 @@ class FilteredAccountsListPage extends ConsumerWidget {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: DataTable(
-                          headingRowColor: WidgetStateProperty.all(
-                            Theme.of(context).colorScheme.surfaceContainerHighest,
+                          headingRowColor: WidgetStatePropertyAll(
+                            Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
                           ),
+                          headingTextStyle: Theme.of(context)
+                              .textTheme
+                              .labelLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                          dataTextStyle: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                           dataRowColor: WidgetStateProperty.resolveWith<Color?>(
                             (Set<WidgetState> states) {
                               return null;
@@ -252,36 +265,50 @@ class FilteredAccountsListPage extends ConsumerWidget {
                             final index = entry.key;
                             final balanceData = entry.value;
                             final account = balanceData.account;
-                            final totalBalance = balanceData.totalCombinedBalance;
+                            final totalBalance =
+                                balanceData.totalCombinedBalance;
 
                             final bool isSupplier =
-                                classificationFilter == kClassificationSuppliers;
+                                classificationFilter ==
+                                kClassificationSuppliers;
                             final bool isOwed = totalBalance < -0.001;
                             final bool showPaymentButton = isSupplier && isOwed;
 
-                            final breakdownSummaries = balanceData.currencySummaries;
-                            
-                            final baseCurrencyCode = ref.read(defaultCurrencyProvider);
-                            final baseCurrencySymbol =
-                                ref.read(preferencesRepositoryProvider).getCurrencySymbol();
+                            final breakdownSummaries =
+                                balanceData.currencySummaries;
+
+                            final baseCurrencyCode = ref.read(
+                              defaultCurrencyProvider,
+                            );
+                            final baseCurrencySymbol = ref
+                                .read(preferencesRepositoryProvider)
+                                .getCurrencySymbol();
 
                             String accountCurrency = baseCurrencyCode;
                             if (account.customAttributes != null) {
                               try {
-                                final attrs = jsonDecode(account.customAttributes!);
+                                final attrs = jsonDecode(
+                                  account.customAttributes!,
+                                );
                                 final stored = attrs['currency'] as String?;
                                 if (stored != null && stored != 'Local') {
                                   accountCurrency = stored;
                                 }
                               } catch (_) {}
                             }
-                            final displaySymbol = accountCurrency == baseCurrencyCode
+                            final displaySymbol =
+                                accountCurrency == baseCurrencyCode
                                 ? baseCurrencySymbol
-                                : CurrencyFormatter.getCurrencySymbol(accountCurrency);
+                                : CurrencyFormatter.getCurrencySymbol(
+                                    accountCurrency,
+                                  );
 
                             final isGray = index % 2 == 0;
                             final rowColor = isGray
-                                ? Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                                ? Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHighest
+                                      .withValues(alpha: 0.3)
                                 : Theme.of(context).colorScheme.surface;
 
                             return DataRow(
@@ -293,14 +320,17 @@ class FilteredAccountsListPage extends ConsumerWidget {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            AccountLedgerScreen(account: account),
+                                            AccountLedgerScreen(
+                                              account: account,
+                                            ),
                                       ),
                                     );
                                   },
                                 ),
                                 DataCell(
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -308,36 +338,49 @@ class FilteredAccountsListPage extends ConsumerWidget {
                                             ? '${totalBalance.toStringAsFixed(2)} $displaySymbol'
                                             : '0.00 $displaySymbol',
                                         style: TextStyle(
-                                          color: totalBalance > 0 ? Colors.green : null,
+                                          color: totalBalance > 0
+                                              ? Theme.of(
+                                                  context,
+                                                ).colorScheme.tertiary
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       if (breakdownSummaries.isNotEmpty)
-                                        ...breakdownSummaries.map((summary) {
-                                          return Text(
-                                            summary.netBalance > 0
-                                                ? '${summary.netBalance.toStringAsFixed(2)} ${summary.currencyCode}'
-                                                : '',
-                                            style: const TextStyle(
-                                              color: Colors.green,
-                                              fontSize: 10,
+                                        ...breakdownSummaries
+                                            .map((summary) {
+                                              return Text(
+                                                summary.netBalance > 0
+                                                    ? '${summary.netBalance.toStringAsFixed(2)} ${summary.currencyCode}'
+                                                    : '',
+                                                style: const TextStyle(
+                                                  color: Colors.green,
+                                                  fontSize: 10,
+                                                ),
+                                              );
+                                            })
+                                            .where(
+                                              (w) => (w.data ?? '').isNotEmpty,
                                             ),
-                                          );
-                                        }).where((w) => (w.data ?? '').isNotEmpty),
                                     ],
                                   ),
                                   onTap: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            AccountLedgerScreen(account: account),
+                                            AccountLedgerScreen(
+                                              account: account,
+                                            ),
                                       ),
                                     );
                                   },
                                 ),
                                 DataCell(
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -345,29 +388,41 @@ class FilteredAccountsListPage extends ConsumerWidget {
                                             ? '${totalBalance.abs().toStringAsFixed(2)} $displaySymbol'
                                             : '0.00 $displaySymbol',
                                         style: TextStyle(
-                                          color: totalBalance < 0 ? Colors.red : null,
+                                          color: totalBalance < 0
+                                              ? Theme.of(
+                                                  context,
+                                                ).colorScheme.error
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       if (breakdownSummaries.isNotEmpty)
-                                        ...breakdownSummaries.map((summary) {
-                                          return Text(
-                                            summary.netBalance < 0
-                                                ? '${summary.netBalance.abs().toStringAsFixed(2)} ${summary.currencyCode}'
-                                                : '',
-                                            style: const TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 10,
+                                        ...breakdownSummaries
+                                            .map((summary) {
+                                              return Text(
+                                                summary.netBalance < 0
+                                                    ? '${summary.netBalance.abs().toStringAsFixed(2)} ${summary.currencyCode}'
+                                                    : '',
+                                                style: const TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 10,
+                                                ),
+                                              );
+                                            })
+                                            .where(
+                                              (w) => (w.data ?? '').isNotEmpty,
                                             ),
-                                          );
-                                        }).where((w) => (w.data ?? '').isNotEmpty),
                                     ],
                                   ),
                                   onTap: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            AccountLedgerScreen(account: account),
+                                            AccountLedgerScreen(
+                                              account: account,
+                                            ),
                                       ),
                                     );
                                   },
@@ -379,10 +434,12 @@ class FilteredAccountsListPage extends ConsumerWidget {
                                           onPressed: () {
                                             Navigator.of(context).push(
                                               MaterialPageRoute(
-                                                builder: (context) => MakePaymentScreen(
-                                                  supplierAccount: account,
-                                                  amountOwed: totalBalance.abs(),
-                                                ),
+                                                builder: (context) =>
+                                                    MakePaymentScreen(
+                                                      supplierAccount: account,
+                                                      amountOwed: totalBalance
+                                                          .abs(),
+                                                    ),
                                               ),
                                             );
                                           },
@@ -400,13 +457,19 @@ class FilteredAccountsListPage extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Center(
-              child: Text('${l10n.errorLoadingSummaries} ${err.toString()}'),
+            error: (_, __) => Center(
+              child: Text(
+                l10n.errorLoadingSummaries,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             ),
           );
         },
-        error: (err, stack) => Center(
-          child: Text('${l10n.errorLoadingAccounts} ${err.toString()}'),
+        error: (_, __) => Center(
+          child: Text(
+            l10n.errorLoadingAccounts,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),

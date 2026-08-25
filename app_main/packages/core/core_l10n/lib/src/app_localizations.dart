@@ -6182,6 +6182,72 @@ abstract class AppLocalizations {
   /// **'Search products...'**
   String get searchProducts;
 
+  /// No description provided for @adjustStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust stock'**
+  String get adjustStock;
+
+  /// No description provided for @addStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Add stock'**
+  String get addStock;
+
+  /// No description provided for @removeStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove stock'**
+  String get removeStock;
+
+  /// No description provided for @quantityToAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity to add'**
+  String get quantityToAdd;
+
+  /// No description provided for @quantityToRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity to remove'**
+  String get quantityToRemove;
+
+  /// No description provided for @currentStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Current stock'**
+  String get currentStock;
+
+  /// No description provided for @lowStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Low stock'**
+  String get lowStock;
+
+  /// No description provided for @stockUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock updated successfully'**
+  String get stockUpdated;
+
+  /// No description provided for @stockUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update stock'**
+  String get stockUpdateFailed;
+
+  /// No description provided for @invalidQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid positive quantity'**
+  String get invalidQuantity;
+
+  /// No description provided for @productsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} products'**
+  String productsCount(int count);
+
   /// No description provided for @outOfStock.
   ///
   /// In en, this message translates to:

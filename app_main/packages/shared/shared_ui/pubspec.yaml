@@ -23,11 +23,14 @@ dependencies:
     path: ../../core/core_data
 
   intl: any
+  flutter_svg: ^2.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
 flutter:
+  assets:
+    - assets/icons/saudi_riyal_symbol.svg
   fonts:
     - family: SaudiRiyal
       fonts:

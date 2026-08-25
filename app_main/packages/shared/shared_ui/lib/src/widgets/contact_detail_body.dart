@@ -33,6 +33,7 @@ class ContactDetailBody extends StatelessWidget {
   final int documentsCount;
   final bool isLoadingDocuments;
   final Object? documentsError;
+  final String documentsErrorLabel;
   final bool hasDocuments;
   final String noDocumentsMessage;
   final IconData noDocumentsIcon;
@@ -64,6 +65,7 @@ class ContactDetailBody extends StatelessWidget {
     required this.documentsCount,
     required this.isLoadingDocuments,
     this.documentsError,
+    required this.documentsErrorLabel,
     required this.hasDocuments,
     required this.noDocumentsMessage,
     required this.noDocumentsIcon,
@@ -206,16 +208,17 @@ class ContactDetailBody extends StatelessWidget {
                     const SizedBox(height: 16),
                     FilledButton.icon(
                       onPressed: onQuickAdjustment,
-                      icon: const Icon(Icons.sync_alt, color: Colors.black87),
+                      icon: Icon(Icons.sync_alt, color: colorScheme.onSurface),
                       label: Text(
                         quickAdjustmentLabel!,
-                        style: const TextStyle(
-                          color: Colors.black87,
+                        style: TextStyle(
+                          color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       style: FilledButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: colorScheme.surface,
+                        foregroundColor: colorScheme.onSurface,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -257,7 +260,11 @@ class ContactDetailBody extends StatelessWidget {
             else if (documentsError != null)
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text('Error: $documentsError'),
+                child: Text(
+                  documentsErrorLabel,
+                  style: TextStyle(color: colorScheme.error),
+                  textAlign: TextAlign.center,
+                ),
               )
             else if (!hasDocuments)
               Container(
@@ -314,13 +321,27 @@ class _InfoRow extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: theme.colorScheme.outline),
           const SizedBox(width: 8),
-          Text(
-            '$label: ',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.outline,
+          Expanded(
+            child: Text(
+              '$label: ',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
-          Expanded(child: Text(value, style: theme.textTheme.bodyMedium)),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 2,
+            child: Text(
+              value,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: theme.textTheme.bodyMedium,
+            ),
+          ),
         ],
       ),
     );

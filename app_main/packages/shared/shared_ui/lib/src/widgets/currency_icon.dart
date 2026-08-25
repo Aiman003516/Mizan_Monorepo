@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// Common display symbols for currencies supported by Mizan.
 ///
@@ -72,9 +73,8 @@ class CurrencySymbols {
 
 /// A compact, direction-safe visual marker for a currency code.
 ///
-/// SAR uses the official Saudi Riyal sign (U+20C1) and the bundled
-/// SaudiRiyal font, which keeps the sign legible on Android versions whose
-/// system font may not yet contain the Unicode 17 glyph.
+/// SAR uses the official Saudi Central Bank SVG asset rather than depending
+/// on Android’s Unicode 17 font coverage or a potentially incompatible font.
 class CurrencyIcon extends StatelessWidget {
   const CurrencyIcon({
     super.key,
@@ -108,19 +108,31 @@ class CurrencyIcon extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: colorScheme.outlineVariant),
         ),
-        child: Text(
-          displaySymbol,
-          textDirection: TextDirection.ltr,
-          maxLines: 1,
-          overflow: TextOverflow.clip,
-          style: TextStyle(
-            fontFamily: isSaudiRiyal ? 'SaudiRiyal' : null,
-            fontSize: isSaudiRiyal ? size - 1 : size * 0.72,
-            height: 1,
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onPrimaryContainer,
-          ),
-        ),
+        child: isSaudiRiyal
+            ? SvgPicture.asset(
+                'assets/icons/saudi_riyal_symbol.svg',
+                package: 'shared_ui',
+                width: size,
+                height: size,
+                fit: BoxFit.contain,
+                colorFilter: ColorFilter.mode(
+                  colorScheme.onPrimaryContainer,
+                  BlendMode.srcIn,
+                ),
+                semanticsLabel: normalizedCode,
+              )
+            : Text(
+                displaySymbol,
+                textDirection: TextDirection.ltr,
+                maxLines: 1,
+                overflow: TextOverflow.clip,
+                style: TextStyle(
+                  fontSize: size * 0.72,
+                  height: 1,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onPrimaryContainer,
+                ),
+              ),
       ),
     );
   }

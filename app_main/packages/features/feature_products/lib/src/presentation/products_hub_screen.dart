@@ -10,10 +10,12 @@ import 'package:feature_products/src/presentation/product_import_screen.dart';
 
 class ProductsHubScreen extends ConsumerWidget {
   final bool isStandalone;
+  final String? initialCategoryId;
 
   const ProductsHubScreen({
     super.key,
     this.isStandalone = false,
+    this.initialCategoryId,
   });
 
   @override
@@ -24,12 +26,14 @@ class ProductsHubScreen extends ConsumerWidget {
       // ✅ NEW: Added AppBar to house the "Action" buttons
       appBar: isStandalone
           ? AppBar(
-              title: Text(l10n.productsTitle), // You can replace this with l10n.products later
+              title: Text(
+                l10n.productsTitle,
+              ), // You can replace this with l10n.products later
               actions: [
                 // ⬇️ THE IMPORT BUTTON
                 IconButton(
                   icon: const Icon(Icons.upload_file),
-                  tooltip: 'Import from Excel/CSV',
+                  tooltip: l10n.importButton,
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -51,7 +55,7 @@ class ProductsHubScreen extends ConsumerWidget {
                 children: [
                   OutlinedButton.icon(
                     icon: const Icon(Icons.upload_file),
-                    label: const Text('Import from Excel/CSV'),
+                    label: Text(l10n.importButton),
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -63,15 +67,15 @@ class ProductsHubScreen extends ConsumerWidget {
                 ],
               ),
             ),
-          const Expanded(child: AllProductsListWidget()),
+          Expanded(
+            child: AllProductsListWidget(initialCategoryId: initialCategoryId),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddProductScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const AddProductScreen()),
           );
         },
         tooltip: l10n.addNewProduct,

@@ -11,8 +11,8 @@ final productsRepositoryProvider = Provider<ProductsRepository>((ref) {
 
 final productsByCategoryStreamProvider =
     StreamProvider.family<List<Product>, String>((ref, categoryId) {
-  return ref.watch(productsRepositoryProvider).watchProducts(categoryId);
-});
+      return ref.watch(productsRepositoryProvider).watchProducts(categoryId);
+    });
 
 class ProductsRepository {
   final AppDatabase _db;
@@ -26,14 +26,15 @@ class ProductsRepository {
   }
 
   Stream<List<Product>> watchAllProducts() {
-    return (_db.select(_db.products)
-          ..orderBy([(p) => OrderingTerm.asc(p.name)]))
-        .watch();
+    return (_db.select(
+      _db.products,
+    )..orderBy([(p) => OrderingTerm.asc(p.name)])).watch();
   }
 
   Future<Product?> findProductByBarcode(String barcode) {
-    return (_db.select(_db.products)..where((p) => p.barcode.equals(barcode)))
-        .getSingleOrNull();
+    return (_db.select(
+      _db.products,
+    )..where((p) => p.barcode.equals(barcode))).getSingleOrNull();
   }
 
   Future<void> createProduct({
@@ -43,7 +44,9 @@ class ProductsRepository {
     String? barcode,
     String? imagePath,
   }) async {
-    await _db.into(_db.products).insert(
+    await _db
+        .into(_db.products)
+        .insert(
           ProductsCompanion.insert(
             name: name,
             price: (price * 100).round(), // Convert to Cents
@@ -74,8 +77,12 @@ class ProductsRepository {
     String? newBarcode,
     String? newImagePath,
   }) async {
-    await _db.update(_db.products).replace(
-          original.toCompanion(false).copyWith(
+    await _db
+        .update(_db.products)
+        .replace(
+          original
+              .toCompanion(false)
+              .copyWith(
                 name: Value(newName),
                 price: Value((newPrice * 100).round()),
                 categoryId: Value(newCategoryId),
@@ -95,9 +102,9 @@ class ProductsRepository {
     required double quantityPurchased,
     required double costPerItem,
   }) async {
-    final product = await (_db.select(_db.products)
-          ..where((p) => p.id.equals(productId)))
-        .getSingle();
+    final product = await (_db.select(
+      _db.products,
+    )..where((p) => p.id.equals(productId))).getSingle();
 
     final double oldQty = product.quantityOnHand;
     final double oldCostCents = product.averageCost.toDouble();
@@ -113,7 +120,9 @@ class ProductsRepository {
           ((oldQty * oldCostCents) + (newQty * newCostCents)) / totalQuantity;
     }
 
-    final companion = product.toCompanion(false).copyWith(
+    final companion = product
+        .toCompanion(false)
+        .copyWith(
           quantityOnHand: Value(totalQuantity),
           averageCost: Value(newAverageCostCents.round()),
           lastUpdated: Value(DateTime.now()),
@@ -122,25 +131,79 @@ class ProductsRepository {
     await _db.update(_db.products).replace(companion);
   }
 
+  /// Adjusts on-hand stock from the product-management screen.
+  ///
+  /// Positive deltas represent a purchase and update weighted average cost.
+  /// Negative deltas represent a stock correction or issue and never allow
+  /// inventory to become negative.
+  Future<void> adjustStock({
+    required String productId,
+    required double quantityDelta,
+    required double costPerItem,
+  }) async {
+    if (!quantityDelta.isFinite || quantityDelta == 0) {
+      throw ArgumentError.value(quantityDelta, 'quantityDelta');
+    }
+    if (!costPerItem.isFinite || costPerItem < 0) {
+      throw ArgumentError.value(costPerItem, 'costPerItem');
+    }
+
+    final product = await (_db.select(
+      _db.products,
+    )..where((p) => p.id.equals(productId))).getSingle();
+    final oldQuantity = product.quantityOnHand;
+    final newQuantity = (oldQuantity + quantityDelta).clamp(
+      0.0,
+      double.infinity,
+    );
+
+    var newAverageCost = product.averageCost;
+    if (quantityDelta > 0) {
+      final purchasedCostCents = costPerItem * 100;
+      final totalCost =
+          (oldQuantity * product.averageCost) +
+          (quantityDelta * purchasedCostCents);
+      if (newQuantity > 0) {
+        newAverageCost = (totalCost / newQuantity).round();
+      }
+    }
+
+    await _db
+        .update(_db.products)
+        .replace(
+          product
+              .toCompanion(false)
+              .copyWith(
+                quantityOnHand: Value(newQuantity),
+                averageCost: Value(newAverageCost),
+                lastUpdated: Value(DateTime.now()),
+              ),
+        );
+  }
+
   // --- Phase 2.5: Product Bundles ---
   /// Deducts stock from child products when a bundle is sold.
   Future<void> sellBundle(String bundleProductId, double bundleQtySold) async {
     // 1. Get all child items for this bundle
-    final bundleItems = await (_db.select(_db.productBundleItems)
-          ..where((tbl) => tbl.bundleProductId.equals(bundleProductId)))
-        .get();
+    final bundleItems = await (_db.select(
+      _db.productBundleItems,
+    )..where((tbl) => tbl.bundleProductId.equals(bundleProductId))).get();
 
     // 2. For each child, deduct (childQty * bundleQtySold) from stock
     for (final item in bundleItems) {
-      final childProduct = await (_db.select(_db.products)
-            ..where((p) => p.id.equals(item.childProductId)))
-          .getSingleOrNull();
+      final childProduct = await (_db.select(
+        _db.products,
+      )..where((p) => p.id.equals(item.childProductId))).getSingleOrNull();
 
       if (childProduct != null) {
         final newQty =
             childProduct.quantityOnHand - (item.quantity * bundleQtySold);
-        await _db.update(_db.products).replace(
-              childProduct.toCompanion(false).copyWith(
+        await _db
+            .update(_db.products)
+            .replace(
+              childProduct
+                  .toCompanion(false)
+                  .copyWith(
                     quantityOnHand: Value(newQty < 0 ? 0 : newQty),
                     lastUpdated: Value(DateTime.now()),
                   ),

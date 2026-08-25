@@ -3,6 +3,7 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 import 'package:feature_settings/src/presentation/onboarding_tutorial_screen.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 // We need a provider to trigger the "First Run Completed" action
 // This will just refresh the main app state
@@ -28,12 +29,32 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   List<Map<String, String>> get _commonCurrencies {
     final isAr = ref.read(localeControllerProvider)?.languageCode == 'ar';
     return [
-      {'code': 'USD', 'symbol': '\$', 'name': isAr ? 'دولار أمريكي' : 'US Dollar'},
-      {'code': 'SAR', 'symbol': isAr ? 'ر.س' : 'SAR', 'name': isAr ? 'ريال سعودي' : 'Saudi Riyal'},
-      {'code': 'YER', 'symbol': '﷼', 'name': isAr ? 'ريال يمني' : 'Yemeni Rial'},
-      {'code': 'AED', 'symbol': isAr ? 'د.إ' : 'AED', 'name': isAr ? 'درهم إماراتي' : 'UAE Dirham'},
+      {
+        'code': 'USD',
+        'symbol': '\$',
+        'name': isAr ? 'دولار أمريكي' : 'US Dollar',
+      },
+      {
+        'code': 'SAR',
+        'symbol': isAr ? 'ر.س' : 'SAR',
+        'name': isAr ? 'ريال سعودي' : 'Saudi Riyal',
+      },
+      {
+        'code': 'YER',
+        'symbol': '﷼',
+        'name': isAr ? 'ريال يمني' : 'Yemeni Rial',
+      },
+      {
+        'code': 'AED',
+        'symbol': isAr ? 'د.إ' : 'AED',
+        'name': isAr ? 'درهم إماراتي' : 'UAE Dirham',
+      },
       {'code': 'EUR', 'symbol': '€', 'name': isAr ? 'يورو' : 'Euro'},
-      {'code': 'CUSTOM', 'symbol': '?', 'name': isAr ? 'مخصص / آخر' : 'Custom / Other'},
+      {
+        'code': 'CUSTOM',
+        'symbol': '?',
+        'name': isAr ? 'مخصص / آخر' : 'Custom / Other',
+      },
     ];
   }
 
@@ -83,10 +104,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
                   // 🌍 SECTION 1: LANGUAGE
-                  _buildSectionHeader(
-                    l10n.language,
-                    Icons.language,
-                  ),
+                  _buildSectionHeader(l10n.language, Icons.language),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -166,7 +184,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(c['symbol']!, style: const TextStyle(fontWeight: FontWeight.bold, fontFamilyFallback: ['packages/core_ui/SaudiRiyal'])),
+                              CurrencyIcon(
+                                code: c['code']!,
+                                symbol: c['symbol']!,
+                                size: 18,
+                              ),
                               const SizedBox(width: 12),
                               Text(c['code']!),
                               const Text(' - '),
@@ -216,7 +238,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           flex: 1,
                           child: TextField(
                             controller: _customSymbolCtrl,
-                            style: const TextStyle(fontFamilyFallback: ['packages/core_ui/SaudiRiyal']),
                             decoration: InputDecoration(
                               labelText: l10n.currencySymbolLabel,
                               border: const OutlineInputBorder(),
@@ -290,7 +311,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Please enter currency details")),
           );
-          setState(() { _isLoading = false; });
+          setState(() {
+            _isLoading = false;
+          });
           return;
         }
         finalCode = _customCodeCtrl.text.toUpperCase();
@@ -337,7 +360,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             builder: (builderContext) => OnboardingTutorialScreen(
               onComplete: () {
                 // Trigger App Rebuild via ProviderScope to avoid 'ref disposed' error
-                ProviderScope.containerOf(builderContext).read(onboardingCompletedProvider.notifier).state = true;
+                ProviderScope.containerOf(
+                  builderContext,
+                ).read(onboardingCompletedProvider.notifier).state = true;
               },
             ),
           ),

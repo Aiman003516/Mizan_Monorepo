@@ -1414,6 +1414,25 @@
     }
   },
   "searchProducts": "Search products...",
+  "adjustStock": "Adjust stock",
+  "addStock": "Add stock",
+  "removeStock": "Remove stock",
+  "quantityToAdd": "Quantity to add",
+  "quantityToRemove": "Quantity to remove",
+  "costPerItem": "Cost per item",
+  "currentStock": "Current stock",
+  "lowStock": "Low stock",
+  "stockUpdated": "Stock updated successfully",
+  "stockUpdateFailed": "Could not update stock",
+  "invalidQuantity": "Enter a valid positive quantity",
+  "productsCount": "{count} products",
+  "@productsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "outOfStock": "Out of stock",
   "cartEmpty": "Your cart is empty",
   "cartEmptyHint": "Tap products to add them to your order",

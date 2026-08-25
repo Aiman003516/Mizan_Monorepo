@@ -12,8 +12,18 @@ class VendorDataSource extends DataTableSource {
   final List<Vendor> vendors;
   final BuildContext context;
   final String currencyCode;
+  final String editTooltip;
+  final String openTooltip;
+  final Future<void> Function(String vendorId) onEdit;
 
-  VendorDataSource(this.vendors, this.context, this.currencyCode);
+  VendorDataSource(
+    this.vendors,
+    this.context,
+    this.currencyCode, {
+    required this.editTooltip,
+    required this.openTooltip,
+    required this.onEdit,
+  });
 
   @override
   DataRow? getRow(int index) {
@@ -42,15 +52,27 @@ class VendorDataSource extends DataTableSource {
           ),
         ),
         DataCell(
-          IconButton(
-            icon: const Icon(Icons.arrow_forward_ios, size: 16),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => VendorDetailScreen(vendorId: vendor.id),
-                ),
-              );
-            },
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                tooltip: editTooltip,
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                onPressed: () => onEdit(vendor.id),
+              ),
+              IconButton(
+                tooltip: openTooltip,
+                icon: const Icon(Icons.arrow_forward_ios, size: 16),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          VendorDetailScreen(vendorId: vendor.id),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ],
@@ -111,7 +133,10 @@ class _VendorsTableScreenState extends ConsumerState<VendorsTableScreen> {
             children: [
               Icon(Icons.error_outline, size: 48, color: colorScheme.error),
               const SizedBox(height: 16),
-              Text('Error: $error'),
+              Text(
+                l10n.errorLoadingData,
+                style: TextStyle(color: colorScheme.error),
+              ),
             ],
           ),
         ),
@@ -160,6 +185,18 @@ class _VendorsTableScreenState extends ConsumerState<VendorsTableScreen> {
             filteredVendors,
             context,
             currencyCode,
+            editTooltip: l10n.editVendor,
+            openTooltip: l10n.details,
+            onEdit: (vendorId) async {
+              final updated = await Navigator.of(context).push<bool>(
+                MaterialPageRoute(
+                  builder: (context) => VendorFormScreen(vendorId: vendorId),
+                ),
+              );
+              if (updated == true && mounted) {
+                ref.invalidate(vendorsStreamProvider);
+              }
+            },
           );
           final rowsPerPage = filteredVendors.isEmpty
               ? 1

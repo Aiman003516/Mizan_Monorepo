@@ -3215,6 +3215,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchProducts => 'Search products...';
 
   @override
+  String get adjustStock => 'Adjust stock';
+
+  @override
+  String get addStock => 'Add stock';
+
+  @override
+  String get removeStock => 'Remove stock';
+
+  @override
+  String get quantityToAdd => 'Quantity to add';
+
+  @override
+  String get quantityToRemove => 'Quantity to remove';
+
+  @override
+  String get currentStock => 'Current stock';
+
+  @override
+  String get lowStock => 'Low stock';
+
+  @override
+  String get stockUpdated => 'Stock updated successfully';
+
+  @override
+  String get stockUpdateFailed => 'Could not update stock';
+
+  @override
+  String get invalidQuantity => 'Enter a valid positive quantity';
+
+  @override
+  String productsCount(int count) {
+    return '$count products';
+  }
+
+  @override
   String get outOfStock => 'Out of stock';
 
   @override

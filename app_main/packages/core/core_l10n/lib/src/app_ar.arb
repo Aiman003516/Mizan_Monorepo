@@ -1467,6 +1467,25 @@
     }
   },
   "searchProducts": "البحث عن منتجات...",
+  "adjustStock": "تعديل المخزون",
+  "addStock": "إضافة إلى المخزون",
+  "removeStock": "خصم من المخزون",
+  "quantityToAdd": "الكمية المراد إضافتها",
+  "quantityToRemove": "الكمية المراد خصمها",
+  "costPerItem": "تكلفة الوحدة",
+  "currentStock": "المخزون الحالي",
+  "lowStock": "مخزون منخفض",
+  "stockUpdated": "تم تحديث المخزون بنجاح",
+  "stockUpdateFailed": "تعذر تحديث المخزون",
+  "invalidQuantity": "أدخل كمية موجبة صحيحة",
+  "productsCount": "{count} منتجات",
+  "@productsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "outOfStock": "غير متوفر",
   "cartEmpty": "سلتك فارغة",
   "cartEmptyHint": "اضغط على المنتجات لإضافتها إلى طلبك",

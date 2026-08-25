@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_ui/shared_ui.dart';
 
 void main() {
@@ -23,16 +24,15 @@ void main() {
     });
   });
 
-  testWidgets('renders SAR with the bundled SaudiRiyal font', (tester) async {
+  testWidgets('renders SAR with the official bundled SVG asset', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(body: CurrencyIcon(code: 'SAR')),
       ),
     );
 
-    final symbol = tester.widget<Text>(
-      find.text(CurrencySymbols.saudiRiyalSign),
-    );
-    expect(symbol.style?.fontFamily, 'SaudiRiyal');
+    expect(find.byType(SvgPicture), findsOneWidget);
   });
 }
