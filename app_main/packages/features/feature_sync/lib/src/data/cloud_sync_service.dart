@@ -3,7 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:core_data/core_data.dart';
 import 'package:feature_auth/feature_auth.dart'; 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:drift/drift.dart' hide Column;
 
 /// 🔄 THE HYBRID SYNC ENGINE (Engine B - Phase 4.3 Billing Enforcer)
 class CloudSyncService {
@@ -165,7 +164,18 @@ class CloudSyncService {
     for (int i = 0; i < chunks; i++) {
       final start = i * batchSize;
       final end = (start + batchSize < rows.length) ? start + batchSize : rows.length;
-      final chunk = rows.sublist(start, end);
+      final chunk = rows.sublist(start, end).map((row) {
+        final lastUpdated = row['lastUpdated'];
+        return <String, dynamic>{
+          'id': row['id'],
+          'tenant_id': _currentTenantId,
+          'data': row,
+          'last_updated': lastUpdated is DateTime
+              ? lastUpdated.toUtc().toIso8601String()
+              : lastUpdated,
+          'is_deleted': row['isDeleted'] == true,
+        };
+      }).toList();
 
       try {
         await _supabase.from(remoteName).upsert(chunk);
@@ -188,7 +198,7 @@ class CloudSyncService {
         final missedData = await _supabase
           .from(remoteName)
           .select()
-          .eq('tenant_id', _currentTenantId!)
+          .eq('tenant_id', _currentTenantId)
           .gte('last_updated', lastSync.toIso8601String());
           
         if (missedData.isNotEmpty) {
@@ -216,11 +226,18 @@ class CloudSyncService {
       table: remoteName,
       filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'tenant_id', value: _currentTenantId),
       callback: (payload) async {
-        if (payload.newRecord != null) {
-          print('📥 [CloudSync] Received realtime update for $remoteName');
-          await _upsertLocal(tableName, [payload.newRecord!]);
-          await _prefs.setLastSyncTime(DateTime.now());
+        final record = payload.eventType == PostgresChangeEvent.delete
+            ? payload.oldRecord
+            : payload.newRecord;
+        if (record.isEmpty) return;
+
+        print('📥 [CloudSync] Received realtime update for $remoteName');
+        final syncRecord = Map<String, dynamic>.from(record);
+        if (payload.eventType == PostgresChangeEvent.delete) {
+          syncRecord['is_deleted'] = true;
         }
+        await _upsertLocal(tableName, [syncRecord]);
+        await _prefs.setLastSyncTime(DateTime.now());
       }
     ).subscribe();
 
@@ -231,22 +248,30 @@ class CloudSyncService {
     await _localDb.transaction(() async {
       for (final data in docs) {
         try {
+          final rawData = data['data'];
+          final localData = rawData is Map
+              ? Map<String, dynamic>.from(rawData)
+              : Map<String, dynamic>.from(data);
+          if (data['is_deleted'] == true) {
+            localData['isDeleted'] = true;
+          }
+
           if (tableName == _localDb.transactions.actualTableName) {
-             await _localDb.into(_localDb.transactions).insertOnConflictUpdate(Transaction.fromJson(data));
+             await _localDb.into(_localDb.transactions).insertOnConflictUpdate(Transaction.fromJson(localData));
           } else if (tableName == _localDb.products.actualTableName) {
-             await _localDb.into(_localDb.products).insertOnConflictUpdate(Product.fromJson(data));
+             await _localDb.into(_localDb.products).insertOnConflictUpdate(Product.fromJson(localData));
           } else if (tableName == _localDb.accounts.actualTableName) {
-             await _localDb.into(_localDb.accounts).insertOnConflictUpdate(Account.fromJson(data));
+             await _localDb.into(_localDb.accounts).insertOnConflictUpdate(Account.fromJson(localData));
           } else if (tableName == _localDb.transactionEntries.actualTableName) {
-             await _localDb.into(_localDb.transactionEntries).insertOnConflictUpdate(TransactionEntry.fromJson(data));
+             await _localDb.into(_localDb.transactionEntries).insertOnConflictUpdate(TransactionEntry.fromJson(localData));
           } else if (tableName == _localDb.orders.actualTableName) {
-             await _localDb.into(_localDb.orders).insertOnConflictUpdate(Order.fromJson(data));
+             await _localDb.into(_localDb.orders).insertOnConflictUpdate(Order.fromJson(localData));
           } else if (tableName == _localDb.orderItems.actualTableName) {
-             await _localDb.into(_localDb.orderItems).insertOnConflictUpdate(OrderItem.fromJson(data));
+             await _localDb.into(_localDb.orderItems).insertOnConflictUpdate(OrderItem.fromJson(localData));
           } else if (tableName == _localDb.categories.actualTableName) {
-             await _localDb.into(_localDb.categories).insertOnConflictUpdate(Category.fromJson(data));
+             await _localDb.into(_localDb.categories).insertOnConflictUpdate(Category.fromJson(localData));
           } else if (tableName == _localDb.inventoryCostLayers.actualTableName) {
-             await _localDb.into(_localDb.inventoryCostLayers).insertOnConflictUpdate(InventoryCostLayer.fromJson(data));
+             await _localDb.into(_localDb.inventoryCostLayers).insertOnConflictUpdate(InventoryCostLayer.fromJson(localData));
           }
         } catch (e) {
           print('❌ [CloudSync] Upsert Error for $tableName: $e');

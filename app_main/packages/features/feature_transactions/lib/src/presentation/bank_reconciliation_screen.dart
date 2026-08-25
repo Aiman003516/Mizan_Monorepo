@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 // Assuming localization exists
 import 'package:core_database/core_database.dart';
 import 'package:shared_ui/shared_ui.dart'; // CurrencyFormatter
 import 'package:feature_accounts/feature_accounts.dart'; // Account selection
+
 import '../data/bank_reconciliation_repository.dart';
 
 class BankReconciliationScreen extends ConsumerStatefulWidget {
   const BankReconciliationScreen({super.key});
 
   @override
-  ConsumerState<BankReconciliationScreen> createState() => _BankReconciliationScreenState();
+  ConsumerState<BankReconciliationScreen> createState() =>
+      _BankReconciliationScreenState();
 }
 
-class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScreen> {
+class _BankReconciliationScreenState
+    extends ConsumerState<BankReconciliationScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   // --- STEP 1 STATE ---
   int _currentStep = 0;
   String? _selectedAccountId;
@@ -26,8 +32,16 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
   int _systemStartingBalance = 0; // Calculated from past reconciliations
   List<TransactionEntry> _candidates = [];
   final Set<String> _selectedTxIds = {};
-  
+
   bool _isLoading = false;
+
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
+
+  @override
+  void dispose() {
+    _endingBalanceController.dispose();
+    super.dispose();
+  }
 
   // --- COMPUTED MATH ---
   // Target = User Input
@@ -53,9 +67,7 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Bank Reconciliation"),
-      ),
+      appBar: AppBar(title: Text(l10n.bankReconciliations)),
       body: _currentStep == 0 ? _buildSetupStep() : _buildReconcileStep(),
     );
   }
@@ -66,83 +78,120 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
   Widget _buildSetupStep() {
     final accountsAsync = ref.watch(accountsStreamProvider);
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Step 1: Statement Details", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 24),
-          
-          // 1. Account Selector
-          accountsAsync.when(
-            data: (accounts) {
-              final assetAccounts = accounts.where((a) => a.type == 'asset').toList();
-              return DropdownButtonFormField<String>(
-                initialValue: _selectedAccountId,
-                decoration: const InputDecoration(labelText: "Select Bank Account", border: OutlineInputBorder()),
-                items: assetAccounts.map((a) => DropdownMenuItem(value: a.id, child: Text(a.name))).toList(),
-                onChanged: (v) => setState(() => _selectedAccountId = v),
-              );
-            },
-            loading: () => const LinearProgressIndicator(),
-            error: (_, __) => const Text("Error loading accounts"),
-          ),
-          const SizedBox(height: 16),
-
-          // 2. Statement Date
-          InkWell(
-            onTap: () async {
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: _statementDate,
-                firstDate: DateTime(2020),
-                lastDate: DateTime.now(),
-              );
-              if (picked != null) setState(() => _statementDate = picked);
-            },
-            child: InputDecorator(
-              decoration: const InputDecoration(labelText: "Statement Date", border: OutlineInputBorder(), suffixIcon: Icon(Icons.calendar_today)),
-              child: Text(DateFormat.yMMMd().format(_statementDate)),
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.statementDetails,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
-          // 3. Ending Balance
-          TextFormField(
-            controller: _endingBalanceController,
-            decoration: const InputDecoration(labelText: "Statement Ending Balance", prefixText: "\$", border: OutlineInputBorder()),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          ),
-          
-          const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: FilledButton(
-              onPressed: (_selectedAccountId == null || _endingBalanceController.text.isEmpty) 
-                  ? null 
-                  : _startReconciliation,
-              child: const Text("Start Reconciling"),
+            // 1. Account Selector
+            accountsAsync.when(
+              data: (accounts) {
+                final assetAccounts = accounts
+                    .where((a) => a.type == 'asset')
+                    .toList();
+                return DropdownButtonFormField<String>(
+                  initialValue: _selectedAccountId,
+                  decoration: InputDecoration(
+                    labelText: l10n.selectBankAccount,
+                    border: const OutlineInputBorder(),
+                  ),
+                  items: assetAccounts
+                      .map(
+                        (a) =>
+                            DropdownMenuItem(value: a.id, child: Text(a.name)),
+                      )
+                      .toList(),
+                  onChanged: (v) => setState(() => _selectedAccountId = v),
+                  validator: (value) =>
+                      value == null ? l10n.requiredField : null,
+                );
+              },
+              loading: () => const LinearProgressIndicator(),
+              error: (_, __) => Text(l10n.errorLoadingAccounts),
             ),
-          )
-        ],
+            const SizedBox(height: 16),
+
+            // 2. Statement Date
+            InkWell(
+              onTap: () async {
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: _statementDate,
+                  firstDate: DateTime(2020),
+                  lastDate: DateTime.now(),
+                );
+                if (picked != null) setState(() => _statementDate = picked);
+              },
+              child: InputDecorator(
+                decoration: InputDecoration(
+                  labelText: l10n.statementDate,
+                  border: const OutlineInputBorder(),
+                  suffixIcon: const Icon(Icons.calendar_today),
+                ),
+                child: Text(DateFormat.yMMMd().format(_statementDate)),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 3. Ending Balance
+            TextFormField(
+              controller: _endingBalanceController,
+              decoration: InputDecoration(
+                labelText: l10n.statementEndingBalance,
+                border: const OutlineInputBorder(),
+              ),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              validator: (value) => InputValidators.requiredDecimal(
+                value,
+                requiredMessage: l10n.requiredField,
+                invalidMessage: l10n.invalidAmount,
+              ),
+            ),
+
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: FilledButton(
+                onPressed:
+                    (_selectedAccountId == null ||
+                        _endingBalanceController.text.isEmpty)
+                    ? null
+                    : _startReconciliation,
+                child: Text(l10n.startReconciling),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Future<void> _startReconciliation() async {
+    if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     try {
       final repo = ref.read(bankReconciliationRepositoryProvider);
-      
+
       // A. Get Starting Balance
-      _systemStartingBalance = await repo.getReconciledBalance(_selectedAccountId!);
-      
+      _systemStartingBalance = await repo.getReconciledBalance(
+        _selectedAccountId!,
+      );
+
       // B. Get Candidates
       _candidates = await repo.getUnreconciledEntries(
-        accountId: _selectedAccountId!, 
-        statementDate: _statementDate
+        accountId: _selectedAccountId!,
+        statementDate: _statementDate,
       );
 
       setState(() {
@@ -151,7 +200,9 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('${l10n.error} $e')));
     }
   }
 
@@ -161,7 +212,9 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
   Widget _buildReconcileStep() {
     final diff = _differenceCents;
     final isBalanced = diff == 0;
-    final color = isBalanced ? context.appColors.success : context.appColors.error;
+    final color = isBalanced
+        ? context.appColors.success
+        : context.appColors.error;
 
     return Column(
       children: [
@@ -175,29 +228,57 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Statement Ending:", style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text(CurrencyFormatter.formatCentsToCurrency(_targetBalanceCents)),
+                  Text(
+                    '${l10n.statementEnding}:',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    CurrencyFormatter.formatCentsToCurrency(
+                      _targetBalanceCents,
+                    ),
+                  ),
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Cleared Balance:"),
-                  Text(CurrencyFormatter.formatCentsToCurrency(_clearedBalanceCents)),
+                  Text('${l10n.clearedBalance}:'),
+                  Text(
+                    CurrencyFormatter.formatCentsToCurrency(
+                      _clearedBalanceCents,
+                    ),
+                  ),
                 ],
               ),
               const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("DIFFERENCE:", style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 18)),
-                  Text(CurrencyFormatter.formatCentsToCurrency(diff), style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 18)),
+                  Text(
+                    '${l10n.difference.toUpperCase()}:',
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Text(
+                    CurrencyFormatter.formatCentsToCurrency(diff),
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                    ),
+                  ),
                 ],
               ),
               if (!isBalanced)
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
-                  child: Text("Select transactions until difference is 0.00", style: TextStyle(color: color, fontSize: 12)),
+                  child: Text(
+                    l10n.selectTransactionsUntilBalanced,
+                    style: TextStyle(color: color, fontSize: 12),
+                  ),
                 ),
             ],
           ),
@@ -205,15 +286,17 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
 
         // --- THE LIST ---
         Expanded(
-          child: _candidates.isEmpty 
-              ? const Center(child: Text("No unreconciled transactions found."))
+          child: _candidates.isEmpty
+              ? Center(child: Text(l10n.noUnreconciledTransactions))
               : ListView.builder(
                   itemCount: _candidates.length,
                   itemBuilder: (context, index) {
                     final tx = _candidates[index];
-                    final isSelected = _selectedTxIds.contains(tx.transactionId);
+                    final isSelected = _selectedTxIds.contains(
+                      tx.transactionId,
+                    );
                     // Amount > 0 = Debit (Deposit), Amount < 0 = Credit (Payment)
-                    final isDeposit = tx.amount >= 0; 
+                    final isDeposit = tx.amount >= 0;
 
                     return CheckboxListTile(
                       value: isSelected,
@@ -226,13 +309,19 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
                           }
                         });
                       },
-                      title: Text(isDeposit ? "Deposit" : "Payment"),
-                      subtitle: Text("ID: ...${tx.transactionId.substring(0,6)}"), // Show description later if joined
+                      title: Text(isDeposit ? l10n.deposit : l10n.payment),
+                      subtitle: Text(
+                        '${l10n.idLabel}: ...${tx.transactionId.substring(0, 6)}',
+                      ), // Show description later if joined
                       secondary: Text(
-                        CurrencyFormatter.formatCentsToCurrency(tx.amount.abs()),
+                        CurrencyFormatter.formatCentsToCurrency(
+                          tx.amount.abs(),
+                        ),
                         style: TextStyle(
-                          color: isDeposit ? context.appColors.success : context.appColors.onSurface,
-                          fontWeight: FontWeight.bold
+                          color: isDeposit
+                              ? context.appColors.success
+                              : context.appColors.onSurface,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     );
@@ -244,31 +333,41 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: context.appColors.primary))
+            border: Border(top: BorderSide(color: context.appColors.primary)),
           ),
           child: Row(
             children: [
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Bank Fee / Interest feature coming soon!")));
-                  }, 
-                  child: const Text("Add Adjustment"),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.bankFeeInterestComingSoon)),
+                    );
+                  },
+                  child: Text(l10n.addAdjustment),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: FilledButton(
                   // 🔒 GUARD: Disable until balanced
-                  onPressed: (!isBalanced || _isLoading) ? null : _finishReconciliation,
-                  child: _isLoading 
-                      ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: context.appColors.onPrimary)) 
-                      : const Text("Finish"),
+                  onPressed: (!isBalanced || _isLoading)
+                      ? null
+                      : _finishReconciliation,
+                  child: _isLoading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: context.appColors.onPrimary,
+                          ),
+                        )
+                      : Text(l10n.finish),
                 ),
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -276,21 +375,30 @@ class _BankReconciliationScreenState extends ConsumerState<BankReconciliationScr
   Future<void> _finishReconciliation() async {
     setState(() => _isLoading = true);
     try {
-      await ref.read(bankReconciliationRepositoryProvider).finalizeReconciliation(
-        accountId: _selectedAccountId!,
-        statementDate: _statementDate,
-        statementEndingBalance: _targetBalanceCents,
-        selectedTransactionIds: _selectedTxIds.toList(),
-      );
-      
+      await ref
+          .read(bankReconciliationRepositoryProvider)
+          .finalizeReconciliation(
+            accountId: _selectedAccountId!,
+            statementDate: _statementDate,
+            statementEndingBalance: _targetBalanceCents,
+            selectedTransactionIds: _selectedTxIds.toList(),
+          );
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Reconciliation Complete!"), backgroundColor: context.appColors.success));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.reconciliationComplete),
+            backgroundColor: context.appColors.success,
+          ),
+        );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${l10n.error} $e')));
       }
     }
   }

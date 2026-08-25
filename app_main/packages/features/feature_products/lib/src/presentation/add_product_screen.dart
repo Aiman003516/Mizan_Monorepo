@@ -152,7 +152,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   return categoriesAsync.when(
                     data: (categories) {
                       return DropdownButtonFormField<String>(
-                        value: _selectedCategoryId,
+                        initialValue: _selectedCategoryId,
                         decoration: InputDecoration(
                           labelText: l10n.category,
                           prefixIcon: const Icon(Icons.category),

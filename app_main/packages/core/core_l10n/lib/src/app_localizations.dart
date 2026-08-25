@@ -404,6 +404,36 @@ abstract class AppLocalizations {
   /// **'Please enter a valid number'**
   String get pleaseEnterValidNumber;
 
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address'**
+  String get invalidEmail;
+
+  /// No description provided for @invalidPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid phone number'**
+  String get invalidPhone;
+
+  /// No description provided for @invalidCurrencyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Use 3-5 uppercase letters'**
+  String get invalidCurrencyCode;
+
+  /// No description provided for @mustBeNonNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a non-negative number'**
+  String get mustBeNonNegative;
+
+  /// No description provided for @mustBePositive.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a number greater than zero'**
+  String get mustBePositive;
+
   /// No description provided for @failedToSaveAccount.
   ///
   /// In en, this message translates to:
@@ -2726,6 +2756,42 @@ abstract class AppLocalizations {
   /// **'Create New Organization'**
   String get createNewOrganization;
 
+  /// No description provided for @createOrganizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your Organization'**
+  String get createOrganizationTitle;
+
+  /// No description provided for @createOrganizationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This will enable Sync, Staff Management, and Advanced Reports.'**
+  String get createOrganizationDescription;
+
+  /// No description provided for @businessNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Name'**
+  String get businessNameLabel;
+
+  /// No description provided for @businessPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Phone'**
+  String get businessPhoneLabel;
+
+  /// No description provided for @createBusinessUpgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Business & Upgrade'**
+  String get createBusinessUpgrade;
+
+  /// No description provided for @businessCloudActivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Cloud Activated!'**
+  String get businessCloudActivated;
+
   /// No description provided for @role.
   ///
   /// In en, this message translates to:
@@ -3050,6 +3116,12 @@ abstract class AppLocalizations {
   /// **'Vendor Invoice #'**
   String get vendorInvoice;
 
+  /// No description provided for @optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get optional;
+
   /// No description provided for @createBill.
   ///
   /// In en, this message translates to:
@@ -3302,6 +3374,84 @@ abstract class AppLocalizations {
   /// **'Bank Reconciliations'**
   String get bankReconciliations;
 
+  /// No description provided for @statementDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement Details'**
+  String get statementDetails;
+
+  /// No description provided for @selectBankAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Bank Account'**
+  String get selectBankAccount;
+
+  /// No description provided for @statementEnding.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement Ending'**
+  String get statementEnding;
+
+  /// No description provided for @clearedBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleared Balance'**
+  String get clearedBalance;
+
+  /// No description provided for @difference.
+  ///
+  /// In en, this message translates to:
+  /// **'Difference'**
+  String get difference;
+
+  /// No description provided for @selectTransactionsUntilBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Select transactions until the difference is zero'**
+  String get selectTransactionsUntilBalanced;
+
+  /// No description provided for @deposit.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit'**
+  String get deposit;
+
+  /// No description provided for @payment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get payment;
+
+  /// No description provided for @idLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ID'**
+  String get idLabel;
+
+  /// No description provided for @bankFeeInterestComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank fee/interest adjustments are coming soon.'**
+  String get bankFeeInterestComingSoon;
+
+  /// No description provided for @addAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Adjustment'**
+  String get addAdjustment;
+
+  /// No description provided for @finish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get finish;
+
+  /// No description provided for @reconciliationComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconciliation complete!'**
+  String get reconciliationComplete;
+
   /// No description provided for @newReconciliation.
   ///
   /// In en, this message translates to:
@@ -3373,6 +3523,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Uncleared Transactions'**
   String get unclearedTransactions;
+
+  /// No description provided for @noUnreconciledTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No unreconciled transactions found.'**
+  String get noUnreconciledTransactions;
 
   /// No description provided for @selectAll.
   ///
@@ -5809,6 +5965,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No products found'**
   String get noProducts;
+
+  /// No description provided for @noProductsInFile.
+  ///
+  /// In en, this message translates to:
+  /// **'No products found in file.'**
+  String get noProductsInFile;
+
+  /// No description provided for @importButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get importButton;
+
+  /// No description provided for @importProductsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Import {count} Products'**
+  String importProductsCount(int count);
+
+  /// No description provided for @recordsImported.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} products imported successfully'**
+  String recordsImported(int count);
 
   /// No description provided for @searchProducts.
   ///

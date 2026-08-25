@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_reports/feature_reports.dart'; // FIX: Import feature_reports
 import 'package:feature_transactions/src/data/transactions_repository.dart';
@@ -10,7 +9,8 @@ import 'package:core_data/core_data.dart';
 
 class ReturnItemsScreen extends ConsumerStatefulWidget {
   final Order order;
-  final List<TransactionDetail> entries; // This class comes from feature_reports
+  final List<TransactionDetail>
+  entries; // This class comes from feature_reports
 
   const ReturnItemsScreen({
     super.key,
@@ -44,22 +44,20 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
 
   (String?, String?) _getFinancialAccountIds() {
     final TransactionDetail? salesEntry = widget.entries
-        .where(
-          (e) => e.accountName == c.kSalesRevenueAccountName,
-        )
+        .where((e) => e.accountName == c.kSalesRevenueAccountName)
         .firstOrNull;
 
     final TransactionDetail? paymentEntry = widget.entries
-        .where(
-          (e) => e.accountType == 'asset' && e.entryAmount > 0,
-        )
+        .where((e) => e.accountType == 'asset' && e.entryAmount > 0)
         .firstOrNull;
 
     return (paymentEntry?.accountId, salesEntry?.accountId);
   }
 
   Future<void> _processPartialReturn(
-      List<OrderItem> items, AppLocalizations l10n) async {
+    List<OrderItem> items,
+    AppLocalizations l10n,
+  ) async {
     if (!mounted) return;
 
     setState(() {
@@ -103,23 +101,31 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
     bool success = false;
 
     try {
-      await ref.read(transactionsRepositoryProvider).processPartialReturn(
+      await ref
+          .read(transactionsRepositoryProvider)
+          .processPartialReturn(
             originalTransactionId: widget.order.transactionId,
             originalPaymentAccountId: paymentAccountId,
             originalSalesAccountId: salesAccountId,
             itemsToReturn: returnMap,
             totalRefundAmount: totalRefundAmount,
-            currencyCode: widget.entries.firstOrNull?.currencyCode ?? ref.read(defaultCurrencyProvider),
-            returnDescription: l10n.partialReturnFor(widget.order.id.substring(0, 8)),
+            currencyCode:
+                widget.entries.firstOrNull?.currencyCode ??
+                ref.read(defaultCurrencyProvider),
+            returnDescription: l10n.partialReturnFor(
+              widget.order.id.substring(0, 8),
+            ),
           );
 
       success = true;
     } catch (e) {
       if (mounted) {
-        messenger.showSnackBar(SnackBar(
-          content: Text('${l10n.returnFailed}: $e'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ));
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('${l10n.returnFailed}: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -130,10 +136,12 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
     }
 
     if (success && mounted) {
-      messenger.showSnackBar(SnackBar(
-        content: Text(l10n.returnSuccess),
-        backgroundColor: context.appColors.success,
-      ));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.returnSuccess),
+          backgroundColor: context.appColors.success,
+        ),
+      );
 
       if (navigator.canPop()) navigator.pop();
       if (navigator.canPop()) navigator.pop();
@@ -143,13 +151,12 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final orderItemsAsync =
-        ref.watch(orderItemsStreamProvider(widget.order.id));
+    final orderItemsAsync = ref.watch(
+      orderItemsStreamProvider(widget.order.id),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.manageReturn),
-      ),
+      appBar: AppBar(title: Text(l10n.manageReturn)),
       body: orderItemsAsync.when(
         data: (items) {
           if (items.isEmpty) {
@@ -190,9 +197,9 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
                   _isMapInitialized = true;
                 });
               } else {
-                  setState(() {
-                    _isMapInitialized = true;
-                  });
+                setState(() {
+                  _isMapInitialized = true;
+                });
               }
             });
 
@@ -214,29 +221,37 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
 
                     return Card(
                       margin: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(item.productName,
-                                style: Theme.of(context).textTheme.titleLarge),
+                            Text(
+                              item.productName,
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
                             const SizedBox(height: 8),
                             Text(
-                                '${l10n.price}: ${item.priceAtSale.toStringAsFixed(2)}'),
+                              '${l10n.price}: ${item.priceAtSale.toStringAsFixed(2)}',
+                            ),
                             Text(
-                                '${l10n.purchased}: ${item.quantity.toString()}'),
+                              '${l10n.purchased}: ${item.quantity.toString()}',
+                            ),
                             Text(
-                                '${l10n.returned}: ${item.quantityReturned.toString()}'),
+                              '${l10n.returned}: ${item.quantityReturned.toString()}',
+                            ),
                             const SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   l10n.returnQuantity,
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
                                 ),
                                 DropdownButton<double>(
                                   value: currentSelection,
@@ -278,18 +293,17 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(l10n.totalRefund,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall),
-                            Text(totalRefund.toStringAsFixed(2),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .error)),
+                            Text(
+                              l10n.totalRefund,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            Text(
+                              totalRefund.toStringAsFixed(2),
+                              style: Theme.of(context).textTheme.headlineSmall
+                                  ?.copyWith(
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -297,15 +311,18 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
                           icon: const Icon(Icons.history),
                           label: Text(l10n.processReturn),
                           style: FilledButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.error,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.error,
                           ),
                           onPressed: totalRefund <= 0
                               ? null
-                              : () =>
-                                  _processPartialReturn(returnableItems, l10n),
+                              : () => _processPartialReturn(
+                                  returnableItems,
+                                  l10n,
+                                ),
                         ),
-                      ]
+                      ],
                     ],
                   ),
                 ),

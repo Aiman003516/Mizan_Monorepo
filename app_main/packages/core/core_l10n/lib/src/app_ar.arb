@@ -59,6 +59,11 @@
   "initialBalance": "الرصيد الافتتاحي",
   "pleaseEnterBalance": "الرجاء إدخال رصيد (0 مقبول)",
   "pleaseEnterValidNumber": "الرجاء إدخال رقم صالح",
+  "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
+  "invalidPhone": "يرجى إدخال رقم هاتف صالح",
+  "invalidCurrencyCode": "استخدم من 3 إلى 5 أحرف إنجليزية كبيرة",
+  "mustBeNonNegative": "يرجى إدخال رقم غير سالب",
+  "mustBePositive": "يرجى إدخال رقم أكبر من صفر",
   "failedToSaveAccount": "فشل حفظ الحساب:",
   "addAccount": "إضافة حساب",
   "noAccountsClassified": "لا توجد حسابات مصنفة كـ \"{classification}\" بعد.\nأضف واحداً في قسم الحسابات.",
@@ -616,6 +621,12 @@
   "inviteCodeExpired": "انتهت صلاحية كود الدعوة هذا",
   "pleaseSignInFirst": "الرجاء تسجيل الدخول أولاً",
   "createNewOrganization": "إنشاء مؤسسة جديدة",
+  "createOrganizationTitle": "إنشاء مؤسستك",
+  "createOrganizationDescription": "سيؤدي ذلك إلى تفعيل المزامنة وإدارة الموظفين والتقارير المتقدمة.",
+  "businessNameLabel": "اسم النشاط التجاري",
+  "businessPhoneLabel": "هاتف النشاط التجاري",
+  "createBusinessUpgrade": "إنشاء النشاط والترقية",
+  "businessCloudActivated": "تم تفعيل سحابة النشاط التجاري!",
   "role": "الصلاحية",
   "customers": "العملاء",
   "addCustomer": "إضافة عميل",
@@ -670,6 +681,7 @@
   "newBill": "فاتورة مشتريات جديدة",
   "billDate": "تاريخ الفاتورة",
   "vendorInvoice": "رقم فاتورة المورد",
+  "optional": "اختياري",
   "createBill": "إنشاء فاتورة مشتريات",
   "billCreated": "تم إنشاء فاتورة المشتريات بنجاح",
   "noBillsYet": "لا توجد فواتير مشتريات بعد",
@@ -712,6 +724,19 @@
   "currentAmount": "حالية",
   "overdueAmount": "متأخرة",
   "bankReconciliations": "التسويات البنكية",
+  "statementDetails": "تفاصيل الكشف",
+  "selectBankAccount": "اختر الحساب البنكي",
+  "statementEnding": "نهاية الكشف",
+  "clearedBalance": "الرصيد المسوّى",
+  "difference": "الفرق",
+  "selectTransactionsUntilBalanced": "اختر العمليات حتى يصبح الفرق صفراً",
+  "deposit": "إيداع",
+  "payment": "دفعة",
+  "idLabel": "المعرّف",
+  "bankFeeInterestComingSoon": "تعديلات الرسوم البنكية والفوائد ستتوفر قريباً.",
+  "addAdjustment": "إضافة تسوية",
+  "finish": "إنهاء",
+  "reconciliationComplete": "اكتملت التسوية!",
   "newReconciliation": "تسوية جديدة",
   "noReconciliationsYet": "لا توجد تسويات حتى الآن",
   "startReconciling": "ابدأ بتسوية كشوف حساباتك البنكية",
@@ -723,7 +748,8 @@
   "selectedCleared": "المحدد كمقاصة:",
   "differenceAmount": "الفرق",
   "balanced": "متوازن!",
-  "unclearedTransactions": "المعاملات غير المقاصة",
+  "unclearedTransactions": "العمليات غير المسواة",
+  "noUnreconciledTransactions": "لا توجد عمليات غير مسواة.",
   "selectAll": "تحديد الكل",
   "deselectAll": "إلغاء تحديد الكل",
   "allTransactionsReconciled": "كل المعاملات تمت تسويتها!",
@@ -1371,6 +1397,24 @@
   "totalUppercase": "الإجمالي",
   "holdOrder": "تعليق الطلب",
   "noProducts": "لا توجد منتجات",
+  "noProductsInFile": "لم يتم العثور على منتجات في الملف.",
+  "importButton": "استيراد",
+  "importProductsCount": "استيراد {count} منتجاً",
+  "recordsImported": "تم استيراد {count} منتج بنجاح",
+  "@recordsImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@importProductsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "searchProducts": "البحث عن منتجات...",
   "outOfStock": "غير متوفر",
   "cartEmpty": "سلتك فارغة",
@@ -1840,6 +1884,7 @@
   "openingBalanceHint": "الرصيد الافتتاحي. أدخل 0 إذا لم يكن هناك رصيد.",
   "openingBalanceHintVendor": "الرصيد الافتتاحي. أدخل 0 إذا لم يكن هناك رصيد.",
   "requiredField": "هذا الحقل مطلوب",
+  "invalidNumber": "رقم غير صالح",
   "emailOptional": "البريد الإلكتروني (اختياري)",
   "phoneOptional": "الهاتف (اختياري)",
   "addressOptional": "العنوان (اختياري)",
@@ -1900,5 +1945,224 @@
   "receive": "استلام دفعة (-)",
   "increasesDebt": "يزيد من دينهم لك",
   "decreasesDebt": "يقلل من دينهم (يُضاف إلى النقدية)",
-  "saveAdjustment": "حفظ التعديل"
+  "saveAdjustment": "حفظ التعديل",
+  "closeBooks": "إقفال الدفاتر",
+  "currentLockDate": "تاريخ القفل الحالي",
+  "booksAreOpen": "الدفاتر مفتوحة",
+  "closingInstructionsTitle": "تعليمات الإقفال",
+  "closingInstructionsBody": "سيؤدي هذا الإجراء إلى:\n1. تصفير جميع الإيرادات والمصروفات للفترة.\n2. تحويل صافي الدخل إلى الأرباح المحتجزة.\n3. قفل الفترة ومنع تعديلها مستقبلاً.",
+  "stepSelectDate": "الخطوة 1: اختر تاريخ الإقفال",
+  "stepSelectEquityAccount": "الخطوة 2: اختر حساب الأرباح المحتجزة",
+  "errorNoEquityAccount": "خطأ: لم يتم العثور على حسابات حقوق ملكية. يرجى إنشاء حساب في قسم الحسابات.",
+  "closePeriodAndLock": "إقفال الفترة وقفلها",
+  "confirmPeriodCloseTitle": "تأكيد إقفال الفترة",
+  "confirmPeriodCloseMessage": "هل أنت متأكد؟ سيؤدي ذلك إلى قفل جميع العمليات في هذا التاريخ أو قبله. لا يمكن التراجع عن هذا الإجراء بسهولة.",
+  "periodClosedSuccessfully": "تم إقفال الفترة بنجاح.",
+  "periodLockedError": "الفترة مقفلة ولا يمكن تعديلها.",
+  "calculator": "الحاسبة",
+  "breakEven": "نقطة التعادل",
+  "marginOfSafety": "هامش الأمان",
+  "whatIf": "تحليل ماذا لو؟",
+  "contributionMargin": "هامش المساهمة",
+  "contributionMarginPerUnit": "هامش المساهمة لكل وحدة",
+  "analyzeAndViewResults": "تحليل وعرض النتائج",
+  "enterDataFirst": "أدخل البيانات في تبويب الحاسبة أولاً",
+  "units": "الوحدات",
+  "sales": "المبيعات",
+  "risk": "المخاطر",
+  "leverageImpact": "التأثير",
+  "priceSensitivityDescription": "يوضح تغير نقطة التعادل عند تعديل سعر البيع",
+  "noStaffFound": "لم يتم العثور على موظفين. ادعُ أحداً للانضمام!",
+  "ownerRole": "المالك",
+  "staffRoleAndEmail": "الدور: {roleId} • {email}",
+  "@staffRoleAndEmail": {
+    "placeholders": {
+      "roleId": {
+        "type": "String"
+      },
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "removeStaffTitle": "إزالة {name}؟",
+  "@removeStaffTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removeStaffWarning": "سيفقد هذا الشخص الوصول إلى هذا النشاط التجاري فوراً.",
+  "inviteStaff": "دعوة موظف",
+  "stepSelectRole": "1. اختر دوراً",
+  "chooseRoleHint": "اختر الدور (مثال: أمين الصندوق)",
+  "errorLoadingRoles": "خطأ في تحميل الأدوار: {error}",
+  "@errorLoadingRoles": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "generateInviteCode": "إنشاء رمز دعوة",
+  "stepShareCode": "2. شارك الرمز",
+  "validFor24Hours": "صالح لمدة 24 ساعة",
+  "shareViaApp": "المشاركة عبر واتساب / تيليجرام",
+  "inviteShareText": "انضم إلى نشاطي التجاري على ميزان!\n\n1. نزّل التطبيق\n2. سجّل الدخول\n3. اختر \"الانضمام إلى نشاط تجاري\" وأدخل الرمز: {code}\n\n(صالح لمدة 24 ساعة)",
+  "@inviteShareText": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "validInviteCodeTitle": "رمز الدعوة صالح!",
+  "roleLabel": "الدور: {roleId}",
+  "@roleLabel": {
+    "placeholders": {
+      "roleId": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseEnterYourName": "يرجى إدخال اسمك",
+  "orText": "أو",
+  "appVersion": "تطبيق ميزان الإصدار {version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "category": "التصنيف",
+  "redFlags": "مؤشرات الخطر",
+  "dsriDescription": "الذمم المدينة / المبيعات",
+  "gmiDescription": "هامش الربح الإجمالي",
+  "aqiDescription": "جودة الأصول",
+  "sgiDescription": "نمو المبيعات",
+  "depiDescription": "الإهلاك",
+  "sgaiDescription": "مصروفات البيع والعمومية والإدارية",
+  "tataDescription": "الاستحقاقات",
+  "lvgiDescription": "الرفع المالي",
+  "whatIsMScore": "ما هو مؤشر M لبنيش؟",
+  "mScoreDescription": "مؤشر M هو نموذج رياضي وضعه الأستاذ مسعود بنيش، ويستخدم النسب المالية لاكتشاف ما إذا كانت الشركة قد تلاعبت بأرباحها.\n\nيشير مؤشر M الأكبر من -1.78 إلى احتمال مرتفع (76%) بأن الشركة تتلاعب بالأرباح.",
+  "dsriName": "مؤشر أيام المبيعات في الذمم المدينة",
+  "dsriExpl": "يقيس ما إذا كانت الذمم المدينة قد نمت أسرع من المبيعات",
+  "gmiName": "مؤشر هامش الربح الإجمالي",
+  "gmiExpl": "يكتشف تدهور هوامش الربح الإجمالي",
+  "aqiName": "مؤشر جودة الأصول",
+  "aqiExpl": "يحدد رسملة المصروفات",
+  "sgiName": "مؤشر نمو المبيعات",
+  "sgiExpl": "النمو المرتفع يسبب ضغطاً قد يؤدي إلى التلاعب",
+  "depiName": "مؤشر الإهلاك",
+  "depiExpl": "يكتشف تباطؤ معدلات الإهلاك",
+  "sgaiName": "مؤشر مصروفات البيع والعمومية والإدارية",
+  "sgaiExpl": "يقيس الكفاءة الإدارية",
+  "tataName": "إجمالي الاستحقاقات إلى إجمالي الأصول",
+  "tataExpl": "ارتفاع الاستحقاقات مقارنة بالنقد يشير إلى انخفاض الجودة",
+  "lvgiName": "مؤشر الرفع المالي",
+  "lvgiExpl": "زيادة الديون تخلق ضغطاً مالياً",
+  "famousCasesDesc": "• إنرون (2001): كان من المتوقع أن يكون مؤشر M أكبر من -1.78\n• وورلدكوم (2002): ارتفاع TATA بسبب رسملة المصروفات\n• ساتيام (2009): ارتفاع DSRI بسبب الذمم المدينة الوهمية\n\nحدد مؤشر M بشكل صحيح 76% من حالات التلاعب في دراسات الاختبار الرجعي.",
+  "mScoreThresholdLabel": "الحد: أكبر من -1.78 يشير إلى تلاعب",
+  "riskLevelHigh": "مرتفع",
+  "riskLevelModerate": "متوسط",
+  "riskLevelLow": "منخفض",
+  "unitsLowercase": "وحدة",
+  "flexibleBudgetResult": "الموازنة المرنة",
+  "varianceFormulas": "• الموازنة الثابتة = الثابت + (المتغير × النشاط المخطط)\n• الموازنة المرنة = الثابت + (المتغير × النشاط الفعلي)\n• انحراف الحجم = المرنة - الثابتة\n• انحراف الإنفاق = الفعلي - المرنة",
+  "materialQtyPerUnit": "كمية المواد/الوحدة",
+  "laborHoursPerUnit": "ساعات العمل/الوحدة",
+  "perHrSuffix": "دولار/ساعة",
+  "totalVarianceValue": "إجمالي الانحراف: {amount}",
+  "@totalVarianceValue": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "actualCostResult": "التكلفة الفعلية",
+  "priceVarianceResult": "انحراف السعر",
+  "quantityVarianceResult": "انحراف الكمية",
+  "materialsFormulasTitle": "معادلات المواد",
+  "materialsFormulasDesc": "• انحراف السعر = (السعر الفعلي - السعر المعياري) × الكمية الفعلية\n• انحراف الكمية = (الكمية الفعلية - الكمية المعيارية) × السعر المعياري",
+  "rateVarianceResult": "انحراف المعدل",
+  "efficiencyVarianceResult": "انحراف الكفاءة",
+  "laborFormulasTitle": "معادلات العمل",
+  "laborFormulasDesc": "• انحراف المعدل = (المعدل الفعلي - المعدل المعياري) × الساعات الفعلية\n• انحراف الكفاءة = (الساعات الفعلية - الساعات المعيارية) × المعدل المعياري",
+  "currentRatioTitle": "النسبة الجارية",
+  "debtEquityTitle": "الدين إلى حقوق الملكية",
+  "netMarginTitle": "هامش صافي الربح",
+  "roaTitle": "العائد على الأصول",
+  "ratioCol": "النسبة",
+  "valueCol": "القيمة",
+  "benchmarkCol": "المعيار",
+  "statusCol": "الحالة",
+  "buyNowAction": "اشترِ الآن",
+  "installedSuccessfully": "تم تثبيت {reportTitle} ✅",
+  "@installedSuccessfully": {
+    "placeholders": {
+      "reportTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "noStandardReportsFound": "لم يتم العثور على تقارير قياسية عبر الإنترنت.",
+  "installAction": "تثبيت",
+  "includedAction": "مضمّن",
+  "buyPriceAction": "شراء $4.99",
+  "lockedAction": "مقفل",
+  "retailBusinessTemplate": "نشاط تجزئة",
+  "serviceBusinessTemplate": "نشاط خدمي",
+  "@adjustBalance": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@customersWithBalances": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@errorLoadingCategories": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@planRenewsLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@planStatusLabel": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "@simulatePaymentFor": {
+    "placeholders": {
+      "planName": {
+        "type": "String"
+      }
+    }
+  },
+  "@vendorsWithBalances": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

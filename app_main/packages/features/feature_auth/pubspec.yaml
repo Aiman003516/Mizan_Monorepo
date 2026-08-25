@@ -26,8 +26,10 @@ dependencies:
     path: ../../core/core_l10n
   core_ui:
     path: ../../core/core_ui
+  shared_ui:
+    path: ../../shared/shared_ui
 
 dev_dependencies:
-  supabase_flutter: ^2.5.4
+
   flutter_test:
     sdk: flutter

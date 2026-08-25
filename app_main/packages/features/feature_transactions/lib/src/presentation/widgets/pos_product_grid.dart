@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:shared_ui/shared_ui.dart';
 import 'package:core_database/core_database.dart';
@@ -54,11 +53,16 @@ class PosProductGrid extends StatelessWidget {
         final crossAxisCount = constraints.maxWidth > 800
             ? 4
             : constraints.maxWidth > 500
-                ? 3
-                : 2;
+            ? 3
+            : 2;
 
         return GridView.builder(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 100), // bottom padding for cart bar
+          padding: const EdgeInsets.fromLTRB(
+            12,
+            8,
+            12,
+            100,
+          ), // bottom padding for cart bar
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             childAspectRatio: 0.78,
@@ -82,25 +86,22 @@ class _ProductCard extends StatelessWidget {
   final Product product;
   final VoidCallback onAdd;
 
-  const _ProductCard({
-    required this.product,
-    required this.onAdd,
-  });
+  const _ProductCard({required this.product, required this.onAdd});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final priceFormatted = CurrencyFormatter.formatCentsToCurrency(product.price);
+    final priceFormatted = CurrencyFormatter.formatCentsToCurrency(
+      product.price,
+    );
     final inStock = product.quantityOnHand.round();
     final isOutOfStock = inStock <= 0;
 
     return Card(
       elevation: 1,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: InkWell(
         onTap: isOutOfStock ? null : onAdd,
         borderRadius: BorderRadius.circular(14),
@@ -119,7 +120,8 @@ class _ProductCard extends StatelessWidget {
                     ? Image.asset(
                         product.imagePath!,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildPlaceholderIcon(context),
+                        errorBuilder: (_, __, ___) =>
+                            _buildPlaceholderIcon(context),
                       )
                     : _buildPlaceholderIcon(context),
               ),

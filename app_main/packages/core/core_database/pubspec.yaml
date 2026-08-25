@@ -19,6 +19,5 @@ dependencies:
   shared_preferences: ^2.5.3
 
 dev_dependencies:
-  supabase_flutter: ^2.5.4
   drift_dev: ^2.29.0
   build_runner: ^2.10.1

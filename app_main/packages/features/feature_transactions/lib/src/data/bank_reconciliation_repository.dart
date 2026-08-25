@@ -1,13 +1,13 @@
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 import 'package:feature_transactions/src/data/database_provider.dart';
 import 'package:uuid/uuid.dart';
 
-final bankReconciliationRepositoryProvider = Provider<BankReconciliationRepository>((ref) {
-  final db = ref.watch(databaseProvider);
-  return BankReconciliationRepository(db);
-});
+final bankReconciliationRepositoryProvider =
+    Provider<BankReconciliationRepository>((ref) {
+      final db = ref.watch(databaseProvider);
+      return BankReconciliationRepository(db);
+    });
 
 class BankReconciliationRepository {
   final AppDatabase _db;
@@ -23,7 +23,8 @@ class BankReconciliationRepository {
   }) async {
     // FIX 1: Execute the query to get a List<String>
     // We cannot pass a 'Selectable' query object directly to 'isNotIn'.
-    final reconciledIds = await _db.select(_db.reconciledTransactions)
+    final reconciledIds = await _db
+        .select(_db.reconciledTransactions)
         .map((r) => r.transactionId)
         .get();
 
@@ -36,10 +37,14 @@ class BankReconciliationRepository {
 
     query.where(
       _db.transactionEntries.accountId.equals(accountId) &
-      _db.transactions.transactionDate.isSmallerOrEqualValue(statementDate) &
-      _db.transactionEntries.transactionId.isNotIn(reconciledIds) // Now safe
+          _db.transactions.transactionDate.isSmallerOrEqualValue(
+            statementDate,
+          ) &
+          _db.transactionEntries.transactionId.isNotIn(
+            reconciledIds,
+          ), // Now safe
     );
-    
+
     // Order by date
     query.orderBy([OrderingTerm.asc(_db.transactions.transactionDate)]);
 
@@ -52,18 +57,20 @@ class BankReconciliationRepository {
   /// This is our "System Beginning Balance".
   Future<int> getReconciledBalance(String accountId) async {
     // FIX 2: Execute the query here as well
-    final reconciledIds = await _db.select(_db.reconciledTransactions)
+    final reconciledIds = await _db
+        .select(_db.reconciledTransactions)
         .map((r) => r.transactionId)
         .get();
-    
+
     final query = _db.select(_db.transactionEntries);
-    query.where((tbl) => 
-      tbl.accountId.equals(accountId) & 
-      tbl.transactionId.isIn(reconciledIds)
+    query.where(
+      (tbl) =>
+          tbl.accountId.equals(accountId) &
+          tbl.transactionId.isIn(reconciledIds),
     );
 
     final results = await query.get();
-    
+
     // FIX 3: Explicitly type the fold accumulator as <int>
     // This prevents Dart from guessing 'FutureOr<int>' and causing the '+' error.
     return results.fold<int>(0, (sum, row) => sum + row.amount);
@@ -79,28 +86,36 @@ class BankReconciliationRepository {
   }) async {
     return _db.transaction(() async {
       final now = DateTime.now();
-      
+
       // A. Create the Session Record
       final recId = const Uuid().v4();
-      await _db.into(_db.bankReconciliations).insert(BankReconciliationsCompanion.insert(
-        id: Value(recId),
-        accountId: accountId,
-        statementDate: statementDate,
-        statementEndingBalance: statementEndingBalance,
-        status: const Value('finalized'),
-        createdAt: Value(now),
-        lastUpdated: Value(now),
-      ));
+      await _db
+          .into(_db.bankReconciliations)
+          .insert(
+            BankReconciliationsCompanion.insert(
+              id: Value(recId),
+              accountId: accountId,
+              statementDate: statementDate,
+              statementEndingBalance: statementEndingBalance,
+              status: const Value('finalized'),
+              createdAt: Value(now),
+              lastUpdated: Value(now),
+            ),
+          );
 
       // B. Mark transactions as cleared (The Link)
       for (final txId in selectedTransactionIds) {
-        await _db.into(_db.reconciledTransactions).insert(ReconciledTransactionsCompanion.insert(
-          id: Value(const Uuid().v4()),
-          reconciliationId: recId,
-          transactionId: txId,
-          createdAt: Value(now),
-          lastUpdated: Value(now),
-        ));
+        await _db
+            .into(_db.reconciledTransactions)
+            .insert(
+              ReconciledTransactionsCompanion.insert(
+                id: Value(const Uuid().v4()),
+                reconciliationId: recId,
+                transactionId: txId,
+                createdAt: Value(now),
+                lastUpdated: Value(now),
+              ),
+            );
       }
     });
   }

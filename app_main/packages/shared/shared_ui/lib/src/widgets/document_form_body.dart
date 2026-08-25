@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 import 'package:shared_ui/shared_ui.dart';
@@ -42,10 +43,11 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
   bool _isLoading = false;
   String _selectedCurrencyCode = 'USD';
 
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
+
   @override
   void initState() {
     super.initState();
-    _lineItems.add(_LineItem());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() {
@@ -98,14 +100,14 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     bool hasValidItems = _lineItems.any(
-      (item) => item.description.isNotEmpty && item.amount > 0,
+      (item) =>
+          item.description.trim().isNotEmpty &&
+          item.quantity > 0 &&
+          item.unitPrice > 0,
     );
     if (!hasValidItems) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please add at least one line item'),
-          backgroundColor: Colors.orange,
-        ),
+        SnackBar(content: Text(l10n.addItem), backgroundColor: Colors.orange),
       );
       return;
     }
@@ -124,7 +126,7 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
               ),
             )
             .toList();
-            
+
         await arRepo.createInvoice(
           customerId: widget.contactId,
           invoiceDate: _documentDate,
@@ -147,14 +149,15 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
               ),
             )
             .toList();
-            
+
         await apRepo.createBill(
           vendorId: widget.contactId,
           billDate: _documentDate,
           dueDate: _dueDate,
           items: items,
           currencyCode: _selectedCurrencyCode,
-          vendorBillNumber: _vendorDocumentNumberController.text.trim().isNotEmpty
+          vendorBillNumber:
+              _vendorDocumentNumberController.text.trim().isNotEmpty
               ? _vendorDocumentNumberController.text.trim()
               : null,
           notes: _notesController.text.trim().isNotEmpty
@@ -162,11 +165,15 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
               : null,
         );
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${widget.type == DocumentType.invoice ? 'Invoice' : 'Bill'} created'),
+            content: Text(
+              widget.type == DocumentType.invoice
+                  ? l10n.invoiceCreated
+                  : l10n.billCreated,
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -176,7 +183,7 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('${l10n.error} $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -199,7 +206,7 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
         actions: [
           TextButton(
             onPressed: _isLoading ? null : _save,
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -212,15 +219,17 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
                 children: [
                   // Currency Selector Dropdown
                   DropdownButtonFormField<String>(
-                    value: _selectedCurrencyCode,
-                    decoration: const InputDecoration(
-                      labelText: 'Currency',
-                      border: OutlineInputBorder(),
+                    initialValue: _selectedCurrencyCode,
+                    decoration: InputDecoration(
+                      labelText: l10n.currencyLabel,
+                      border: const OutlineInputBorder(),
                     ),
                     items: CurrencyFormatter.currencySymbols.keys.map((code) {
                       return DropdownMenuItem(
                         value: code,
-                        child: Text('$code (${CurrencyFormatter.getCurrencySymbol(code)})'),
+                        child: Text(
+                          '$code (${CurrencyFormatter.getCurrencySymbol(code)})',
+                        ),
                       );
                     }).toList(),
                     onChanged: (val) {
@@ -230,13 +239,13 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  
+
                   if (!isInvoice) ...[
                     TextFormField(
                       controller: _vendorDocumentNumberController,
-                      decoration: const InputDecoration(
-                        labelText: 'Vendor Bill Number (Optional)',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: '${l10n.vendorInvoice} (${l10n.optional})',
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -249,7 +258,9 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
                           onTap: () => _selectDate(context, true),
                           child: InputDecorator(
                             decoration: InputDecoration(
-                              labelText: isInvoice ? 'Invoice Date' : 'Bill Date',
+                              labelText: isInvoice
+                                  ? l10n.invoiceDate
+                                  : l10n.billDate,
                               border: const OutlineInputBorder(),
                             ),
                             child: Row(
@@ -269,9 +280,9 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
                         child: InkWell(
                           onTap: () => _selectDate(context, false),
                           child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Due Date',
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.dueDate,
+                              border: const OutlineInputBorder(),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -288,12 +299,9 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  const Text(
-                    'Line Items',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Text(
+                    l10n.lineItems,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   ListView.builder(
@@ -314,14 +322,14 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
                   TextButton.icon(
                     onPressed: _addLineItem,
                     icon: const Icon(Icons.add),
-                    label: const Text('Add Line Item'),
+                    label: Text(l10n.addItem),
                   ),
                   const Divider(height: 32),
                   TextFormField(
                     controller: _notesController,
-                    decoration: const InputDecoration(
-                      labelText: 'Notes',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.notes,
+                      border: const OutlineInputBorder(),
                     ),
                     maxLines: 3,
                   ),
@@ -336,14 +344,17 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Total',
+                          l10n.total,
                           style: theme.textTheme.titleLarge?.copyWith(
                             color: colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          CurrencyFormatter.formatAmount(_subtotal, _selectedCurrencyCode),
+                          CurrencyFormatter.formatAmount(
+                            _subtotal,
+                            _selectedCurrencyCode,
+                          ),
                           style: theme.textTheme.headlineMedium?.copyWith(
                             color: colorScheme.onPrimaryContainer,
                             fontWeight: FontWeight.bold,
@@ -378,6 +389,8 @@ class _LineItemCard extends StatefulWidget {
 }
 
 class _LineItemCardState extends State<_LineItemCard> {
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
+
   late final TextEditingController _qtyController;
   late final TextEditingController _priceController;
   final FocusNode _qtyFocus = FocusNode();
@@ -387,23 +400,29 @@ class _LineItemCardState extends State<_LineItemCard> {
   void initState() {
     super.initState();
     _qtyController = TextEditingController(
-        text: widget.item.quantity > 0 ? widget.item.quantity.toString() : '');
+      text: widget.item.quantity > 0 ? widget.item.quantity.toString() : '',
+    );
     _priceController = TextEditingController(
-        text: widget.item.unitPrice > 0
-            ? (widget.item.unitPrice / 100).toString()
-            : '');
+      text: widget.item.unitPrice > 0
+          ? (widget.item.unitPrice / 100).toString()
+          : '',
+    );
 
     _qtyFocus.addListener(() {
       if (_qtyFocus.hasFocus && _qtyController.text.isNotEmpty) {
         _qtyController.selection = TextSelection(
-            baseOffset: 0, extentOffset: _qtyController.text.length);
+          baseOffset: 0,
+          extentOffset: _qtyController.text.length,
+        );
       }
     });
 
     _priceFocus.addListener(() {
       if (_priceFocus.hasFocus && _priceController.text.isNotEmpty) {
         _priceController.selection = TextSelection(
-            baseOffset: 0, extentOffset: _priceController.text.length);
+          baseOffset: 0,
+          extentOffset: _priceController.text.length,
+        );
       }
     });
   }
@@ -434,16 +453,18 @@ class _LineItemCardState extends State<_LineItemCard> {
                 Expanded(
                   child: TextFormField(
                     initialValue: widget.item.description,
-                    decoration: const InputDecoration(
-                      labelText: 'Description',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.description,
+                      border: const OutlineInputBorder(),
                       isDense: true,
                     ),
                     onChanged: (v) {
                       widget.item.description = v;
                       widget.onChanged();
                     },
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                    validator: (v) => v == null || v.trim().isEmpty
+                        ? l10n.requiredField
+                        : null,
                   ),
                 ),
                 if (widget.onRemove != null)
@@ -462,16 +483,26 @@ class _LineItemCardState extends State<_LineItemCard> {
                   child: TextFormField(
                     controller: _qtyController,
                     focusNode: _qtyFocus,
-                    decoration: const InputDecoration(
-                      labelText: 'Qty',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.quantityShort,
+                      border: const OutlineInputBorder(),
                       isDense: true,
                     ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     onChanged: (v) {
                       widget.item.quantity = double.tryParse(v) ?? 0.0;
                       widget.onChanged();
                     },
+                    validator: (v) => InputValidators.requiredDecimal(
+                      v,
+                      requiredMessage: l10n.requiredField,
+                      invalidMessage: l10n.mustBePositive,
+                      minimum: 0,
+                      allowNegative: false,
+                      exclusiveMinimum: true,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -481,20 +512,34 @@ class _LineItemCardState extends State<_LineItemCard> {
                     controller: _priceController,
                     focusNode: _priceFocus,
                     decoration: InputDecoration(
-                      labelText: 'Unit Price',
+                      labelText: l10n.unitPrice,
                       hintText: '0.00',
                       border: const OutlineInputBorder(),
                       isDense: true,
-                      prefixText: '${CurrencyFormatter.getCurrencySymbol(widget.currencyCode)} ',
+                      prefixText:
+                          '${CurrencyFormatter.getCurrencySymbol(widget.currencyCode)} ',
                     ),
-                    keyboardType: TextInputType.number,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
                     ],
                     onChanged: (v) {
-                      widget.item.unitPrice = ((double.tryParse(v) ?? 0) * 100).round();
+                      widget.item.unitPrice = ((double.tryParse(v) ?? 0) * 100)
+                          .round();
                       widget.onChanged();
                     },
+                    validator: (v) => InputValidators.requiredDecimal(
+                      v,
+                      requiredMessage: l10n.requiredField,
+                      invalidMessage: l10n.mustBePositive,
+                      minimum: 0,
+                      allowNegative: false,
+                      exclusiveMinimum: true,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -509,7 +554,10 @@ class _LineItemCardState extends State<_LineItemCard> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    CurrencyFormatter.formatAmount(widget.item.amount, widget.currencyCode),
+                    CurrencyFormatter.formatAmount(
+                      widget.item.amount,
+                      widget.currencyCode,
+                    ),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

@@ -43,6 +43,5 @@ dependencies:
   appinio_swiper: ^2.1.1
 
 dev_dependencies:
-  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

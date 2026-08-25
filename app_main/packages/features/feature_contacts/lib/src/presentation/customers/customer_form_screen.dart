@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 /// 📝 Customer Form Screen
 /// Add or edit a customer.
@@ -142,7 +143,9 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_isEdit ? l10n.customerUpdated : l10n.customerCreated),
+            content: Text(
+              _isEdit ? l10n.customerUpdated : l10n.customerCreated,
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -152,7 +155,7 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('${l10n.error} $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -217,6 +220,10 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                         prefixIcon: const Icon(Icons.email),
                       ),
                       keyboardType: TextInputType.emailAddress,
+                      validator: (value) => InputValidators.optionalEmail(
+                        value,
+                        invalidMessage: l10n.invalidEmail,
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -229,6 +236,10 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                         prefixIcon: const Icon(Icons.phone),
                       ),
                       keyboardType: TextInputType.phone,
+                      validator: (value) => InputValidators.optionalPhone(
+                        value,
+                        invalidMessage: l10n.invalidPhone,
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -265,12 +276,18 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                                 ButtonSegment(
                                   value: true,
                                   label: Text(l10n.debit),
-                                  icon: const Icon(Icons.add_circle_outline, color: Colors.green),
+                                  icon: const Icon(
+                                    Icons.add_circle_outline,
+                                    color: Colors.green,
+                                  ),
                                 ),
                                 ButtonSegment(
                                   value: false,
                                   label: Text(l10n.credit),
-                                  icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                                  icon: const Icon(
+                                    Icons.remove_circle_outline,
+                                    color: Colors.red,
+                                  ),
                                 ),
                               ],
                               selected: {_isDebit},
@@ -299,10 +316,13 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                           if (value == null || value.trim().isEmpty) {
                             return l10n.requiredField;
                           }
-                          if (double.tryParse(value) == null) {
-                            return l10n.requiredField;
-                          }
-                          return null;
+                          return InputValidators.requiredDecimal(
+                            value,
+                            requiredMessage: l10n.requiredField,
+                            invalidMessage: l10n.pleaseEnterValidNumber,
+                            minimum: 0,
+                            allowNegative: false,
+                          );
                         },
                       ),
                       const SizedBox(height: 16),
@@ -316,7 +336,13 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.credit_card),
                       ),
-                      keyboardType: TextInputType.number,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      validator: (value) => InputValidators.optionalDecimal(
+                        value,
+                        invalidMessage: l10n.mustBeNonNegative,
+                      ),
                     ),
                     const SizedBox(height: 16),
 

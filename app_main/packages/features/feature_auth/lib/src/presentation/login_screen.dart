@@ -1,12 +1,12 @@
 // FILE: packages/features/feature_auth/lib/src/presentation/login_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_auth/src/presentation/auth_controller.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -42,10 +42,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
+    final emailError = InputValidators.optionalEmail(
+      email,
+      invalidMessage: l10n.invalidEmail,
+    );
+    if (emailError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(emailError),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+
     if (_isSignUp) {
-      ref.read(authControllerProvider.notifier).signUpWithEmail(email, password);
+      ref
+          .read(authControllerProvider.notifier)
+          .signUpWithEmail(email, password);
     } else {
-      ref.read(authControllerProvider.notifier).signInWithEmail(email, password);
+      ref
+          .read(authControllerProvider.notifier)
+          .signInWithEmail(email, password);
     }
   }
 
@@ -77,10 +95,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 0,
-      ),
+      appBar: AppBar(backgroundColor: colorScheme.surface, elevation: 0),
       backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -132,7 +147,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                     ),
                     onPressed: () {
                       setState(() {
@@ -173,7 +190,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         onPressed: _submit,
                         child: Text(
                           _isSignUp ? l10n.createAccount : l10n.signIn,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
               ),
@@ -200,7 +220,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       l10n.orSeparator,
-                      style: textTheme.bodySmall?.copyWith(color: colorScheme.outline),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.outline,
+                      ),
                     ),
                   ),
                   Expanded(child: Divider(color: colorScheme.outlineVariant)),
@@ -226,7 +248,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     },
                     borderRadius: BorderRadius.circular(8),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 14,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

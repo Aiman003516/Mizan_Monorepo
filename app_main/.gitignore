@@ -31,6 +31,9 @@ build/
 **/*.g.dart
 **/*.freezed.dart
 
+# The core Drift database is required for a clean checkout to analyze and build.
+!packages/core/core_database/lib/src/database.g.dart
+
 #==================================================
 # Flutter (General)
 #==================================================

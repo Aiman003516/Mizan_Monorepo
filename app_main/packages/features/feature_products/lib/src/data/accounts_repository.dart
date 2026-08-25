@@ -1,7 +1,6 @@
 // FILE: packages/features/feature_products/lib/src/data/accounts_repository.dart
 
 import 'package:core_database/core_database.dart';
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // FIX: Import the local database provider
 import 'package:feature_products/src/data/database_provider.dart';
@@ -18,7 +17,7 @@ class AccountsRepository {
   /// Watches all accounts, ordered by name.
   Stream<List<Account>> watchAccounts() {
     return (_db.select(_db.accounts)
-      ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
         .watch();
   }
 
@@ -41,8 +40,9 @@ class AccountsRepository {
 
   /// Updates an existing account.
   Future<void> updateAccount(Account account) {
-    return _db.update(_db.accounts).replace(
-        account.toCompanion(false).copyWith(lastUpdated: Value(DateTime.now())));
+    return _db.update(_db.accounts).replace(account
+        .toCompanion(false)
+        .copyWith(lastUpdated: Value(DateTime.now())));
   }
 
   /// Deletes an account.

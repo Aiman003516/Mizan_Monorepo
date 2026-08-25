@@ -35,7 +35,6 @@ Future<void> main() async {
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     Workmanager().initialize(
       callbackDispatcher, // The top level function from feature_sync
-      isInDebugMode: true, // If enabled it will post a notification whenever the task is running
     );
     // Register the task to run periodically when connected
     Workmanager().registerPeriodicTask(
@@ -81,7 +80,7 @@ Future<void> main() async {
 
   await Supabase.initialize(
     url: EnvConfig.supabaseUrl,
-    anonKey: EnvConfig.supabaseAnonKey,
+    publishableKey: EnvConfig.supabaseAnonKey,
   );
 
   final overrides = await Bootstrap.init();

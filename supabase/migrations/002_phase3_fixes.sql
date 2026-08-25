@@ -130,7 +130,44 @@ CREATE POLICY "Service role can insert profiles"
 
 
 -- ─────────────────────────────────────────────────────────
--- 6. VERIFY — run this SELECT to confirm setup
+-- 6. ENABLE RLS ON SYNC TABLES
+--    Client-side tenant filters are not an authorization boundary.
+--    Restrict reads and writes to users whose profile belongs to the row's
+--    tenant, including staff members who are not the tenant owner.
+-- ─────────────────────────────────────────────────────────
+DO $$
+DECLARE
+  sync_table TEXT;
+BEGIN
+  FOREACH sync_table IN ARRAY ARRAY[
+    'synced_transactions',
+    'synced_products',
+    'synced_accounts',
+    'synced_transaction_entries',
+    'synced_orders',
+    'synced_order_items',
+    'synced_categories',
+    'synced_inventory_cost_layers'
+  ] LOOP
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', sync_table);
+    EXECUTE format('DROP POLICY IF EXISTS "Tenant members can manage sync data" ON public.%I', sync_table);
+    EXECUTE format(
+      'CREATE POLICY "Tenant members can manage sync data" ON public.%I
+       FOR ALL
+       USING (tenant_id IN (
+         SELECT tenant_id FROM public.user_profiles WHERE id = auth.uid()
+       ))
+       WITH CHECK (tenant_id IN (
+         SELECT tenant_id FROM public.user_profiles WHERE id = auth.uid()
+       ))',
+      sync_table
+    );
+  END LOOP;
+END $$;
+
+
+-- ─────────────────────────────────────────────────────────
+-- 7. VERIFY — run this SELECT to confirm setup
 -- ─────────────────────────────────────────────────────────
 -- SELECT column_name, data_type
 -- FROM information_schema.columns

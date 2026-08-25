@@ -23,6 +23,8 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
   bool _isLoading = false;
   String? _selectedDefaultCategoryId;
 
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
+
   Future<void> _pickFile() async {
     setState(() => _isLoading = true);
     try {
@@ -32,13 +34,13 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
       });
       if (drafts.isEmpty) {
         if (mounted)
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("No products found in file.")));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(l10n.noProductsInFile)));
       }
     } catch (e) {
       if (mounted)
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e")));
+            .showSnackBar(SnackBar(content: Text('${l10n.error} $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -46,8 +48,8 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
 
   Future<void> _confirmImport() async {
     if (_selectedDefaultCategoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select a Default Category")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.pleaseSelectCategory)));
       return;
     }
 
@@ -70,15 +72,15 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
       await ref.read(importServiceProvider).saveProducts(companions);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text("Successfully imported ${companions.length} products!")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.recordsImported(companions.length))),
+        );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted)
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Import Failed: $e")));
+            .showSnackBar(SnackBar(content: Text('${l10n.error} $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -101,8 +103,10 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(l10n.selectDefaultCategoryHint,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    l10n.selectDefaultCategoryHint,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   categoriesAsync.when(
                     data: (categories) {
@@ -111,21 +115,28 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
                       return DropdownButtonFormField<String>(
                         initialValue: _selectedDefaultCategoryId,
                         items: categories
-                            .map((c) => DropdownMenuItem(
-                                value: c.id, child: Text(c.name)))
+                            .map(
+                              (c) => DropdownMenuItem(
+                                value: c.id,
+                                child: Text(c.name),
+                              ),
+                            )
                             .toList(),
                         onChanged: (val) =>
                             setState(() => _selectedDefaultCategoryId = val),
-                        decoration:
-                            const InputDecoration(border: OutlineInputBorder()),
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
                       );
                     },
                     loading: () => const LinearProgressIndicator(),
-                    error: (e, s) => Text("Error: $e"),
+                    error: (e, s) => Text('${l10n.error} $e'),
                   ),
                   const SizedBox(height: 16),
-                  Text(l10n.uploadFileHint,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    l10n.uploadFileHint,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: _isLoading ? null : _pickFile,
@@ -145,19 +156,21 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: DataTable(
-                        columns: const [
-                          DataColumn(label: Text("Name")),
-                          DataColumn(label: Text("Barcode")),
-                          DataColumn(label: Text("Price")),
-                          DataColumn(label: Text("Qty")),
+                        columns: [
+                          DataColumn(label: Text(l10n.name)),
+                          DataColumn(label: Text(l10n.barcode)),
+                          DataColumn(label: Text(l10n.price)),
+                          DataColumn(label: Text(l10n.quantityShort)),
                         ],
                         rows: _drafts.map((d) {
-                          return DataRow(cells: [
-                            DataCell(Text(d.name)),
-                            DataCell(Text(d.barcode)),
-                            DataCell(Text(d.price.toStringAsFixed(2))),
-                            DataCell(Text(d.quantity.toString())),
-                          ]);
+                          return DataRow(
+                            cells: [
+                              DataCell(Text(d.name)),
+                              DataCell(Text(d.barcode)),
+                              DataCell(Text(d.price.toStringAsFixed(2))),
+                              DataCell(Text(d.quantity.toString())),
+                            ],
+                          );
                         }).toList(),
                       ),
                     ),
@@ -174,8 +187,10 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
                 onPressed:
                     (_drafts.isEmpty || _isLoading) ? null : _confirmImport,
                 child: _isLoading
-                    ? CircularProgressIndicator(color: context.appColors.onPrimary)
-                    : Text("Import ${_drafts.length} Products"),
+                    ? CircularProgressIndicator(
+                        color: context.appColors.onPrimary,
+                      )
+                    : Text(l10n.importProductsCount(_drafts.length)),
               ),
             ),
           ),

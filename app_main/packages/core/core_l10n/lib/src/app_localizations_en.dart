@@ -164,6 +164,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseEnterValidNumber => 'Please enter a valid number';
 
   @override
+  String get invalidEmail => 'Please enter a valid email address';
+
+  @override
+  String get invalidPhone => 'Please enter a valid phone number';
+
+  @override
+  String get invalidCurrencyCode => 'Use 3-5 uppercase letters';
+
+  @override
+  String get mustBeNonNegative => 'Please enter a non-negative number';
+
+  @override
+  String get mustBePositive => 'Please enter a number greater than zero';
+
+  @override
   String get failedToSaveAccount => 'Failed to save account:';
 
   @override
@@ -1396,6 +1411,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createNewOrganization => 'Create New Organization';
 
   @override
+  String get createOrganizationTitle => 'Create your Organization';
+
+  @override
+  String get createOrganizationDescription =>
+      'This will enable Sync, Staff Management, and Advanced Reports.';
+
+  @override
+  String get businessNameLabel => 'Business Name';
+
+  @override
+  String get businessPhoneLabel => 'Business Phone';
+
+  @override
+  String get createBusinessUpgrade => 'Create Business & Upgrade';
+
+  @override
+  String get businessCloudActivated => 'Business Cloud Activated!';
+
+  @override
   String get role => 'Role';
 
   @override
@@ -1562,6 +1596,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vendorInvoice => 'Vendor Invoice #';
 
   @override
+  String get optional => 'Optional';
+
+  @override
   String get createBill => 'Create Bill';
 
   @override
@@ -1690,6 +1727,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bankReconciliations => 'Bank Reconciliations';
 
   @override
+  String get statementDetails => 'Statement Details';
+
+  @override
+  String get selectBankAccount => 'Select Bank Account';
+
+  @override
+  String get statementEnding => 'Statement Ending';
+
+  @override
+  String get clearedBalance => 'Cleared Balance';
+
+  @override
+  String get difference => 'Difference';
+
+  @override
+  String get selectTransactionsUntilBalanced =>
+      'Select transactions until the difference is zero';
+
+  @override
+  String get deposit => 'Deposit';
+
+  @override
+  String get payment => 'Payment';
+
+  @override
+  String get idLabel => 'ID';
+
+  @override
+  String get bankFeeInterestComingSoon =>
+      'Bank fee/interest adjustments are coming soon.';
+
+  @override
+  String get addAdjustment => 'Add Adjustment';
+
+  @override
+  String get finish => 'Finish';
+
+  @override
+  String get reconciliationComplete => 'Reconciliation complete!';
+
+  @override
   String get newReconciliation => 'New Reconciliation';
 
   @override
@@ -1724,6 +1802,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unclearedTransactions => 'Uncleared Transactions';
+
+  @override
+  String get noUnreconciledTransactions =>
+      'No unreconciled transactions found.';
 
   @override
   String get selectAll => 'Select All';
@@ -3005,6 +3087,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noProducts => 'No products found';
+
+  @override
+  String get noProductsInFile => 'No products found in file.';
+
+  @override
+  String get importButton => 'Import';
+
+  @override
+  String importProductsCount(int count) {
+    return 'Import $count Products';
+  }
+
+  @override
+  String recordsImported(int count) {
+    return '$count products imported successfully';
+  }
 
   @override
   String get searchProducts => 'Search products...';

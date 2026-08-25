@@ -1,9 +1,6 @@
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 import 'package:feature_products/src/data/database_provider.dart';
-
-
 
 final categoriesRepositoryProvider = Provider<CategoriesRepository>((ref) {
   final db = ref.watch(databaseProvider);
@@ -33,7 +30,8 @@ class CategoriesRepository {
   }
 
   // Logic moved from database.dart
-  Future<void> updateCategory(Category original, {required String newName, String? newImagePath}) {
+  Future<void> updateCategory(Category original,
+      {required String newName, String? newImagePath}) {
     final companion = original.toCompanion(false).copyWith(
           name: Value(newName),
           imagePath: Value(newImagePath),

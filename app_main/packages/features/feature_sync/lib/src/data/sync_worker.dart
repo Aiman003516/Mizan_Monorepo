@@ -8,10 +8,10 @@ void callbackDispatcher() {
       print("Native called background task: $task");
       // Execute the silent backup
       await SyncService.performSilentBackup();
-      return Future.value(true);
+      return true;
     } catch (e) {
       print("Background task failed: $e");
-      return Future.value(false);
+      return false;
     }
   });
 }

@@ -35,6 +35,5 @@ dependencies:
     path: ../feature_auth
 
 dev_dependencies:
-  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

@@ -4,13 +4,15 @@ import 'package:feature_auth/src/data/auth_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:shared_ui/shared_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BusinessSetupScreen extends ConsumerStatefulWidget {
   const BusinessSetupScreen({super.key});
 
   @override
-  ConsumerState<BusinessSetupScreen> createState() => _BusinessSetupScreenState();
+  ConsumerState<BusinessSetupScreen> createState() =>
+      _BusinessSetupScreenState();
 }
 
 class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
@@ -20,6 +22,8 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
   final _phoneCtrl = TextEditingController();
   bool _isLoading = false;
 
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -27,25 +31,30 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
 
     try {
       // ⚡ Call the Repository
-      await ref.read(authRepositoryProvider).createBusinessTenant(
-        businessName: _nameCtrl.text,
-        taxId: _taxCtrl.text,
-        phone: _phoneCtrl.text,
-      );
+      await ref
+          .read(authRepositoryProvider)
+          .createBusinessTenant(
+            businessName: _nameCtrl.text.trim(),
+            taxId: _taxCtrl.text.trim(),
+            phone: _phoneCtrl.text.trim(),
+          );
 
-      // On Success, the 'currentUserStreamProvider' will emit a new value 
+      // On Success, the 'currentUserStreamProvider' will emit a new value
       // with 'tenantId' != null.
-      
+
       if (mounted) {
         Navigator.pop(context); // Go back to Dashboard (now upgraded)
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('🎉 Business Cloud Activated!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.businessCloudActivated)));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: context.appColors.error),
+          SnackBar(
+            content: Text('${l10n.error} $e'),
+            backgroundColor: context.appColors.error,
+          ),
         );
       }
     } finally {
@@ -65,36 +74,37 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                "Create your Organization",
+              Text(
+                l10n.createOrganizationTitle,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                "This will enable Sync, Staff Management, and Advanced Reports.",
+                l10n.createOrganizationDescription,
                 style: TextStyle(color: context.appColors.subtleText),
               ),
               const SizedBox(height: 32),
-              
+
               // Business Name
               TextFormField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: "Business Name",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.store),
+                decoration: InputDecoration(
+                  labelText: l10n.businessNameLabel,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.store),
                 ),
-                validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? l10n.requiredField : null,
               ),
               const SizedBox(height: 16),
 
               // Tax ID
               TextFormField(
                 controller: _taxCtrl,
-                decoration: const InputDecoration(
-                  labelText: "Tax ID / VAT Number",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.badge),
+                decoration: InputDecoration(
+                  labelText: l10n.taxID,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.badge),
                 ),
               ),
               const SizedBox(height: 16),
@@ -103,12 +113,17 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
               TextFormField(
                 controller: _phoneCtrl,
                 keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  labelText: "Business Phone",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
+                decoration: InputDecoration(
+                  labelText: l10n.businessPhoneLabel,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.phone),
                 ),
-                validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                validator: (v) =>
+                    InputValidators.optionalPhone(
+                      v,
+                      invalidMessage: l10n.invalidPhone,
+                    ) ??
+                    (v == null || v.trim().isEmpty ? l10n.requiredField : null),
               ),
               const Spacer(),
 
@@ -119,7 +134,7 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
                   onPressed: _isLoading ? null : _submit,
                   child: _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text("Create Business & Upgrade"),
+                      : Text(l10n.createBusinessUpgrade),
                 ),
               ),
             ],

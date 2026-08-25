@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 /// 📝 Vendor Form Screen
 class VendorFormScreen extends ConsumerStatefulWidget {
@@ -111,7 +112,8 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
           ),
         );
       } else {
-        final openingBalance = double.tryParse(_openingBalanceController.text) ?? 0;
+        final openingBalance =
+            double.tryParse(_openingBalanceController.text) ?? 0;
         await apRepo.createVendor(
           name: _nameController.text.trim(),
           email: _emailController.text.trim().isNotEmpty
@@ -129,7 +131,8 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
           paymentTerms: _paymentTermsController.text.trim().isNotEmpty
               ? _paymentTermsController.text.trim()
               : null,
-          openingBalance: (openingBalance * 100).round() * (_isCredit ? 1 : -1), // 🟢 NEW
+          openingBalance:
+              (openingBalance * 100).round() * (_isCredit ? 1 : -1), // 🟢 NEW
           notes: _notesController.text.trim().isNotEmpty
               ? _notesController.text.trim()
               : null,
@@ -148,7 +151,7 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('${l10n.error} $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -192,8 +195,9 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.business),
                       ),
-                      validator: (v) =>
-                          v == null || v.trim().isEmpty ? l10n.requiredField : null,
+                      validator: (v) => v == null || v.trim().isEmpty
+                          ? l10n.requiredField
+                          : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -204,6 +208,10 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
                         prefixIcon: const Icon(Icons.email),
                       ),
                       keyboardType: TextInputType.emailAddress,
+                      validator: (value) => InputValidators.optionalEmail(
+                        value,
+                        invalidMessage: l10n.invalidEmail,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -214,6 +222,10 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
                         prefixIcon: const Icon(Icons.phone),
                       ),
                       keyboardType: TextInputType.phone,
+                      validator: (value) => InputValidators.optionalPhone(
+                        value,
+                        invalidMessage: l10n.invalidPhone,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -245,12 +257,18 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
                                 ButtonSegment(
                                   value: true,
                                   label: Text(l10n.credit),
-                                  icon: const Icon(Icons.add_circle_outline, color: Colors.green),
+                                  icon: const Icon(
+                                    Icons.add_circle_outline,
+                                    color: Colors.green,
+                                  ),
                                 ),
                                 ButtonSegment(
                                   value: false,
                                   label: Text(l10n.debit),
-                                  icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                                  icon: const Icon(
+                                    Icons.remove_circle_outline,
+                                    color: Colors.red,
+                                  ),
                                 ),
                               ],
                               selected: {_isCredit},
@@ -279,10 +297,13 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
                           if (value == null || value.trim().isEmpty) {
                             return l10n.requiredField;
                           }
-                          if (double.tryParse(value) == null) {
-                            return l10n.requiredField;
-                          }
-                          return null;
+                          return InputValidators.requiredDecimal(
+                            value,
+                            requiredMessage: l10n.requiredField,
+                            invalidMessage: l10n.pleaseEnterValidNumber,
+                            minimum: 0,
+                            allowNegative: false,
+                          );
                         },
                       ),
                       const SizedBox(height: 16),

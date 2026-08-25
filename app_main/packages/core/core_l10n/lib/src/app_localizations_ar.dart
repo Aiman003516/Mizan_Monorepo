@@ -164,6 +164,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pleaseEnterValidNumber => 'الرجاء إدخال رقم صالح';
 
   @override
+  String get invalidEmail => 'يرجى إدخال عنوان بريد إلكتروني صالح';
+
+  @override
+  String get invalidPhone => 'يرجى إدخال رقم هاتف صالح';
+
+  @override
+  String get invalidCurrencyCode => 'استخدم من 3 إلى 5 أحرف إنجليزية كبيرة';
+
+  @override
+  String get mustBeNonNegative => 'يرجى إدخال رقم غير سالب';
+
+  @override
+  String get mustBePositive => 'يرجى إدخال رقم أكبر من صفر';
+
+  @override
   String get failedToSaveAccount => 'فشل حفظ الحساب:';
 
   @override
@@ -1395,6 +1410,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get createNewOrganization => 'إنشاء مؤسسة جديدة';
 
   @override
+  String get createOrganizationTitle => 'إنشاء مؤسستك';
+
+  @override
+  String get createOrganizationDescription =>
+      'سيؤدي ذلك إلى تفعيل المزامنة وإدارة الموظفين والتقارير المتقدمة.';
+
+  @override
+  String get businessNameLabel => 'اسم النشاط التجاري';
+
+  @override
+  String get businessPhoneLabel => 'هاتف النشاط التجاري';
+
+  @override
+  String get createBusinessUpgrade => 'إنشاء النشاط والترقية';
+
+  @override
+  String get businessCloudActivated => 'تم تفعيل سحابة النشاط التجاري!';
+
+  @override
   String get role => 'الصلاحية';
 
   @override
@@ -1559,6 +1593,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get vendorInvoice => 'رقم فاتورة المورد';
 
   @override
+  String get optional => 'اختياري';
+
+  @override
   String get createBill => 'إنشاء فاتورة مشتريات';
 
   @override
@@ -1688,6 +1725,47 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bankReconciliations => 'التسويات البنكية';
 
   @override
+  String get statementDetails => 'تفاصيل الكشف';
+
+  @override
+  String get selectBankAccount => 'اختر الحساب البنكي';
+
+  @override
+  String get statementEnding => 'نهاية الكشف';
+
+  @override
+  String get clearedBalance => 'الرصيد المسوّى';
+
+  @override
+  String get difference => 'الفرق';
+
+  @override
+  String get selectTransactionsUntilBalanced =>
+      'اختر العمليات حتى يصبح الفرق صفراً';
+
+  @override
+  String get deposit => 'إيداع';
+
+  @override
+  String get payment => 'دفعة';
+
+  @override
+  String get idLabel => 'المعرّف';
+
+  @override
+  String get bankFeeInterestComingSoon =>
+      'تعديلات الرسوم البنكية والفوائد ستتوفر قريباً.';
+
+  @override
+  String get addAdjustment => 'إضافة تسوية';
+
+  @override
+  String get finish => 'إنهاء';
+
+  @override
+  String get reconciliationComplete => 'اكتملت التسوية!';
+
+  @override
   String get newReconciliation => 'تسوية جديدة';
 
   @override
@@ -1721,7 +1799,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get balanced => 'متوازن!';
 
   @override
-  String get unclearedTransactions => 'المعاملات غير المقاصة';
+  String get unclearedTransactions => 'العمليات غير المسواة';
+
+  @override
+  String get noUnreconciledTransactions => 'لا توجد عمليات غير مسواة.';
 
   @override
   String get selectAll => 'تحديد الكل';
@@ -1745,62 +1826,61 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noBankAccountsFound => 'لم يتم العثور على حسابات بنكية';
 
   @override
-  String get closeBooks => 'Close Books';
+  String get closeBooks => 'إقفال الدفاتر';
 
   @override
-  String get currentLockDate => 'Current Lock Date';
+  String get currentLockDate => 'تاريخ القفل الحالي';
 
   @override
-  String get booksAreOpen => 'Books are OPEN';
+  String get booksAreOpen => 'الدفاتر مفتوحة';
 
   @override
-  String get closingInstructionsTitle => 'Closing Instructions';
+  String get closingInstructionsTitle => 'تعليمات الإقفال';
 
   @override
   String get closingInstructionsBody =>
-      'This action will:\n1. Zero out all Revenue & Expenses for the period.\n2. Transfer Net Income to Retained Earnings.\n3. LOCK the period from future edits.';
+      'سيؤدي هذا الإجراء إلى:\n1. تصفير جميع الإيرادات والمصروفات للفترة.\n2. تحويل صافي الدخل إلى الأرباح المحتجزة.\n3. قفل الفترة ومنع تعديلها مستقبلاً.';
 
   @override
-  String get stepSelectDate => 'Step 1: Select Closing Date';
+  String get stepSelectDate => 'الخطوة 1: اختر تاريخ الإقفال';
 
   @override
-  String get stepSelectEquityAccount =>
-      'Step 2: Select Retained Earnings Account';
+  String get stepSelectEquityAccount => 'الخطوة 2: اختر حساب الأرباح المحتجزة';
 
   @override
   String get errorNoEquityAccount =>
-      'Error: No Equity accounts found. Please create one in Accounts.';
+      'خطأ: لم يتم العثور على حسابات حقوق ملكية. يرجى إنشاء حساب في قسم الحسابات.';
 
   @override
-  String get closePeriodAndLock => 'CLOSE PERIOD & LOCK';
+  String get closePeriodAndLock => 'إقفال الفترة وقفلها';
 
   @override
-  String get confirmPeriodCloseTitle => 'Confirm Period Close';
+  String get confirmPeriodCloseTitle => 'تأكيد إقفال الفترة';
 
   @override
   String get confirmPeriodCloseMessage =>
-      'Are you sure? This will lock all transactions on or before this date. This action cannot be easily undone.';
+      'هل أنت متأكد؟ سيؤدي ذلك إلى قفل جميع العمليات في هذا التاريخ أو قبله. لا يمكن التراجع عن هذا الإجراء بسهولة.';
 
   @override
-  String get periodClosedSuccessfully => 'Period Closed Successfully.';
+  String get periodClosedSuccessfully => 'تم إقفال الفترة بنجاح.';
 
   @override
-  String get periodLockedError => 'Period is closed for edits.';
+  String get periodLockedError => 'الفترة مقفلة ولا يمكن تعديلها.';
 
   @override
   String get cvpAnalysis => 'تحليل التكلفة-الحجم-الربح';
 
   @override
-  String get calculator => 'Calculator';
+  String get calculator => 'الحاسبة';
 
   @override
-  String get breakEven => 'Break-Even';
+  String get breakEven => 'نقطة التعادل';
 
   @override
-  String get marginOfSafety => 'Margin of Safety';
+  String get marginOfSafety => 'هامش الأمان';
 
   @override
-  String get whatIf => 'What-If';
+  String get whatIf => 'تحليل ماذا لو؟';
 
   @override
   String get costStructure => 'هيكل التكاليف';
@@ -1821,10 +1901,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get variableCost => 'التكلفة المتغيرة';
 
   @override
-  String get contributionMargin => 'Contribution Margin';
+  String get contributionMargin => 'هامش المساهمة';
 
   @override
-  String get contributionMarginPerUnit => 'CM per Unit';
+  String get contributionMarginPerUnit => 'هامش المساهمة لكل وحدة';
 
   @override
   String get actualExpectedSales => 'المبيعات الفعلية/المتوقعة';
@@ -1842,19 +1922,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get desiredProfitHelper => 'كم من الربح تريد تحقيقه؟';
 
   @override
-  String get analyzeAndViewResults => 'Analyze & View Results';
+  String get analyzeAndViewResults => 'تحليل وعرض النتائج';
 
   @override
-  String get enterDataFirst => 'Enter data in the Calculator tab first';
+  String get enterDataFirst => 'أدخل البيانات في تبويب الحاسبة أولاً';
 
   @override
   String get breakEvenPoint => 'نقطة التعادل';
 
   @override
-  String get units => 'Units';
+  String get units => 'الوحدات';
 
   @override
-  String get sales => 'Sales';
+  String get sales => 'المبيعات';
 
   @override
   String get targetProfitAnalysis => 'تحليل الربح المستهدف';
@@ -1866,7 +1946,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get requiredSales => 'المبيعات المطلوبة';
 
   @override
-  String get risk => 'RISK';
+  String get risk => 'المخاطر';
 
   @override
   String get mosRatio => 'نسبة هامش الأمان';
@@ -1890,14 +1970,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get leverageLevel => 'مستوى الرافعة';
 
   @override
-  String get leverageImpact => 'Impact';
+  String get leverageImpact => 'التأثير';
 
   @override
   String get priceSensitivityAnalysis => 'تحليل حساسية السعر';
 
   @override
   String get priceSensitivityDescription =>
-      'Shows how break-even changes when you adjust selling price';
+      'يوضح تغير نقطة التعادل عند تعديل سعر البيع';
 
   @override
   String currentBreakEven(String units) {
@@ -3000,6 +3080,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noProducts => 'لا توجد منتجات';
 
   @override
+  String get noProductsInFile => 'لم يتم العثور على منتجات في الملف.';
+
+  @override
+  String get importButton => 'استيراد';
+
+  @override
+  String importProductsCount(int count) {
+    return 'استيراد $count منتجاً';
+  }
+
+  @override
+  String recordsImported(int count) {
+    return 'تم استيراد $count منتج بنجاح';
+  }
+
+  @override
   String get searchProducts => 'البحث عن منتجات...';
 
   @override
@@ -3809,259 +3905,260 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mockPaymentSuccess => '✅ تم الدفع بنجاح!';
 
   @override
-  String get noStaffFound => 'No staff found. Invite someone!';
+  String get noStaffFound => 'لم يتم العثور على موظفين. ادعُ أحداً للانضمام!';
 
   @override
-  String get ownerRole => 'Owner';
+  String get ownerRole => 'المالك';
 
   @override
   String staffRoleAndEmail(String roleId, String email) {
-    return 'Role: $roleId • $email';
+    return 'الدور: $roleId • $email';
   }
 
   @override
   String removeStaffTitle(String name) {
-    return 'Remove $name?';
+    return 'إزالة $name؟';
   }
 
   @override
   String get removeStaffWarning =>
-      'They will lose access to this business immediately.';
+      'سيفقد هذا الشخص الوصول إلى هذا النشاط التجاري فوراً.';
 
   @override
-  String get inviteStaff => 'Invite Staff';
+  String get inviteStaff => 'دعوة موظف';
 
   @override
-  String get stepSelectRole => '1. Select a Role';
+  String get stepSelectRole => '1. اختر دوراً';
 
   @override
-  String get chooseRoleHint => 'Choose Role (e.g. Cashier)';
+  String get chooseRoleHint => 'اختر الدور (مثال: أمين الصندوق)';
 
   @override
   String errorLoadingRoles(String error) {
-    return 'Error loading roles: $error';
+    return 'خطأ في تحميل الأدوار: $error';
   }
 
   @override
-  String get generateInviteCode => 'Generate Invite Code';
+  String get generateInviteCode => 'إنشاء رمز دعوة';
 
   @override
-  String get stepShareCode => '2. Share Code';
+  String get stepShareCode => '2. شارك الرمز';
 
   @override
-  String get validFor24Hours => 'Valid for 24 hours';
+  String get validFor24Hours => 'صالح لمدة 24 ساعة';
 
   @override
-  String get shareViaApp => 'Share via WhatsApp / Telegram';
+  String get shareViaApp => 'المشاركة عبر واتساب / تيليجرام';
 
   @override
   String inviteShareText(String code) {
-    return 'Join my business on Mizan!\n\n1. Download the App\n2. Sign In\n3. Select \'Join Business\' and enter code: $code\n\n(Valid for 24 hours)';
+    return 'انضم إلى نشاطي التجاري على ميزان!\n\n1. نزّل التطبيق\n2. سجّل الدخول\n3. اختر \"الانضمام إلى نشاط تجاري\" وأدخل الرمز: $code\n\n(صالح لمدة 24 ساعة)';
   }
 
   @override
-  String get validInviteCodeTitle => 'Valid Invite Code!';
+  String get validInviteCodeTitle => 'رمز الدعوة صالح!';
 
   @override
   String roleLabel(String roleId) {
-    return 'Role: $roleId';
+    return 'الدور: $roleId';
   }
 
   @override
-  String get pleaseEnterYourName => 'Please enter your name';
+  String get pleaseEnterYourName => 'يرجى إدخال اسمك';
 
   @override
-  String get orText => 'or';
+  String get orText => 'أو';
 
   @override
   String appVersion(String version) {
-    return 'Mizan App v$version';
+    return 'تطبيق ميزان الإصدار $version';
   }
 
   @override
-  String get invalidNumber => 'Invalid number';
+  String get invalidNumber => 'رقم غير صالح';
 
   @override
   String get requiredField => 'هذا الحقل مطلوب';
 
   @override
-  String get category => 'Category';
+  String get category => 'التصنيف';
 
   @override
-  String get redFlags => 'Red Flags';
+  String get redFlags => 'مؤشرات الخطر';
 
   @override
-  String get dsriDescription => 'Receivables/Sales';
+  String get dsriDescription => 'الذمم المدينة / المبيعات';
 
   @override
-  String get gmiDescription => 'Gross Margin';
+  String get gmiDescription => 'هامش الربح الإجمالي';
 
   @override
-  String get aqiDescription => 'Asset Quality';
+  String get aqiDescription => 'جودة الأصول';
 
   @override
-  String get sgiDescription => 'Sales Growth';
+  String get sgiDescription => 'نمو المبيعات';
 
   @override
-  String get depiDescription => 'Depreciation';
+  String get depiDescription => 'الإهلاك';
 
   @override
-  String get sgaiDescription => 'SG&A Expenses';
+  String get sgaiDescription => 'مصروفات البيع والعمومية والإدارية';
 
   @override
-  String get tataDescription => 'Accruals';
+  String get tataDescription => 'الاستحقاقات';
 
   @override
-  String get lvgiDescription => 'Leverage';
+  String get lvgiDescription => 'الرفع المالي';
 
   @override
-  String get whatIsMScore => 'What is the Beneish M-Score?';
+  String get whatIsMScore => 'ما هو مؤشر M لبنيش؟';
 
   @override
   String get mScoreDescription =>
-      'The M-Score is a mathematical model created by Professor Messod Beneish that uses financial ratios to detect whether a company has manipulated its earnings.\n\nAn M-Score greater than -1.78 suggests a HIGH probability (76%) that the company is an earnings manipulator.';
+      'مؤشر M هو نموذج رياضي وضعه الأستاذ مسعود بنيش، ويستخدم النسب المالية لاكتشاف ما إذا كانت الشركة قد تلاعبت بأرباحها.\n\nيشير مؤشر M الأكبر من -1.78 إلى احتمال مرتفع (76%) بأن الشركة تتلاعب بالأرباح.';
 
   @override
-  String get dsriName => 'Days Sales in Receivables Index';
+  String get dsriName => 'مؤشر أيام المبيعات في الذمم المدينة';
 
   @override
-  String get dsriExpl => 'Measures if receivables grew faster than sales';
+  String get dsriExpl =>
+      'يقيس ما إذا كانت الذمم المدينة قد نمت أسرع من المبيعات';
 
   @override
-  String get gmiName => 'Gross Margin Index';
+  String get gmiName => 'مؤشر هامش الربح الإجمالي';
 
   @override
-  String get gmiExpl => 'Detects deteriorating gross margins';
+  String get gmiExpl => 'يكتشف تدهور هوامش الربح الإجمالي';
 
   @override
-  String get aqiName => 'Asset Quality Index';
+  String get aqiName => 'مؤشر جودة الأصول';
 
   @override
-  String get aqiExpl => 'Identifies expense capitalization';
+  String get aqiExpl => 'يحدد رسملة المصروفات';
 
   @override
-  String get sgiName => 'Sales Growth Index';
+  String get sgiName => 'مؤشر نمو المبيعات';
 
   @override
-  String get sgiExpl => 'High growth creates manipulation pressure';
+  String get sgiExpl => 'النمو المرتفع يسبب ضغطاً قد يؤدي إلى التلاعب';
 
   @override
-  String get depiName => 'Depreciation Index';
+  String get depiName => 'مؤشر الإهلاك';
 
   @override
-  String get depiExpl => 'Detects slowing depreciation rates';
+  String get depiExpl => 'يكتشف تباطؤ معدلات الإهلاك';
 
   @override
-  String get sgaiName => 'SG&A Index';
+  String get sgaiName => 'مؤشر مصروفات البيع والعمومية والإدارية';
 
   @override
-  String get sgaiExpl => 'Measures administrative efficiency';
+  String get sgaiExpl => 'يقيس الكفاءة الإدارية';
 
   @override
-  String get tataName => 'Total Accruals to Total Assets';
+  String get tataName => 'إجمالي الاستحقاقات إلى إجمالي الأصول';
 
   @override
-  String get tataExpl => 'High accruals vs cash = low quality';
+  String get tataExpl =>
+      'ارتفاع الاستحقاقات مقارنة بالنقد يشير إلى انخفاض الجودة';
 
   @override
-  String get lvgiName => 'Leverage Index';
+  String get lvgiName => 'مؤشر الرفع المالي';
 
   @override
-  String get lvgiExpl => 'Increasing debt creates pressure';
+  String get lvgiExpl => 'زيادة الديون تخلق ضغطاً مالياً';
 
   @override
   String get famousCasesDesc =>
-      '• Enron (2001): Would have had M-Score > -1.78\n• WorldCom (2002): High TATA due to expense capitalization\n• Satyam (2009): High DSRI from fictitious receivables\n\nThe M-Score correctly identified 76% of manipulators in backtesting studies.';
+      '• إنرون (2001): كان من المتوقع أن يكون مؤشر M أكبر من -1.78\n• وورلدكوم (2002): ارتفاع TATA بسبب رسملة المصروفات\n• ساتيام (2009): ارتفاع DSRI بسبب الذمم المدينة الوهمية\n\nحدد مؤشر M بشكل صحيح 76% من حالات التلاعب في دراسات الاختبار الرجعي.';
 
   @override
-  String get mScoreThresholdLabel =>
-      'Threshold: > -1.78 indicates manipulation';
+  String get mScoreThresholdLabel => 'الحد: أكبر من -1.78 يشير إلى تلاعب';
 
   @override
-  String get riskLevelHigh => 'HIGH';
+  String get riskLevelHigh => 'مرتفع';
 
   @override
-  String get riskLevelModerate => 'MODERATE';
+  String get riskLevelModerate => 'متوسط';
 
   @override
-  String get riskLevelLow => 'LOW';
+  String get riskLevelLow => 'منخفض';
 
   @override
-  String get unitsLowercase => 'units';
+  String get unitsLowercase => 'وحدة';
 
   @override
-  String get flexibleBudgetResult => 'Flexible Budget';
+  String get flexibleBudgetResult => 'الموازنة المرنة';
 
   @override
   String get varianceFormulas =>
-      '• Static Budget = Fixed + (Variable × Planned Activity)\n• Flexible Budget = Fixed + (Variable × Actual Activity)\n• Volume Variance = Flexible - Static\n• Spending Variance = Actual - Flexible';
+      '• الموازنة الثابتة = الثابت + (المتغير × النشاط المخطط)\n• الموازنة المرنة = الثابت + (المتغير × النشاط الفعلي)\n• انحراف الحجم = المرنة - الثابتة\n• انحراف الإنفاق = الفعلي - المرنة';
 
   @override
-  String get materialQtyPerUnit => 'Material Qty/Unit';
+  String get materialQtyPerUnit => 'كمية المواد/الوحدة';
 
   @override
-  String get laborHoursPerUnit => 'Labor Hours/Unit';
+  String get laborHoursPerUnit => 'ساعات العمل/الوحدة';
 
   @override
-  String get perHrSuffix => '\$/hr';
+  String get perHrSuffix => 'دولار/ساعة';
 
   @override
   String totalVarianceValue(String amount) {
-    return 'Total Variance: $amount';
+    return 'إجمالي الانحراف: $amount';
   }
 
   @override
-  String get actualCostResult => 'Actual Cost';
+  String get actualCostResult => 'التكلفة الفعلية';
 
   @override
-  String get priceVarianceResult => 'Price Variance';
+  String get priceVarianceResult => 'انحراف السعر';
 
   @override
-  String get quantityVarianceResult => 'Quantity Variance';
+  String get quantityVarianceResult => 'انحراف الكمية';
 
   @override
-  String get materialsFormulasTitle => 'Materials Formulas';
+  String get materialsFormulasTitle => 'معادلات المواد';
 
   @override
   String get materialsFormulasDesc =>
-      '• Price Variance = (Actual Price - Standard Price) × Actual Qty\n• Quantity Variance = (Actual Qty - Standard Qty) × Standard Price';
+      '• انحراف السعر = (السعر الفعلي - السعر المعياري) × الكمية الفعلية\n• انحراف الكمية = (الكمية الفعلية - الكمية المعيارية) × السعر المعياري';
 
   @override
-  String get rateVarianceResult => 'Rate Variance';
+  String get rateVarianceResult => 'انحراف المعدل';
 
   @override
-  String get efficiencyVarianceResult => 'Efficiency Variance';
+  String get efficiencyVarianceResult => 'انحراف الكفاءة';
 
   @override
-  String get laborFormulasTitle => 'Labor Formulas';
+  String get laborFormulasTitle => 'معادلات العمل';
 
   @override
   String get laborFormulasDesc =>
-      '• Rate Variance = (Actual Rate - Standard Rate) × Actual Hours\n• Efficiency Variance = (Actual Hours - Std Hours) × Std Rate';
+      '• انحراف المعدل = (المعدل الفعلي - المعدل المعياري) × الساعات الفعلية\n• انحراف الكفاءة = (الساعات الفعلية - الساعات المعيارية) × المعدل المعياري';
 
   @override
-  String get currentRatioTitle => 'Current Ratio';
+  String get currentRatioTitle => 'النسبة الجارية';
 
   @override
-  String get debtEquityTitle => 'Debt/Equity';
+  String get debtEquityTitle => 'الدين إلى حقوق الملكية';
 
   @override
-  String get netMarginTitle => 'Net Margin';
+  String get netMarginTitle => 'هامش صافي الربح';
 
   @override
-  String get roaTitle => 'ROA';
+  String get roaTitle => 'العائد على الأصول';
 
   @override
-  String get ratioCol => 'Ratio';
+  String get ratioCol => 'النسبة';
 
   @override
-  String get valueCol => 'Value';
+  String get valueCol => 'القيمة';
 
   @override
-  String get benchmarkCol => 'Benchmark';
+  String get benchmarkCol => 'المعيار';
 
   @override
-  String get statusCol => 'Status';
+  String get statusCol => 'الحالة';
 
   @override
   String get descriptionCol => 'الوصف';
@@ -4117,33 +4214,34 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get buyNowAction => 'Buy Now';
+  String get buyNowAction => 'اشترِ الآن';
 
   @override
   String installedSuccessfully(String reportTitle) {
-    return '✅ Installed $reportTitle';
+    return 'تم تثبيت $reportTitle ✅';
   }
 
   @override
-  String get noStandardReportsFound => 'No standard reports found online.';
+  String get noStandardReportsFound =>
+      'لم يتم العثور على تقارير قياسية عبر الإنترنت.';
 
   @override
-  String get installAction => 'Install';
+  String get installAction => 'تثبيت';
 
   @override
-  String get includedAction => 'Included';
+  String get includedAction => 'مضمّن';
 
   @override
-  String get buyPriceAction => 'Buy \$4.99';
+  String get buyPriceAction => 'شراء \$4.99';
 
   @override
-  String get lockedAction => 'Locked';
+  String get lockedAction => 'مقفل';
 
   @override
-  String get retailBusinessTemplate => 'Retail Business';
+  String get retailBusinessTemplate => 'نشاط تجزئة';
 
   @override
-  String get serviceBusinessTemplate => 'Service Business';
+  String get serviceBusinessTemplate => 'نشاط خدمي';
 
   @override
   String get customersAr => 'العملاء (AR)';

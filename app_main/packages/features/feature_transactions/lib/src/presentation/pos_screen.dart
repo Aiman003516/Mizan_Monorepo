@@ -12,7 +12,6 @@ import 'package:printing/printing.dart';
 // Core Imports
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_data/core_data.dart';
-import 'package:core_database/core_database.dart';
 
 // Shared Imports
 import 'package:shared_ui/shared_ui.dart';
@@ -49,10 +48,7 @@ final paymentMethodsProvider = StreamProvider<List<PaymentMethod>>((ref) {
 class PosScreen extends ConsumerStatefulWidget {
   final bool isStandalone;
 
-  const PosScreen({
-    super.key,
-    this.isStandalone = false,
-  });
+  const PosScreen({super.key, this.isStandalone = false});
 
   @override
   ConsumerState<PosScreen> createState() => _PosScreenState();
@@ -63,7 +59,6 @@ class _PosScreenState extends ConsumerState<PosScreen> {
   String? _selectedCategoryId;
   String _searchQuery = '';
   bool _isSearching = false;
-  bool _isProcessing = false;
 
   // ─── KEYBOARD / BARCODE ─────────────────────────
   final FocusNode _focusNode = FocusNode();
@@ -209,8 +204,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     ref.read(posStateProvider.notifier).parkOrder();
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(l10n.orderParked)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.orderParked)));
   }
 
   void _showParkedOrdersDialog() {
@@ -221,8 +217,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(l10n.recallOrder),
           content: SizedBox(
             width: 340,
@@ -232,14 +229,18 @@ class _PosScreenState extends ConsumerState<PosScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.inbox_outlined,
-                            size: 48,
-                            color: context.appColors.subtleText
-                                .withValues(alpha: 0.4)),
+                        Icon(
+                          Icons.inbox_outlined,
+                          size: 48,
+                          color: context.appColors.subtleText.withValues(
+                            alpha: 0.4,
+                          ),
+                        ),
                         const SizedBox(height: 12),
-                        Text(l10n.noParkedOrders,
-                            style: TextStyle(
-                                color: context.appColors.subtleText)),
+                        Text(
+                          l10n.noParkedOrders,
+                          style: TextStyle(color: context.appColors.subtleText),
+                        ),
                       ],
                     ),
                   )
@@ -256,13 +257,17 @@ class _PosScreenState extends ConsumerState<PosScreen> {
                           leading: CircleAvatar(
                             backgroundColor: context.appColors.primary
                                 .withValues(alpha: 0.1),
-                            child: Icon(Icons.receipt_long,
-                                color: context.appColors.primary),
+                            child: Icon(
+                              Icons.receipt_long,
+                              color: context.appColors.primary,
+                            ),
                           ),
-                          title: Text(l10n
-                              .orderNumber(order.id.substring(0, 4))),
-                          subtitle: Text(l10n.itemsAndTime(
-                              order.items.length, minutesAgo)),
+                          title: Text(
+                            l10n.orderNumber(order.id.substring(0, 4)),
+                          ),
+                          subtitle: Text(
+                            l10n.itemsAndTime(order.items.length, minutesAgo),
+                          ),
                           trailing: Text(
                             CurrencyFormatter.formatCentsToCurrency(
                               (order.total * 100).round(),
@@ -300,8 +305,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     final state = ref.read(posStateProvider);
     if (state.activeOrder.items.isEmpty) {
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.cartEmpty)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.cartEmpty)));
       return;
     }
 
@@ -312,8 +318,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(l10n.orderDetails),
           content: SizedBox(
             width: 400,
@@ -341,7 +348,8 @@ class _PosScreenState extends ConsumerState<PosScreen> {
                             },
                             style: FilledButton.styleFrom(
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             icon: const Icon(Icons.payment),
                             label: Text(l10n.payWith(m.name)),
@@ -362,7 +370,6 @@ class _PosScreenState extends ConsumerState<PosScreen> {
   }
 
   Future<void> _processTransaction(PaymentMethod method) async {
-    setState(() => _isProcessing = true);
     final l10n = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     final profileData = ref.read(companyProfileProvider);
@@ -376,7 +383,6 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       final lDate = DateTime(lockDate.year, lockDate.month, lockDate.day);
 
       if (tDate.compareTo(lDate) <= 0) {
-        setState(() => _isProcessing = false);
         messenger.showSnackBar(
           SnackBar(
             content: Text(l10n.periodLockedError),
@@ -400,11 +406,11 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     }).toList();
 
     final accountsRepo = ref.read(accountsRepositoryProvider);
-    final salesAccountId =
-        await accountsRepo.getAccountIdByName(kSalesRevenueAccountName);
+    final salesAccountId = await accountsRepo.getAccountIdByName(
+      kSalesRevenueAccountName,
+    );
 
     if (salesAccountId == null) {
-      setState(() => _isProcessing = false);
       messenger.showSnackBar(SnackBar(content: Text(l10n.criticalSetupError)));
       return;
     }
@@ -430,7 +436,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
         DateTime.now().microsecondsSinceEpoch.toString(),
       );
 
-      await ref.read(transactionsRepositoryProvider).createPosSale(
+      await ref
+          .read(transactionsRepositoryProvider)
+          .createPosSale(
             transactionCompanion: TransactionsCompanion.insert(
               description: description,
               transactionDate: DateTime.now(),
@@ -445,7 +453,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
 
       // Print receipt
       try {
-        final pdfData = await ref.read(receiptServiceProvider).generatePosReceipt(
+        final pdfData = await ref
+            .read(receiptServiceProvider)
+            .generatePosReceipt(
               items: legacyItems,
               total: totalAmount,
               profile: profileData,
@@ -467,9 +477,7 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       messenger.showSnackBar(
         SnackBar(content: Text('${l10n.transactionFailed} $e')),
       );
-    } finally {
-      if (mounted) setState(() => _isProcessing = false);
-    }
+    } finally {}
   }
 
   // ─── FILTERING ──────────────────────────────────
@@ -488,8 +496,11 @@ class _PosScreenState extends ConsumerState<PosScreen> {
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
       filtered = filtered
-          .where((p) => p.name.toLowerCase().contains(query) ||
-              (p.barcode?.toLowerCase().contains(query) ?? false))
+          .where(
+            (p) =>
+                p.name.toLowerCase().contains(query) ||
+                (p.barcode?.toLowerCase().contains(query) ?? false),
+          )
           .toList();
     }
 
@@ -523,7 +534,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
                           hintText: l10n.searchProducts,
                           border: InputBorder.none,
                           hintStyle: TextStyle(
-                            color: context.appColors.subtleText.withValues(alpha: 0.7),
+                            color: context.appColors.subtleText.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                         ),
                         style: TextStyle(color: context.appColors.onSurface),
@@ -575,7 +588,10 @@ class _PosScreenState extends ConsumerState<PosScreen> {
               children: [
                 if (!widget.isStandalone)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,
                       boxShadow: [
@@ -606,9 +622,8 @@ class _PosScreenState extends ConsumerState<PosScreen> {
                           Expanded(
                             child: Text(
                               l10n.posTerminalTitle,
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
                         IconButton(

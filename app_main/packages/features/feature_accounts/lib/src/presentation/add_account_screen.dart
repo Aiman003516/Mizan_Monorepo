@@ -7,6 +7,7 @@ import 'package:feature_accounts/src/data/classifications_repository.dart';
 import 'package:core_data/core_data.dart';
 import 'package:shared_ui/shared_ui.dart';
 import 'package:drift/drift.dart' as d;
+
 import 'dart:convert';
 
 class AddAccountScreen extends ConsumerStatefulWidget {
@@ -27,15 +28,13 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   String _selectedAccountType = 'asset';
   Classification? _selectedClassification;
   String _selectedCurrency = 'USD'; // will be updated in initState
-  String _baseCurrency = 'USD';     // will be updated in initState
+  String _baseCurrency = 'USD'; // will be updated in initState
   bool _isLoading = false;
   Map<String, double> _exchangeRates = {};
 
   final _accountTypes = ['asset', 'liability', 'equity', 'revenue', 'expense'];
 
   AppLocalizations get l10n => AppLocalizations.of(context)!;
-
-
 
   @override
   void initState() {
@@ -59,25 +58,26 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
             if (json.containsKey('exchangeRate')) {
               _exchangeRateController.text = json['exchangeRate'].toString();
             }
-            if (json.containsKey('foreignDebitBalance') && json.containsKey('foreignCreditBalance')) {
-              final double fDebit = (json['foreignDebitBalance'] as num).toDouble();
-              final double fCredit = (json['foreignCreditBalance'] as num).toDouble();
+            if (json.containsKey('foreignDebitBalance') &&
+                json.containsKey('foreignCreditBalance')) {
+              final double fDebit = (json['foreignDebitBalance'] as num)
+                  .toDouble();
+              final double fCredit = (json['foreignCreditBalance'] as num)
+                  .toDouble();
               _debitBalanceController.text = fDebit.toStringAsFixed(2);
               _creditBalanceController.text = fCredit.toStringAsFixed(2);
             }
           } catch (_) {
             // Fallback for legacy string format
             if (attrsStr.contains('"currency":"')) {
-              final currencyMatch = RegExp(
-                r'"currency":"([^"]+)"',
-              ).firstMatch(attrsStr);
+              final currencyMatch = RegExp(r'"currency":"([^"]+)"')
+                  .firstMatch(attrsStr);
               if (currencyMatch != null) {
                 _selectedCurrency = currencyMatch.group(1)!;
               }
             } else if (attrsStr.contains('currency: ')) {
-              final currencyMatch = RegExp(
-                r'currency:\s*([^,}]+)',
-              ).firstMatch(attrsStr);
+              final currencyMatch = RegExp(r'currency:\s*([^,}]+)')
+                  .firstMatch(attrsStr);
               if (currencyMatch != null) {
                 _selectedCurrency = currencyMatch.group(1)!.trim();
               }
@@ -88,7 +88,8 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         }
       }
 
-      if (_debitBalanceController.text.isEmpty && _creditBalanceController.text.isEmpty) {
+      if (_debitBalanceController.text.isEmpty &&
+          _creditBalanceController.text.isEmpty) {
         // Fallback to initialBalance if foreign balances not found in customAttributes
         final balance = account.initialBalance / 100.0;
         if (balance >= 0) {
@@ -136,13 +137,20 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   String _getLocalizedCurrencyName(String code, String fallbackName) {
     final isAr = ref.read(localeControllerProvider)?.languageCode == 'ar';
     switch (code.toUpperCase()) {
-      case 'USD': return isAr ? 'دولار أمريكي' : 'US Dollar';
-      case 'SAR': return isAr ? 'ريال سعودي' : 'Saudi Riyal';
-      case 'YER': return isAr ? 'ريال يمني' : 'Yemeni Rial';
-      case 'AED': return isAr ? 'درهم إماراتي' : 'UAE Dirham';
-      case 'EUR': return isAr ? 'يورو' : 'Euro';
-      case 'CUSTOM': return isAr ? 'مخصص / آخر' : 'Custom / Other';
-      default: return fallbackName;
+      case 'USD':
+        return isAr ? 'دولار أمريكي' : 'US Dollar';
+      case 'SAR':
+        return isAr ? 'ريال سعودي' : 'Saudi Riyal';
+      case 'YER':
+        return isAr ? 'ريال يمني' : 'Yemeni Rial';
+      case 'AED':
+        return isAr ? 'درهم إماراتي' : 'UAE Dirham';
+      case 'EUR':
+        return isAr ? 'يورو' : 'Euro';
+      case 'CUSTOM':
+        return isAr ? 'مخصص / آخر' : 'Custom / Other';
+      default:
+        return fallbackName;
     }
   }
 
@@ -189,20 +197,25 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
       });
       try {
         final name = _nameController.text;
-        final foreignDebit = double.tryParse(_debitBalanceController.text) ?? 0.0;
-        final foreignCredit = double.tryParse(_creditBalanceController.text) ?? 0.0;
+        final foreignDebit =
+            double.tryParse(_debitBalanceController.text) ?? 0.0;
+        final foreignCredit =
+            double.tryParse(_creditBalanceController.text) ?? 0.0;
         final phoneNumber = _phoneNumberController.text.isNotEmpty
             ? _phoneNumberController.text
             : null;
         String? classificationId = _selectedClassification?.id;
         if (classificationId == null) {
-          classificationId = await ref.read(accountsRepositoryProvider).getClassificationIdByName(kClassificationGeneral);
+          classificationId = await ref
+              .read(accountsRepositoryProvider)
+              .getClassificationIdByName(kClassificationGeneral);
         }
-        final exchangeRate = double.tryParse(_exchangeRateController.text) ?? 1.0;
+        final exchangeRate =
+            double.tryParse(_exchangeRateController.text) ?? 1.0;
 
         // Calculate foreign net balance
         final foreignNetBalance = foreignDebit - foreignCredit;
-        
+
         // Base currency balance for the main ledger
         final double baseNetBalance = foreignNetBalance * exchangeRate;
         final int balanceCents = (baseNetBalance * 100).round();
@@ -378,7 +391,8 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
   Widget build(BuildContext context) {
     final translatedAccountTypes = _getTranslatedAccountTypes(l10n);
 
-    if (widget.accountToEdit != null && _selectedClassification?.name == 'Loading...') {
+    if (widget.accountToEdit != null &&
+        _selectedClassification?.name == 'Loading...') {
       _selectedClassification = _selectedClassification?.copyWith(
         name: l10n.loading,
       );
@@ -472,7 +486,12 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                 children: [
                                   Text(currency.code),
                                   const Text(' - '),
-                                  Text(_getLocalizedCurrencyName(currency.code, currency.name)),
+                                  Text(
+                                    _getLocalizedCurrencyName(
+                                      currency.code,
+                                      currency.name,
+                                    ),
+                                  ),
                                 ],
                               ),
                             );
@@ -489,8 +508,6 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                     ),
                     const SizedBox(height: 16),
 
-
-
                     // Phone Number
                     TextFormField(
                       controller: _phoneNumberController,
@@ -500,6 +517,10 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                         prefixIcon: const Icon(Icons.phone),
                       ),
                       keyboardType: TextInputType.phone,
+                      validator: (value) => InputValidators.optionalPhone(
+                        value,
+                        invalidMessage: l10n.invalidPhone,
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -528,7 +549,8 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                         Icons.arrow_upward,
                                         color: Colors.green,
                                       ),
-                                      prefixText: '${_getCurrencySymbol(_selectedCurrency)} ',
+                                      prefixText:
+                                          '${_getCurrencySymbol(_selectedCurrency)} ',
                                       hintText: '0.00',
                                     ),
                                     keyboardType:
@@ -540,15 +562,16 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                         RegExp(r'^\d+\.?\d{0,2}'),
                                       ),
                                     ],
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return l10n.pleaseEnterBalance;
-                                      }
-                                      if (double.tryParse(value) == null) {
-                                        return l10n.pleaseEnterValidNumber;
-                                      }
-                                      return null;
-                                    },
+                                    validator: (value) =>
+                                        InputValidators.requiredDecimal(
+                                          value,
+                                          requiredMessage:
+                                              l10n.pleaseEnterBalance,
+                                          invalidMessage:
+                                              l10n.pleaseEnterValidNumber,
+                                          minimum: 0,
+                                          allowNegative: false,
+                                        ),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -562,7 +585,8 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                         Icons.arrow_downward,
                                         color: Colors.red,
                                       ),
-                                      prefixText: '${_getCurrencySymbol(_selectedCurrency)} ',
+                                      prefixText:
+                                          '${_getCurrencySymbol(_selectedCurrency)} ',
                                       hintText: '0.00',
                                     ),
                                     keyboardType:
@@ -574,15 +598,16 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                         RegExp(r'^\d+\.?\d{0,2}'),
                                       ),
                                     ],
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return l10n.pleaseEnterBalance;
-                                      }
-                                      if (double.tryParse(value) == null) {
-                                        return l10n.pleaseEnterValidNumber;
-                                      }
-                                      return null;
-                                    },
+                                    validator: (value) =>
+                                        InputValidators.requiredDecimal(
+                                          value,
+                                          requiredMessage:
+                                              l10n.pleaseEnterBalance,
+                                          invalidMessage:
+                                              l10n.pleaseEnterValidNumber,
+                                          minimum: 0,
+                                          allowNegative: false,
+                                        ),
                                   ),
                                 ),
                               ],
@@ -592,9 +617,9 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primaryContainer,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
@@ -604,18 +629,18 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                   Text(
                                     l10n.netBalance,
                                     style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onPrimaryContainer,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   Text(
                                     '$_selectedCurrency ${((double.tryParse(_debitBalanceController.text) ?? 0.0) - (double.tryParse(_creditBalanceController.text) ?? 0.0)).toStringAsFixed(2)}',
                                     style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onPrimaryContainer,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
@@ -646,50 +671,62 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                 decoration: InputDecoration(
                                   labelText: l10n.exchangeRateShort,
                                   border: const OutlineInputBorder(),
-                                  helperText: '1 $_selectedCurrency = ? $_baseCurrency',
-                                  prefixIcon: const Icon(Icons.currency_exchange),
+                                  helperText: l10n.exchangeRate(
+                                    _selectedCurrency,
+                                    _baseCurrency,
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.currency_exchange,
+                                  ),
                                 ),
-                                keyboardType: const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                ),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
                                 inputFormatters: [
                                   FilteringTextInputFormatter.allow(
                                     RegExp(r'^\d+\.?\d{0,6}'),
                                   ),
                                 ],
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return l10n.pleaseEnterRate;
-                                  }
-                                  if (double.tryParse(value) == null ||
-                                      double.parse(value) <= 0) {
-                                    return l10n.pleaseEnterValidRate;
-                                  }
-                                  return null;
-                                },
+                                validator: (value) =>
+                                    InputValidators.requiredDecimal(
+                                      value,
+                                      requiredMessage: l10n.pleaseEnterRate,
+                                      invalidMessage: l10n.pleaseEnterValidRate,
+                                      minimum: 0,
+                                      allowNegative: false,
+                                      exclusiveMinimum: true,
+                                    ),
                                 onChanged: (value) => setState(() {}),
                               ),
                               const SizedBox(height: 16),
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceVariant,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceVariant,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Base Equivalent',
+                                      l10n.totalLocal,
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                     Text(
                                       '$_baseCurrency ${(((double.tryParse(_debitBalanceController.text) ?? 0.0) - (double.tryParse(_creditBalanceController.text) ?? 0.0)) * (double.tryParse(_exchangeRateController.text) ?? 1.0)).toStringAsFixed(2)}',
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
@@ -732,9 +769,9 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                 l10n.noExchangeRates,
                                 style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                     ),
                               )
                             else

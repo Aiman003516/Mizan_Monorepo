@@ -59,6 +59,11 @@
   "initialBalance": "Initial Balance",
   "pleaseEnterBalance": "Please enter a balance (0 is okay)",
   "pleaseEnterValidNumber": "Please enter a valid number",
+  "invalidEmail": "Please enter a valid email address",
+  "invalidPhone": "Please enter a valid phone number",
+  "invalidCurrencyCode": "Use 3-5 uppercase letters",
+  "mustBeNonNegative": "Please enter a non-negative number",
+  "mustBePositive": "Please enter a number greater than zero",
   "failedToSaveAccount": "Failed to save account:",
   "addAccount": "Add Account",
   "noAccountsClassified": "No accounts classified as \"{classification}\" yet.\nAdd one in the Accounts section.",
@@ -616,6 +621,12 @@
   "inviteCodeExpired": "This invite code has expired",
   "pleaseSignInFirst": "Please sign in first",
   "createNewOrganization": "Create New Organization",
+  "createOrganizationTitle": "Create your Organization",
+  "createOrganizationDescription": "This will enable Sync, Staff Management, and Advanced Reports.",
+  "businessNameLabel": "Business Name",
+  "businessPhoneLabel": "Business Phone",
+  "createBusinessUpgrade": "Create Business & Upgrade",
+  "businessCloudActivated": "Business Cloud Activated!",
   "role": "Role",
   "customers": "Customers",
   "addCustomer": "Add Customer",
@@ -670,6 +681,7 @@
   "newBill": "New Bill",
   "billDate": "Bill Date",
   "vendorInvoice": "Vendor Invoice #",
+  "optional": "Optional",
   "createBill": "Create Bill",
   "billCreated": "Bill created successfully",
   "noBillsYet": "No bills yet",
@@ -712,6 +724,19 @@
   "currentAmount": "Current",
   "overdueAmount": "Overdue",
   "bankReconciliations": "Bank Reconciliations",
+  "statementDetails": "Statement Details",
+  "selectBankAccount": "Select Bank Account",
+  "statementEnding": "Statement Ending",
+  "clearedBalance": "Cleared Balance",
+  "difference": "Difference",
+  "selectTransactionsUntilBalanced": "Select transactions until the difference is zero",
+  "deposit": "Deposit",
+  "payment": "Payment",
+  "idLabel": "ID",
+  "bankFeeInterestComingSoon": "Bank fee/interest adjustments are coming soon.",
+  "addAdjustment": "Add Adjustment",
+  "finish": "Finish",
+  "reconciliationComplete": "Reconciliation complete!",
   "newReconciliation": "New Reconciliation",
   "noReconciliationsYet": "No reconciliations yet",
   "startReconciling": "Start reconciling your bank statements",
@@ -724,6 +749,7 @@
   "differenceAmount": "Difference",
   "balanced": "Balanced!",
   "unclearedTransactions": "Uncleared Transactions",
+  "noUnreconciledTransactions": "No unreconciled transactions found.",
   "selectAll": "Select All",
   "deselectAll": "Deselect All",
   "allTransactionsReconciled": "All transactions reconciled!",
@@ -1318,6 +1344,24 @@
   "totalUppercase": "TOTAL",
   "holdOrder": "Hold Order",
   "noProducts": "No products found",
+  "noProductsInFile": "No products found in file.",
+  "importButton": "Import",
+  "importProductsCount": "Import {count} Products",
+  "recordsImported": "{count} products imported successfully",
+  "@recordsImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@importProductsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "searchProducts": "Search products...",
   "outOfStock": "Out of stock",
   "cartEmpty": "Your cart is empty",
