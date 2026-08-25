@@ -409,6 +409,85 @@ class CloudCrmRepository {
     }
   }
 
+  Future<Invoice> _createOfflineInvoice({
+    required String tenantId,
+    required String customerId,
+    required DateTime invoiceDate,
+    required DateTime dueDate,
+    required List<InvoiceItemData> items,
+    required String currencyCode,
+    String? notes,
+  }) async {
+    final id = _uuid.v4();
+    final now = DateTime.now().toUtc();
+    final subtotal = items.fold<int>(
+      0,
+      (sum, item) => sum + (item.quantity * item.unitPrice).round(),
+    );
+    final header = <String, dynamic>{
+      'id': id,
+      'tenant_id': tenantId,
+      'customer_id': customerId,
+      'invoice_number':
+          'OFFLINE-${now.millisecondsSinceEpoch}-${id.substring(0, 6)}',
+      'invoice_date': invoiceDate.toUtc().toIso8601String(),
+      'due_date': dueDate.toUtc().toIso8601String(),
+      'subtotal': subtotal,
+      'tax_amount': 0,
+      'total_amount': subtotal,
+      'amount_paid': 0,
+      'status': 'draft',
+      'currency_code': currencyCode.toUpperCase(),
+      'notes': notes,
+      'created_at': now.toIso8601String(),
+      'updated_at': now.toIso8601String(),
+    };
+    final invoice = _invoiceFromMap(header);
+    final itemRows = items
+        .map((item) {
+          final itemId = _uuid.v4();
+          final itemTimestamp = DateTime.now().toUtc().toIso8601String();
+          return <String, dynamic>{
+            'id': itemId,
+            'tenant_id': tenantId,
+            'invoice_id': id,
+            'description': item.description.trim(),
+            'quantity': item.quantity,
+            'unit_price': item.unitPrice,
+            'amount': (item.quantity * item.unitPrice).round(),
+            'product_id': item.productId,
+            'created_at': itemTimestamp,
+            'updated_at': itemTimestamp,
+          };
+        })
+        .toList(growable: false);
+    await _db.transaction(() async {
+      await _db.into(_db.invoices).insertOnConflictUpdate(invoice);
+      for (final row in itemRows) {
+        await _db
+            .into(_db.invoiceItems)
+            .insertOnConflictUpdate(_invoiceItemFromMap(row));
+      }
+    });
+    await _queue.enqueue(
+      tenantId: tenantId,
+      tableName: 'invoices',
+      recordId: id,
+      operation: 'insert',
+      payload: header,
+    );
+    for (final row in itemRows) {
+      await _queue.enqueue(
+        tenantId: tenantId,
+        tableName: 'invoice_items',
+        recordId: row['id'] as String,
+        operation: 'insert',
+        payload: row,
+      );
+    }
+    return invoice;
+  }
+
   Future<void> _cacheInvoices(List<Invoice> invoices) async {
     await _db.transaction(() async {
       for (final invoice in invoices) {
@@ -482,53 +561,67 @@ class CloudCrmRepository {
         code: 'MIZAN_EMPTY_DOCUMENT',
       );
     }
-    final result = await _supabase.rpc(
-      'create_invoice',
-      params: {
-        'p_customer_id': customerId,
-        'p_invoice_date': invoiceDate
-            .toUtc()
-            .toIso8601String()
-            .split('T')
-            .first,
-        'p_due_date': dueDate.toUtc().toIso8601String().split('T').first,
-        'p_currency_code': currencyCode.toUpperCase(),
-        'p_notes': notes,
-        'p_items': items
-            .map(
-              (item) => {
-                'description': item.description.trim(),
-                'quantity': item.quantity,
-                'unit_price': item.unitPrice,
-                'product_id': item.productId,
-              },
-            )
-            .toList(growable: false),
-      },
-    );
-    if (result is! Map || result['invoice'] is! Map) {
-      throw const PostgrestException(
-        message: 'Invoice creation returned no committed document.',
-        code: 'MIZAN_DOCUMENT_INVALID_RESPONSE',
+    final tenantId = await currentTenantId();
+    try {
+      final result = await _supabase.rpc(
+        'create_invoice',
+        params: {
+          'p_customer_id': customerId,
+          'p_invoice_date': invoiceDate
+              .toUtc()
+              .toIso8601String()
+              .split('T')
+              .first,
+          'p_due_date': dueDate.toUtc().toIso8601String().split('T').first,
+          'p_currency_code': currencyCode.toUpperCase(),
+          'p_notes': notes,
+          'p_items': items
+              .map(
+                (item) => {
+                  'description': item.description.trim(),
+                  'quantity': item.quantity,
+                  'unit_price': item.unitPrice,
+                  'product_id': item.productId,
+                },
+              )
+              .toList(growable: false),
+        },
+      );
+      if (result is! Map || result['invoice'] is! Map) {
+        throw const PostgrestException(
+          message: 'Invoice creation returned no committed document.',
+          code: 'MIZAN_DOCUMENT_INVALID_RESPONSE',
+        );
+      }
+      final invoice = _invoiceFromMap(
+        Map<String, dynamic>.from(result['invoice'] as Map),
+      );
+      final itemRows = (result['items'] as List? ?? const [])
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .toList(growable: false);
+      final customer = await getCustomer(customerId);
+      if (customer == null) return invoice;
+      await _db.transaction(() async {
+        await _db.into(_db.invoices).insertOnConflictUpdate(invoice);
+        for (final item in itemRows) {
+          await _db
+              .into(_db.invoiceItems)
+              .insertOnConflictUpdate(_invoiceItemFromMap(item));
+        }
+      });
+      return invoice;
+    } catch (error) {
+      if (!_isRetryable(error)) rethrow;
+      return _createOfflineInvoice(
+        tenantId: tenantId,
+        customerId: customerId,
+        invoiceDate: invoiceDate,
+        dueDate: dueDate,
+        items: items,
+        currencyCode: currencyCode,
+        notes: notes,
       );
     }
-    final invoice = _invoiceFromMap(
-      Map<String, dynamic>.from(result['invoice'] as Map),
-    );
-    final itemRows = (result['items'] as List? ?? const [])
-        .map((item) => Map<String, dynamic>.from(item as Map))
-        .toList(growable: false);
-    final customer = await getCustomer(customerId);
-    if (customer == null) return invoice;
-    await _db.transaction(() async {
-      await _db.into(_db.invoices).insertOnConflictUpdate(invoice);
-      for (final item in itemRows) {
-        await _db
-            .into(_db.invoiceItems)
-            .insertOnConflictUpdate(_invoiceItemFromMap(item));
-      }
-    });
-    return invoice;
   }
 
   Stream<List<Bill>> watchVendorBills(String vendorId) async* {
@@ -686,6 +779,87 @@ class CloudCrmRepository {
     return vendor;
   }
 
+  Future<Bill> _createOfflineBill({
+    required String tenantId,
+    required String vendorId,
+    required DateTime billDate,
+    required DateTime dueDate,
+    required List<BillItemData> items,
+    required String currencyCode,
+    String? vendorBillNumber,
+    String? notes,
+  }) async {
+    final id = _uuid.v4();
+    final now = DateTime.now().toUtc();
+    final subtotal = items.fold<int>(
+      0,
+      (sum, item) => sum + (item.quantity * item.unitPrice).round(),
+    );
+    final header = <String, dynamic>{
+      'id': id,
+      'tenant_id': tenantId,
+      'vendor_id': vendorId,
+      'bill_number':
+          'OFFLINE-${now.millisecondsSinceEpoch}-${id.substring(0, 6)}',
+      'vendor_bill_number': vendorBillNumber,
+      'bill_date': billDate.toUtc().toIso8601String(),
+      'due_date': dueDate.toUtc().toIso8601String(),
+      'subtotal': subtotal,
+      'tax_amount': 0,
+      'total_amount': subtotal,
+      'amount_paid': 0,
+      'status': 'draft',
+      'currency_code': currencyCode.toUpperCase(),
+      'notes': notes,
+      'created_at': now.toIso8601String(),
+      'updated_at': now.toIso8601String(),
+    };
+    final bill = _billFromMap(header);
+    final itemRows = items
+        .map((item) {
+          final itemId = _uuid.v4();
+          final itemTimestamp = DateTime.now().toUtc().toIso8601String();
+          return <String, dynamic>{
+            'id': itemId,
+            'tenant_id': tenantId,
+            'bill_id': id,
+            'description': item.description.trim(),
+            'quantity': item.quantity,
+            'unit_price': item.unitPrice,
+            'amount': (item.quantity * item.unitPrice).round(),
+            'product_id': item.productId,
+            'created_at': itemTimestamp,
+            'updated_at': itemTimestamp,
+          };
+        })
+        .toList(growable: false);
+    await _db.transaction(() async {
+      await _db.into(_db.bills).insertOnConflictUpdate(bill);
+      for (final row in itemRows) {
+        await _db
+            .into(_db.billItems)
+            .insertOnConflictUpdate(_billItemFromMap(row));
+      }
+    });
+    await _queue.enqueue(
+      tenantId: tenantId,
+      tableName: 'bills',
+      recordId: id,
+      operation: 'insert',
+      payload: header,
+    );
+    for (final row in itemRows) {
+      await _queue.enqueue(
+        tenantId: tenantId,
+        tableName: 'bill_items',
+        recordId: row['id'] as String,
+        operation: 'insert',
+        payload: row,
+      );
+    }
+    return bill;
+  }
+
   Future<Bill> createBill({
     required String vendorId,
     required DateTime billDate,
@@ -701,45 +875,62 @@ class CloudCrmRepository {
         code: 'MIZAN_EMPTY_DOCUMENT',
       );
     }
-    final result = await _supabase.rpc(
-      'create_bill',
-      params: {
-        'p_vendor_id': vendorId,
-        'p_bill_date': billDate.toUtc().toIso8601String().split('T').first,
-        'p_due_date': dueDate.toUtc().toIso8601String().split('T').first,
-        'p_currency_code': currencyCode.toUpperCase(),
-        'p_vendor_bill_number': vendorBillNumber,
-        'p_notes': notes,
-        'p_items': items
-            .map(
-              (item) => {
-                'description': item.description.trim(),
-                'quantity': item.quantity,
-                'unit_price': item.unitPrice,
-                'product_id': item.productId,
-              },
-            )
-            .toList(growable: false),
-      },
-    );
-    if (result is! Map || result['bill'] is! Map) {
-      throw const PostgrestException(
-        message: 'Bill creation returned no committed document.',
-        code: 'MIZAN_DOCUMENT_INVALID_RESPONSE',
+    final tenantId = await currentTenantId();
+    try {
+      final result = await _supabase.rpc(
+        'create_bill',
+        params: {
+          'p_vendor_id': vendorId,
+          'p_bill_date': billDate.toUtc().toIso8601String().split('T').first,
+          'p_due_date': dueDate.toUtc().toIso8601String().split('T').first,
+          'p_currency_code': currencyCode.toUpperCase(),
+          'p_vendor_bill_number': vendorBillNumber,
+          'p_notes': notes,
+          'p_items': items
+              .map(
+                (item) => {
+                  'description': item.description.trim(),
+                  'quantity': item.quantity,
+                  'unit_price': item.unitPrice,
+                  'product_id': item.productId,
+                },
+              )
+              .toList(growable: false),
+        },
+      );
+      if (result is! Map || result['bill'] is! Map) {
+        throw const PostgrestException(
+          message: 'Bill creation returned no committed document.',
+          code: 'MIZAN_DOCUMENT_INVALID_RESPONSE',
+        );
+      }
+      final bill = _billFromMap(
+        Map<String, dynamic>.from(result['bill'] as Map),
+      );
+      final itemRows = (result['items'] as List? ?? const [])
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .toList(growable: false);
+      await _db.transaction(() async {
+        await _db.into(_db.bills).insertOnConflictUpdate(bill);
+        for (final item in itemRows) {
+          await _db
+              .into(_db.billItems)
+              .insertOnConflictUpdate(_billItemFromMap(item));
+        }
+      });
+      return bill;
+    } catch (error) {
+      if (!_isRetryable(error)) rethrow;
+      return _createOfflineBill(
+        tenantId: tenantId,
+        vendorId: vendorId,
+        billDate: billDate,
+        dueDate: dueDate,
+        items: items,
+        currencyCode: currencyCode,
+        vendorBillNumber: vendorBillNumber,
+        notes: notes,
       );
     }
-    final bill = _billFromMap(Map<String, dynamic>.from(result['bill'] as Map));
-    final itemRows = (result['items'] as List? ?? const [])
-        .map((item) => Map<String, dynamic>.from(item as Map))
-        .toList(growable: false);
-    await _db.transaction(() async {
-      await _db.into(_db.bills).insertOnConflictUpdate(bill);
-      for (final item in itemRows) {
-        await _db
-            .into(_db.billItems)
-            .insertOnConflictUpdate(_billItemFromMap(item));
-      }
-    });
-    return bill;
   }
 }
