@@ -1,5 +1,4 @@
 // Repository for Fixed Assets management
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 

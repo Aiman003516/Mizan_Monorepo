@@ -4,9 +4,8 @@ import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feature_reports/src/data/report_models.dart';
 import 'package:feature_accounts/feature_accounts.dart';
-import 'package:core_database/core_database.dart';
 import 'package:collection/collection.dart';
-import 'package:core_database/src/initial_constants.dart' as c;
+import 'package:core_database/core_database.dart' as c;
 import 'dart:async';
 import 'package:async/async.dart';
 import 'package:drift/drift.dart' as d;
@@ -490,8 +489,9 @@ class ReportsService {
           }
         }
         summaries.sort((a, b) {
-          if (a.accountName != b.accountName)
+          if (a.accountName != b.accountName) {
             return a.accountName.compareTo(b.accountName);
+          }
           return a.currencyCode.compareTo(b.currencyCode);
         });
         return summaries;
@@ -523,7 +523,7 @@ class ReportsService {
           .toList();
       List<TransactionDetail> finalFilteredDetails;
       switch (filter.reportFilter) {
-        case ReportFilter.POS_ONLY:
+        case ReportFilter.posOnly:
           finalFilteredDetails = classificationFilteredDetails
               .where(
                 (d) =>
@@ -532,7 +532,7 @@ class ReportsService {
               )
               .toList();
           break;
-        case ReportFilter.ACCOUNTS_ONLY:
+        case ReportFilter.accountsOnly:
           finalFilteredDetails = classificationFilteredDetails
               .where(
                 (d) =>
@@ -542,7 +542,7 @@ class ReportsService {
               )
               .toList();
           break;
-        case ReportFilter.ALL:
+        case ReportFilter.all:
         // ignore: unreachable_switch_default
         default:
           finalFilteredDetails = classificationFilteredDetails;
@@ -591,8 +591,9 @@ class ReportsService {
         }
       }
       summaries.sort((a, b) {
-        if (a.accountName != b.accountName)
+        if (a.accountName != b.accountName) {
           return a.accountName.compareTo(b.accountName);
+        }
         return a.currencyCode.compareTo(b.currencyCode);
       });
       return summaries;
@@ -612,7 +613,7 @@ class ReportsService {
           .toList();
       List<TransactionDetail> finalFilteredDetails;
       switch (filter.reportFilter) {
-        case ReportFilter.POS_ONLY:
+        case ReportFilter.posOnly:
           finalFilteredDetails = classificationFilteredDetails
               .where(
                 (d) =>
@@ -621,7 +622,7 @@ class ReportsService {
               )
               .toList();
           break;
-        case ReportFilter.ACCOUNTS_ONLY:
+        case ReportFilter.accountsOnly:
           finalFilteredDetails = classificationFilteredDetails
               .where(
                 (d) =>
@@ -631,7 +632,7 @@ class ReportsService {
               )
               .toList();
           break;
-        case ReportFilter.ALL:
+        case ReportFilter.all:
         // ignore: unreachable_switch_default
         default:
           finalFilteredDetails = classificationFilteredDetails;
@@ -702,7 +703,7 @@ class ReportsService {
           .toList();
       List<TransactionDetail> finalFilteredDetails;
       switch (filter.reportFilter) {
-        case ReportFilter.POS_ONLY:
+        case ReportFilter.posOnly:
           finalFilteredDetails = classificationFilteredDetails
               .where(
                 (d) =>
@@ -711,7 +712,7 @@ class ReportsService {
               )
               .toList();
           break;
-        case ReportFilter.ACCOUNTS_ONLY:
+        case ReportFilter.accountsOnly:
           finalFilteredDetails = classificationFilteredDetails
               .where(
                 (d) =>
@@ -721,7 +722,7 @@ class ReportsService {
               )
               .toList();
           break;
-        case ReportFilter.ALL:
+        case ReportFilter.all:
         // ignore: unreachable_switch_default
         default:
           finalFilteredDetails = classificationFilteredDetails;
@@ -759,8 +760,9 @@ class ReportsService {
           double totalDebit = 0.0, totalCredit = 0.0;
           for (final detail in currencyDetails) {
             if (detail.accountName == c.kEquityAccountName ||
-                detail.accountName == c.kSalesRevenueAccountName)
+                detail.accountName == c.kSalesRevenueAccountName) {
               continue;
+            }
             if (detail.entryAmount > 0) {
               totalDebit += detail.entryAmount;
             } else {

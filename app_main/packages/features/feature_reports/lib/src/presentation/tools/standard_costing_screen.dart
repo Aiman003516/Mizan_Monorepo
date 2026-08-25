@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:core_l10n/app_localizations.dart';
-import 'package:core_data/src/services/standard_costing_service.dart';
+import 'package:core_data/core_data.dart';
 
 /// Standard Costing Screen - Variance Analysis Calculator
 class StandardCostingScreen extends StatefulWidget {

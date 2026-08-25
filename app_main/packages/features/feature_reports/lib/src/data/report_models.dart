@@ -8,7 +8,7 @@ import 'package:equatable/equatable.dart';
 // (Preserved exactly as requested)
 // ==========================================
 
-enum ReportFilter { ALL, POS_ONLY, ACCOUNTS_ONLY }
+enum ReportFilter { all, posOnly, accountsOnly }
 
 class TotalAmountsFilter extends Equatable {
   final ReportFilter reportFilter;

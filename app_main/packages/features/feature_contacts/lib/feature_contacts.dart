@@ -1,4 +1,4 @@
-library feature_contacts;
+library;
 
 export 'src/presentation/customers/customers_table_screen.dart';
 export 'src/presentation/customers/customer_form_screen.dart';

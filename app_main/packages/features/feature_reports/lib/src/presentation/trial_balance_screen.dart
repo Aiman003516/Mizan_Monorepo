@@ -59,11 +59,6 @@ class TrialBalanceScreen extends ConsumerWidget {
                     vertical: 8.0,
                   ),
                   child: PopupMenuButton<String>(
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.download_outlined),
-                      label: Text(l10n.export),
-                      onPressed: null, // The PopupMenuButton handles the tap
-                    ),
                     tooltip: l10n.export,
                     itemBuilder: (context) => [
                       PopupMenuItem(
@@ -86,6 +81,11 @@ class TrialBalanceScreen extends ConsumerWidget {
                         );
                       }
                     },
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.download_outlined),
+                      label: Text(l10n.export),
+                      onPressed: null, // The PopupMenuButton handles the tap
+                    ),
                   ),
                 ),
               ),

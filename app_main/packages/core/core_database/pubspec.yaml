@@ -1,4 +1,5 @@
 name: core_database
+resolution: workspace
 description: Core database schema and connection logic for Mizan.
 publish_to: 'none'
 
@@ -6,7 +7,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
-  supabase_flutter: ^2.5.4
+  supabase_flutter: ^2.17.2
   flutter:
     sdk: flutter
   drift: ^2.29.0

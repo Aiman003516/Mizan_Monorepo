@@ -1,6 +1,5 @@
 // FILE: packages/features/feature_reports/lib/src/data/inventory_repository.dart
 
-import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';

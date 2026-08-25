@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:core_database/core_database.dart';
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final syncQueueServiceProvider = Provider<SyncQueueService>((ref) {

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:core_data/src/services/capital_budgeting_service.dart';
+import 'package:core_data/core_data.dart';
 
 /// Capital Budgeting Calculator Screen
 class CapitalBudgetingScreen extends StatefulWidget {
@@ -532,22 +532,26 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
     int acceptCount = 0;
     int rejectCount = 0;
 
-    if (_npvResult!.isAcceptable)
+    if (_npvResult!.isAcceptable) {
       acceptCount++;
-    else
+    } else {
       rejectCount++;
-    if (_irrResult!.isAcceptable(requiredReturn))
+    }
+    if (_irrResult!.isAcceptable(requiredReturn)) {
       acceptCount++;
-    else
+    } else {
       rejectCount++;
-    if (_piResult!.isAcceptable)
+    }
+    if (_piResult!.isAcceptable) {
       acceptCount++;
-    else
+    } else {
       rejectCount++;
-    if (_paybackResult!.recoversInvestment)
+    }
+    if (_paybackResult!.recoversInvestment) {
       acceptCount++;
-    else
+    } else {
       rejectCount++;
+    }
 
     final recommendation = acceptCount > rejectCount ? 'ACCEPT' : 'REJECT';
     final isAccept = acceptCount > rejectCount;

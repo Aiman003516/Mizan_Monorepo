@@ -1,6 +1,5 @@
 // FILE: packages/features/feature_accounts/lib/src/data/classifications_repository.dart
 
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 // FIX: Import the provider from the correct file

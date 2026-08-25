@@ -1,4 +1,5 @@
 name: feature_transactions
+resolution: workspace
 description: Manages POS, journal entries, purchases, returns, and all transaction logic.
 publish_to: 'none'
 
@@ -6,7 +7,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
-  supabase_flutter: ^2.5.4
+  supabase_flutter: ^2.17.2
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
@@ -27,6 +28,8 @@ dependencies:
     path: ../../core/core_l10n
   core_ui:
     path: ../../core/core_ui
+  shared_ui:
+    path: ../../shared/shared_ui
   shared_services:
     path: ../../shared/shared_services
 
@@ -42,6 +45,8 @@ dependencies:
   qr_flutter: ^4.1.0
   appinio_swiper: ^2.1.1
 
+  pdf: any
+  feature_auth: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

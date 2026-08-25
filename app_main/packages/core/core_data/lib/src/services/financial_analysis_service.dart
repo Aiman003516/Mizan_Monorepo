@@ -5,7 +5,6 @@
 import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
-import 'package:drift/drift.dart';
 
 // ============================================================================
 // DATA CLASSES

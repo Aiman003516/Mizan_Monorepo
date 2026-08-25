@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_l10n/app_localizations.dart';
-import 'package:shared_ui/shared_ui.dart';
 
 // --- EXISTING REPORT IMPORTS ---
 import 'profit_and_loss_screen.dart';

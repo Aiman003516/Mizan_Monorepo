@@ -28,11 +28,9 @@ final financialRatiosProvider = FutureProvider<FinancialRatios>((ref) async {
   // Get AR and AP totals
   final customers = await db.select(db.customers).get();
   double totalReceivables = 0;
-  for (final c in customers) totalReceivables += c.balance / 100;
-
-  final vendors = await db.select(db.vendors).get();
-  double totalPayables = 0;
-  for (final v in vendors) totalPayables += v.balance / 100;
+  for (final c in customers) {
+    totalReceivables += c.balance / 100;
+  }
 
   // Calculate ratios
   final currentAssets = balanceSheet.totalAssets; // Simplified

@@ -12,7 +12,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:core_data/core_data.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:rxdart/rxdart.dart';
 

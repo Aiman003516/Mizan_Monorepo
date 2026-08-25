@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
-import 'package:drift/drift.dart';
 
 /// Audit Service for logging all data changes.
 class AuditService {

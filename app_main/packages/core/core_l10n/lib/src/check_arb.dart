@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:convert';
 
 void checkFile(String path) {
   final content = File(path).readAsStringSync();

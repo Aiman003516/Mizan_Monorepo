@@ -64,8 +64,9 @@ class _SalesLineChart extends ConsumerWidget {
 
     return dataAsync.when(
       data: (points) {
-        if (points.isEmpty)
+        if (points.isEmpty) {
           return const Center(child: Text("No sales data yet."));
+        }
 
         // Normalize Data for Chart
         final spots = points.asMap().entries.map((e) {
@@ -145,8 +146,9 @@ class _CategoryPieChart extends ConsumerWidget {
 
     return dataAsync.when(
       data: (categories) {
-        if (categories.isEmpty)
+        if (categories.isEmpty) {
           return const Center(child: Text("No category data."));
+        }
 
         final total = categories.fold(
           0.0,

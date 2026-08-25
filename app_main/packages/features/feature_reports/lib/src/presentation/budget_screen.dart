@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
-import 'package:core_data/src/services/budgeting_service.dart';
+import 'package:core_data/core_data.dart';
 
 /// Budget Screen - Create budgets and analyze variances
 class BudgetScreen extends StatefulWidget {

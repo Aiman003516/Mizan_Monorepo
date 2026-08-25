@@ -4,7 +4,6 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
-import 'package:drift/drift.dart';
 
 import 'file_parser.dart';
 import 'field_mapper.dart';

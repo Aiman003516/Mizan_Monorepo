@@ -1,4 +1,5 @@
 name: feature_dashboard
+resolution: workspace
 description: The main dashboard, scaffold, and navigation hub for the app.
 publish_to: 'none'
 
@@ -6,7 +7,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
-  supabase_flutter: ^2.5.4
+  supabase_flutter: ^2.17.2
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
@@ -46,7 +47,9 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   fl_chart: ^0.66.2
 
+  shared_ui: any
+  path_provider: any
+  path: any
 dev_dependencies:
-  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

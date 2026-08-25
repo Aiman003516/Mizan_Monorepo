@@ -6,6 +6,7 @@ export 'src/company_profile_controller.dart';
 export 'package:core_database/core_database.dart';
 export 'src/env_config.dart';
 export 'src/bootstrap.dart';
+export 'src/tenant_context.dart';
 
 export 'src/models/rbac_models.dart';
 export 'src/services/permission_service.dart';
@@ -42,6 +43,7 @@ export 'src/services/cvp_analysis_service.dart';
 // Phase Budget: Budgeting & Variance Analysis
 export 'src/services/budgeting_service.dart';
 // Phase Standard Costing: Standard Costs & Variance Analysis
+export 'src/services/standard_costing_service.dart';
 // Phase 2.3: ZATCA Compliance
 export 'src/utils/zatca_encoder.dart';
 // Phase 2.4: Reconciliation

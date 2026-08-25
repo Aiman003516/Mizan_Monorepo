@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_accounts/src/data/accounts_repository.dart';
-import 'package:feature_accounts/src/data/classifications_repository.dart';
 import 'package:core_data/core_data.dart';
 import 'package:shared_ui/shared_ui.dart';
 import 'package:drift/drift.dart' as d;
@@ -70,14 +69,16 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
           } catch (_) {
             // Fallback for legacy string format
             if (attrsStr.contains('"currency":"')) {
-              final currencyMatch = RegExp(r'"currency":"([^"]+)"')
-                  .firstMatch(attrsStr);
+              final currencyMatch = RegExp(
+                r'"currency":"([^"]+)"',
+              ).firstMatch(attrsStr);
               if (currencyMatch != null) {
                 _selectedCurrency = currencyMatch.group(1)!;
               }
             } else if (attrsStr.contains('currency: ')) {
-              final currencyMatch = RegExp(r'currency:\s*([^,}]+)')
-                  .firstMatch(attrsStr);
+              final currencyMatch = RegExp(
+                r'currency:\s*([^,}]+)',
+              ).firstMatch(attrsStr);
               if (currencyMatch != null) {
                 _selectedCurrency = currencyMatch.group(1)!.trim();
               }
@@ -617,9 +618,9 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primaryContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
@@ -629,18 +630,18 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                   Text(
                                     l10n.netBalance,
                                     style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimaryContainer,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   Text(
                                     '$_selectedCurrency ${((double.tryParse(_debitBalanceController.text) ?? 0.0) - (double.tryParse(_creditBalanceController.text) ?? 0.0)).toStringAsFixed(2)}',
                                     style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimaryContainer,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
@@ -703,9 +704,9 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceVariant,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.surfaceContainerHighest,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
@@ -715,18 +716,18 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                     Text(
                                       l10n.totalLocal,
                                       style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                     Text(
                                       '$_baseCurrency ${(((double.tryParse(_debitBalanceController.text) ?? 0.0) - (double.tryParse(_creditBalanceController.text) ?? 0.0)) * (double.tryParse(_exchangeRateController.text) ?? 1.0)).toStringAsFixed(2)}',
                                       style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
@@ -769,9 +770,9 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                 l10n.noExchangeRates,
                                 style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
                                     ),
                               )
                             else

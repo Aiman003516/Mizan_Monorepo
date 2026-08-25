@@ -1,4 +1,5 @@
 name: core_data
+resolution: workspace
 description: Core data services like preferences and secure storage.
 publish_to: 'none'
 
@@ -6,7 +7,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
-  supabase_flutter: ^2.5.4
+  supabase_flutter: ^2.17.2
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
@@ -17,7 +18,9 @@ dependencies:
     path: ../core_database
   intl: ^0.20.2
 
+  collection: any
+  uuid: any
+  drift: any
 dev_dependencies:
-  supabase_flutter: ^2.5.4
   flutter_test:
     sdk: flutter

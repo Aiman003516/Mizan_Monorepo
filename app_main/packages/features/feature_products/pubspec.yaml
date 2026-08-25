@@ -1,12 +1,13 @@
 name: feature_products
+resolution: workspace
 description: Manages products, categories, and inventory logic.
 publish_to: 'none'
 
 environment:
-  sdk: ^3.0.0 # Adjusted for broader compatibility
+  sdk: ^3.9.2
 
 dependencies:
-  supabase_flutter: ^2.5.4
+  supabase_flutter: ^2.17.2
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
@@ -33,6 +34,7 @@ dependencies:
   shared_services:
     path: ../../shared/shared_services
 
+  uuid: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -65,7 +65,7 @@ class RolesRepository {
         .map(
           (row) => AppRole.fromJson(
             Map<String, dynamic>.from(row as Map),
-            (row as Map)['id'] as String,
+            row['id'] as String,
           ),
         )
         .toList(growable: false);

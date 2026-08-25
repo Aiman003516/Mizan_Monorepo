@@ -1,8 +1,41 @@
-name: app_main
+name: mizan_monorepo
+publish_to: none
+
 environment:
   sdk: ">=3.9.2 <4.0.0"
-dev_dependencies:
-  supabase_flutter: ^2.5.4
-  melos: ^7.3.0
 
-melos: 
+workspace:
+  - apps
+  - packages/core/core_data
+  - packages/core/core_database
+  - packages/core/core_l10n
+  - packages/core/core_ui
+  - packages/features/feature_accounts
+  - packages/features/feature_auth
+  - packages/features/feature_contacts
+  - packages/features/feature_dashboard
+  - packages/features/feature_data_import
+  - packages/features/feature_products
+  - packages/features/feature_reports
+  - packages/features/feature_settings
+  - packages/features/feature_sync
+  - packages/features/feature_transactions
+  - packages/shared/shared_services
+  - packages/shared/shared_ui
+
+dev_dependencies:
+  melos: ^7.3.0
+  supabase_flutter: ^2.17.2
+
+melos:
+  repository: https://github.com/Aiman003516/Mizan_Monorepo
+  scripts:
+    test:all:
+      run: dart run melos exec -- flutter test
+      description: Run tests in every workspace package.
+    analyze:all:
+      run: dart run melos exec -- flutter analyze
+      description: Analyze every workspace package.
+    build:all:
+      run: dart run melos exec -- flutter pub run build_runner build --delete-conflicting-outputs
+      description: Run build_runner in every package that supports it.

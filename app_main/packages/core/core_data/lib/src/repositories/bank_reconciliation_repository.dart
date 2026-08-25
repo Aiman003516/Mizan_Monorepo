@@ -1,5 +1,4 @@
 import 'package:core_database/core_database.dart';
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/src/services/auto_categorization_service.dart';
 import 'package:uuid/uuid.dart';

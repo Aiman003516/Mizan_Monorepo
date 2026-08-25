@@ -3,10 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core_database/core_database.dart';
 import 'package:core_data/core_data.dart';
 import 'package:feature_accounts/src/presentation/accounts_list_provider.dart';
-import 'package:feature_accounts/src/presentation/add_account_screen.dart';
 import 'package:feature_accounts/src/presentation/account_ledger_screen.dart';
 import 'package:feature_reports/feature_reports.dart';
 import 'package:intl/intl.dart';
@@ -27,7 +25,10 @@ class _HierarchicalAccountsListState
   String _formatBalance(double balance) {
     final currencyCode = ref.watch(currentCurrencyCodeProvider);
     final symbol = CurrencyFormatter.getCurrencySymbol(currencyCode);
-    return NumberFormat.currency(symbol: '$symbol ', decimalDigits: 2).format(balance);
+    return NumberFormat.currency(
+      symbol: '$symbol ',
+      decimalDigits: 2,
+    ).format(balance);
   }
 
   @override

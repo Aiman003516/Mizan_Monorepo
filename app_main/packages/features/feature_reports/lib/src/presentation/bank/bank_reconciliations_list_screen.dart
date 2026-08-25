@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
-import 'package:core_database/core_database.dart';
 
 import 'bank_reconciliation_screen.dart';
 
@@ -162,7 +161,7 @@ class BankReconciliationsListScreen extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<Account>(
-                  value: selectedAccount,
+                  initialValue: selectedAccount,
                   decoration: const InputDecoration(
                     labelText: 'Bank Account',
                     border: OutlineInputBorder(),
@@ -212,8 +211,9 @@ class BankReconciliationsListScreen extends ConsumerWidget {
             ),
             FilledButton(
               onPressed: () async {
-                if (selectedAccount == null || balanceController.text.isEmpty)
+                if (selectedAccount == null || balanceController.text.isEmpty) {
                   return;
+                }
                 final balance =
                     (double.tryParse(balanceController.text) ?? 0) * 100;
                 await repo.createReconciliation(

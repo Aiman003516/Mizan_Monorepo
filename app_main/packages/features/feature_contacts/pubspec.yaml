@@ -1,10 +1,11 @@
 name: feature_contacts
+resolution: workspace
 description: "Contacts and Debts feature for Mizan."
 version: 0.0.1
 publish_to: 'none'
 
 environment:
-  sdk: '>=3.10.1 <4.0.0'
+  sdk: ^3.9.2
   flutter: ">=3.3.0"
 
 dependencies:
@@ -26,4 +27,4 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0

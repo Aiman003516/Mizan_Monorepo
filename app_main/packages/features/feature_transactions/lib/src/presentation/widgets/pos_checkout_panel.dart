@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 import '../pos_state_provider.dart';
 

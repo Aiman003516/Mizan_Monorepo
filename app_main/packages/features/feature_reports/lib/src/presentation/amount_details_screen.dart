@@ -1,7 +1,6 @@
 // // lib/src/features/reports/presentation/amount_details_screen.dart
 
 // import 'package:flutter/material.dart';
-import 'package:core_ui/core_ui.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:intl/intl.dart';
 // // ⭐️ 1. IMPORT THE GENERATED LOCALIZATIONS FILE
@@ -20,7 +19,7 @@ import 'package:core_ui/core_ui.dart';
 // }
 
 // class _AmountDetailsScreenState extends ConsumerState<AmountDetailsScreen> {
-//   ReportFilter _selectedReportFilter = ReportFilter.ALL;
+//   ReportFilter _selectedReportFilter = ReportFilter.all;
 //   String _selectedClassification = c.kClassificationGeneral;
 
 //   @override
@@ -67,15 +66,15 @@ import 'package:core_ui/core_ui.dart';
 //                     // ⭐️ 3. USE L10N KEYS
 //                     segments: [
 //                       ButtonSegment(
-//                           value: ReportFilter.ALL,
+//                           value: ReportFilter.all,
 //                           label: Text(l10n.all),
 //                           icon: const Icon(Icons.all_inclusive)),
 //                       ButtonSegment(
-//                           value: ReportFilter.POS_ONLY,
+//                           value: ReportFilter.posOnly,
 //                           label: Text(l10n.posSales),
 //                           icon: const Icon(Icons.point_of_sale)),
 //                       ButtonSegment(
-//                           value: ReportFilter.ACCOUNTS_ONLY,
+//                           value: ReportFilter.accountsOnly,
 //                           label: Text(l10n.accounts),
 //                           icon: const Icon(Icons.account_balance_wallet)),
 //                     ],

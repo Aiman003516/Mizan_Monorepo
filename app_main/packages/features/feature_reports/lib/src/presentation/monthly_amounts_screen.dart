@@ -23,7 +23,7 @@ class MonthlyAmountsScreen extends ConsumerStatefulWidget {
 }
 
 class _MonthlyAmountsScreenState extends ConsumerState<MonthlyAmountsScreen> {
-  ReportFilter _selectedReportFilter = ReportFilter.ALL;
+  ReportFilter _selectedReportFilter = ReportFilter.all;
   String _selectedClassification = c.kClassificationGeneral;
 
   @override
@@ -135,17 +135,17 @@ class _MonthlyAmountsScreenState extends ConsumerState<MonthlyAmountsScreen> {
               child: SegmentedButton<ReportFilter>(
                 segments: [
                   ButtonSegment(
-                    value: ReportFilter.ALL,
+                    value: ReportFilter.all,
                     label: Text(l10n.all),
                     icon: const Icon(Icons.all_inclusive),
                   ),
                   ButtonSegment(
-                    value: ReportFilter.POS_ONLY,
+                    value: ReportFilter.posOnly,
                     label: Text(l10n.posSales),
                     icon: const Icon(Icons.point_of_sale),
                   ),
                   ButtonSegment(
-                    value: ReportFilter.ACCOUNTS_ONLY,
+                    value: ReportFilter.accountsOnly,
                     label: Text(l10n.accounts),
                     icon: const Icon(Icons.account_balance_wallet),
                   ),

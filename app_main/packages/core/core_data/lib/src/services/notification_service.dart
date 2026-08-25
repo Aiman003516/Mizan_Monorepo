@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
-import 'package:drift/drift.dart';
 
 /// Notification Service for in-app alerts.
 class NotificationService {

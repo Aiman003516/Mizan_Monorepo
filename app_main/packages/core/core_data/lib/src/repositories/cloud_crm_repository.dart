@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../services/sync_queue_service.dart';
+import '../tenant_context.dart';
 import 'ar_repository.dart';
 import 'ap_repository.dart';
 
@@ -15,15 +16,22 @@ final cloudCrmRepositoryProvider = Provider<CloudCrmRepository>((ref) {
     ref.watch(appDatabaseProvider),
     Supabase.instance.client,
     ref.watch(syncQueueServiceProvider),
+    ref.watch(tenantContextProvider),
   );
 });
 
 class CloudCrmRepository {
-  CloudCrmRepository(this._db, this._supabase, this._queue);
+  CloudCrmRepository(
+    this._db,
+    this._supabase,
+    this._queue,
+    this._tenantContext,
+  );
 
   final AppDatabase _db;
   final SupabaseClient _supabase;
   final SyncQueueService _queue;
+  final TenantContext _tenantContext;
   String? _cachedTenantId;
   static const _uuid = Uuid();
 
@@ -72,29 +80,14 @@ class CloudCrmRepository {
   }
 
   Future<String> currentTenantId() async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) throw const AuthException('Authentication is required.');
     try {
-      final membership = await _supabase
-          .from('staff_members')
-          .select('tenant_id')
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .order('created_at')
-          .limit(1)
-          .maybeSingle();
-      final tenantId = membership?['tenant_id'] as String?;
-      if (tenantId == null || tenantId.isEmpty) {
-        throw const PostgrestException(
-          message: 'Tenant membership was not found.',
-          code: 'MIZAN_TENANT_NOT_FOUND',
-        );
-      }
+      final tenantId = await _tenantContext.currentTenantId();
       _cachedTenantId = tenantId;
       return tenantId;
     } catch (error) {
-      if (_cachedTenantId != null && _isRetryable(error))
+      if (_cachedTenantId != null && _isRetryable(error)) {
         return _cachedTenantId!;
+      }
       rethrow;
     }
   }

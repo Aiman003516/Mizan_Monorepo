@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:core_data/src/services/financial_analysis_service.dart';
+import 'package:core_data/core_data.dart';
 
 /// Fraud Detection Screen using Beneish M-Score
 class FraudDetectionScreen extends StatefulWidget {

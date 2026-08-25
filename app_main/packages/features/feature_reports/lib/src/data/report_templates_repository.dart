@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:core_database/core_database.dart';
-import 'package:drift/drift.dart'; // For Variable
+// For Variable
 import 'package:feature_reports/src/data/report_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -115,7 +117,11 @@ class ReportTemplatesRepository {
       final result = await _localDb.customSelect(finalSql).get();
       return result.map((row) => row.data).toList();
     } catch (e) {
-      print('❌ Report Engine Error: $e\nSQL: $finalSql');
+      developer.log(
+        'Report Engine Error: $e\nSQL: $finalSql',
+        name: 'mizan.report_templates',
+        level: 1000,
+      );
       throw Exception('Failed to generate report: $e');
     }
   }

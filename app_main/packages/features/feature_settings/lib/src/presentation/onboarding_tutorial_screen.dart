@@ -1,6 +1,5 @@
 // Onboarding Tutorial Screen for new users
 import 'package:flutter/material.dart';
-import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -193,7 +192,10 @@ class _OnboardingTutorialScreenState
                       ? const SizedBox(
                           width: 24,
                           height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
                         )
                       : Text(
                           _currentPage == _pages.length - 1

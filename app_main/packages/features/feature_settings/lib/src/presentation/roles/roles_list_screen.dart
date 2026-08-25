@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:core_l10n/app_localizations.dart';
-import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
 import 'role_editor_screen.dart';

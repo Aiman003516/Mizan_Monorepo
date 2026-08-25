@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:excel/excel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -39,8 +40,8 @@ class ExportService {
         bold: pw.Font.ttf(boldFont),
       );
     } catch (e) {
-      print("Error loading fonts for PDF: $e");
-      print("Falling back to default font.");
+      debugPrint('Error loading fonts for PDF: $e');
+      debugPrint('Falling back to default font.');
       // Fallback theme
       return pw.ThemeData.withFont();
     }
@@ -992,10 +993,13 @@ class ExportService {
 
       // share_plus uses the OS share sheet on Android/iOS, and opens the file
       // directly on Windows/macOS — works without FileProvider configuration
-      await Share.shareXFiles(
-        [XFile(path, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')],
-        subject: fileName,
-      );
+      await Share.shareXFiles([
+        XFile(
+          path,
+          mimeType:
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ),
+      ], subject: fileName);
     } else {
       throw Exception('Failed to generate Excel file.');
     }

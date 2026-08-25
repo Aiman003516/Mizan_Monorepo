@@ -1,7 +1,6 @@
 // FILE: packages/features/feature_accounts/lib/src/presentation/filtered_accounts_list_page.dart
 
 import 'package:feature_accounts/feature_accounts.dart';
-import 'package:feature_accounts/src/presentation/add_account_screen.dart';
 import 'package:feature_accounts/src/presentation/account_ledger_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
@@ -282,7 +281,7 @@ class FilteredAccountsListPage extends ConsumerWidget {
 
                             final isGray = index % 2 == 0;
                             final rowColor = isGray
-                                ? Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3)
+                                ? Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
                                 : Theme.of(context).colorScheme.surface;
 
                             return DataRow(

@@ -86,7 +86,7 @@ class AccountsListScreen extends ConsumerWidget {
 
                     final isGray = index % 2 == 0;
                     final rowColor = isGray
-                        ? Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3)
+                        ? Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
                         : Theme.of(context).colorScheme.surface;
 
                     return DataRow(
