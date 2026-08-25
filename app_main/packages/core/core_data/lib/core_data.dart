@@ -23,6 +23,7 @@ export 'src/account_templates.dart';
 export 'src/services/journal_entry_service.dart';
 export 'src/services/currency_service.dart';
 export 'src/providers/currency_providers.dart';
+export 'src/providers/cloud_data_mode_provider.dart';
 export 'src/services/accruals_service.dart';
 export 'src/services/depreciation_service.dart';
 export 'src/services/inventory_costing_service.dart';

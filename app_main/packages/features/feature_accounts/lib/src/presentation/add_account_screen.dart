@@ -485,6 +485,12 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 textDirection: TextDirection.ltr,
                                 children: [
+                                  CurrencyIcon(
+                                    code: currency.code,
+                                    symbol: currency.symbol,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 8),
                                   Text(currency.code),
                                   const Text(' - '),
                                   Text(

@@ -9,7 +9,7 @@ final currenciesRepositoryProvider = Provider<CurrenciesRepository>((ref) {
   return CurrenciesRepository(
     ref.watch(appDatabaseProvider),
     Supabase.instance.client,
-    cloudMode: EnvConfig.isProd || EnvConfig.supabaseUrl.isNotEmpty,
+    cloudMode: ref.watch(cloudDataModeProvider),
   );
 });
 

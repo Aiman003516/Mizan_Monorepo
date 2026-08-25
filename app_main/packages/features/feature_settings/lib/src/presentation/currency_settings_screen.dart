@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:shared_ui/shared_ui.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_l10n/app_localizations.dart';
@@ -137,9 +138,7 @@ class _CurrencySettingsScreenState
               final currency = currencies[index];
               return RadioListTile<String>(
                 title: Text(currency.name),
-                subtitle: Text(
-                  '${l10n.codeLabel} ${currency.code}${currency.symbol != null ? " (${currency.symbol})" : ""}',
-                ),
+                subtitle: Text('${l10n.codeLabel} ${currency.code}'),
                 value: currency.code,
                 // ignore: deprecated_member_use
                 groupValue: defaultCurrencyCode,
@@ -151,9 +150,23 @@ class _CurrencySettingsScreenState
                         .setCurrency(newCode); // Use correct method name
                   }
                 },
-                secondary: defaultCurrencyCode == currency.code
-                    ? Icon(Icons.check_circle, color: context.appColors.success)
-                    : null,
+                secondary: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CurrencyIcon(
+                      code: currency.code,
+                      symbol: currency.symbol,
+                      size: 20,
+                    ),
+                    if (defaultCurrencyCode == currency.code) ...[
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.check_circle,
+                        color: context.appColors.success,
+                      ),
+                    ],
+                  ],
+                ),
               );
             },
           );

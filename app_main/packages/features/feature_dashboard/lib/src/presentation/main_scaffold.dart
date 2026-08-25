@@ -306,62 +306,6 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     );
   }
 
-  Widget _buildGuestDashboard() {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.account_balance_wallet_outlined,
-                    size: 72,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    l10n.mainDashboard,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    l10n.signInToSync,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    l10n.dataSafetyMessage,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.login),
-                    label: Text(l10n.signInWithGoogle),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
@@ -632,38 +576,36 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         ),
       ),
 
-      body: _hasAuthenticatedSession(authStatus)
-          ? switch (currentPage) {
-              MainPage.dashboard => TabBarView(
-                children: [
-                  FilteredAccountsListPage(
-                    classificationFilter: c.kClassificationGeneral,
-                  ),
-                  FilteredAccountsListPage(
-                    classificationFilter: c.kClassificationClients,
-                  ),
-                  FilteredAccountsListPage(
-                    classificationFilter: c.kClassificationSuppliers,
-                  ),
-                ],
-              ),
-              MainPage.pos => const PosScreen(),
-              MainPage.reportsHub => const ReportsHubScreen(),
-              MainPage.reportTotalAmounts => const TotalAmountsScreen(),
-              MainPage.reportMonthlyAmounts => const MonthlyAmountsScreen(),
-              MainPage.reportAccountActivity => const AccountActivityScreen(),
-              MainPage.manageAccounts => const AccountsHubScreen(),
-              MainPage.manageProducts => const ProductsHubScreen(),
-              MainPage.manageCategories => const CategoriesHubScreen(),
-              MainPage.settings => const SettingsScreen(),
-              MainPage.orderHistory => const OrderHistoryScreen(),
-              MainPage.reportProfitAndLoss => const ProfitAndLossScreen(),
-              MainPage.reportBalanceSheet => const BalanceSheetScreen(),
-              MainPage.reportTrialBalance => const TrialBalanceScreen(),
-              MainPage.customers => const CustomersTableScreen(),
-              MainPage.vendors => const VendorsTableScreen(),
-            }
-          : _buildGuestDashboard(),
+      body: switch (currentPage) {
+        MainPage.dashboard => TabBarView(
+          children: [
+            FilteredAccountsListPage(
+              classificationFilter: c.kClassificationGeneral,
+            ),
+            FilteredAccountsListPage(
+              classificationFilter: c.kClassificationClients,
+            ),
+            FilteredAccountsListPage(
+              classificationFilter: c.kClassificationSuppliers,
+            ),
+          ],
+        ),
+        MainPage.pos => const PosScreen(),
+        MainPage.reportsHub => const ReportsHubScreen(),
+        MainPage.reportTotalAmounts => const TotalAmountsScreen(),
+        MainPage.reportMonthlyAmounts => const MonthlyAmountsScreen(),
+        MainPage.reportAccountActivity => const AccountActivityScreen(),
+        MainPage.manageAccounts => const AccountsHubScreen(),
+        MainPage.manageProducts => const ProductsHubScreen(),
+        MainPage.manageCategories => const CategoriesHubScreen(),
+        MainPage.settings => const SettingsScreen(),
+        MainPage.orderHistory => const OrderHistoryScreen(),
+        MainPage.reportProfitAndLoss => const ProfitAndLossScreen(),
+        MainPage.reportBalanceSheet => const BalanceSheetScreen(),
+        MainPage.reportTrialBalance => const TrialBalanceScreen(),
+        MainPage.customers => const CustomersTableScreen(),
+        MainPage.vendors => const VendorsTableScreen(),
+      },
     );
 
     // Wrap in DefaultTabController ONLY when on the dashboard so the AppBar

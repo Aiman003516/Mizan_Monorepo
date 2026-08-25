@@ -8,3 +8,4 @@ export 'src/widgets/empty_state.dart';
 export 'src/widgets/contact_detail_body.dart';
 export 'src/widgets/document_form_body.dart';
 export 'src/widgets/permission_guard.dart';
+export 'src/widgets/currency_icon.dart';

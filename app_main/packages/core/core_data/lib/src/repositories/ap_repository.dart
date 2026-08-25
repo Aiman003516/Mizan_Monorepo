@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
 import 'package:uuid/uuid.dart';
 
-import '../env_config.dart';
 import 'cloud_crm_repository.dart';
+import '../providers/cloud_data_mode_provider.dart';
 
 const _uuid = Uuid();
 // Providers
@@ -13,7 +13,7 @@ final apRepositoryProvider = Provider<APRepository>((ref) {
   return APRepository(
     db,
     cloud: ref.watch(cloudCrmRepositoryProvider),
-    cloudMode: EnvConfig.isProd || EnvConfig.supabaseUrl.isNotEmpty,
+    cloudMode: ref.watch(cloudDataModeProvider),
   );
 });
 
@@ -93,11 +93,14 @@ class APRepository {
     : _cloud = cloud,
       _cloudMode = cloudMode;
 
+  bool get _useCloud => _cloudMode && _cloud != null;
+  CloudCrmRepository get _cloudRepository => _cloud!;
+
   // ==================== VENDORS ====================
 
   /// Watch all vendors ordered by name
   Stream<List<Vendor>> watchAllVendors() {
-    if (_cloudMode && _cloud != null) return _cloud.watchVendors();
+    if (_useCloud) return _cloudRepository.watchVendors();
     return (_db.select(_db.vendors)
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.asc(t.name)]))
@@ -106,7 +109,7 @@ class APRepository {
 
   /// Get a single vendor by ID
   Future<Vendor?> getVendor(String id) {
-    if (_cloudMode && _cloud != null) return _cloud.getVendor(id);
+    if (_useCloud) return _cloudRepository.getVendor(id);
     return (_db.select(_db.vendors)
           ..where((t) => t.id.equals(id))
           ..where((t) => t.isDeleted.equals(false)))
@@ -125,8 +128,8 @@ class APRepository {
     String? notes,
     int openingBalance = 0,
   }) async {
-    if (_cloudMode && _cloud != null) {
-      return _cloud.createVendor(
+    if (_useCloud) {
+      return _cloudRepository.createVendor(
         name: name,
         email: email,
         phone: phone,
@@ -215,7 +218,7 @@ class APRepository {
 
   /// Update vendor
   Future<void> updateVendor(String id, VendorsCompanion companion) async {
-    if (_cloudMode && _cloud != null) {
+    if (_useCloud) {
       final values = <String, dynamic>{};
       if (companion.name.present) values['name'] = companion.name.value;
       if (companion.email.present) values['email'] = companion.email.value;
@@ -226,7 +229,7 @@ class APRepository {
       if (companion.paymentTerms.present)
         values['payment_terms'] = companion.paymentTerms.value;
       if (companion.notes.present) values['notes'] = companion.notes.value;
-      await _cloud.updateVendor(id, values);
+      await _cloudRepository.updateVendor(id, values);
       return;
     }
     await (_db.update(
@@ -256,7 +259,7 @@ class APRepository {
 
   /// Watch all bills for a vendor
   Stream<List<Bill>> watchVendorBills(String vendorId) {
-    if (_cloudMode && _cloud != null) return _cloud.watchVendorBills(vendorId);
+    if (_useCloud) return _cloudRepository.watchVendorBills(vendorId);
     return (_db.select(_db.bills)
           ..where((t) => t.vendorId.equals(vendorId))
           ..orderBy([(t) => OrderingTerm.desc(t.billDate)]))
@@ -265,7 +268,7 @@ class APRepository {
 
   /// Watch all bills
   Stream<List<Bill>> watchAllBills() {
-    if (_cloudMode && _cloud != null) return _cloud.watchAllBills();
+    if (_useCloud) return _cloudRepository.watchAllBills();
     return (_db.select(_db.bills)
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.desc(t.billDate)]))
@@ -315,8 +318,8 @@ class APRepository {
     String? vendorBillNumber,
     String? notes,
   }) async {
-    if (_cloudMode && _cloud != null) {
-      return _cloud.createBill(
+    if (_useCloud) {
+      return _cloudRepository.createBill(
         vendorId: vendorId,
         billDate: billDate,
         dueDate: dueDate,

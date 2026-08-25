@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
 import 'package:uuid/uuid.dart';
 
-import '../env_config.dart';
 import 'cloud_crm_repository.dart';
+import '../providers/cloud_data_mode_provider.dart';
 
 const _uuid = Uuid();
 // Providers
@@ -13,7 +13,7 @@ final arRepositoryProvider = Provider<ARRepository>((ref) {
   return ARRepository(
     db,
     cloud: ref.watch(cloudCrmRepositoryProvider),
-    cloudMode: EnvConfig.isProd || EnvConfig.supabaseUrl.isNotEmpty,
+    cloudMode: ref.watch(cloudDataModeProvider),
   );
 });
 
@@ -100,11 +100,14 @@ class ARRepository {
     : _cloud = cloud,
       _cloudMode = cloudMode;
 
+  bool get _useCloud => _cloudMode && _cloud != null;
+  CloudCrmRepository get _cloudRepository => _cloud!;
+
   // ==================== CUSTOMERS ====================
 
   /// Watch all customers ordered by name
   Stream<List<Customer>> watchAllCustomers() {
-    if (_cloudMode && _cloud != null) return _cloud.watchCustomers();
+    if (_useCloud) return _cloudRepository.watchCustomers();
     return (_db.select(_db.customers)
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.asc(t.name)]))
@@ -113,7 +116,7 @@ class ARRepository {
 
   /// Get a single customer by ID
   Future<Customer?> getCustomer(String id) {
-    if (_cloudMode && _cloud != null) return _cloud.getCustomer(id);
+    if (_useCloud) return _cloudRepository.getCustomer(id);
     return (_db.select(_db.customers)
           ..where((t) => t.id.equals(id))
           ..where((t) => t.isDeleted.equals(false)))
@@ -133,8 +136,8 @@ class ARRepository {
     bool isOnHold = false,
     int openingBalance = 0,
   }) async {
-    if (_cloudMode && _cloud != null) {
-      return _cloud.createCustomer(
+    if (_useCloud) {
+      return _cloudRepository.createCustomer(
         name: name,
         email: email,
         phone: phone,
@@ -225,7 +228,7 @@ class ARRepository {
 
   /// Update customer
   Future<void> updateCustomer(String id, CustomersCompanion companion) async {
-    if (_cloudMode && _cloud != null) {
+    if (_useCloud) {
       final values = <String, dynamic>{};
       if (companion.name.present) values['name'] = companion.name.value;
       if (companion.email.present) values['email'] = companion.email.value;
@@ -236,7 +239,7 @@ class ARRepository {
       if (companion.creditLimit.present)
         values['credit_limit'] = companion.creditLimit.value;
       if (companion.notes.present) values['notes'] = companion.notes.value;
-      await _cloud.updateCustomer(id, values);
+      await _cloudRepository.updateCustomer(id, values);
       return;
     }
     await (_db.update(
@@ -360,8 +363,7 @@ class ARRepository {
 
   /// Watch all invoices for a customer
   Stream<List<Invoice>> watchCustomerInvoices(String customerId) {
-    if (_cloudMode && _cloud != null)
-      return _cloud.watchCustomerInvoices(customerId);
+    if (_useCloud) return _cloudRepository.watchCustomerInvoices(customerId);
     return (_db.select(_db.invoices)
           ..where((t) => t.customerId.equals(customerId))
           ..orderBy([(t) => OrderingTerm.desc(t.invoiceDate)]))
@@ -370,7 +372,7 @@ class ARRepository {
 
   /// Watch all invoices
   Stream<List<Invoice>> watchAllInvoices() {
-    if (_cloudMode && _cloud != null) return _cloud.watchAllInvoices();
+    if (_useCloud) return _cloudRepository.watchAllInvoices();
     return (_db.select(_db.invoices)
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.desc(t.invoiceDate)]))
@@ -379,8 +381,7 @@ class ARRepository {
 
   /// Get invoice with items
   Future<InvoiceWithItems?> getInvoiceWithItems(String invoiceId) async {
-    if (_cloudMode && _cloud != null)
-      return _cloud.getInvoiceWithItems(invoiceId);
+    if (_useCloud) return _cloudRepository.getInvoiceWithItems(invoiceId);
     final invoice = await (_db.select(
       _db.invoices,
     )..where((t) => t.id.equals(invoiceId))).getSingleOrNull();
@@ -440,8 +441,8 @@ class ARRepository {
     required String currencyCode,
     String? notes,
   }) async {
-    if (_cloudMode && _cloud != null) {
-      return _cloud.createInvoice(
+    if (_useCloud) {
+      return _cloudRepository.createInvoice(
         customerId: customerId,
         invoiceDate: invoiceDate,
         dueDate: dueDate,
