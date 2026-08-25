@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -31,7 +32,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Background Sync Worker (Only needed on Mobile usually)
-  if (Platform.isAndroid || Platform.isIOS) {
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     Workmanager().initialize(
       callbackDispatcher, // The top level function from feature_sync
       isInDebugMode: true, // If enabled it will post a notification whenever the task is running
@@ -48,7 +49,7 @@ Future<void> main() async {
   }
 
   // 🖥️ WINDOWS: Initialize window manager for size/position retention
-  if (Platform.isWindows) {
+  if (!kIsWeb && Platform.isWindows) {
     await windowManager.ensureInitialized();
     
     // Load saved window preferences or use defaults

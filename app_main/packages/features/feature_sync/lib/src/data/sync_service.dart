@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 
@@ -44,6 +45,7 @@ class SyncService {
   }
 
   Future<void> backupDatabase() async {
+    if (kIsWeb) return;
     // ⚡ SET SPECIFIC STATE
     _ref.read(syncStatusProvider.notifier).state = SyncStatus.backupInProgress;
     
@@ -167,6 +169,7 @@ class SyncService {
   }
 
   Future<void> restoreDatabase() async {
+    if (kIsWeb) return;
     // ⚡ SET SPECIFIC STATE
     _ref.read(syncStatusProvider.notifier).state = SyncStatus.restoreInProgress;
     
