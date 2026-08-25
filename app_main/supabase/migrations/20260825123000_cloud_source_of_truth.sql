@@ -4,6 +4,28 @@
 
 create extension if not exists pgcrypto;
 
+-- Legacy-schema preflight. These dynamic statements intentionally run before
+-- any index, policy, or function can reference the newer lifecycle columns.
+do $$
+begin
+  if to_regclass('public.staff_members') is not null then
+    execute 'alter table public.staff_members add column if not exists status text';
+    execute 'update public.staff_members set status = ''active'' where status is null';
+    execute 'alter table public.staff_members alter column status set default ''active''';
+    execute 'alter table public.staff_members alter column status set not null';
+  end if;
+  if to_regclass('public.invites') is not null then
+    execute 'alter table public.invites add column if not exists is_used boolean';
+    execute 'update public.invites set is_used = false where is_used is null';
+    execute 'alter table public.invites alter column is_used set default false';
+    execute 'alter table public.invites alter column is_used set not null';
+    execute 'alter table public.invites add column if not exists used_by uuid';
+    execute 'alter table public.invites add column if not exists used_at timestamptz';
+    execute 'alter table public.invites add column if not exists created_by uuid';
+  end if;
+end;
+$$;
+
 create table if not exists public.tenants (
   id uuid primary key default gen_random_uuid(),
   name text not null check (length(btrim(name)) between 1 and 200),
