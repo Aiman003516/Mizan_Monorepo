@@ -36,6 +36,7 @@ import 'package:feature_transactions/src/presentation/pos_receipt_provider.dart'
 import 'package:feature_transactions/src/presentation/pos_state_provider.dart';
 import 'package:feature_transactions/src/presentation/widgets/pos_product_grid.dart';
 import 'package:feature_transactions/src/presentation/widgets/pos_cart_sheet.dart';
+import 'package:feature_transactions/src/presentation/widgets/pos_checkout_panel.dart';
 
 // ──────────────────────────────────────────────────
 // PROVIDERS
@@ -516,7 +517,6 @@ class _PosScreenState extends ConsumerState<PosScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final parkCount = ref.watch(posStateProvider).parkedOrders.length;
     final categoriesAsync = ref.watch(categoriesStreamProvider);
     final productsAsync = ref.watch(allProductsStreamProvider);
 
@@ -525,185 +525,238 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
-        // ─── APP BAR ──────────────────────────────
-        appBar: widget.isStandalone
-            ? AppBar(
-                title: _isSearching
-                    ? TextField(
-                        controller: _searchController,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          hintText: l10n.searchProducts,
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(
-                            color: context.appColors.subtleText.withValues(
-                              alpha: 0.7,
-                            ),
-                          ),
-                        ),
-                        style: TextStyle(color: context.appColors.onSurface),
-                        onChanged: (value) {
-                          setState(() => _searchQuery = value);
-                        },
-                      )
-                    : Text(l10n.posTerminalTitle),
-                actions: [
-                  // Search
-                  IconButton(
-                    icon: Icon(_isSearching ? Icons.close : Icons.search),
-                    tooltip: l10n.searchProductTooltip,
-                    onPressed: () {
-                      setState(() {
-                        _isSearching = !_isSearching;
-                        if (!_isSearching) {
-                          _searchQuery = '';
-                          _searchController.clear();
-                        }
-                      });
-                    },
-                  ),
-                  // Barcode Scanner
-                  IconButton(
-                    icon: const Icon(Icons.qr_code_scanner),
-                    tooltip: l10n.scanMode,
-                    onPressed: _openMobileScanner,
-                  ),
-                  // Parked Orders
-                  Badge(
-                    label: Text(parkCount.toString()),
-                    isLabelVisible: parkCount > 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.history),
-                      onPressed: _showParkedOrdersDialog,
-                      tooltip: l10n.recallOrderTooltip,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                ],
-              )
-            : null,
+        appBar: widget.isStandalone ? _buildStandaloneAppBar(l10n) : null,
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 980;
+              final catalog = _buildCatalogWorkspace(
+                categoriesAsync,
+                productsAsync,
+                l10n,
+              );
 
-        // ─── BODY ─────────────────────────────────
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                if (!widget.isStandalone)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+              if (!isWide) {
+                return Stack(
+                  children: [
+                    catalog,
+                    PosCartSheet(
+                      onPayPressed: _showPaymentDialog,
+                      onHoldPressed: _handleHoldOrder,
                     ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 2,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
+                  ],
+                );
+              }
+
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(flex: 7, child: catalog),
+                    const SizedBox(width: 18),
+                    SizedBox(
+                      width: 390,
+                      child: PosCheckoutPanel(
+                        onPayPressed: _showPaymentDialog,
+                        onHoldPressed: _handleHoldOrder,
+                        onRecallPressed: _showParkedOrdersDialog,
+                        onClearPressed: () => ref
+                            .read(posStateProvider.notifier)
+                            .clearActiveOrder(),
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        if (_isSearching)
-                          Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              autofocus: true,
-                              decoration: InputDecoration(
-                                hintText: l10n.searchProducts,
-                                border: InputBorder.none,
-                              ),
-                              onChanged: (value) {
-                                setState(() => _searchQuery = value);
-                              },
-                            ),
-                          )
-                        else
-                          Expanded(
-                            child: Text(
-                              l10n.posTerminalTitle,
-                              style: Theme.of(context).textTheme.titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        IconButton(
-                          icon: Icon(_isSearching ? Icons.close : Icons.search),
-                          tooltip: l10n.searchProductTooltip,
-                          onPressed: () {
-                            setState(() {
-                              _isSearching = !_isSearching;
-                              if (!_isSearching) {
-                                _searchQuery = '';
-                                _searchController.clear();
-                              }
-                            });
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.qr_code_scanner),
-                          tooltip: l10n.scanMode,
-                          onPressed: _openMobileScanner,
-                        ),
-                        Badge(
-                          label: Text(parkCount.toString()),
-                          isLabelVisible: parkCount > 0,
-                          child: IconButton(
-                            icon: const Icon(Icons.history),
-                            onPressed: _showParkedOrdersDialog,
-                            tooltip: l10n.recallOrderTooltip,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                // ── Category Filter Chips ──
-                categoriesAsync.when(
-                  data: (categories) => _buildCategoryChips(categories, l10n),
-                  loading: () => const SizedBox(height: 50),
-                  error: (_, __) => const SizedBox.shrink(),
+                  ],
                 ),
-
-                // ── Product Grid ──
-                Expanded(
-                  child: productsAsync.when(
-                    data: (allProducts) {
-                      final filtered = _filterProducts(allProducts);
-                      return PosProductGrid(
-                        products: filtered,
-                        onAddToCart: _onProductTapped,
-                      );
-                    },
-                    loading: () => const PosProductGrid(
-                      products: [],
-                      onAddToCart: _dummyAdd,
-                      isLoading: true,
-                    ),
-                    error: (e, _) => Center(child: Text('Error: $e')),
-                  ),
-                ),
-              ],
-            ),
-
-            // ── Draggable Cart Bottom Sheet ──
-            PosCartSheet(
-              onPayPressed: _showPaymentDialog,
-              onHoldPressed: _handleHoldOrder,
-            ),
-          ],
+              );
+            },
+          ),
         ),
-
-        // ─── FAB (mobile only) ────────────────────
         floatingActionButton: (!Platform.isWindows)
             ? Padding(
                 padding: const EdgeInsets.only(bottom: 50),
-                child: FloatingActionButton(
+                child: FloatingActionButton.extended(
                   onPressed: _openMobileScanner,
-                  child: const Icon(Icons.qr_code_scanner),
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: Text(l10n.scanMode),
                 ),
               )
             : null,
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildStandaloneAppBar(AppLocalizations l10n) {
+    final parkCount = ref.watch(posStateProvider).parkedOrders.length;
+    return AppBar(
+      title: _isSearching
+          ? TextField(
+              controller: _searchController,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: l10n.searchProducts,
+                border: InputBorder.none,
+              ),
+              onChanged: (value) => setState(() => _searchQuery = value),
+            )
+          : Text(l10n.posTerminalTitle),
+      actions: [
+        IconButton(
+          tooltip: _isSearching ? l10n.clear : l10n.searchProductTooltip,
+          icon: Icon(_isSearching ? Icons.close : Icons.search),
+          onPressed: () {
+            setState(() {
+              _isSearching = !_isSearching;
+              if (!_isSearching) {
+                _searchQuery = '';
+                _searchController.clear();
+              }
+            });
+          },
+        ),
+        IconButton(
+          tooltip: l10n.scanMode,
+          icon: const Icon(Icons.qr_code_scanner),
+          onPressed: _openMobileScanner,
+        ),
+        Badge(
+          label: Text(parkCount.toString()),
+          isLabelVisible: parkCount > 0,
+          child: IconButton(
+            tooltip: l10n.recallOrderTooltip,
+            icon: const Icon(Icons.inbox_outlined),
+            onPressed: _showParkedOrdersDialog,
+          ),
+        ),
+        const SizedBox(width: 8),
+      ],
+    );
+  }
+
+  Widget _buildCatalogWorkspace(
+    AsyncValue<List<Category>> categoriesAsync,
+    AsyncValue<List<Product>> productsAsync,
+    AppLocalizations l10n,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (!widget.isStandalone) _buildPosToolbar(l10n),
+        const SizedBox(height: 14),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: categoriesAsync.when(
+            data: (categories) => _buildCategoryChips(categories, l10n),
+            loading: () => const SizedBox(height: 48),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Expanded(
+          child: productsAsync.when(
+            data: (allProducts) {
+              final filtered = _filterProducts(allProducts);
+              return PosProductGrid(
+                products: filtered,
+                onAddToCart: _onProductTapped,
+              );
+            },
+            loading: () => const PosProductGrid(
+              products: [],
+              onAddToCart: _dummyAdd,
+              isLoading: true,
+            ),
+            error: (error, _) => Center(child: Text('${l10n.error}: $error')),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPosToolbar(AppLocalizations l10n) {
+    final parkCount = ref.watch(posStateProvider).parkedOrders.length;
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 16, 12, 16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(11),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              Icons.point_of_sale_outlined,
+              color: theme.colorScheme.onPrimaryContainer,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _isSearching
+                ? TextField(
+                    controller: _searchController,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: l10n.searchProducts,
+                      border: InputBorder.none,
+                      isDense: true,
+                    ),
+                    onChanged: (value) => setState(() => _searchQuery = value),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.posTerminalTitle,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        l10n.scanMode,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: context.appColors.subtleText,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+          IconButton(
+            tooltip: _isSearching ? l10n.clear : l10n.searchProductTooltip,
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                _isSearching = !_isSearching;
+                if (!_isSearching) {
+                  _searchQuery = '';
+                  _searchController.clear();
+                }
+              });
+            },
+          ),
+          IconButton(
+            tooltip: l10n.scanMode,
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: _openMobileScanner,
+          ),
+          Badge(
+            label: Text(parkCount.toString()),
+            isLabelVisible: parkCount > 0,
+            child: IconButton(
+              tooltip: l10n.recallOrderTooltip,
+              icon: const Icon(Icons.inbox_outlined),
+              onPressed: _showParkedOrdersDialog,
+            ),
+          ),
+        ],
       ),
     );
   }
