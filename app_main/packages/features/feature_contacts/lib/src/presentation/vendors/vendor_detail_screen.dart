@@ -20,7 +20,8 @@ class VendorDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return vendorsAsync.when(
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
         appBar: AppBar(title: Text(l10n.vendorDetailTitle)),
         body: Center(child: Text('Error: $e')),
@@ -39,6 +40,9 @@ class VendorDetailScreen extends ConsumerWidget {
           phone: vendor.phone ?? '-',
           address: vendor.address ?? '-',
           taxId: vendor.taxId ?? '-',
+          phoneLabel: l10n.phone,
+          addressLabel: l10n.address,
+          taxIdLabel: l10n.taxId,
           extraInfoLabel: l10n.paymentTerms,
           extraInfoValue: vendor.paymentTerms ?? '-',
           balance: vendor.balance,
@@ -51,12 +55,15 @@ class VendorDetailScreen extends ConsumerWidget {
               ),
             );
           },
-          onNewDocument: () {
-            Navigator.of(context).push(
+          onNewDocument: () async {
+            final created = await Navigator.of(context).push<bool>(
               MaterialPageRoute(
                 builder: (context) => BillFormScreen(vendorId: vendor.id),
               ),
             );
+            if (created == true) {
+              ref.invalidate(vendorBillsProvider(vendor.id));
+            }
           },
           newDocumentLabel: l10n.newBill,
           newDocumentIcon: Icons.receipt,
@@ -108,36 +115,59 @@ class _BillCard extends StatelessWidget {
           ),
         ),
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              bill.billNumber,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+            Expanded(
+              child: Text(
+                bill.billNumber,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
             ),
-            Text(
-              CurrencyFormatter.formatAmount(bill.totalAmount, currencyCode),
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                CurrencyFormatter.formatAmount(bill.totalAmount, currencyCode),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
         subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '${bill.billDate.day}/${bill.billDate.month}/${bill.billDate.year}',
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
+            Expanded(
               child: Text(
-                bill.status.toUpperCase(),
-                style: TextStyle(
-                  color: statusColor,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+                '${bill.billDate.day}/${bill.billDate.month}/${bill.billDate.year}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    bill.status.toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -145,11 +175,17 @@ class _BillCard extends StatelessWidget {
         ),
         trailing: isPaid
             ? Icon(Icons.check_circle, color: context.appColors.success)
-            : Text(
-                CurrencyFormatter.formatAmount(outstanding, currencyCode),
-                style: TextStyle(
-                  color: colorScheme.tertiary,
-                  fontWeight: FontWeight.bold,
+            : ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 92),
+                child: Text(
+                  CurrencyFormatter.formatAmount(outstanding, currencyCode),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    color: colorScheme.tertiary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
       ),

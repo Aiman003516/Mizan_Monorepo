@@ -25,7 +25,12 @@ class CustomerDataSource extends DataTableSource {
 
     return DataRow(
       cells: [
-        DataCell(Text(customer.name, style: const TextStyle(fontWeight: FontWeight.bold))),
+        DataCell(
+          Text(
+            customer.name,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
         DataCell(Text(customer.phone ?? customer.email ?? '-')),
         DataCell(
           Text(
@@ -42,7 +47,8 @@ class CustomerDataSource extends DataTableSource {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => CustomerDetailScreen(customerId: customer.id),
+                  builder: (context) =>
+                      CustomerDetailScreen(customerId: customer.id),
                 ),
               );
             },
@@ -50,12 +56,12 @@ class CustomerDataSource extends DataTableSource {
         ),
       ],
       onSelectChanged: (_) {
-         Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => CustomerDetailScreen(customerId: customer.id),
-            ),
-          );
-      }
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => CustomerDetailScreen(customerId: customer.id),
+          ),
+        );
+      },
     );
   }
 
@@ -71,7 +77,8 @@ class CustomersTableScreen extends ConsumerStatefulWidget {
   const CustomersTableScreen({super.key});
 
   @override
-  ConsumerState<CustomersTableScreen> createState() => _CustomersTableScreenState();
+  ConsumerState<CustomersTableScreen> createState() =>
+      _CustomersTableScreenState();
 }
 
 class _CustomersTableScreenState extends ConsumerState<CustomersTableScreen> {
@@ -87,10 +94,13 @@ class _CustomersTableScreenState extends ConsumerState<CustomersTableScreen> {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).push(
+        onPressed: () async {
+          final created = await Navigator.of(context).push<bool>(
             MaterialPageRoute(builder: (context) => const CustomerFormScreen()),
           );
+          if (created == true && mounted) {
+            ref.invalidate(customersStreamProvider);
+          }
         },
         icon: const Icon(Icons.person_add),
         label: Text(l10n.addCustomerBtn),
@@ -109,7 +119,7 @@ class _CustomersTableScreenState extends ConsumerState<CustomersTableScreen> {
         ),
         data: (customers) {
           if (customers.isEmpty) {
-             return Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -139,14 +149,23 @@ class _CustomersTableScreenState extends ConsumerState<CustomersTableScreen> {
 
           // Filter
           final filteredCustomers = customers.where((c) {
-             if (_searchQuery.isEmpty) return true;
-             return c.name.toLowerCase().contains(_searchQuery.toLowerCase()) || 
-                    (c.phone != null && c.phone!.contains(_searchQuery)) ||
-                    (c.email != null && c.email!.toLowerCase().contains(_searchQuery.toLowerCase()));
+            if (_searchQuery.isEmpty) return true;
+            return c.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                (c.phone != null && c.phone!.contains(_searchQuery)) ||
+                (c.email != null &&
+                    c.email!.toLowerCase().contains(
+                      _searchQuery.toLowerCase(),
+                    ));
           }).toList();
 
-          final source = CustomerDataSource(filteredCustomers, context, currencyCode);
-          final rowsPerPage = filteredCustomers.isEmpty ? 1 : filteredCustomers.length.clamp(1, 10);
+          final source = CustomerDataSource(
+            filteredCustomers,
+            context,
+            currencyCode,
+          );
+          final rowsPerPage = filteredCustomers.isEmpty
+              ? 1
+              : filteredCustomers.length.clamp(1, 10);
 
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -161,30 +180,48 @@ class _CustomersTableScreenState extends ConsumerState<CustomersTableScreen> {
               ),
               const SizedBox(height: 16),
               if (filteredCustomers.isEmpty)
-                 Center(child: Padding(
-                   padding: const EdgeInsets.all(32.0),
-                   child: Text(l10n.noCustomersMatch),
-                 ))
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Text(l10n.noCustomersMatch),
+                  ),
+                )
               else
-                 SingleChildScrollView(
-                   scrollDirection: Axis.horizontal,
-                   child: SizedBox(
-                     width: math.max(MediaQuery.of(context).size.width - 32, 600.0),
-                     child: PaginatedDataTable(
-                       header: Text(l10n.customerBalances),
-                       columns: [
-                         DataColumn(label: Text(l10n.name)),
-                         DataColumn(label: Text(l10n.contact)),
-                         DataColumn(label: Text(l10n.balance)),
-                         DataColumn(label: Text(l10n.actions)),
-                       ],
-                       source: source,
-                       rowsPerPage: rowsPerPage,
-                       availableRowsPerPage: const [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50],
-                       showCheckboxColumn: false,
-                     ),
-                   ),
-                 ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: math.max(
+                      MediaQuery.of(context).size.width - 32,
+                      600.0,
+                    ),
+                    child: PaginatedDataTable(
+                      header: Text(l10n.customerBalances),
+                      columns: [
+                        DataColumn(label: Text(l10n.name)),
+                        DataColumn(label: Text(l10n.contact)),
+                        DataColumn(label: Text(l10n.balance)),
+                        DataColumn(label: Text(l10n.actions)),
+                      ],
+                      source: source,
+                      rowsPerPage: rowsPerPage,
+                      availableRowsPerPage: const [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        20,
+                        50,
+                      ],
+                      showCheckboxColumn: false,
+                    ),
+                  ),
+                ),
             ],
           );
         },

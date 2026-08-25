@@ -189,16 +189,24 @@ class AuthRepository {
 
         // B. Supabase Sign In (Hybrid Link)
         final googleAuth = await user.authentication;
-        if (googleAuth.idToken != null && googleAuth.accessToken != null) {
-          await _supabase.auth.signInWithIdToken(
-            provider: OAuthProvider.google,
-            idToken: googleAuth.idToken!,
-            accessToken: googleAuth.accessToken!,
+        final idToken = googleAuth.idToken;
+        final accessToken = googleAuth.accessToken;
+        if (idToken == null || accessToken == null) {
+          throw const AuthException(
+            'Google did not return the credentials required for cloud sign-in.',
           );
         }
-        print(
-          "✅ [Auth] Supabase Sign-In Successful: ${_supabase.auth.currentUser?.id}",
+
+        final response = await _supabase.auth.signInWithIdToken(
+          provider: OAuthProvider.google,
+          idToken: idToken,
+          accessToken: accessToken,
         );
+        if (response.session == null || _supabase.auth.currentUser == null) {
+          throw const AuthException(
+            'Google sign-in completed, but the Supabase session was not created.',
+          );
+        }
 
         // C. Create Drive Client
         final authHeaders = await user.authHeaders;
@@ -264,16 +272,18 @@ class AuthRepository {
         if (user == null) return null;
         _googleUser = user;
 
-        // Ensure Supabase is also signed in silently
+        // Ensure Supabase is also signed in silently.
         if (_supabase.auth.currentUser == null) {
           final googleAuth = await user.authentication;
-          if (googleAuth.idToken != null && googleAuth.accessToken != null) {
-            await _supabase.auth.signInWithIdToken(
-              provider: OAuthProvider.google,
-              idToken: googleAuth.idToken!,
-              accessToken: googleAuth.accessToken!,
-            );
-          }
+          final idToken = googleAuth.idToken;
+          final accessToken = googleAuth.accessToken;
+          if (idToken == null || accessToken == null) return null;
+          final response = await _supabase.auth.signInWithIdToken(
+            provider: OAuthProvider.google,
+            idToken: idToken,
+            accessToken: accessToken,
+          );
+          if (response.session == null) return null;
         }
 
         final authHeaders = await user.authHeaders;

@@ -23,7 +23,8 @@ class CustomerDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return customersAsync.when(
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(
         appBar: AppBar(title: Text(l10n.customerDetailTitle)),
         body: Center(child: Text('Error: $e')),
@@ -42,8 +43,14 @@ class CustomerDetailScreen extends ConsumerWidget {
           phone: customer.phone ?? '-',
           address: customer.address ?? '-',
           taxId: customer.taxId ?? '-',
+          phoneLabel: l10n.phone,
+          addressLabel: l10n.address,
+          taxIdLabel: l10n.taxId,
           extraInfoLabel: l10n.creditLimit,
-          extraInfoValue: CurrencyFormatter.formatAmount(customer.creditLimit, currencyCode),
+          extraInfoValue: CurrencyFormatter.formatAmount(
+            customer.creditLimit,
+            currencyCode,
+          ),
           balance: customer.balance,
           currencyCode: currencyCode,
           outstandingBalanceLabel: l10n.outstandingBalance,
@@ -51,16 +58,21 @@ class CustomerDetailScreen extends ConsumerWidget {
           onEdit: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => CustomerFormScreen(customerId: customer.id),
+                builder: (context) =>
+                    CustomerFormScreen(customerId: customer.id),
               ),
             );
           },
-          onNewDocument: () {
-            Navigator.of(context).push(
+          onNewDocument: () async {
+            final created = await Navigator.of(context).push<bool>(
               MaterialPageRoute(
-                builder: (context) => InvoiceFormScreen(customerId: customer.id),
+                builder: (context) =>
+                    InvoiceFormScreen(customerId: customer.id),
               ),
             );
+            if (created == true) {
+              ref.invalidate(customerInvoicesProvider(customer.id));
+            }
           },
           onQuickAdjustment: () {
             showDialog(
@@ -130,36 +142,62 @@ class _InvoiceCard extends StatelessWidget {
           ),
         ),
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              invoice.invoiceNumber,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+            Expanded(
+              child: Text(
+                invoice.invoiceNumber,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
             ),
-            Text(
-              CurrencyFormatter.formatAmount(invoice.totalAmount, currencyCode),
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                CurrencyFormatter.formatAmount(
+                  invoice.totalAmount,
+                  currencyCode,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
         subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '${invoice.invoiceDate.day}/${invoice.invoiceDate.month}/${invoice.invoiceDate.year}',
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
+            Expanded(
               child: Text(
-                invoice.status.toUpperCase(),
-                style: TextStyle(
-                  color: statusColor,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+                '${invoice.invoiceDate.day}/${invoice.invoiceDate.month}/${invoice.invoiceDate.year}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    invoice.status.toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -167,11 +205,17 @@ class _InvoiceCard extends StatelessWidget {
         ),
         trailing: isPaid
             ? Icon(Icons.check_circle, color: context.appColors.success)
-            : Text(
-                CurrencyFormatter.formatAmount(outstanding, currencyCode),
-                style: TextStyle(
-                  color: colorScheme.error,
-                  fontWeight: FontWeight.bold,
+            : ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 92),
+                child: Text(
+                  CurrencyFormatter.formatAmount(outstanding, currencyCode),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    color: colorScheme.error,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
         onTap: () {},

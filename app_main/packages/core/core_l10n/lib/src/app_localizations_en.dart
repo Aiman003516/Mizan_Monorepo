@@ -4531,4 +4531,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveAdjustment => 'Save Adjustment';
+
+  @override
+  String get crmSectionTitle => 'Customer & Vendor Management';
 }

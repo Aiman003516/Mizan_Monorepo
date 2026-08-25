@@ -4534,4 +4534,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get saveAdjustment => 'حفظ التعديل';
+
+  @override
+  String get crmSectionTitle => 'إدارة العملاء والموردين';
 }

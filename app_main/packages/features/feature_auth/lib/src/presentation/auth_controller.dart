@@ -55,7 +55,7 @@ class AuthController extends StateNotifier<AuthState> {
         }
       } catch (e) {
         print('Silent sign-in failed (likely offline): $e');
-        state = AuthState(status: AuthStatus.authenticated_offline);
+        state = AuthState(status: AuthStatus.unauthenticated);
       }
     } catch (e) {
       state = AuthState(
@@ -69,10 +69,17 @@ class AuthController extends StateNotifier<AuthState> {
     state = AuthState(status: AuthStatus.loading);
     try {
       final client = await _authRepository.signIn();
-      if (client != null) {
+      final hasSupabaseSession = await _authRepository
+          .hasActiveSupabaseSession();
+      if (client != null && hasSupabaseSession) {
         state = AuthState(status: AuthStatus.authenticated_online);
       } else {
-        state = AuthState(status: AuthStatus.unauthenticated);
+        state = AuthState(
+          status: AuthStatus.unauthenticated,
+          errorMessage: client == null
+              ? 'Google sign-in was cancelled or unavailable.'
+              : 'Google sign-in did not create a cloud session.',
+        );
       }
     } catch (e) {
       state = AuthState(

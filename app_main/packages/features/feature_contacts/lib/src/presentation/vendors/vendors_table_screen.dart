@@ -25,7 +25,12 @@ class VendorDataSource extends DataTableSource {
 
     return DataRow(
       cells: [
-        DataCell(Text(vendor.name, style: const TextStyle(fontWeight: FontWeight.bold))),
+        DataCell(
+          Text(
+            vendor.name,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
         DataCell(Text(vendor.phone ?? vendor.email ?? '-')),
         DataCell(
           Text(
@@ -50,12 +55,12 @@ class VendorDataSource extends DataTableSource {
         ),
       ],
       onSelectChanged: (_) {
-         Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => VendorDetailScreen(vendorId: vendor.id),
-            ),
-          );
-      }
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => VendorDetailScreen(vendorId: vendor.id),
+          ),
+        );
+      },
     );
   }
 
@@ -87,10 +92,13 @@ class _VendorsTableScreenState extends ConsumerState<VendorsTableScreen> {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).push(
+        onPressed: () async {
+          final created = await Navigator.of(context).push<bool>(
             MaterialPageRoute(builder: (context) => const VendorFormScreen()),
           );
+          if (created == true && mounted) {
+            ref.invalidate(vendorsStreamProvider);
+          }
         },
         icon: const Icon(Icons.add_business),
         label: Text(l10n.addVendorBtn),
@@ -109,7 +117,7 @@ class _VendorsTableScreenState extends ConsumerState<VendorsTableScreen> {
         ),
         data: (vendors) {
           if (vendors.isEmpty) {
-             return Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -139,14 +147,23 @@ class _VendorsTableScreenState extends ConsumerState<VendorsTableScreen> {
 
           // Filter
           final filteredVendors = vendors.where((v) {
-             if (_searchQuery.isEmpty) return true;
-             return v.name.toLowerCase().contains(_searchQuery.toLowerCase()) || 
-                    (v.phone != null && v.phone!.contains(_searchQuery)) ||
-                    (v.email != null && v.email!.toLowerCase().contains(_searchQuery.toLowerCase()));
+            if (_searchQuery.isEmpty) return true;
+            return v.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                (v.phone != null && v.phone!.contains(_searchQuery)) ||
+                (v.email != null &&
+                    v.email!.toLowerCase().contains(
+                      _searchQuery.toLowerCase(),
+                    ));
           }).toList();
 
-          final source = VendorDataSource(filteredVendors, context, currencyCode);
-          final rowsPerPage = filteredVendors.isEmpty ? 1 : filteredVendors.length.clamp(1, 10);
+          final source = VendorDataSource(
+            filteredVendors,
+            context,
+            currencyCode,
+          );
+          final rowsPerPage = filteredVendors.isEmpty
+              ? 1
+              : filteredVendors.length.clamp(1, 10);
 
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -160,31 +177,49 @@ class _VendorsTableScreenState extends ConsumerState<VendorsTableScreen> {
                 onChanged: (val) => setState(() => _searchQuery = val),
               ),
               const SizedBox(height: 16),
-               if (filteredVendors.isEmpty)
-                 Center(child: Padding(
-                   padding: const EdgeInsets.all(32.0),
-                   child: Text(l10n.noVendorsMatch),
-                 ))
+              if (filteredVendors.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Text(l10n.noVendorsMatch),
+                  ),
+                )
               else
-                 SingleChildScrollView(
-                   scrollDirection: Axis.horizontal,
-                   child: SizedBox(
-                     width: math.max(MediaQuery.of(context).size.width - 32, 600.0),
-                     child: PaginatedDataTable(
-                       header: Text(l10n.vendorBalances),
-                       columns: [
-                         DataColumn(label: Text(l10n.name)),
-                         DataColumn(label: Text(l10n.contact)),
-                         DataColumn(label: Text(l10n.balance)),
-                         DataColumn(label: Text(l10n.actions)),
-                       ],
-                       source: source,
-                       rowsPerPage: rowsPerPage,
-                       availableRowsPerPage: const [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50],
-                       showCheckboxColumn: false,
-                     ),
-                   ),
-                 ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: math.max(
+                      MediaQuery.of(context).size.width - 32,
+                      600.0,
+                    ),
+                    child: PaginatedDataTable(
+                      header: Text(l10n.vendorBalances),
+                      columns: [
+                        DataColumn(label: Text(l10n.name)),
+                        DataColumn(label: Text(l10n.contact)),
+                        DataColumn(label: Text(l10n.balance)),
+                        DataColumn(label: Text(l10n.actions)),
+                      ],
+                      source: source,
+                      rowsPerPage: rowsPerPage,
+                      availableRowsPerPage: const [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        20,
+                        50,
+                      ],
+                      showCheckboxColumn: false,
+                    ),
+                  ),
+                ),
             ],
           );
         },

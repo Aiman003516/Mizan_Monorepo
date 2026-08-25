@@ -460,6 +460,13 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               },
             ),
             const Divider(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Text(
+                l10n.crmSectionTitle,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
             ListTile(
               leading: const Icon(Icons.people),
               title: Text(l10n.customersAr),

@@ -11,6 +11,9 @@ class ContactDetailBody extends StatelessWidget {
   final String phone;
   final String address;
   final String taxId;
+  final String phoneLabel;
+  final String addressLabel;
+  final String taxIdLabel;
   final String extraInfoLabel;
   final String extraInfoValue;
 
@@ -43,6 +46,9 @@ class ContactDetailBody extends StatelessWidget {
     required this.phone,
     required this.address,
     required this.taxId,
+    required this.phoneLabel,
+    required this.addressLabel,
+    required this.taxIdLabel,
     required this.extraInfoLabel,
     required this.extraInfoValue,
     required this.balance,
@@ -68,27 +74,26 @@ class ContactDetailBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     // Determine colors based on contact type
-    final primaryAvatarColor = type == ContactType.payable ? colorScheme.tertiary : colorScheme.primary;
-    final onPrimaryAvatarColor = type == ContactType.payable ? colorScheme.onTertiary : colorScheme.onPrimary;
+    final primaryAvatarColor = type == ContactType.payable
+        ? colorScheme.tertiary
+        : colorScheme.primary;
+    final onPrimaryAvatarColor = type == ContactType.payable
+        ? colorScheme.onTertiary
+        : colorScheme.onPrimary;
 
     final balanceColors = balance > 0
         ? (type == ContactType.payable
-            ? [colorScheme.tertiary, colorScheme.tertiaryContainer]
-            : [colorScheme.error, colorScheme.errorContainer])
+              ? [colorScheme.tertiary, colorScheme.tertiaryContainer]
+              : [colorScheme.error, colorScheme.errorContainer])
         : [context.appColors.success, context.appColors.primary];
 
     return Scaffold(
       appBar: AppBar(
         title: Text(contactName),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: onEdit,
-          ),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.edit), onPressed: onEdit)],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: onNewDocument,
@@ -116,7 +121,9 @@ class ContactDetailBody extends StatelessWidget {
                         radius: 32,
                         backgroundColor: primaryAvatarColor,
                         child: Text(
-                          contactName.isNotEmpty ? contactName.substring(0, 1).toUpperCase() : '?',
+                          contactName.isNotEmpty
+                              ? contactName.substring(0, 1).toUpperCase()
+                              : '?',
                           style: TextStyle(
                             color: onPrimaryAvatarColor,
                             fontSize: 24,
@@ -148,23 +155,21 @@ class ContactDetailBody extends StatelessWidget {
                     ],
                   ),
                   const Divider(height: 32),
-                  _InfoRow(
-                    icon: Icons.phone,
-                    label: 'Phone', // You could pass this in as well, but keeping it simple
-                    value: phone,
-                  ),
+                  _InfoRow(icon: Icons.phone, label: phoneLabel, value: phone),
                   _InfoRow(
                     icon: Icons.location_on,
-                    label: 'Address',
+                    label: addressLabel,
                     value: address,
                   ),
                   _InfoRow(
                     icon: Icons.receipt_long,
-                    label: 'Tax ID',
+                    label: taxIdLabel,
                     value: taxId,
                   ),
                   _InfoRow(
-                    icon: type == ContactType.payable ? Icons.schedule : Icons.credit_card,
+                    icon: type == ContactType.payable
+                        ? Icons.schedule
+                        : Icons.credit_card,
                     label: extraInfoLabel,
                     value: extraInfoValue,
                   ),
@@ -196,7 +201,8 @@ class ContactDetailBody extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (onQuickAdjustment != null && quickAdjustmentLabel != null) ...[
+                  if (onQuickAdjustment != null &&
+                      quickAdjustmentLabel != null) ...[
                     const SizedBox(height: 16),
                     FilledButton.icon(
                       onPressed: onQuickAdjustment,
@@ -263,11 +269,7 @@ class ContactDetailBody extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    Icon(
-                      noDocumentsIcon,
-                      size: 48,
-                      color: colorScheme.outline,
-                    ),
+                    Icon(noDocumentsIcon, size: 48, color: colorScheme.outline),
                     const SizedBox(height: 8),
                     Text(
                       noDocumentsMessage,

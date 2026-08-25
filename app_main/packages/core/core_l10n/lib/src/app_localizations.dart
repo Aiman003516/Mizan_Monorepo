@@ -8611,6 +8611,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save Adjustment'**
   String get saveAdjustment;
+
+  /// No description provided for @crmSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer & Vendor Management'**
+  String get crmSectionTitle;
 }
 
 class _AppLocalizationsDelegate

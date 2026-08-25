@@ -397,6 +397,7 @@ class CloudCrmRepository {
       yield await (_db.select(_db.invoices)
             ..where((table) => table.tenantId.equals(tenantId))
             ..where((table) => table.customerId.equals(customerId))
+            ..where((table) => table.isDeleted.equals(false))
             ..orderBy([(table) => drift.OrderingTerm.desc(table.invoiceDate)]))
           .get();
     }
@@ -637,6 +638,7 @@ class CloudCrmRepository {
       yield await (_db.select(_db.bills)
             ..where((table) => table.tenantId.equals(tenantId))
             ..where((table) => table.vendorId.equals(vendorId))
+            ..where((table) => table.isDeleted.equals(false))
             ..orderBy([(table) => drift.OrderingTerm.desc(table.billDate)]))
           .get();
     }

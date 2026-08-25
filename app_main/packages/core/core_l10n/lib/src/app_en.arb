@@ -2093,5 +2093,6 @@
   "receive": "Receive (-)",
   "increasesDebt": "Increases their debt to you",
   "decreasesDebt": "Decreases their debt (routes to Cash)",
-  "saveAdjustment": "Save Adjustment"
+  "saveAdjustment": "Save Adjustment",
+  "crmSectionTitle": "Customer & Vendor Management"
 }
