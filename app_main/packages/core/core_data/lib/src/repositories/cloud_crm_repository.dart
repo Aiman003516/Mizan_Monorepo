@@ -715,6 +715,48 @@ class CloudCrmRepository {
     }
   }
 
+  Future<Vendor> _createOfflineVendor({
+    required String tenantId,
+    required String name,
+    String? email,
+    String? phone,
+    String? address,
+    String? taxId,
+    String? paymentTerms,
+    String? notes,
+  }) async {
+    final id = _uuid.v4();
+    final timestamp = DateTime.now().toUtc().toIso8601String();
+    final row = <String, dynamic>{
+      'id': id,
+      'tenant_id': tenantId,
+      'name': name.trim(),
+      'email': email?.trim().isEmpty == true
+          ? null
+          : email?.trim().toLowerCase(),
+      'phone': phone?.trim().isEmpty == true ? null : phone?.trim(),
+      'address': address?.trim().isEmpty == true ? null : address?.trim(),
+      'tax_id': taxId?.trim().isEmpty == true ? null : taxId?.trim(),
+      'payment_terms': paymentTerms,
+      'notes': notes,
+      'balance': 0,
+      'is_deleted': false,
+      'created_at': timestamp,
+      'updated_at': timestamp,
+      'created_by': _supabase.auth.currentUser!.id,
+    };
+    final vendor = _vendorFromMap(row);
+    await _db.into(_db.vendors).insertOnConflictUpdate(vendor);
+    await _queue.enqueue(
+      tenantId: tenantId,
+      tableName: 'vendors',
+      recordId: id,
+      operation: 'insert',
+      payload: row,
+    );
+    return vendor;
+  }
+
   Future<Vendor> createVendor({
     required String name,
     String? email,
@@ -725,27 +767,41 @@ class CloudCrmRepository {
     String? notes,
   }) async {
     final tenantId = await currentTenantId();
-    final row = await _supabase
-        .from('vendors')
-        .insert({
-          'id': _uuid.v4(),
-          'tenant_id': tenantId,
-          'name': name.trim(),
-          'email': email?.trim().isEmpty == true
-              ? null
-              : email?.trim().toLowerCase(),
-          'phone': phone?.trim().isEmpty == true ? null : phone?.trim(),
-          'address': address?.trim().isEmpty == true ? null : address?.trim(),
-          'tax_id': taxId?.trim().isEmpty == true ? null : taxId?.trim(),
-          'payment_terms': paymentTerms,
-          'notes': notes,
-          'created_by': _supabase.auth.currentUser!.id,
-        })
-        .select()
-        .single();
-    final vendor = _vendorFromMap(Map<String, dynamic>.from(row));
-    await _db.into(_db.vendors).insertOnConflictUpdate(vendor);
-    return vendor;
+    try {
+      final row = await _supabase
+          .from('vendors')
+          .insert({
+            'id': _uuid.v4(),
+            'tenant_id': tenantId,
+            'name': name.trim(),
+            'email': email?.trim().isEmpty == true
+                ? null
+                : email?.trim().toLowerCase(),
+            'phone': phone?.trim().isEmpty == true ? null : phone?.trim(),
+            'address': address?.trim().isEmpty == true ? null : address?.trim(),
+            'tax_id': taxId?.trim().isEmpty == true ? null : taxId?.trim(),
+            'payment_terms': paymentTerms,
+            'notes': notes,
+            'created_by': _supabase.auth.currentUser!.id,
+          })
+          .select()
+          .single();
+      final vendor = _vendorFromMap(Map<String, dynamic>.from(row));
+      await _db.into(_db.vendors).insertOnConflictUpdate(vendor);
+      return vendor;
+    } catch (error) {
+      if (!_isRetryable(error)) rethrow;
+      return _createOfflineVendor(
+        tenantId: tenantId,
+        name: name,
+        email: email,
+        phone: phone,
+        address: address,
+        taxId: taxId,
+        paymentTerms: paymentTerms,
+        notes: notes,
+      );
+    }
   }
 
   Future<void> updateVendor(String id, Map<String, dynamic> values) async {
