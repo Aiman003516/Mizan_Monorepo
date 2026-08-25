@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,58 +17,54 @@ class PermissionService {
 
   PermissionService(this._supabase);
 
-  Stream<AppRole> watchCurrentUserRole() {
-    return _supabase.auth.onAuthStateChange.switchMap((authState) {
-      final user = authState.session?.user;
-      if (user == null) return Stream.value(AppRole.guest());
+  /// Loads the current role from REST first. Realtime is not required for
+  /// authorization UI and must not turn a settings page into a raw transport
+  /// error when a table is missing from the project's publication.
+  Stream<AppRole> watchCurrentUserRole() async* {
+    final initialUser = _supabase.auth.currentUser;
+    yield await _safeLoadRole(initialUser);
 
-      return _supabase
-          .from('user_profiles')
-          .stream(primaryKey: ['id'])
-          .eq('id', user.id)
-          .asyncExpand((profiles) {
-            final tenantId = profiles.isEmpty
-                ? null
-                : profiles.first['tenant_id'] as String?;
-            if (tenantId == null || tenantId.isEmpty) {
-              return Stream.value(AppRole.guest());
-            }
-
-            return _supabase
-                .from('staff_members')
-                .stream(primaryKey: ['id'])
-                .eq('tenant_id', tenantId)
-                .eq('user_id', user.id)
-                .eq('status', 'active')
-                .asyncExpand((memberships) {
-                  if (memberships.isEmpty) {
-                    return Stream.value(AppRole.guest());
-                  }
-                  final roleId = memberships.first['role_id'] as String?;
-                  if (roleId == null || roleId.isEmpty) {
-                    return Stream.value(AppRole.guest());
-                  }
-                  return _supabase
-                      .from('roles')
-                      .stream(primaryKey: ['id'])
-                      .eq('tenant_id', tenantId)
-                      .eq('id', roleId)
-                      .map(
-                        (roles) => roles.isEmpty
-                            ? AppRole.guest()
-                            : AppRole.fromJson(
-                                roles.first,
-                                roles.first['id'] as String,
-                              ),
-                      );
-                });
-          });
-    });
+    await for (final authState in _supabase.auth.onAuthStateChange) {
+      yield await _safeLoadRole(authState.session?.user);
+    }
   }
-}
 
-extension _StreamSwitchMap<T> on Stream<T> {
-  Stream<R> switchMap<R>(Stream<R> Function(T event) mapper) {
-    return asyncExpand(mapper);
+  Future<AppRole> _safeLoadRole(User? user) async {
+    if (user == null) return AppRole.guest();
+    try {
+      return await _loadRole(user);
+    } catch (_) {
+      return AppRole.guest();
+    }
+  }
+
+  Future<AppRole> _loadRole(User user) async {
+    final profile = await _supabase
+        .from('user_profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .maybeSingle();
+    final tenantId = profile?['tenant_id'] as String?;
+    if (tenantId == null || tenantId.isEmpty) return AppRole.guest();
+
+    final membership = await _supabase
+        .from('staff_members')
+        .select('role_id,roles(id,name,permissions,is_system_admin)')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+    final roleMap = membership?['roles'] is Map
+        ? Map<String, dynamic>.from(membership!['roles'] as Map)
+        : null;
+    final roleId = membership?['role_id'] as String?;
+    if (roleMap == null || roleId == null || roleId.isEmpty) {
+      return AppRole.guest();
+    }
+
+    return AppRole.fromJson(<String, dynamic>{
+      ...roleMap,
+      'id': roleId,
+    }, roleId);
   }
 }

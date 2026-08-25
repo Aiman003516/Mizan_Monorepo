@@ -4,6 +4,7 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:feature_settings/src/data/fixed_assets_repository.dart';
 import 'package:core_data/core_data.dart';
+import 'package:shared_ui/shared_ui.dart';
 import 'package:intl/intl.dart';
 
 class FixedAssetsScreen extends ConsumerStatefulWidget {
@@ -15,14 +16,18 @@ class FixedAssetsScreen extends ConsumerStatefulWidget {
 
 class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
     with SingleTickerProviderStateMixin {
-  final _currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
   final _dateFormat = DateFormat('MMM d, yyyy');
   late TabController _tabController;
 
   AppLocalizations get l10n => AppLocalizations.of(context)!;
 
   String _formatCurrency(int amountInCents) {
-    return _currencyFormat.format(amountInCents / 100);
+    final currencyCode = ref.read(defaultCurrencyProvider);
+    final symbol = CurrencySymbols.forCode(currencyCode);
+    return NumberFormat.currency(
+      symbol: '$symbol ',
+      decimalDigits: 2,
+    ).format(amountInCents / 100);
   }
 
   @override
@@ -78,6 +83,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(defaultCurrencyProvider);
     final assetsAsync = ref.watch(fixedAssetsStreamProvider);
 
     return Scaffold(
@@ -95,7 +101,7 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
       body: assetsAsync.when(
         data: (assets) => _buildDashboard(assets),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
+        error: (err, _) => Center(child: Text(l10n.errorLoadingData)),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddAssetDialog,
@@ -848,7 +854,10 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Depreciation recorded: ${_formatCurrency(result.annualDepreciation)}',
+                l10n.depreciationRecordedFor(
+                  _formatCurrency(result.annualDepreciation),
+                  asset.name,
+                ),
               ),
               backgroundColor: Colors.green,
             ),
@@ -856,9 +865,9 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.errorLoadingData)));
         }
       }
     }
@@ -867,16 +876,482 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
   Future<void> _disposeAsset(FixedAsset asset) async {
     Navigator.pop(context);
 
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.assetDisposalComingSoon)));
+    final disposalDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: asset.acquisitionDate,
+      lastDate: DateTime.now().add(const Duration(days: 3650)),
+      helpText: l10n.assetDisposalDate,
+    );
+    if (disposalDate == null || !mounted) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.disposeAssetTitle),
+        content: Text(l10n.disposeAssetMessage(asset.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.disposeButton),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await ref
+          .read(fixedAssetsRepositoryProvider)
+          .updateAsset(
+            asset.copyWith(
+              disposalDate: Value(disposalDate),
+              status: 'DISPOSED',
+              lastUpdated: DateTime.now(),
+            ),
+          );
+      ref.invalidate(fixedAssetsStreamProvider);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.assetDisposedSuccess)));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.errorLoadingData)));
+      }
     }
   }
 
-  void _showAddAssetDialog() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(l10n.addAssetComingSoon)));
+  Future<void> _showAddAssetDialog() async {
+    final db = ref.read(appDatabaseProvider);
+    final accounts =
+        await (db.select(db.accounts)
+              ..where((table) => table.isDeleted.equals(false))
+              ..orderBy([(table) => OrderingTerm.asc(table.name)]))
+            .get();
+    if (!mounted) return;
+
+    final draft = await showDialog<_AssetDraft>(
+      context: context,
+      builder: (context) => _AssetFormDialog(accounts: accounts),
+    );
+    if (draft == null || !mounted) return;
+
+    try {
+      await ref
+          .read(fixedAssetsRepositoryProvider)
+          .createAsset(
+            name: draft.name,
+            description: draft.description,
+            assetAccountId: draft.assetAccountId,
+            accumulatedDepreciationAccountId:
+                draft.accumulatedDepreciationAccountId,
+            depreciationExpenseAccountId: draft.depreciationExpenseAccountId,
+            acquisitionCost: draft.acquisitionCost,
+            salvageValue: draft.salvageValue,
+            acquisitionDate: draft.acquisitionDate,
+            usefulLifeMonths: draft.usefulLifeMonths,
+            depreciationMethod: draft.depreciationMethod,
+            decliningBalanceRate: draft.decliningBalanceRate,
+            usefulLifeUnits: draft.usefulLifeUnits,
+          );
+      ref.invalidate(fixedAssetsStreamProvider);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.assetSavedSuccess)));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.errorLoadingData)));
+      }
+    }
+  }
+}
+
+class _AssetDraft {
+  const _AssetDraft({
+    required this.name,
+    required this.description,
+    required this.assetAccountId,
+    required this.accumulatedDepreciationAccountId,
+    required this.depreciationExpenseAccountId,
+    required this.acquisitionCost,
+    required this.salvageValue,
+    required this.acquisitionDate,
+    required this.usefulLifeMonths,
+    required this.depreciationMethod,
+    this.decliningBalanceRate,
+    this.usefulLifeUnits,
+  });
+
+  final String name;
+  final String? description;
+  final String assetAccountId;
+  final String accumulatedDepreciationAccountId;
+  final String depreciationExpenseAccountId;
+  final int acquisitionCost;
+  final int salvageValue;
+  final DateTime acquisitionDate;
+  final int usefulLifeMonths;
+  final String depreciationMethod;
+  final double? decliningBalanceRate;
+  final int? usefulLifeUnits;
+}
+
+class _AssetFormDialog extends StatefulWidget {
+  const _AssetFormDialog({required this.accounts});
+
+  final List<Account> accounts;
+
+  @override
+  State<_AssetFormDialog> createState() => _AssetFormDialogState();
+}
+
+class _AssetFormDialogState extends State<_AssetFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _costController = TextEditingController();
+  final _salvageController = TextEditingController(text: '0');
+  final _usefulLifeController = TextEditingController(text: '60');
+  final _decliningRateController = TextEditingController(text: '2');
+  final _usefulLifeUnitsController = TextEditingController();
+
+  late String? _assetAccountId;
+  late String? _accumulatedDepreciationAccountId;
+  late String? _depreciationExpenseAccountId;
+  DateTime _acquisitionDate = DateTime.now();
+  String _depreciationMethod = 'STRAIGHT_LINE';
+
+  AppLocalizations get l10n => AppLocalizations.of(context)!;
+
+  @override
+  void initState() {
+    super.initState();
+    _assetAccountId = _findAccountId(
+      (account) => account.type.toUpperCase().contains('ASSET'),
+    );
+    _accumulatedDepreciationAccountId = _findAccountId(
+      (account) => account.name.toUpperCase().contains('ACCUMULATED'),
+    );
+    _depreciationExpenseAccountId = _findAccountId(
+      (account) => account.type.toUpperCase().contains('EXPENSE'),
+    );
+  }
+
+  String? _findAccountId(bool Function(Account account) predicate) {
+    for (final account in widget.accounts) {
+      if (predicate(account)) return account.id;
+    }
+    return null;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _costController.dispose();
+    _salvageController.dispose();
+    _usefulLifeController.dispose();
+    _decliningRateController.dispose();
+    _usefulLifeUnitsController.dispose();
+    super.dispose();
+  }
+
+  int? _parseCents(String value) {
+    final amount = double.tryParse(value.trim());
+    if (amount == null || !amount.isFinite || amount < 0) return null;
+    return (amount * 100).round();
+  }
+
+  int? _parsePositiveInt(String value) {
+    final parsed = int.tryParse(value.trim());
+    return parsed != null && parsed > 0 ? parsed : null;
+  }
+
+  Future<void> _pickAcquisitionDate() async {
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: _acquisitionDate,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      helpText: l10n.addAssetAcquisitionDate,
+    );
+    if (selected != null && mounted) {
+      setState(() => _acquisitionDate = selected);
+    }
+  }
+
+  void _submit() {
+    if (!_formKey.currentState!.validate()) return;
+
+    final acquisitionCost = _parseCents(_costController.text);
+    final salvageValue = _parseCents(_salvageController.text);
+    final usefulLifeMonths = _parsePositiveInt(_usefulLifeController.text);
+    if (acquisitionCost == null ||
+        salvageValue == null ||
+        usefulLifeMonths == null) {
+      return;
+    }
+    if (salvageValue > acquisitionCost) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.salvageExceedsCost)));
+      return;
+    }
+
+    final decliningRate = _depreciationMethod == 'DECLINING_BALANCE'
+        ? double.tryParse(_decliningRateController.text.trim())
+        : null;
+    if (_depreciationMethod == 'DECLINING_BALANCE' &&
+        (decliningRate == null ||
+            !decliningRate.isFinite ||
+            decliningRate <= 0)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.invalidDecliningRate)));
+      return;
+    }
+
+    final usefulLifeUnits = _depreciationMethod == 'UNITS_OF_ACTIVITY'
+        ? _parsePositiveInt(_usefulLifeUnitsController.text)
+        : null;
+    if (_depreciationMethod == 'UNITS_OF_ACTIVITY' && usefulLifeUnits == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.invalidUsefulLife)));
+      return;
+    }
+
+    Navigator.of(context).pop(
+      _AssetDraft(
+        name: _nameController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
+        assetAccountId: _assetAccountId!,
+        accumulatedDepreciationAccountId: _accumulatedDepreciationAccountId!,
+        depreciationExpenseAccountId: _depreciationExpenseAccountId!,
+        acquisitionCost: acquisitionCost,
+        salvageValue: salvageValue,
+        acquisitionDate: _acquisitionDate,
+        usefulLifeMonths: usefulLifeMonths,
+        depreciationMethod: _depreciationMethod,
+        decliningBalanceRate: decliningRate,
+        usefulLifeUnits: usefulLifeUnits,
+      ),
+    );
+  }
+
+  Widget _accountField({
+    required String label,
+    required String hint,
+    required String? value,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      initialValue: value,
+      isExpanded: true,
+      decoration: InputDecoration(labelText: label),
+      hint: Text(hint),
+      items: widget.accounts
+          .map(
+            (account) => DropdownMenuItem<String>(
+              value: account.id,
+              child: Text(account.name, overflow: TextOverflow.ellipsis),
+            ),
+          )
+          .toList(growable: false),
+      onChanged: onChanged,
+      validator: (selected) => selected == null ? l10n.requiredField : null,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return AlertDialog(
+      title: Text(l10n.addAsset),
+      content: SizedBox(
+        width: 520,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.accounts.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      l10n.criticalAccountError,
+                      style: TextStyle(color: theme.colorScheme.error),
+                    ),
+                  ),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(labelText: l10n.addAssetName),
+                  textInputAction: TextInputAction.next,
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? l10n.requiredField
+                      : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: InputDecoration(
+                    labelText: l10n.addAssetDescription,
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                _accountField(
+                  label: l10n.assetAccountLabel,
+                  hint: l10n.selectAssetAccount,
+                  value: _assetAccountId,
+                  onChanged: (value) => setState(() => _assetAccountId = value),
+                ),
+                const SizedBox(height: 12),
+                _accountField(
+                  label: l10n.accumulatedDepreciationAccountLabel,
+                  hint: l10n.selectAccumulatedDepreciationAccount,
+                  value: _accumulatedDepreciationAccountId,
+                  onChanged: (value) =>
+                      setState(() => _accumulatedDepreciationAccountId = value),
+                ),
+                const SizedBox(height: 12),
+                _accountField(
+                  label: l10n.depreciationExpenseAccountLabel,
+                  hint: l10n.selectDepreciationExpenseAccount,
+                  value: _depreciationExpenseAccountId,
+                  onChanged: (value) =>
+                      setState(() => _depreciationExpenseAccountId = value),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _costController,
+                        decoration: InputDecoration(
+                          labelText: l10n.addAssetAcquisitionCost,
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        validator: (value) => _parseCents(value ?? '') == null
+                            ? l10n.invalidAmount
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _salvageController,
+                        decoration: InputDecoration(
+                          labelText: l10n.addAssetSalvageValue,
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        validator: (value) => _parseCents(value ?? '') == null
+                            ? l10n.invalidAmount
+                            : null,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.addAssetAcquisitionDate),
+                  subtitle: Text(DateFormat.yMMMd().format(_acquisitionDate)),
+                  trailing: const Icon(Icons.calendar_today),
+                  onTap: _pickAcquisitionDate,
+                ),
+                const SizedBox(height: 4),
+                TextFormField(
+                  controller: _usefulLifeController,
+                  decoration: InputDecoration(
+                    labelText: l10n.addAssetUsefulLife,
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) => _parsePositiveInt(value ?? '') == null
+                      ? l10n.invalidUsefulLife
+                      : null,
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: _depreciationMethod,
+                  decoration: InputDecoration(
+                    labelText: l10n.addAssetDepreciationMethod,
+                  ),
+                  items: [
+                    DropdownMenuItem(
+                      value: 'STRAIGHT_LINE',
+                      child: Text(l10n.straightLine),
+                    ),
+                    DropdownMenuItem(
+                      value: 'DECLINING_BALANCE',
+                      child: Text(l10n.decliningBalance),
+                    ),
+                    DropdownMenuItem(
+                      value: 'UNITS_OF_ACTIVITY',
+                      child: Text(l10n.unitsOfActivity),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null)
+                      setState(() => _depreciationMethod = value);
+                  },
+                ),
+                if (_depreciationMethod == 'DECLINING_BALANCE') ...[
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _decliningRateController,
+                    decoration: InputDecoration(
+                      labelText: l10n.addAssetDecliningRate,
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                  ),
+                ],
+                if (_depreciationMethod == 'UNITS_OF_ACTIVITY') ...[
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _usefulLifeUnitsController,
+                    decoration: InputDecoration(
+                      labelText: l10n.usefulLifeUnitsLabel,
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) => _parsePositiveInt(value ?? '') == null
+                        ? l10n.invalidUsefulLife
+                        : null,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(onPressed: _submit, child: Text(l10n.save)),
+      ],
+    );
   }
 }

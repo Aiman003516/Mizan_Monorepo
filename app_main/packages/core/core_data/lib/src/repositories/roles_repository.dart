@@ -18,23 +18,51 @@ class RolesRepository {
 
   RolesRepository(this._supabase);
 
-  Stream<List<AppRole>> watchCurrentTenantRoles() {
+  Stream<List<AppRole>> watchCurrentTenantRoles() async* {
     final user = _supabase.auth.currentUser;
-    if (user == null) return Stream.value(const <AppRole>[]);
+    if (user == null) {
+      yield const <AppRole>[];
+      return;
+    }
 
-    return _supabase
-        .from('user_profiles')
-        .stream(primaryKey: ['id'])
-        .eq('id', user.id)
-        .asyncMap((profiles) async {
-          final tenantId = profiles.isEmpty
-              ? null
-              : profiles.first['tenant_id'] as String?;
-          if (tenantId == null || tenantId.isEmpty) {
-            return const <AppRole>[];
-          }
-          return _fetchRoles(tenantId);
-        });
+    String tenantId;
+    try {
+      tenantId = await _getTenantId();
+    } catch (_) {
+      // A guest, incomplete membership, or unavailable backend should render
+      // as an empty admin surface rather than leak a transport exception.
+      yield const <AppRole>[];
+      return;
+    }
+
+    try {
+      // REST is the source for the initial state. Realtime is an enhancement,
+      // not a prerequisite for opening the Roles screen.
+      yield await _fetchRoles(tenantId);
+
+      try {
+        await for (final rows
+            in _supabase
+                .from('roles')
+                .stream(primaryKey: ['id'])
+                .eq('tenant_id', tenantId)
+                .order('name')) {
+          yield rows
+              .map(
+                (row) => AppRole.fromJson(
+                  Map<String, dynamic>.from(row),
+                  row['id'] as String,
+                ),
+              )
+              .toList(growable: false);
+        }
+      } catch (_) {
+        // Keep the REST snapshot visible when the project has not enabled the
+        // affected table in supabase_realtime.
+      }
+    } catch (_) {
+      yield const <AppRole>[];
+    }
   }
 
   Stream<List<AppRole>> watchAllRoles(String tenantId) {

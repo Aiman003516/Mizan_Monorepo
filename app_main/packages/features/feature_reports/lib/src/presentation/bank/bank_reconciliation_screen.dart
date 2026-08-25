@@ -66,7 +66,7 @@ class _BankReconciliationScreenState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.errorLoadingData)));
       }
     }
   }
@@ -123,7 +123,7 @@ class _BankReconciliationScreenState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.errorLoadingData)));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

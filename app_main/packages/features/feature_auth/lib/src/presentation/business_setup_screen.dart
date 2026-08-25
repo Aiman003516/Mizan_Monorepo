@@ -3,6 +3,7 @@
 import 'package:feature_auth/src/data/auth_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:core_l10n/app_localizations.dart';
+import 'package:core_data/core_data.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:shared_ui/shared_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,8 +40,11 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
             phone: _phoneCtrl.text.trim(),
           );
 
-      // On Success, the 'currentUserStreamProvider' will emit a new value
-      // with 'tenantId' != null.
+      // Database writes do not emit an auth event. Refresh both the enriched
+      // identity and tenant-ready data mode explicitly.
+      ref.invalidate(currentUserStreamProvider);
+      ref.invalidate(cloudDataModeStateProvider);
+      ref.invalidate(userRoleProvider);
 
       if (mounted) {
         Navigator.pop(context); // Go back to Dashboard (now upgraded)

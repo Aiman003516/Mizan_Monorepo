@@ -313,7 +313,6 @@ class _TotalAmountsListView extends ConsumerWidget {
                       '${l10n.currencyLabel} ${summary.currencyCode}',
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
-                    onTap: () {},
                     trailing: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.45,
                       child: Row(

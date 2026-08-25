@@ -4220,6 +4220,12 @@ abstract class AppLocalizations {
   /// **'Useful Life (Months)'**
   String get addAssetUsefulLife;
 
+  /// No description provided for @usefulLifeUnitsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Useful Life (Units)'**
+  String get usefulLifeUnitsLabel;
+
   /// No description provided for @addAssetAcquisitionDate.
   ///
   /// In en, this message translates to:
@@ -4237,6 +4243,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Declining Balance Rate'**
   String get addAssetDecliningRate;
+
+  /// No description provided for @assetAccountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Account'**
+  String get assetAccountLabel;
+
+  /// No description provided for @accumulatedDepreciationAccountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Accumulated Depreciation Account'**
+  String get accumulatedDepreciationAccountLabel;
+
+  /// No description provided for @depreciationExpenseAccountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Depreciation Expense Account'**
+  String get depreciationExpenseAccountLabel;
+
+  /// No description provided for @selectAssetAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an asset account'**
+  String get selectAssetAccount;
+
+  /// No description provided for @selectAccumulatedDepreciationAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an accumulated depreciation account'**
+  String get selectAccumulatedDepreciationAccount;
+
+  /// No description provided for @selectDepreciationExpenseAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a depreciation expense account'**
+  String get selectDepreciationExpenseAccount;
+
+  /// No description provided for @assetSavedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset saved successfully.'**
+  String get assetSavedSuccess;
+
+  /// No description provided for @assetDisposedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset disposed successfully.'**
+  String get assetDisposedSuccess;
+
+  /// No description provided for @disposeAssetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispose Asset'**
+  String get disposeAssetTitle;
+
+  /// No description provided for @disposeAssetMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {assetName} as disposed? This records the disposal date and removes it from active assets.'**
+  String disposeAssetMessage(String assetName);
+
+  /// No description provided for @assetDisposalDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Disposal Date'**
+  String get assetDisposalDate;
+
+  /// No description provided for @salvageExceedsCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Salvage value cannot exceed acquisition cost.'**
+  String get salvageExceedsCost;
+
+  /// No description provided for @invalidUsefulLife.
+  ///
+  /// In en, this message translates to:
+  /// **'Useful life must be greater than zero.'**
+  String get invalidUsefulLife;
+
+  /// No description provided for @invalidDecliningRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Declining-balance rate must be greater than zero.'**
+  String get invalidDecliningRate;
 
   /// No description provided for @reportsAndAnalytics.
   ///
@@ -5474,6 +5564,24 @@ abstract class AppLocalizations {
   /// **'System Admin role cannot be edited.'**
   String get systemAdminReadonly;
 
+  /// No description provided for @noRolesDefined.
+  ///
+  /// In en, this message translates to:
+  /// **'No roles defined yet. Create one to assign permissions.'**
+  String get noRolesDefined;
+
+  /// No description provided for @fullSystemAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Full system access'**
+  String get fullSystemAccess;
+
+  /// No description provided for @permissionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} permissions'**
+  String permissionsCount(int count);
+
   /// No description provided for @customFieldsProducts.
   ///
   /// In en, this message translates to:
@@ -5791,6 +5899,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error loading data'**
   String get errorLoadingData;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get retry;
 
   /// No description provided for @errorLoadingBills.
   ///

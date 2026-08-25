@@ -13,8 +13,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:core_data/core_data.dart';
 
-import 'package:rxdart/rxdart.dart';
-
 const _scopes = ['https://www.googleapis.com/auth/drive.appdata'];
 
 /// 🧠 THE IDENTITY ENGINE (Hybrid: Drive + SaaS)
@@ -42,17 +40,29 @@ class AuthRepository {
   // --- 🛡️ SAAS IDENTITY LOGIC ---
 
   /// Listens to the enriched AppUser profile (Supabase Auth + user_profiles table)
-  Stream<AppUser?> watchCurrentUser() {
-    return _supabase.auth.onAuthStateChange.switchMap((authState) {
-      final user = authState.session?.user;
-      if (user == null) return Stream.value(null);
-      return _supabase
-          .from('user_profiles')
-          .stream(primaryKey: ['id'])
-          .eq('id', user.id)
-          .startWith(const <Map<String, dynamic>>[])
-          .asyncMap((_) => _loadCurrentUser(user));
-    });
+  Stream<AppUser?> watchCurrentUser() async* {
+    final initialUser = _supabase.auth.currentUser;
+    yield await _safeLoadCurrentUser(initialUser);
+
+    await for (final authState in _supabase.auth.onAuthStateChange) {
+      yield await _safeLoadCurrentUser(authState.session?.user);
+    }
+  }
+
+  Future<AppUser?> _safeLoadCurrentUser(User? user) async {
+    if (user == null) return null;
+    try {
+      return await _loadCurrentUser(user);
+    } catch (_) {
+      return AppUser(
+        uid: user.id,
+        email: user.email ?? '',
+        displayName: user.userMetadata?['full_name'] as String? ?? user.email,
+        tenantId: null,
+        role: 'staff',
+        isPro: false,
+      );
+    }
   }
 
   Future<AppUser> _loadCurrentUser(User user) async {

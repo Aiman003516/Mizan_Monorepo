@@ -57,9 +57,7 @@ class AppTheme {
         selectedColor: colors.primary,
         labelStyle: TextStyle(color: colors.onSurface),
         secondaryLabelStyle: TextStyle(color: colors.onPrimary),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
 
@@ -76,9 +74,7 @@ class AppTheme {
         backgroundColor: colors.accent,
         foregroundColor: colors.onPrimary,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
 
       // ── Elevated Button ──
@@ -122,16 +118,16 @@ class AppTheme {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: colors.primary, width: 1.5),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
 
       // ── Dialogs ──
       dialogTheme: DialogThemeData(
         backgroundColor: colors.cardSurface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
 
       // ── Bottom Sheet ──
@@ -140,6 +136,15 @@ class AppTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
+      ),
+
+      // ── Snackbars ──
+      // Keep transient feedback above extended FABs and Android navigation
+      // controls instead of covering the page's primary action.
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        insetPadding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
 
       // ── Divider ──
@@ -164,9 +169,7 @@ class AppTheme {
       ),
 
       // ── Register AppColors extension ──
-      extensions: const <ThemeExtension>[
-        AppColors.light,
-      ],
+      extensions: const <ThemeExtension>[AppColors.light],
     );
   }
 
@@ -224,9 +227,7 @@ class AppTheme {
         selectedColor: colors.primary,
         labelStyle: TextStyle(color: colors.onSurface),
         secondaryLabelStyle: TextStyle(color: colors.onPrimary),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
 
@@ -243,9 +244,7 @@ class AppTheme {
         backgroundColor: colors.accent,
         foregroundColor: colors.onPrimary,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
 
       // ── Elevated Button ──
@@ -289,16 +288,16 @@ class AppTheme {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: colors.primary, width: 1.5),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
 
       // ── Dialogs ──
       dialogTheme: DialogThemeData(
         backgroundColor: colors.cardSurface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
 
       // ── Bottom Sheet ──
@@ -307,6 +306,15 @@ class AppTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
+      ),
+
+      // ── Snackbars ──
+      // Keep transient feedback above extended FABs and Android navigation
+      // controls instead of covering the page's primary action.
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        insetPadding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
 
       // ── Divider ──
@@ -331,9 +339,7 @@ class AppTheme {
       ),
 
       // ── Register AppColors extension ──
-      extensions: const <ThemeExtension>[
-        AppColors.dark,
-      ],
+      extensions: const <ThemeExtension>[AppColors.dark],
     );
   }
 }

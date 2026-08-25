@@ -92,7 +92,7 @@ class FinancialRatiosWidget extends ConsumerWidget {
       error: (e, _) => Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Text('Error: $e'),
+          child: Text(l10n.errorLoadingData),
         ),
       ),
       data: (ratios) => Card(

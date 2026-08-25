@@ -1010,9 +1010,31 @@
   "addAssetAcquisitionCost": "تكلفة الاقتناء",
   "addAssetSalvageValue": "القيمة المتبقية",
   "addAssetUsefulLife": "العمر الإنتاجي (بالأشهر)",
+  "usefulLifeUnitsLabel": "العمر الإنتاجي (بالوحدات)",
   "addAssetAcquisitionDate": "تاريخ الاقتناء",
   "addAssetDepreciationMethod": "طريقة الإهلاك",
-  "addAssetDecliningRate": "معدل القسط المتناقص",
+  "addAssetDecliningRate": "معدل الرصيد المتناقص",
+  "assetAccountLabel": "حساب الأصل",
+  "accumulatedDepreciationAccountLabel": "حساب الإهلاك المتراكم",
+  "depreciationExpenseAccountLabel": "حساب مصروف الإهلاك",
+  "selectAssetAccount": "اختر حساب الأصل",
+  "selectAccumulatedDepreciationAccount": "اختر حساب الإهلاك المتراكم",
+  "selectDepreciationExpenseAccount": "اختر حساب مصروف الإهلاك",
+  "assetSavedSuccess": "تم حفظ الأصل بنجاح.",
+  "assetDisposedSuccess": "تم استبعاد الأصل بنجاح.",
+  "disposeAssetTitle": "استبعاد الأصل",
+  "disposeAssetMessage": "هل تريد تحديد {assetName} كأصل مستبعد؟ سيتم تسجيل تاريخ الاستبعاد وإزالته من الأصول النشطة.",
+  "@disposeAssetMessage": {
+    "placeholders": {
+      "assetName": {
+        "type": "String"
+      }
+    }
+  },
+  "assetDisposalDate": "تاريخ الاستبعاد",
+  "salvageExceedsCost": "لا يمكن أن تتجاوز القيمة المتبقية تكلفة الاقتناء.",
+  "invalidUsefulLife": "يجب أن تكون مدة الاستخدام أكبر من صفر.",
+  "invalidDecliningRate": "يجب أن يكون معدل الرصيد المتناقص أكبر من صفر.",
   "reportsAndAnalytics": "التقارير والتحليلات",
   "reportMarketplaceTooltip": "سوق التقارير",
   "financialStatementsSection": "القوائم المالية",
@@ -1283,6 +1305,16 @@
   "roleNameLabel": "اسم الدور",
   "selectPermission": "الرجاء اختيار صلاحية واحدة على الأقل.",
   "systemAdminReadonly": "لا يمكن تعديل دور مدير النظام.",
+  "noRolesDefined": "لا توجد أدوار معرّفة بعد. أنشئ دورًا لتعيين الصلاحيات.",
+  "fullSystemAccess": "صلاحيات النظام كاملة",
+  "permissionsCount": "عدد الصلاحيات: {count}",
+  "@permissionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "customFieldsProducts": "حقول مخصصة (المنتجات)",
   "enterDataCalculator": "أدخل بيانات الاستثمار في تبويب الآلة الحاسبة",
   "enterDataAnalysis": "أدخل البيانات لعرض التحليل",
@@ -1335,6 +1367,7 @@
   "addAssetComingSoon": "ميزة إضافة الأصول قريبًا",
   "assetDisposalComingSoon": "ميزة التخلص من الأصول قريبًا",
   "errorLoadingData": "خطأ في تحميل البيانات",
+  "retry": "حاول مرة أخرى",
   "errorLoadingBills": "خطأ في تحميل الفواتير",
   "errorLoadingInvoices": "خطأ في تحميل الفواتير",
   "errorSavingRole": "خطأ في حفظ الدور",

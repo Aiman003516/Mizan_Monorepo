@@ -26,7 +26,7 @@ class RolesListScreen extends ConsumerWidget {
       body: rolesAsync.when(
         data: (roles) {
           if (roles.isEmpty) {
-            return const Center(child: Text("No roles defined. Create one!"));
+            return Center(child: Text(l10n.noRolesDefined));
           }
           return ListView.builder(
             itemCount: roles.length,
@@ -40,16 +40,14 @@ class RolesListScreen extends ConsumerWidget {
                 title: Text(role.name),
                 subtitle: Text(
                   role.isSystemAdmin
-                      ? 'Full System Access'
-                      : '${role.permissions.length} Permissions',
+                      ? l10n.fullSystemAccess
+                      : l10n.permissionsCount(role.permissions.length),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                 onTap: () {
                   if (role.isSystemAdmin) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('System Admin role cannot be edited.'),
-                      ),
+                      SnackBar(content: Text(l10n.systemAdminReadonly)),
                     );
                     return;
                   }
@@ -68,7 +66,19 @@ class RolesListScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.errorLoadingData),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: () => ref.invalidate(rolesStreamProvider),
+                child: Text(l10n.retry),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -225,8 +225,7 @@ class _AccountActivityList extends ConsumerWidget {
           ],
         );
       },
-      error: (err, stack) =>
-          Center(child: Text('${l10n.error} ${err.toString()}')),
+      error: (err, stack) => Center(child: Text(l10n.errorLoadingData)),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }

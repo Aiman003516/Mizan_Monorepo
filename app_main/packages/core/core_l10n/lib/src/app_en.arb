@@ -953,9 +953,31 @@
   "addAssetAcquisitionCost": "Acquisition Cost",
   "addAssetSalvageValue": "Salvage Value",
   "addAssetUsefulLife": "Useful Life (Months)",
+  "usefulLifeUnitsLabel": "Useful Life (Units)",
   "addAssetAcquisitionDate": "Acquisition Date",
   "addAssetDepreciationMethod": "Depreciation Method",
   "addAssetDecliningRate": "Declining Balance Rate",
+  "assetAccountLabel": "Asset Account",
+  "accumulatedDepreciationAccountLabel": "Accumulated Depreciation Account",
+  "depreciationExpenseAccountLabel": "Depreciation Expense Account",
+  "selectAssetAccount": "Select an asset account",
+  "selectAccumulatedDepreciationAccount": "Select an accumulated depreciation account",
+  "selectDepreciationExpenseAccount": "Select a depreciation expense account",
+  "assetSavedSuccess": "Asset saved successfully.",
+  "assetDisposedSuccess": "Asset disposed successfully.",
+  "disposeAssetTitle": "Dispose Asset",
+  "disposeAssetMessage": "Mark {assetName} as disposed? This records the disposal date and removes it from active assets.",
+  "@disposeAssetMessage": {
+    "placeholders": {
+      "assetName": {
+        "type": "String"
+      }
+    }
+  },
+  "assetDisposalDate": "Disposal Date",
+  "salvageExceedsCost": "Salvage value cannot exceed acquisition cost.",
+  "invalidUsefulLife": "Useful life must be greater than zero.",
+  "invalidDecliningRate": "Declining-balance rate must be greater than zero.",
   "reportsAndAnalytics": "Reports & Analytics",
   "reportMarketplaceTooltip": "Report Marketplace",
   "financialStatementsSection": "Financial Statements",
@@ -1231,6 +1253,16 @@
   "roleNameLabel": "Role Name",
   "selectPermission": "Please select at least one permission.",
   "systemAdminReadonly": "System Admin role cannot be edited.",
+  "noRolesDefined": "No roles defined yet. Create one to assign permissions.",
+  "fullSystemAccess": "Full system access",
+  "permissionsCount": "{count} permissions",
+  "@permissionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "customFieldsProducts": "Custom Fields (Products)",
   "enterDataCalculator": "Enter investment data in the Calculator tab",
   "enterDataAnalysis": "Enter data to see analysis",
@@ -1284,6 +1316,7 @@
   "addAssetComingSoon": "Add Asset feature coming soon",
   "assetDisposalComingSoon": "Asset disposal feature coming soon",
   "errorLoadingData": "Error loading data",
+  "retry": "Try again",
   "errorLoadingBills": "Error loading bills",
   "errorLoadingInvoices": "Error loading invoices",
   "errorSavingRole": "Error saving role",

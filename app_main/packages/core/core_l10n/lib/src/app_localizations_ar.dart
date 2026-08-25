@@ -2176,13 +2176,63 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addAssetUsefulLife => 'العمر الإنتاجي (بالأشهر)';
 
   @override
+  String get usefulLifeUnitsLabel => 'العمر الإنتاجي (بالوحدات)';
+
+  @override
   String get addAssetAcquisitionDate => 'تاريخ الاقتناء';
 
   @override
   String get addAssetDepreciationMethod => 'طريقة الإهلاك';
 
   @override
-  String get addAssetDecliningRate => 'معدل القسط المتناقص';
+  String get addAssetDecliningRate => 'معدل الرصيد المتناقص';
+
+  @override
+  String get assetAccountLabel => 'حساب الأصل';
+
+  @override
+  String get accumulatedDepreciationAccountLabel => 'حساب الإهلاك المتراكم';
+
+  @override
+  String get depreciationExpenseAccountLabel => 'حساب مصروف الإهلاك';
+
+  @override
+  String get selectAssetAccount => 'اختر حساب الأصل';
+
+  @override
+  String get selectAccumulatedDepreciationAccount =>
+      'اختر حساب الإهلاك المتراكم';
+
+  @override
+  String get selectDepreciationExpenseAccount => 'اختر حساب مصروف الإهلاك';
+
+  @override
+  String get assetSavedSuccess => 'تم حفظ الأصل بنجاح.';
+
+  @override
+  String get assetDisposedSuccess => 'تم استبعاد الأصل بنجاح.';
+
+  @override
+  String get disposeAssetTitle => 'استبعاد الأصل';
+
+  @override
+  String disposeAssetMessage(String assetName) {
+    return 'هل تريد تحديد $assetName كأصل مستبعد؟ سيتم تسجيل تاريخ الاستبعاد وإزالته من الأصول النشطة.';
+  }
+
+  @override
+  String get assetDisposalDate => 'تاريخ الاستبعاد';
+
+  @override
+  String get salvageExceedsCost =>
+      'لا يمكن أن تتجاوز القيمة المتبقية تكلفة الاقتناء.';
+
+  @override
+  String get invalidUsefulLife => 'يجب أن تكون مدة الاستخدام أكبر من صفر.';
+
+  @override
+  String get invalidDecliningRate =>
+      'يجب أن يكون معدل الرصيد المتناقص أكبر من صفر.';
 
   @override
   String get reportsAndAnalytics => 'التقارير والتحليلات';
@@ -2824,6 +2874,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get systemAdminReadonly => 'لا يمكن تعديل دور مدير النظام.';
 
   @override
+  String get noRolesDefined =>
+      'لا توجد أدوار معرّفة بعد. أنشئ دورًا لتعيين الصلاحيات.';
+
+  @override
+  String get fullSystemAccess => 'صلاحيات النظام كاملة';
+
+  @override
+  String permissionsCount(int count) {
+    return 'عدد الصلاحيات: $count';
+  }
+
+  @override
   String get customFieldsProducts => 'حقول مخصصة (المنتجات)';
 
   @override
@@ -2982,6 +3044,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errorLoadingData => 'خطأ في تحميل البيانات';
+
+  @override
+  String get retry => 'حاول مرة أخرى';
 
   @override
   String get errorLoadingBills => 'خطأ في تحميل الفواتير';

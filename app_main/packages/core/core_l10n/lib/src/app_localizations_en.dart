@@ -2181,6 +2181,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addAssetUsefulLife => 'Useful Life (Months)';
 
   @override
+  String get usefulLifeUnitsLabel => 'Useful Life (Units)';
+
+  @override
   String get addAssetAcquisitionDate => 'Acquisition Date';
 
   @override
@@ -2188,6 +2191,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addAssetDecliningRate => 'Declining Balance Rate';
+
+  @override
+  String get assetAccountLabel => 'Asset Account';
+
+  @override
+  String get accumulatedDepreciationAccountLabel =>
+      'Accumulated Depreciation Account';
+
+  @override
+  String get depreciationExpenseAccountLabel => 'Depreciation Expense Account';
+
+  @override
+  String get selectAssetAccount => 'Select an asset account';
+
+  @override
+  String get selectAccumulatedDepreciationAccount =>
+      'Select an accumulated depreciation account';
+
+  @override
+  String get selectDepreciationExpenseAccount =>
+      'Select a depreciation expense account';
+
+  @override
+  String get assetSavedSuccess => 'Asset saved successfully.';
+
+  @override
+  String get assetDisposedSuccess => 'Asset disposed successfully.';
+
+  @override
+  String get disposeAssetTitle => 'Dispose Asset';
+
+  @override
+  String disposeAssetMessage(String assetName) {
+    return 'Mark $assetName as disposed? This records the disposal date and removes it from active assets.';
+  }
+
+  @override
+  String get assetDisposalDate => 'Disposal Date';
+
+  @override
+  String get salvageExceedsCost =>
+      'Salvage value cannot exceed acquisition cost.';
+
+  @override
+  String get invalidUsefulLife => 'Useful life must be greater than zero.';
+
+  @override
+  String get invalidDecliningRate =>
+      'Declining-balance rate must be greater than zero.';
 
   @override
   String get reportsAndAnalytics => 'Reports & Analytics';
@@ -2832,6 +2884,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get systemAdminReadonly => 'System Admin role cannot be edited.';
 
   @override
+  String get noRolesDefined =>
+      'No roles defined yet. Create one to assign permissions.';
+
+  @override
+  String get fullSystemAccess => 'Full system access';
+
+  @override
+  String permissionsCount(int count) {
+    return '$count permissions';
+  }
+
+  @override
   String get customFieldsProducts => 'Custom Fields (Products)';
 
   @override
@@ -2991,6 +3055,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorLoadingData => 'Error loading data';
+
+  @override
+  String get retry => 'Try again';
 
   @override
   String get errorLoadingBills => 'Error loading bills';

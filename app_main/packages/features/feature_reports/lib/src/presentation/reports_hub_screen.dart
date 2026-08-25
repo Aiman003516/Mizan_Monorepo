@@ -210,24 +210,28 @@ class ReportsHubScreen extends ConsumerWidget {
                 icon: Icons.speed,
                 color: Colors.grey,
                 isLocked: true,
+                subtitle: l10n.featureNotImplemented,
               ),
               _ReportCard(
                 title: l10n.lowStockAlertTitle,
                 icon: Icons.warning_amber,
                 color: Colors.grey,
                 isLocked: true,
+                subtitle: l10n.featureNotImplemented,
               ),
               _ReportCard(
                 title: l10n.salesByCashierTitle,
                 icon: Icons.badge,
                 color: Colors.grey,
                 isLocked: true,
+                subtitle: l10n.featureNotImplemented,
               ),
               _ReportCard(
                 title: l10n.taxLiabilityTitle,
                 icon: Icons.receipt_long,
                 color: Colors.grey,
                 isLocked: true,
+                subtitle: l10n.featureNotImplemented,
               ),
             ]),
           ],
@@ -287,6 +291,7 @@ class _ReportCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback? onTap;
+  final String? subtitle;
   final bool isLocked;
 
   const _ReportCard({
@@ -294,6 +299,7 @@ class _ReportCard extends StatelessWidget {
     required this.icon,
     required this.color,
     this.onTap,
+    this.subtitle,
     this.isLocked = false,
   });
 
@@ -321,28 +327,42 @@ class _ReportCard extends StatelessWidget {
                 size: 32,
                 color: isLocked ? Colors.grey.shade400 : color,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: isLocked ? Colors.grey : null,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: isLocked ? Colors.grey : null,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (isLocked)
+                            const Icon(
+                              Icons.lock_outline,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
+                        ],
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle!,
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  if (isLocked)
-                    const Icon(
-                      Icons.lock_outline,
-                      size: 16,
-                      color: Colors.grey,
-                    ),
-                ],
-              ),
             ],
           ),
         ),

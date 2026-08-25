@@ -307,7 +307,6 @@ class _MonthlyAmountsListView extends ConsumerWidget {
                       '${l10n.currencyLabel} ${summary.currencyCode}',
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
-                    onTap: () {},
                     trailing: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.45,
                       child: Row(
@@ -351,8 +350,7 @@ class _MonthlyAmountsListView extends ConsumerWidget {
           ],
         );
       },
-      error: (err, stack) =>
-          Center(child: Text('${l10n.error} ${err.toString()}')),
+      error: (err, stack) => Center(child: Text(l10n.errorLoadingData)),
       loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
