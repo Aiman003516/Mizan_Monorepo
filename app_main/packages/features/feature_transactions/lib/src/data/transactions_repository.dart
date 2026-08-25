@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart' as d;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart'; // Preferences
@@ -29,15 +31,16 @@ final transactionsRepositoryProvider = Provider<TransactionsRepository>((ref) {
   final prefsRepo = ref.watch(preferencesRepositoryProvider);
   final authRepo = ref.watch(authRepositoryProvider);
 
-  // 🛡️ TEMP FIX: Hardcode Tenant ID to match CloudSyncService
-  // In Phase 4, we will read this from the AuthRepository.
+  // Resolve the tenant from the authenticated Supabase profile. The repository
+  // remains usable for local-only sessions, but never writes a synthetic tenant.
+  final tenantId = ref.watch(currentUserStreamProvider).value?.tenantId;
   return TransactionsRepository(
     db,
     accountsRepo,
     const Uuid(),
     prefsRepo,
     authRepo,
-    tenantId: 'test_tenant_123',
+    tenantId: tenantId,
   );
 });
 
@@ -439,7 +442,8 @@ class TransactionsRepository {
     required DateTime transactionDate,
     required List<TransactionEntriesCompanion> entries,
     String? attachmentPath,
-    String currencyCode = 'USD', // Callers should pass ref.read(defaultCurrencyProvider)
+    String currencyCode =
+        'USD', // Callers should pass ref.read(defaultCurrencyProvider)
     String? relatedTransactionId,
   }) {
     _enforcePeriodLock(transactionDate);
@@ -484,7 +488,8 @@ class TransactionsRepository {
     required String description,
     required DateTime transactionDate,
     required List<TransactionEntriesCompanion> entries,
-    String currencyCode = 'USD', // Callers should pass ref.read(defaultCurrencyProvider)
+    String currencyCode =
+        'USD', // Callers should pass ref.read(defaultCurrencyProvider)
   }) async {
     _enforcePeriodLock(transactionDate);
 
@@ -539,6 +544,33 @@ class TransactionsRepository {
       final now = DateTime.now();
       final newTransactionId = _uuid.v4();
       final int refundCents = (totalRefundAmount * 100).round();
+      if (refundCents <= 0 || itemsToReturn.isEmpty) {
+        throw Exception(
+          'A positive return amount and at least one item are required.',
+        );
+      }
+
+      var calculatedRefundCents = 0;
+      for (final requested in itemsToReturn.entries) {
+        final storedItem =
+            await (_db.select(_db.orderItems)
+                  ..where((row) => row.id.equals(requested.key.id))
+                  ..where((row) => row.orderId.equals(requested.key.orderId)))
+                .getSingleOrNull();
+        if (storedItem == null) {
+          throw Exception('The returned item no longer exists.');
+        }
+        final maxReturnable = storedItem.quantity - storedItem.quantityReturned;
+        if (requested.value <= 0 ||
+            requested.value > maxReturnable + 0.000001) {
+          throw Exception('Return quantity exceeds the remaining quantity.');
+        }
+        calculatedRefundCents += (requested.value * storedItem.priceAtSale)
+            .round();
+      }
+      if (calculatedRefundCents != refundCents) {
+        throw Exception('Return amount does not match the selected items.');
+      }
 
       await _db
           .into(_db.transactions)
@@ -547,6 +579,12 @@ class TransactionsRepository {
               id: d.Value(newTransactionId),
               description: returnDescription,
               transactionDate: now,
+              customAttributes: d.Value(
+                jsonEncode({
+                  'source': 'pos_return',
+                  'original_transaction_id': originalTransactionId,
+                }),
+              ),
               currencyCode: d.Value(currencyCode),
               relatedTransactionId: d.Value(originalTransactionId),
               createdAt: d.Value(now),

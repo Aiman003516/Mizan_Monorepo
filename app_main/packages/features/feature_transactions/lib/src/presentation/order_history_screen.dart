@@ -14,10 +14,12 @@ class OrderHistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     final historyAsync = ref.watch(posSalesHistoryProvider);
     final returnsAsync = ref.watch(posReturnsProvider);
-    final ledgerAsync = ref.watch(generalLedgerStreamProvider); // This is from feature_reports
+    final ledgerAsync = ref.watch(
+      generalLedgerStreamProvider,
+    ); // This is from feature_reports
 
     return Scaffold(
       body: historyAsync.when(
@@ -28,8 +30,9 @@ class OrderHistoryScreen extends ConsumerWidget {
 
           return returnsAsync.when(
             data: (returns) {
-              final returnedIds =
-                  returns.map((r) => r.relatedTransactionId).toSet();
+              final returnedIds = returns
+                  .map((r) => r.relatedTransactionId)
+                  .toSet();
 
               return ledgerAsync.when(
                 data: (ledgerEntries) {
@@ -43,8 +46,10 @@ class OrderHistoryScreen extends ConsumerWidget {
                     itemBuilder: (context, index) {
                       final transaction = transactions[index];
                       final entries = entriesMap[transaction.id] ?? [];
-                      
-                      final bool isReturned = returnedIds.contains(transaction.id);
+
+                      final bool isReturned = returnedIds.contains(
+                        transaction.id,
+                      );
 
                       final saleEntry = entries.firstWhere(
                         (e) => e.accountName == c.kSalesRevenueAccountName,
@@ -61,25 +66,31 @@ class OrderHistoryScreen extends ConsumerWidget {
                         ),
                       );
 
-                      final totalAmount = saleEntry.entryAmount.abs();
+                      // Ledger amounts are stored in the smallest currency unit.
+                      final totalAmount = saleEntry.entryAmount.abs() / 100.0;
 
                       return ListTile(
                         leading: isReturned
-                            ? Icon(Icons.check_circle,
-                                color: Theme.of(context).colorScheme.primary)
-                            : Icon(Icons.receipt,
-                                color: Theme.of(context).colorScheme.secondary),
+                            ? Icon(
+                                Icons.check_circle,
+                                color: Theme.of(context).colorScheme.primary,
+                              )
+                            : Icon(
+                                Icons.receipt,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
                         title: Text(transaction.description),
                         subtitle: Text(
-                          DateFormat.yMMMd(l10n.localeName)
-                              .add_jm()
-                              .format(transaction.transactionDate),
+                          DateFormat.yMMMd(
+                            l10n.localeName,
+                          ).add_jm().format(transaction.transactionDate),
                         ),
                         trailing: isReturned
                             ? Chip(
                                 label: Text(l10n.returned),
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.errorContainer,
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.errorContainer,
                               )
                             : Text(
                                 '${totalAmount.toStringAsFixed(2)} ${transaction.currencyCode}',

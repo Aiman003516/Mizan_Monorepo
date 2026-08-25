@@ -51,7 +51,8 @@ class OrderDetailsScreen extends ConsumerWidget {
                     itemCount: items.length,
                     itemBuilder: (context, index) {
                       final item = items[index];
-                      final itemTotal = item.quantity * item.priceAtSale;
+                      final itemTotal =
+                          item.quantity * item.priceAtSale / 100.0;
                       final bool isFullyReturned =
                           item.quantityReturned >= item.quantity;
 
@@ -65,7 +66,7 @@ class OrderDetailsScreen extends ConsumerWidget {
                           ),
                         ),
                         subtitle: Text(
-                          '${l10n.quantity} ${item.quantity.toString()} ${l10n.atPrice(item.priceAtSale.toStringAsFixed(2))}',
+                          '${l10n.quantity} ${item.quantity.toString()} ${l10n.atPrice((item.priceAtSale / 100.0).toStringAsFixed(2))}',
                         ),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,

@@ -37,7 +37,7 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
     double total = 0.0;
     for (final item in items) {
       final quantityToReturn = _itemsToReturn[item.id] ?? 0.0;
-      total += quantityToReturn * item.priceAtSale;
+      total += quantityToReturn * item.priceAtSale / 100.0;
     }
     return total;
   }
@@ -235,7 +235,7 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '${l10n.price}: ${item.priceAtSale.toStringAsFixed(2)}',
+                              '${l10n.price}: ${(item.priceAtSale / 100.0).toStringAsFixed(2)}',
                             ),
                             Text(
                               '${l10n.purchased}: ${item.quantity.toString()}',

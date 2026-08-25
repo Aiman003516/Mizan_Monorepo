@@ -1,5 +1,6 @@
 // FILE: packages/features/feature_transactions/lib/src/presentation/pos_screen.dart
 
+import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
@@ -443,6 +444,7 @@ class _PosScreenState extends ConsumerState<PosScreen> {
               description: description,
               transactionDate: DateTime.now(),
               attachmentPath: const d.Value(null),
+              customAttributes: d.Value(jsonEncode({'source': 'pos_sale'})),
               currencyCode: d.Value(ref.read(defaultCurrencyProvider)),
               relatedTransactionId: const d.Value(null),
             ),
