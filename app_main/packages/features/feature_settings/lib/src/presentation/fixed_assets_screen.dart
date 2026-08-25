@@ -744,6 +744,13 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
               ]),
               const SizedBox(height: 24),
 
+              OutlinedButton.icon(
+                onPressed: () => _editAsset(asset),
+                icon: const Icon(Icons.edit),
+                label: Text(l10n.editAsset),
+              ),
+              const SizedBox(height: 12),
+
               // Action Buttons
               if (asset.status == 'ACTIVE') ...[
                 Row(
@@ -869,6 +876,59 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
             context,
           ).showSnackBar(SnackBar(content: Text(l10n.errorLoadingData)));
         }
+      }
+    }
+  }
+
+  Future<void> _editAsset(FixedAsset asset) async {
+    Navigator.pop(context);
+
+    final db = ref.read(appDatabaseProvider);
+    final accounts =
+        await (db.select(db.accounts)
+              ..where((table) => table.isDeleted.equals(false))
+              ..orderBy([(table) => OrderingTerm.asc(table.name)]))
+            .get();
+    if (!mounted) return;
+
+    final draft = await showDialog<_AssetDraft>(
+      context: context,
+      builder: (context) =>
+          _AssetFormDialog(accounts: accounts, initialAsset: asset),
+    );
+    if (draft == null || !mounted) return;
+
+    try {
+      await ref
+          .read(fixedAssetsRepositoryProvider)
+          .updateAsset(
+            asset.copyWith(
+              name: draft.name,
+              description: Value(draft.description),
+              assetAccountId: draft.assetAccountId,
+              accumulatedDepreciationAccountId:
+                  draft.accumulatedDepreciationAccountId,
+              depreciationExpenseAccountId: draft.depreciationExpenseAccountId,
+              acquisitionCost: draft.acquisitionCost,
+              salvageValue: draft.salvageValue,
+              acquisitionDate: draft.acquisitionDate,
+              usefulLifeMonths: draft.usefulLifeMonths,
+              depreciationMethod: draft.depreciationMethod,
+              decliningBalanceRate: Value(draft.decliningBalanceRate),
+              usefulLifeUnits: Value(draft.usefulLifeUnits),
+            ),
+          );
+      ref.invalidate(fixedAssetsStreamProvider);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.assetSavedSuccess)));
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.errorLoadingData)));
       }
     }
   }
@@ -1009,9 +1069,10 @@ class _AssetDraft {
 }
 
 class _AssetFormDialog extends StatefulWidget {
-  const _AssetFormDialog({required this.accounts});
+  const _AssetFormDialog({required this.accounts, this.initialAsset});
 
   final List<Account> accounts;
+  final FixedAsset? initialAsset;
 
   @override
   State<_AssetFormDialog> createState() => _AssetFormDialogState();
@@ -1038,15 +1099,34 @@ class _AssetFormDialogState extends State<_AssetFormDialog> {
   @override
   void initState() {
     super.initState();
-    _assetAccountId = _findAccountId(
-      (account) => account.type.toUpperCase().contains('ASSET'),
-    );
-    _accumulatedDepreciationAccountId = _findAccountId(
-      (account) => account.name.toUpperCase().contains('ACCUMULATED'),
-    );
-    _depreciationExpenseAccountId = _findAccountId(
-      (account) => account.type.toUpperCase().contains('EXPENSE'),
-    );
+    final asset = widget.initialAsset;
+    if (asset != null) {
+      _nameController.text = asset.name;
+      _descriptionController.text = asset.description ?? '';
+      _costController.text = (asset.acquisitionCost / 100).toStringAsFixed(2);
+      _salvageController.text = (asset.salvageValue / 100).toStringAsFixed(2);
+      _usefulLifeController.text = asset.usefulLifeMonths.toString();
+      _decliningRateController.text = (asset.decliningBalanceRate ?? 2)
+          .toString();
+      _usefulLifeUnitsController.text = asset.usefulLifeUnits?.toString() ?? '';
+      _acquisitionDate = asset.acquisitionDate;
+      _depreciationMethod = asset.depreciationMethod;
+    }
+    _assetAccountId =
+        widget.initialAsset?.assetAccountId ??
+        _findAccountId(
+          (account) => account.type.toUpperCase().contains('ASSET'),
+        );
+    _accumulatedDepreciationAccountId =
+        widget.initialAsset?.accumulatedDepreciationAccountId ??
+        _findAccountId(
+          (account) => account.name.toUpperCase().contains('ACCUMULATED'),
+        );
+    _depreciationExpenseAccountId =
+        widget.initialAsset?.depreciationExpenseAccountId ??
+        _findAccountId(
+          (account) => account.type.toUpperCase().contains('EXPENSE'),
+        );
   }
 
   String? _findAccountId(bool Function(Account account) predicate) {

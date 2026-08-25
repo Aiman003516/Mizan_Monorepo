@@ -1153,6 +1153,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addAsset => 'إضافة أصل';
 
   @override
+  String get editAsset => 'تعديل الأصل';
+
+  @override
   String get bookValue => 'القيمة الدفترية';
 
   @override

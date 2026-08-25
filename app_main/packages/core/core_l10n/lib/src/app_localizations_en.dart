@@ -1154,6 +1154,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addAsset => 'Add Asset';
 
   @override
+  String get editAsset => 'Edit Asset';
+
+  @override
   String get bookValue => 'Book Value';
 
   @override

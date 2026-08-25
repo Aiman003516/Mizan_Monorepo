@@ -2252,6 +2252,12 @@ abstract class AppLocalizations {
   /// **'Add Asset'**
   String get addAsset;
 
+  /// No description provided for @editAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Asset'**
+  String get editAsset;
+
   /// No description provided for @bookValue.
   ///
   /// In en, this message translates to:
