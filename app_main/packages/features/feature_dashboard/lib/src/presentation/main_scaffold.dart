@@ -33,6 +33,11 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
   AppLocalizations get l10n => AppLocalizations.of(context)!;
 
+  bool _hasAuthenticatedSession(AuthStatus status) {
+    return status == AuthStatus.authenticated_online ||
+        status == AuthStatus.authenticated_offline;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +48,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
   Future<void> _showSyncWarningMaybe() async {
     final authState = ref.read(authControllerProvider);
-    if (authState.status == AuthStatus.unauthenticated) {
+    if (!_hasAuthenticatedSession(authState.status)) {
       final prefs = ref.read(preferencesRepositoryProvider);
       final hasSeenWarning = prefs.hasSeenSyncWarning();
 
@@ -104,7 +109,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
       case MainPage.pos:
         return Text(l10n.newSalePOS);
       case MainPage.reportsHub:
-        return const Text("Reports & Analysis");
+        return Text(l10n.reportsAndAnalytics);
       case MainPage.reportTotalAmounts:
         return Text(l10n.totalAmountsReport);
       case MainPage.reportMonthlyAmounts:
@@ -170,7 +175,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     }
 
     if (currentPage != MainPage.settings &&
-        authStatus != AuthStatus.unauthenticated) {
+        _hasAuthenticatedSession(authStatus)) {
       if (isSyncing) {
         actions.add(
           Padding(
@@ -179,7 +184,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               width: 24,
               height: 24,
               child: CircularProgressIndicator(
-              color: context.appColors.onPrimary,
+                color: context.appColors.onPrimary,
                 strokeWidth: 2,
               ),
             ),
@@ -206,10 +211,10 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
   Widget _buildCustomDrawerHeader(AuthStatus authStatus) {
     // Watch the profile provider to get live updates for name and image
     final profile = ref.watch(companyProfileProvider);
-    
+
     // Safely check if the provider has an image path property (assuming you add this to your model)
     // Replace `profile.imagePath` with your actual property name if different
-    final String? imagePath = profile.imagePath; 
+    final String? imagePath = profile.imagePath;
 
     final isOnline = authStatus == AuthStatus.authenticated_online;
     final isOffline = authStatus == AuthStatus.authenticated_offline;
@@ -231,27 +236,45 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               CircleAvatar(
                 radius: 36,
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                backgroundImage: (imagePath != null && imagePath.isNotEmpty) 
-                    ? FileImage(File(imagePath)) 
+                backgroundImage: (imagePath != null && imagePath.isNotEmpty)
+                    ? FileImage(File(imagePath))
                     : null,
                 child: (imagePath == null || imagePath.isEmpty)
-                    ? Icon(Icons.business, size: 36, color: Theme.of(context).colorScheme.onPrimary)
+                    ? Icon(
+                        Icons.business,
+                        size: 36,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      )
                     : null,
               ),
               // Cloud Status Icon
               if (isOnline)
-                Icon(Icons.cloud_queue, color: Theme.of(context).colorScheme.primary)
+                Icon(
+                  Icons.cloud_queue,
+                  color: Theme.of(context).colorScheme.primary,
+                )
               else if (isOffline)
-                Icon(Icons.cloud_off, color: Theme.of(context).colorScheme.error)
+                Icon(
+                  Icons.cloud_off,
+                  color: Theme.of(context).colorScheme.error,
+                )
               else
-                Icon(Icons.cloud_off, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                Icon(
+                  Icons.cloud_off,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
             ],
           ),
-          const SizedBox(height: 16), // Explicit, rigid spacing prevents overlap
-          
+          const SizedBox(
+            height: 16,
+          ), // Explicit, rigid spacing prevents overlap
           // Dynamic Account Name
           Text(
-            profile.companyName.isNotEmpty ? profile.companyName : (authStatus != AuthStatus.unauthenticated ? l10n.mizanUser : l10n.notSignedIn),
+            profile.companyName.isNotEmpty
+                ? profile.companyName
+                : (authStatus != AuthStatus.unauthenticated
+                      ? l10n.mizanUser
+                      : l10n.notSignedIn),
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.onPrimaryContainer,
@@ -260,19 +283,81 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
-          
+
           // Dynamic Account Status / Email
           Text(
-            profile.userName.isNotEmpty 
-                ? profile.userName 
-                : (isOnline ? l10n.online : isOffline ? l10n.offlineMode : l10n.syncDisabled),
+            profile.userName.isNotEmpty
+                ? profile.userName
+                : (isOnline
+                      ? l10n.online
+                      : isOffline
+                      ? l10n.offlineMode
+                      : l10n.syncDisabled),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+              color: Theme.of(
+                context,
+              ).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGuestDashboard() {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.account_balance_wallet_outlined,
+                    size: 72,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    l10n.mainDashboard,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.signInToSync,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.dataSafetyMessage,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.login),
+                    label: Text(l10n.signInWithGoogle),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -324,254 +409,255 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
     final scaffold = Scaffold(
       key: _scaffoldKey,
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.menu),
-            tooltip: l10n.openNavigationMenu,
-            onPressed: () {
-              _scaffoldKey.currentState?.openDrawer();
-            },
-          ),
-          title: _buildAppBarTitle(currentPage, context),
-          actions: _buildAppBarActions(currentPage, authStatus, isSyncing),
-          bottom: isDashboard
-              ? TabBar(
-                  tabs: [
-                    Tab(text: l10n.general),
-                    Tab(text: l10n.clients),
-                    Tab(text: l10n.suppliers),
-                  ],
-                )
-              : null,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          tooltip: l10n.openNavigationMenu,
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
         ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              _buildCustomDrawerHeader(authStatus), // Replaced overlapping header
-              ListTile(
-                leading: const Icon(Icons.dashboard),
-                title: Text(l10n.mainDashboard),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state = MainPage.dashboard;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.point_of_sale),
-                title: Text(l10n.newSalePOS),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state = MainPage.pos;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.history),
-                title: Text(l10n.orderHistory),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.orderHistory;
-                },
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.people),
-                title: Text(l10n.customersAr),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state = MainPage.customers;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.store),
-                title: Text(l10n.vendorsAp),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state = MainPage.vendors;
-                },
-              ),
+        title: _buildAppBarTitle(currentPage, context),
+        actions: _buildAppBarActions(currentPage, authStatus, isSyncing),
+        bottom: isDashboard
+            ? TabBar(
+                tabs: [
+                  Tab(text: l10n.general),
+                  Tab(text: l10n.clients),
+                  Tab(text: l10n.suppliers),
+                ],
+              )
+            : null,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            _buildCustomDrawerHeader(authStatus), // Replaced overlapping header
+            ListTile(
+              leading: const Icon(Icons.dashboard),
+              title: Text(l10n.mainDashboard),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state = MainPage.dashboard;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.point_of_sale),
+              title: Text(l10n.newSalePOS),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state = MainPage.pos;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: Text(l10n.orderHistory),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.orderHistory;
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: Text(l10n.customersAr),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state = MainPage.customers;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.store),
+              title: Text(l10n.vendorsAp),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state = MainPage.vendors;
+              },
+            ),
 
-              const Divider(),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: Text(
-                  l10n.reports,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Text(
+                l10n.reports,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              ListTile(
-                leading: const Icon(Icons.dashboard_customize),
-                title: Text(l10n.allReportsAndTools),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.reportsHub;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.poll),
-                title: Text(l10n.totalAmountsSummary),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.reportTotalAmounts;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.calendar_month),
-                title: Text(l10n.monthlyAmountsSummary),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.reportMonthlyAmounts;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.receipt_long),
-                title: Text(l10n.accountActivityLedger),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.reportAccountActivity;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.assessment_outlined),
-                title: Text(l10n.profitAndLossReport),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.reportProfitAndLoss;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.account_balance_outlined),
-                title: Text(l10n.balanceSheetReport),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.reportBalanceSheet;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.table_chart_outlined),
-                title: Text(l10n.trialBalanceReport),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.reportTrialBalance;
-                },
-              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.dashboard_customize),
+              title: Text(l10n.allReportsAndTools),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state = MainPage.reportsHub;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.poll),
+              title: Text(l10n.totalAmountsSummary),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.reportTotalAmounts;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_month),
+              title: Text(l10n.monthlyAmountsSummary),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.reportMonthlyAmounts;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.receipt_long),
+              title: Text(l10n.accountActivityLedger),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.reportAccountActivity;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.assessment_outlined),
+              title: Text(l10n.profitAndLossReport),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.reportProfitAndLoss;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance_outlined),
+              title: Text(l10n.balanceSheetReport),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.reportBalanceSheet;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.table_chart_outlined),
+              title: Text(l10n.trialBalanceReport),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.reportTrialBalance;
+              },
+            ),
 
-              const Divider(),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: Text(
-                  l10n.management,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Text(
+                l10n.management,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance),
+              title: Text(l10n.accounts),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.manageAccounts;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.inventory_2),
+              title: Text(l10n.products),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.manageProducts;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.category),
+              title: Text(l10n.manageCategories),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state =
+                    MainPage.manageCategories;
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: Text(l10n.settings),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state = MainPage.settings;
+              },
+            ),
+            if (authStatus == AuthStatus.unauthenticated)
+              ListTile(
+                leading: Icon(
+                  Icons.login,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.account_balance),
-                title: Text(l10n.accounts),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.manageAccounts;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.inventory_2),
-                title: Text(l10n.products),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.manageProducts;
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.category),
-                title: Text(l10n.manageCategories),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state =
-                      MainPage.manageCategories;
-                },
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.settings),
-                title: Text(l10n.settings),
-                onTap: () {
-                  Navigator.pop(context);
-                  ref.read(mainNavProvider.notifier).state = MainPage.settings;
-                },
-              ),
-              if (authStatus == AuthStatus.unauthenticated)
-                ListTile(
-                  leading: Icon(
-                    Icons.login,
+                title: Text(
+                  l10n.signInWithGoogle,
+                  style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                   ),
-                  title: Text(
-                    l10n.signInWithGoogle,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const LoginScreen(),
-                      ),
-                    );
-                  },
-                )
-              else
-                ListTile(
-                  leading: const Icon(Icons.logout),
-                  title: Text(l10n.signOut),
-                  onTap: () {
-                    ref.read(authControllerProvider.notifier).signOut();
-                  },
                 ),
-            ],
-          ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  );
+                },
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: Text(l10n.signOut),
+                onTap: () {
+                  ref.read(authControllerProvider.notifier).signOut();
+                },
+              ),
+          ],
         ),
+      ),
 
-        body: switch (currentPage) {
-          MainPage.dashboard => TabBarView(
-            children: [
-              FilteredAccountsListPage(
-                classificationFilter: c.kClassificationGeneral,
+      body: _hasAuthenticatedSession(authStatus)
+          ? switch (currentPage) {
+              MainPage.dashboard => TabBarView(
+                children: [
+                  FilteredAccountsListPage(
+                    classificationFilter: c.kClassificationGeneral,
+                  ),
+                  FilteredAccountsListPage(
+                    classificationFilter: c.kClassificationClients,
+                  ),
+                  FilteredAccountsListPage(
+                    classificationFilter: c.kClassificationSuppliers,
+                  ),
+                ],
               ),
-              FilteredAccountsListPage(
-                classificationFilter: c.kClassificationClients,
-              ),
-              FilteredAccountsListPage(
-                classificationFilter: c.kClassificationSuppliers,
-              ),
-            ],
-          ),
-          MainPage.pos => const PosScreen(),
-          MainPage.reportsHub => const ReportsHubScreen(),
-          MainPage.reportTotalAmounts => const TotalAmountsScreen(),
-          MainPage.reportMonthlyAmounts => const MonthlyAmountsScreen(),
-          MainPage.reportAccountActivity => const AccountActivityScreen(),
-          MainPage.manageAccounts => const AccountsHubScreen(),
-          MainPage.manageProducts => const ProductsHubScreen(),
-          MainPage.manageCategories => const CategoriesHubScreen(),
-          MainPage.settings => const SettingsScreen(),
-          MainPage.orderHistory => const OrderHistoryScreen(),
-          MainPage.reportProfitAndLoss => const ProfitAndLossScreen(),
-          MainPage.reportBalanceSheet => const BalanceSheetScreen(),
-          MainPage.reportTrialBalance => const TrialBalanceScreen(),
-          MainPage.customers => const CustomersTableScreen(),
-          MainPage.vendors => const VendorsTableScreen(),
-        },
-      );
+              MainPage.pos => const PosScreen(),
+              MainPage.reportsHub => const ReportsHubScreen(),
+              MainPage.reportTotalAmounts => const TotalAmountsScreen(),
+              MainPage.reportMonthlyAmounts => const MonthlyAmountsScreen(),
+              MainPage.reportAccountActivity => const AccountActivityScreen(),
+              MainPage.manageAccounts => const AccountsHubScreen(),
+              MainPage.manageProducts => const ProductsHubScreen(),
+              MainPage.manageCategories => const CategoriesHubScreen(),
+              MainPage.settings => const SettingsScreen(),
+              MainPage.orderHistory => const OrderHistoryScreen(),
+              MainPage.reportProfitAndLoss => const ProfitAndLossScreen(),
+              MainPage.reportBalanceSheet => const BalanceSheetScreen(),
+              MainPage.reportTrialBalance => const TrialBalanceScreen(),
+              MainPage.customers => const CustomersTableScreen(),
+              MainPage.vendors => const VendorsTableScreen(),
+            }
+          : _buildGuestDashboard(),
+    );
 
     // Wrap in DefaultTabController ONLY when on the dashboard so the AppBar
     // TabBar and body TabBarView share one controller, without conflicting

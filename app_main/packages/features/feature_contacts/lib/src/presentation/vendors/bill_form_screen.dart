@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:shared_ui/shared_ui.dart';
 
 class BillFormScreen extends ConsumerWidget {
@@ -12,7 +13,7 @@ class BillFormScreen extends ConsumerWidget {
     return DocumentFormBody(
       type: DocumentType.bill,
       contactId: vendorId,
-      title: 'New Bill',
+      title: AppLocalizations.of(context)!.newBill,
     );
   }
 }

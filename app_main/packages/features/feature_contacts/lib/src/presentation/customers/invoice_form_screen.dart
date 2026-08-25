@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:shared_ui/shared_ui.dart';
 
 class InvoiceFormScreen extends ConsumerWidget {
@@ -12,7 +13,7 @@ class InvoiceFormScreen extends ConsumerWidget {
     return DocumentFormBody(
       type: DocumentType.invoice,
       contactId: customerId,
-      title: 'New Invoice',
+      title: AppLocalizations.of(context)!.newInvoice,
     );
   }
 }

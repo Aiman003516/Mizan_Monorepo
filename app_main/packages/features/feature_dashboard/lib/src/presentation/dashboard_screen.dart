@@ -80,7 +80,10 @@ class DashboardScreen extends ConsumerWidget {
       );
     } catch (e) {
       scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text(l10n.backupFailed), backgroundColor: context.appColors.error),
+        SnackBar(
+          content: Text(l10n.backupFailed),
+          backgroundColor: context.appColors.error,
+        ),
       );
     }
   }
@@ -148,7 +151,9 @@ class DashboardScreen extends ConsumerWidget {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const CustomersTableScreen()),
+                  MaterialPageRoute(
+                    builder: (ctx) => const CustomersTableScreen(),
+                  ),
                 );
               },
             ),
@@ -158,7 +163,9 @@ class DashboardScreen extends ConsumerWidget {
               onTap: () {
                 Navigator.pop(context);
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => const VendorsTableScreen()),
+                  MaterialPageRoute(
+                    builder: (ctx) => const VendorsTableScreen(),
+                  ),
                 );
               },
             ),
@@ -177,7 +184,7 @@ class DashboardScreen extends ConsumerWidget {
         overlayOpacity: 0.5,
         spacing: 12,
         spaceBetweenChildren: 8,
-        tooltip: 'Quick Actions',
+        tooltip: l10n.quickActions,
         children: [
           SpeedDialChild(
             child: const Icon(Icons.point_of_sale),

@@ -12,7 +12,6 @@ import 'package:core_data/core_data.dart';
 
 // --- Feature Packages ---
 import 'package:feature_dashboard/feature_dashboard.dart';
-import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_sync/feature_sync.dart';
 // 🟢 NEW: Import Settings to access Onboarding
 import 'package:feature_settings/feature_settings.dart';
@@ -137,26 +136,26 @@ class MyApp extends ConsumerWidget {
       supportedLocales: AppLocalizations.supportedLocales,
 
       // 🟢 ROUTING SWITCH
+      // Login is optional. After first-run onboarding, users enter the main
+      // shell directly; account sync and tenant-specific features remain
+      // protected by their repositories and the optional sign-in action in
+      // the navigation drawer.
       home: showOnboarding
           ? const OnboardingScreen()
-          : AuthGate(
-              authenticatedChild: _AuthenticatedApp(
-                child: Builder(
-                  builder: (context) {
-                    return ProviderScope(
-                      overrides: [
-                        transactions_ui.appLocalizationsProvider.overrideWith(
-                          (ref) => ref.watch(
-                            app_l10n.contextualAppLocalizationsProvider(
-                              context,
-                            ),
-                          ),
+          : _AuthenticatedApp(
+              child: Builder(
+                builder: (context) {
+                  return ProviderScope(
+                    overrides: [
+                      transactions_ui.appLocalizationsProvider.overrideWith(
+                        (ref) => ref.watch(
+                          app_l10n.contextualAppLocalizationsProvider(context),
                         ),
-                      ],
-                      child: const MainScaffold(),
-                    );
-                  },
-                ),
+                      ),
+                    ],
+                    child: const MainScaffold(),
+                  );
+                },
               ),
             ),
     );
@@ -265,6 +264,7 @@ class _AuthenticatedAppState extends ConsumerState<_AuthenticatedApp>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_isLocked && _biometricsEnabled) {
       // Simple Lock Screen
       return Scaffold(
@@ -274,11 +274,11 @@ class _AuthenticatedAppState extends ConsumerState<_AuthenticatedApp>
             children: [
               const Icon(Icons.lock, size: 64, color: Colors.blue),
               const SizedBox(height: 16),
-              const Text("Mizan is Locked", style: TextStyle(fontSize: 24)),
+              Text(l10n.lockedLabel, style: const TextStyle(fontSize: 24)),
               const SizedBox(height: 32),
               FilledButton(
                 onPressed: _authenticate,
-                child: const Text("Unlock"),
+                child: Text(l10n.lockedAction),
               ),
             ],
           ),
