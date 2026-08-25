@@ -5894,6 +5894,72 @@ abstract class AppLocalizations {
   /// **'Edit Field'**
   String get editField;
 
+  /// No description provided for @noCustomFieldsDefined.
+  ///
+  /// In en, this message translates to:
+  /// **'No custom fields defined.'**
+  String get noCustomFieldsDefined;
+
+  /// No description provided for @customFieldTypeAndKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Type: {type} | Key: {key}'**
+  String customFieldTypeAndKey(String type, String key);
+
+  /// No description provided for @customFieldDisplayLabelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Display label (for example, Color)'**
+  String get customFieldDisplayLabelHint;
+
+  /// No description provided for @customFieldInternalKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal key (for example, color)'**
+  String get customFieldInternalKeyHint;
+
+  /// No description provided for @customFieldDataType.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Type'**
+  String get customFieldDataType;
+
+  /// No description provided for @customFieldText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get customFieldText;
+
+  /// No description provided for @customFieldNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get customFieldNumber;
+
+  /// No description provided for @customFieldBoolean.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes/No'**
+  String get customFieldBoolean;
+
+  /// No description provided for @customFieldDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get customFieldDate;
+
+  /// No description provided for @customFieldKeyInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Use lowercase snake_case letters, numbers, and underscores.'**
+  String get customFieldKeyInvalid;
+
+  /// No description provided for @customFieldLabelRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Display label is required'**
+  String get customFieldLabelRequired;
+
   /// No description provided for @editRole.
   ///
   /// In en, this message translates to:
@@ -7208,6 +7274,54 @@ abstract class AppLocalizations {
   /// **'Sign up to create your business'**
   String get signUpSubtitle;
 
+  /// No description provided for @emailConfirmationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email to confirm your account before signing in.'**
+  String get emailConfirmationRequired;
+
+  /// No description provided for @authenticationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in to continue.'**
+  String get authenticationRequired;
+
+  /// No description provided for @invalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'The email or password is incorrect.'**
+  String get invalidCredentials;
+
+  /// No description provided for @emailAlreadyRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email already exists.'**
+  String get emailAlreadyRegistered;
+
+  /// No description provided for @authRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please try again later.'**
+  String get authRateLimited;
+
+  /// No description provided for @networkAuthenticationError.
+  ///
+  /// In en, this message translates to:
+  /// **'The network is unavailable. Please try again.'**
+  String get networkAuthenticationError;
+
+  /// No description provided for @unknownAuthenticationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication could not be completed.'**
+  String get unknownAuthenticationError;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must contain at least 8 characters.'**
+  String get passwordMinLength;
+
   /// No description provided for @orSeparator.
   ///
   /// In en, this message translates to:
@@ -7309,6 +7423,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System Settings'**
   String get permManageSettings;
+
+  /// No description provided for @permManageCrm.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage CRM'**
+  String get permManageCrm;
+
+  /// No description provided for @permManageCustomers.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Customers'**
+  String get permManageCustomers;
+
+  /// No description provided for @permManageVendors.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Vendors'**
+  String get permManageVendors;
+
+  /// No description provided for @permCreateInvoices.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Invoices'**
+  String get permCreateInvoices;
+
+  /// No description provided for @permManageInvoices.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Invoices'**
+  String get permManageInvoices;
+
+  /// No description provided for @permCreateBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Bills'**
+  String get permCreateBills;
+
+  /// No description provided for @permManageBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Bills'**
+  String get permManageBills;
+
+  /// No description provided for @permManageAccounting.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Accounting'**
+  String get permManageAccounting;
+
+  /// No description provided for @permPostJournalEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Post Journal Entries'**
+  String get permPostJournalEntries;
 
   /// No description provided for @permSwitchTenant.
   ///

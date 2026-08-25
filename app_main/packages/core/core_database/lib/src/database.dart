@@ -474,6 +474,22 @@ class UserRoles extends MizanTable {
   TextColumn get role => text()(); // admin, editor, viewer
 }
 
+/// Durable offline mutation queue. The payload is a versioned JSON snapshot
+/// that is uploaded only after the user is authenticated for the same tenant.
+@DataClassName('SyncQueueEntry')
+class SyncQueueEntries extends MizanTable {
+  TextColumn get entityTable => text()();
+  TextColumn get recordId => text()();
+  TextColumn get operation => text()(); // insert, update, delete
+  TextColumn get payloadJson => text()();
+  DateTimeColumn get queuedAt =>
+      dateTime().clientDefault(() => DateTime.now())();
+  IntColumn get attemptCount => integer().withDefault(const Constant(0))();
+  DateTimeColumn get lastAttemptAt => dateTime().nullable()();
+  TextColumn get lastError => text().nullable()();
+  TextColumn get status => text().withDefault(const Constant('pending'))();
+}
+
 // --- CORE TABLES ---
 @DataClassName('Classification')
 class Classifications extends MizanTable {
@@ -687,6 +703,7 @@ class OrderItems extends MizanTable {
     Attachments,
     Comments,
     UserRoles,
+    SyncQueueEntries,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -695,9 +712,9 @@ class AppDatabase extends _$AppDatabase {
   /// 🧪 Constructor for Testing
   AppDatabase.connect(QueryExecutor connection) : super(connection);
 
-  // ⭐️ BUMPED VERSION: 29 -> 30 (Full Expansion)
+  // ⭐️ BUMPED VERSION: 31 -> 32 (Offline outbox)
   @override
-  int get schemaVersion => 31;
+  int get schemaVersion => 32;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -846,6 +863,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 31) {
         await m.addColumn(invoices, invoices.currencyCode);
         await m.addColumn(bills, bills.currencyCode);
+      }
+      // Offline mutation queue (Version 32)
+      if (from < 32) {
+        await m.createTable(syncQueueEntries);
       }
     },
     beforeOpen: (details) async {

@@ -3038,6 +3038,42 @@ class AppLocalizationsAr extends AppLocalizations {
   String get editField => 'تعديل حقل';
 
   @override
+  String get noCustomFieldsDefined => 'لا توجد حقول مخصصة.';
+
+  @override
+  String customFieldTypeAndKey(String type, String key) {
+    return 'النوع: $type | المفتاح: $key';
+  }
+
+  @override
+  String get customFieldDisplayLabelHint => 'تسمية العرض (مثال: اللون)';
+
+  @override
+  String get customFieldInternalKeyHint => 'المفتاح الداخلي (مثال: color)';
+
+  @override
+  String get customFieldDataType => 'نوع البيانات';
+
+  @override
+  String get customFieldText => 'نص';
+
+  @override
+  String get customFieldNumber => 'رقم';
+
+  @override
+  String get customFieldBoolean => 'نعم/لا';
+
+  @override
+  String get customFieldDate => 'تاريخ';
+
+  @override
+  String get customFieldKeyInvalid =>
+      'استخدم أحرفاً إنجليزية صغيرة بصيغة snake_case والأرقام والشرطات السفلية.';
+
+  @override
+  String get customFieldLabelRequired => 'تسمية العرض مطلوبة';
+
+  @override
   String get editRole => 'تعديل الدور';
 
   @override
@@ -3780,6 +3816,35 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signUpSubtitle => 'قم بالتسجيل لإنشاء نشاطك التجاري';
 
   @override
+  String get emailConfirmationRequired =>
+      'تحقق من بريدك الإلكتروني لتأكيد حسابك قبل تسجيل الدخول.';
+
+  @override
+  String get authenticationRequired => 'يرجى تسجيل الدخول للمتابعة.';
+
+  @override
+  String get invalidCredentials =>
+      'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل.';
+
+  @override
+  String get authRateLimited => 'تم إجراء محاولات كثيرة. يرجى المحاولة لاحقاً.';
+
+  @override
+  String get networkAuthenticationError =>
+      'الشبكة غير متاحة. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get unknownAuthenticationError => 'تعذر إكمال عملية المصادقة.';
+
+  @override
+  String get passwordMinLength =>
+      'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.';
+
+  @override
   String get orSeparator => 'أو';
 
   @override
@@ -3830,6 +3895,33 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get permManageSettings => 'إعدادات النظام';
+
+  @override
+  String get permManageCrm => 'إدارة إدارة علاقات العملاء';
+
+  @override
+  String get permManageCustomers => 'إدارة العملاء';
+
+  @override
+  String get permManageVendors => 'إدارة الموردين';
+
+  @override
+  String get permCreateInvoices => 'إنشاء الفواتير';
+
+  @override
+  String get permManageInvoices => 'إدارة الفواتير';
+
+  @override
+  String get permCreateBills => 'إنشاء فواتير الموردين';
+
+  @override
+  String get permManageBills => 'إدارة فواتير الموردين';
+
+  @override
+  String get permManageAccounting => 'إدارة المحاسبة';
+
+  @override
+  String get permPostJournalEntries => 'ترحيل قيود اليومية';
 
   @override
   String get permSwitchTenant => 'تبديل فرع النشاط التجاري';

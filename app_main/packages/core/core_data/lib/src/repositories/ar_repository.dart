@@ -4,11 +4,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
 import 'package:uuid/uuid.dart';
 
+import '../env_config.dart';
+import 'cloud_crm_repository.dart';
+
 const _uuid = Uuid();
 // Providers
 final arRepositoryProvider = Provider<ARRepository>((ref) {
   final db = ref.watch(appDatabaseProvider);
-  return ARRepository(db);
+  return ARRepository(
+    db,
+    cloud: ref.watch(cloudCrmRepositoryProvider),
+    cloudMode: EnvConfig.isProd || EnvConfig.supabaseUrl.isNotEmpty,
+  );
 });
 
 final customersStreamProvider = StreamProvider.autoDispose<List<Customer>>((
@@ -87,23 +94,31 @@ class CustomerBalance {
 /// Accounts Receivable Repository
 class ARRepository {
   final AppDatabase _db;
+  final CloudCrmRepository? _cloud;
+  final bool _cloudMode;
 
-  ARRepository(this._db);
+  ARRepository(this._db, {CloudCrmRepository? cloud, bool cloudMode = false})
+    : _cloud = cloud,
+      _cloudMode = cloudMode;
 
   // ==================== CUSTOMERS ====================
 
   /// Watch all customers ordered by name
   Stream<List<Customer>> watchAllCustomers() {
-    return (_db.select(
-      _db.customers,
-    )..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
+    if (_cloudMode && _cloud != null) return _cloud.watchCustomers();
+    return (_db.select(_db.customers)
+          ..where((t) => t.isDeleted.equals(false))
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+        .watch();
   }
 
   /// Get a single customer by ID
   Future<Customer?> getCustomer(String id) {
-    return (_db.select(
-      _db.customers,
-    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    if (_cloudMode && _cloud != null) return _cloud.getCustomer(id);
+    return (_db.select(_db.customers)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.isDeleted.equals(false)))
+        .getSingleOrNull();
   }
 
   /// Create a new customer
@@ -119,6 +134,18 @@ class ARRepository {
     bool isOnHold = false,
     int openingBalance = 0,
   }) async {
+    if (_cloudMode && _cloud != null) {
+      return _cloud.createCustomer(
+        name: name,
+        email: email,
+        phone: phone,
+        address: address,
+        taxId: taxId,
+        creditLimit: creditLimit,
+        notes: notes,
+        isOnHold: isOnHold,
+      );
+    }
     return await _db.transaction(() async {
       // Pre-generate UUID so we can use it as both the PK and in FK references
       final customerUuid = _uuid.v4();
@@ -141,15 +168,23 @@ class ARRepository {
 
       if (openingBalance != 0) {
         final accountsList = await _db.select(_db.accounts).get();
-        final arAccount = accountsList.firstWhereOrNull(
-            (a) => a.name == 'Accounts Receivable' || a.name.contains('Receivable'))
-            ?? accountsList.firstWhereOrNull((a) => a.type == 'asset');
-        final equityAccount = accountsList.firstWhereOrNull(
-            (a) => a.name == 'Equity' || a.name.contains('Equity'))
-            ?? accountsList.firstWhereOrNull((a) => a.type == 'equity');
+        final arAccount =
+            accountsList.firstWhereOrNull(
+              (a) =>
+                  a.name == 'Accounts Receivable' ||
+                  a.name.contains('Receivable'),
+            ) ??
+            accountsList.firstWhereOrNull((a) => a.type == 'asset');
+        final equityAccount =
+            accountsList.firstWhereOrNull(
+              (a) => a.name == 'Equity' || a.name.contains('Equity'),
+            ) ??
+            accountsList.firstWhereOrNull((a) => a.type == 'equity');
 
         if (arAccount == null || equityAccount == null) {
-          throw Exception('Required system accounts (Accounts Receivable or Equity) are missing from the database.');
+          throw Exception(
+            'Required system accounts (Accounts Receivable or Equity) are missing from the database.',
+          );
         }
 
         // Pre-generate transaction UUID for FK references
@@ -161,26 +196,50 @@ class ARRepository {
         );
         await _db.into(_db.transactions).insert(txnCompanion);
 
-        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-          transactionId: txnUuid, // ✅ UUID string, not int rowid
-          accountId: arAccount.id,
-          amount: openingBalance,
-        ));
+        await _db
+            .into(_db.transactionEntries)
+            .insert(
+              TransactionEntriesCompanion.insert(
+                transactionId: txnUuid, // ✅ UUID string, not int rowid
+                accountId: arAccount.id,
+                amount: openingBalance,
+              ),
+            );
 
-        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-          transactionId: txnUuid, // ✅ UUID string, not int rowid
-          accountId: equityAccount.id,
-          amount: -openingBalance,
-        ));
+        await _db
+            .into(_db.transactionEntries)
+            .insert(
+              TransactionEntriesCompanion.insert(
+                transactionId: txnUuid, // ✅ UUID string, not int rowid
+                accountId: equityAccount.id,
+                amount: -openingBalance,
+              ),
+            );
       }
 
       // Use the pre-generated UUID — no need to re-query by rowid
-      return (await (_db.select(_db.customers)..where((t) => t.id.equals(customerUuid))).getSingle());
+      return (await (_db.select(
+        _db.customers,
+      )..where((t) => t.id.equals(customerUuid))).getSingle());
     });
   }
 
   /// Update customer
   Future<void> updateCustomer(String id, CustomersCompanion companion) async {
+    if (_cloudMode && _cloud != null) {
+      final values = <String, dynamic>{};
+      if (companion.name.present) values['name'] = companion.name.value;
+      if (companion.email.present) values['email'] = companion.email.value;
+      if (companion.phone.present) values['phone'] = companion.phone.value;
+      if (companion.address.present)
+        values['address'] = companion.address.value;
+      if (companion.taxId.present) values['tax_id'] = companion.taxId.value;
+      if (companion.creditLimit.present)
+        values['credit_limit'] = companion.creditLimit.value;
+      if (companion.notes.present) values['notes'] = companion.notes.value;
+      await _cloud.updateCustomer(id, values);
+      return;
+    }
     await (_db.update(
       _db.customers,
     )..where((t) => t.id.equals(id))).write(companion);
@@ -218,15 +277,23 @@ class ARRepository {
       if (customer == null) return;
 
       final accountsList = await _db.select(_db.accounts).get();
-      final arAccount = accountsList.firstWhereOrNull(
-          (a) => a.name == 'Accounts Receivable' || a.name.contains('Receivable'))
-          ?? accountsList.firstWhereOrNull((a) => a.type == 'asset');
-      final cashAccount = accountsList.firstWhereOrNull(
-          (a) => a.name == 'Cash' || a.name.contains('Cash'))
-          ?? accountsList.firstWhereOrNull((a) => a.type == 'asset');
+      final arAccount =
+          accountsList.firstWhereOrNull(
+            (a) =>
+                a.name == 'Accounts Receivable' ||
+                a.name.contains('Receivable'),
+          ) ??
+          accountsList.firstWhereOrNull((a) => a.type == 'asset');
+      final cashAccount =
+          accountsList.firstWhereOrNull(
+            (a) => a.name == 'Cash' || a.name.contains('Cash'),
+          ) ??
+          accountsList.firstWhereOrNull((a) => a.type == 'asset');
 
       if (arAccount == null || cashAccount == null) {
-        throw Exception('Required system accounts (Accounts Receivable or Cash) are missing from the database.');
+        throw Exception(
+          'Required system accounts (Accounts Receivable or Cash) are missing from the database.',
+        );
       }
 
       // Pre-generate transaction UUID for FK references
@@ -234,34 +301,54 @@ class ARRepository {
       final txnCompanion = TransactionsCompanion.insert(
         id: Value(txnUuid),
         transactionDate: DateTime.now(),
-        description: notes ?? (isCharge ? 'Quick Charge for ${customer.name}' : 'Payment Received from ${customer.name}'),
+        description:
+            notes ??
+            (isCharge
+                ? 'Quick Charge for ${customer.name}'
+                : 'Payment Received from ${customer.name}'),
       );
       await _db.into(_db.transactions).insert(txnCompanion);
 
       if (isCharge) {
         // Customer owes us more: Debit AR (positive), Credit Cash (negative)
-        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-          transactionId: txnUuid, // ✅ UUID string, not int rowid
-          accountId: arAccount.id,
-          amount: amount,
-        ));
-        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-          transactionId: txnUuid, // ✅ UUID string, not int rowid
-          accountId: cashAccount.id,
-          amount: -amount,
-        ));
+        await _db
+            .into(_db.transactionEntries)
+            .insert(
+              TransactionEntriesCompanion.insert(
+                transactionId: txnUuid, // ✅ UUID string, not int rowid
+                accountId: arAccount.id,
+                amount: amount,
+              ),
+            );
+        await _db
+            .into(_db.transactionEntries)
+            .insert(
+              TransactionEntriesCompanion.insert(
+                transactionId: txnUuid, // ✅ UUID string, not int rowid
+                accountId: cashAccount.id,
+                amount: -amount,
+              ),
+            );
       } else {
         // Customer pays us: Debit Cash (positive), Credit AR (negative)
-        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-          transactionId: txnUuid, // ✅ UUID string, not int rowid
-          accountId: cashAccount.id,
-          amount: amount,
-        ));
-        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-          transactionId: txnUuid, // ✅ UUID string, not int rowid
-          accountId: arAccount.id,
-          amount: -amount,
-        ));
+        await _db
+            .into(_db.transactionEntries)
+            .insert(
+              TransactionEntriesCompanion.insert(
+                transactionId: txnUuid, // ✅ UUID string, not int rowid
+                accountId: cashAccount.id,
+                amount: amount,
+              ),
+            );
+        await _db
+            .into(_db.transactionEntries)
+            .insert(
+              TransactionEntriesCompanion.insert(
+                transactionId: txnUuid, // ✅ UUID string, not int rowid
+                accountId: arAccount.id,
+                amount: -amount,
+              ),
+            );
       }
 
       final newBalance = customer.balance + (isCharge ? amount : -amount);
@@ -274,6 +361,8 @@ class ARRepository {
 
   /// Watch all invoices for a customer
   Stream<List<Invoice>> watchCustomerInvoices(String customerId) {
+    if (_cloudMode && _cloud != null)
+      return _cloud.watchCustomerInvoices(customerId);
     return (_db.select(_db.invoices)
           ..where((t) => t.customerId.equals(customerId))
           ..orderBy([(t) => OrderingTerm.desc(t.invoiceDate)]))
@@ -282,13 +371,17 @@ class ARRepository {
 
   /// Watch all invoices
   Stream<List<Invoice>> watchAllInvoices() {
-    return (_db.select(
-      _db.invoices,
-    )..orderBy([(t) => OrderingTerm.desc(t.invoiceDate)])).watch();
+    if (_cloudMode && _cloud != null) return _cloud.watchAllInvoices();
+    return (_db.select(_db.invoices)
+          ..where((t) => t.isDeleted.equals(false))
+          ..orderBy([(t) => OrderingTerm.desc(t.invoiceDate)]))
+        .watch();
   }
 
   /// Get invoice with items
   Future<InvoiceWithItems?> getInvoiceWithItems(String invoiceId) async {
+    if (_cloudMode && _cloud != null)
+      return _cloud.getInvoiceWithItems(invoiceId);
     final invoice = await (_db.select(
       _db.invoices,
     )..where((t) => t.id.equals(invoiceId))).getSingleOrNull();
@@ -313,16 +406,18 @@ class ARRepository {
     final monthStr = now.month.toString().padLeft(2, '0');
     final prefix = 'INV-$yearStr-$monthStr-';
 
-    final result = await _db.customSelect(
-      '''
+    final result = await _db
+        .customSelect(
+          '''
       SELECT invoice_number 
       FROM invoices 
       WHERE invoice_number LIKE ? 
       ORDER BY invoice_number DESC 
       LIMIT 1
       ''',
-      variables: [Variable<String>('$prefix%')],
-    ).getSingleOrNull();
+          variables: [Variable<String>('$prefix%')],
+        )
+        .getSingleOrNull();
 
     int nextNum = 1;
     if (result != null) {
@@ -346,6 +441,16 @@ class ARRepository {
     required String currencyCode,
     String? notes,
   }) async {
+    if (_cloudMode && _cloud != null) {
+      return _cloud.createInvoice(
+        customerId: customerId,
+        invoiceDate: invoiceDate,
+        dueDate: dueDate,
+        items: items,
+        currencyCode: currencyCode,
+        notes: notes,
+      );
+    }
     return await _db.transaction(() async {
       final invoiceNumber = await generateInvoiceNumber();
 

@@ -7,6 +7,7 @@ import 'package:core_ui/core_ui.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
+
 // Assuming PermissionGuard/EmptyState
 
 class CustomFieldsScreen extends ConsumerWidget {
@@ -29,7 +30,7 @@ class CustomFieldsScreen extends ConsumerWidget {
       body: fieldsAsync.when(
         data: (fields) {
           if (fields.isEmpty) {
-            return const Center(child: Text("No custom fields defined."));
+            return Center(child: Text(l10n.noCustomFieldsDefined));
           }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -39,7 +40,9 @@ class CustomFieldsScreen extends ConsumerWidget {
               final field = fields[index];
               return ListTile(
                 title: Text(field.label),
-                subtitle: Text("Type: ${field.type.name} | Key: ${field.key}"),
+                subtitle: Text(
+                  l10n.customFieldTypeAndKey(field.type.name, field.key),
+                ),
                 trailing: IconButton(
                   icon: Icon(Icons.delete, color: context.appColors.error),
                   onPressed: () => ref
@@ -52,7 +55,7 @@ class CustomFieldsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text("Error: $err")),
+        error: (err, _) => Center(child: Text(l10n.error)),
       ),
     );
   }
@@ -106,10 +109,12 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
           children: [
             TextFormField(
               controller: _labelCtrl,
-              decoration: const InputDecoration(
-                labelText: "Display Label (e.g. Color)",
+              decoration: InputDecoration(
+                labelText: l10n.customFieldDisplayLabelHint,
               ),
-              validator: (v) => v!.isEmpty ? "Required" : null,
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? l10n.customFieldLabelRequired
+                  : null,
               onChanged: (val) {
                 // Auto-generate key if new
                 if (widget.existing == null) {
@@ -119,18 +124,29 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
             ),
             TextFormField(
               controller: _keyCtrl,
-              decoration: const InputDecoration(
-                labelText: "Internal Key (e.g. color)",
+              decoration: InputDecoration(
+                labelText: l10n.customFieldInternalKeyHint,
               ),
-              validator: (v) => v!.isEmpty ? "Required" : null,
+              validator: (v) =>
+                  v == null ||
+                      !RegExp(
+                        r'^[a-z][a-z0-9_]{0,62}$',
+                      ).hasMatch(v.trim().toLowerCase())
+                  ? l10n.customFieldKeyInvalid
+                  : null,
             ),
             DropdownButtonFormField<CustomFieldType>(
               initialValue: _selectedType,
-              decoration: const InputDecoration(labelText: "Data Type"),
+              decoration: InputDecoration(labelText: l10n.customFieldDataType),
               items: CustomFieldType.values.map((t) {
                 return DropdownMenuItem(
                   value: t,
-                  child: Text(t.name.toUpperCase()),
+                  child: Text(switch (t) {
+                    CustomFieldType.text => l10n.customFieldText,
+                    CustomFieldType.number => l10n.customFieldNumber,
+                    CustomFieldType.boolean => l10n.customFieldBoolean,
+                    CustomFieldType.date => l10n.customFieldDate,
+                  }),
                 );
               }).toList(),
               onChanged: (val) => setState(() => _selectedType = val!),
@@ -141,7 +157,7 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text("Cancel"),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ElevatedButton(
           onPressed: () async {
@@ -159,7 +175,7 @@ class _FieldEditorDialogState extends ConsumerState<_FieldEditorDialog> {
               if (mounted) Navigator.pop(context);
             }
           },
-          child: const Text("Save"),
+          child: Text(AppLocalizations.of(context)!.save),
         ),
       ],
     );

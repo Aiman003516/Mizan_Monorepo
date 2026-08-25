@@ -3047,6 +3047,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editField => 'Edit Field';
 
   @override
+  String get noCustomFieldsDefined => 'No custom fields defined.';
+
+  @override
+  String customFieldTypeAndKey(String type, String key) {
+    return 'Type: $type | Key: $key';
+  }
+
+  @override
+  String get customFieldDisplayLabelHint =>
+      'Display label (for example, Color)';
+
+  @override
+  String get customFieldInternalKeyHint => 'Internal key (for example, color)';
+
+  @override
+  String get customFieldDataType => 'Data Type';
+
+  @override
+  String get customFieldText => 'Text';
+
+  @override
+  String get customFieldNumber => 'Number';
+
+  @override
+  String get customFieldBoolean => 'Yes/No';
+
+  @override
+  String get customFieldDate => 'Date';
+
+  @override
+  String get customFieldKeyInvalid =>
+      'Use lowercase snake_case letters, numbers, and underscores.';
+
+  @override
+  String get customFieldLabelRequired => 'Display label is required';
+
+  @override
   String get editRole => 'Edit Role';
 
   @override
@@ -3778,6 +3815,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signUpSubtitle => 'Sign up to create your business';
 
   @override
+  String get emailConfirmationRequired =>
+      'Check your email to confirm your account before signing in.';
+
+  @override
+  String get authenticationRequired => 'Please sign in to continue.';
+
+  @override
+  String get invalidCredentials => 'The email or password is incorrect.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'An account with this email already exists.';
+
+  @override
+  String get authRateLimited => 'Too many attempts. Please try again later.';
+
+  @override
+  String get networkAuthenticationError =>
+      'The network is unavailable. Please try again.';
+
+  @override
+  String get unknownAuthenticationError =>
+      'Authentication could not be completed.';
+
+  @override
+  String get passwordMinLength =>
+      'Password must contain at least 8 characters.';
+
+  @override
   String get orSeparator => 'OR';
 
   @override
@@ -3828,6 +3894,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get permManageSettings => 'System Settings';
+
+  @override
+  String get permManageCrm => 'Manage CRM';
+
+  @override
+  String get permManageCustomers => 'Manage Customers';
+
+  @override
+  String get permManageVendors => 'Manage Vendors';
+
+  @override
+  String get permCreateInvoices => 'Create Invoices';
+
+  @override
+  String get permManageInvoices => 'Manage Invoices';
+
+  @override
+  String get permCreateBills => 'Create Bills';
+
+  @override
+  String get permManageBills => 'Manage Bills';
+
+  @override
+  String get permManageAccounting => 'Manage Accounting';
+
+  @override
+  String get permPostJournalEntries => 'Post Journal Entries';
 
   @override
   String get permSwitchTenant => 'Switch Business Branch';

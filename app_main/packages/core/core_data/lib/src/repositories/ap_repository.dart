@@ -4,11 +4,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:collection/collection.dart';
 import 'package:uuid/uuid.dart';
 
+import '../env_config.dart';
+import 'cloud_crm_repository.dart';
+
 const _uuid = Uuid();
 // Providers
 final apRepositoryProvider = Provider<APRepository>((ref) {
   final db = ref.watch(appDatabaseProvider);
-  return APRepository(db);
+  return APRepository(
+    db,
+    cloud: ref.watch(cloudCrmRepositoryProvider),
+    cloudMode: EnvConfig.isProd || EnvConfig.supabaseUrl.isNotEmpty,
+  );
 });
 
 final vendorsStreamProvider = StreamProvider.autoDispose<List<Vendor>>((ref) {
@@ -80,23 +87,31 @@ class VendorBalance {
 /// Accounts Payable Repository
 class APRepository {
   final AppDatabase _db;
+  final CloudCrmRepository? _cloud;
+  final bool _cloudMode;
 
-  APRepository(this._db);
+  APRepository(this._db, {CloudCrmRepository? cloud, bool cloudMode = false})
+    : _cloud = cloud,
+      _cloudMode = cloudMode;
 
   // ==================== VENDORS ====================
 
   /// Watch all vendors ordered by name
   Stream<List<Vendor>> watchAllVendors() {
-    return (_db.select(
-      _db.vendors,
-    )..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
+    if (_cloudMode && _cloud != null) return _cloud.watchVendors();
+    return (_db.select(_db.vendors)
+          ..where((t) => t.isDeleted.equals(false))
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+        .watch();
   }
 
   /// Get a single vendor by ID
   Future<Vendor?> getVendor(String id) {
-    return (_db.select(
-      _db.vendors,
-    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    if (_cloudMode && _cloud != null) return _cloud.getVendor(id);
+    return (_db.select(_db.vendors)
+          ..where((t) => t.id.equals(id))
+          ..where((t) => t.isDeleted.equals(false)))
+        .getSingleOrNull();
   }
 
   /// Create a new vendor
@@ -111,6 +126,17 @@ class APRepository {
     String? notes,
     int openingBalance = 0,
   }) async {
+    if (_cloudMode && _cloud != null) {
+      return _cloud.createVendor(
+        name: name,
+        email: email,
+        phone: phone,
+        address: address,
+        taxId: taxId,
+        paymentTerms: paymentTerms,
+        notes: notes,
+      );
+    }
     return await _db.transaction(() async {
       // Pre-generate UUID so we can use it as both the PK and in FK references
       final vendorUuid = _uuid.v4();
@@ -132,16 +158,22 @@ class APRepository {
 
       if (openingBalance != 0) {
         final accountsList = await _db.select(_db.accounts).get();
-        final apAccount = accountsList.firstWhereOrNull(
-            (a) => a.name == 'Accounts Payable' || a.name.contains('Payable'))
-            ?? accountsList.firstWhereOrNull((a) => a.type == 'liability');
+        final apAccount =
+            accountsList.firstWhereOrNull(
+              (a) => a.name == 'Accounts Payable' || a.name.contains('Payable'),
+            ) ??
+            accountsList.firstWhereOrNull((a) => a.type == 'liability');
 
-        final equityAccount = accountsList.firstWhereOrNull(
-            (a) => a.name == 'Equity' || a.name.contains('Equity'))
-            ?? accountsList.firstWhereOrNull((a) => a.type == 'equity');
+        final equityAccount =
+            accountsList.firstWhereOrNull(
+              (a) => a.name == 'Equity' || a.name.contains('Equity'),
+            ) ??
+            accountsList.firstWhereOrNull((a) => a.type == 'equity');
 
         if (apAccount == null || equityAccount == null) {
-          throw Exception('Required system accounts (Accounts Payable or Equity) are missing from the database.');
+          throw Exception(
+            'Required system accounts (Accounts Payable or Equity) are missing from the database.',
+          );
         }
 
         // Pre-generate transaction UUID for FK references
@@ -153,26 +185,51 @@ class APRepository {
         );
         await _db.into(_db.transactions).insert(txnCompanion);
 
-        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-          transactionId: txnUuid, // ✅ UUID string, not int rowid
-          accountId: apAccount.id,
-          amount: -openingBalance, // Liabilities are increased with credits (-)
-        ));
+        await _db
+            .into(_db.transactionEntries)
+            .insert(
+              TransactionEntriesCompanion.insert(
+                transactionId: txnUuid, // ✅ UUID string, not int rowid
+                accountId: apAccount.id,
+                amount:
+                    -openingBalance, // Liabilities are increased with credits (-)
+              ),
+            );
 
-        await _db.into(_db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-          transactionId: txnUuid, // ✅ UUID string, not int rowid
-          accountId: equityAccount.id,
-          amount: openingBalance,
-        ));
+        await _db
+            .into(_db.transactionEntries)
+            .insert(
+              TransactionEntriesCompanion.insert(
+                transactionId: txnUuid, // ✅ UUID string, not int rowid
+                accountId: equityAccount.id,
+                amount: openingBalance,
+              ),
+            );
       }
 
       // Use the pre-generated UUID — no need to re-query by rowid
-      return (await (_db.select(_db.vendors)..where((t) => t.id.equals(vendorUuid))).getSingle());
+      return (await (_db.select(
+        _db.vendors,
+      )..where((t) => t.id.equals(vendorUuid))).getSingle());
     });
   }
 
   /// Update vendor
   Future<void> updateVendor(String id, VendorsCompanion companion) async {
+    if (_cloudMode && _cloud != null) {
+      final values = <String, dynamic>{};
+      if (companion.name.present) values['name'] = companion.name.value;
+      if (companion.email.present) values['email'] = companion.email.value;
+      if (companion.phone.present) values['phone'] = companion.phone.value;
+      if (companion.address.present)
+        values['address'] = companion.address.value;
+      if (companion.taxId.present) values['tax_id'] = companion.taxId.value;
+      if (companion.paymentTerms.present)
+        values['payment_terms'] = companion.paymentTerms.value;
+      if (companion.notes.present) values['notes'] = companion.notes.value;
+      await _cloud.updateVendor(id, values);
+      return;
+    }
     await (_db.update(
       _db.vendors,
     )..where((t) => t.id.equals(id))).write(companion);
@@ -200,6 +257,7 @@ class APRepository {
 
   /// Watch all bills for a vendor
   Stream<List<Bill>> watchVendorBills(String vendorId) {
+    if (_cloudMode && _cloud != null) return _cloud.watchVendorBills(vendorId);
     return (_db.select(_db.bills)
           ..where((t) => t.vendorId.equals(vendorId))
           ..orderBy([(t) => OrderingTerm.desc(t.billDate)]))
@@ -208,9 +266,11 @@ class APRepository {
 
   /// Watch all bills
   Stream<List<Bill>> watchAllBills() {
-    return (_db.select(
-      _db.bills,
-    )..orderBy([(t) => OrderingTerm.desc(t.billDate)])).watch();
+    if (_cloudMode && _cloud != null) return _cloud.watchAllBills();
+    return (_db.select(_db.bills)
+          ..where((t) => t.isDeleted.equals(false))
+          ..orderBy([(t) => OrderingTerm.desc(t.billDate)]))
+        .watch();
   }
 
   /// Generate next bill number
@@ -220,16 +280,18 @@ class APRepository {
     final monthStr = now.month.toString().padLeft(2, '0');
     final prefix = 'BILL-$yearStr-$monthStr-';
 
-    final result = await _db.customSelect(
-      '''
+    final result = await _db
+        .customSelect(
+          '''
       SELECT bill_number 
       FROM bills 
       WHERE bill_number LIKE ? 
       ORDER BY bill_number DESC 
       LIMIT 1
       ''',
-      variables: [Variable<String>('$prefix%')],
-    ).getSingleOrNull();
+          variables: [Variable<String>('$prefix%')],
+        )
+        .getSingleOrNull();
 
     int nextNum = 1;
     if (result != null) {
@@ -254,6 +316,17 @@ class APRepository {
     String? vendorBillNumber,
     String? notes,
   }) async {
+    if (_cloudMode && _cloud != null) {
+      return _cloud.createBill(
+        vendorId: vendorId,
+        billDate: billDate,
+        dueDate: dueDate,
+        items: items,
+        currencyCode: currencyCode,
+        vendorBillNumber: vendorBillNumber,
+        notes: notes,
+      );
+    }
     return await _db.transaction(() async {
       final billNumber = await generateBillNumber();
 

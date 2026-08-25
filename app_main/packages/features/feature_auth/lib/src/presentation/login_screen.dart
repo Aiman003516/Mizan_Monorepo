@@ -28,6 +28,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  String _localizedAuthError(String? raw, AppLocalizations l10n) {
+    final message = (raw ?? '').toLowerCase();
+    if (message.contains('invalid login credentials') ||
+        message.contains('invalid credentials') ||
+        message.contains('invalid password')) {
+      return l10n.invalidCredentials;
+    }
+    if (message.contains('already registered') ||
+        message.contains('already exists') ||
+        message.contains('user_already_exists')) {
+      return l10n.emailAlreadyRegistered;
+    }
+    if (message.contains('rate limit') || message.contains('too many')) {
+      return l10n.authRateLimited;
+    }
+    if (message.contains('socket') ||
+        message.contains('network') ||
+        message.contains('connection')) {
+      return l10n.networkAuthenticationError;
+    }
+    return l10n.unknownAuthenticationError;
+  }
+
   void _submit() {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -50,6 +73,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(emailError),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+
+    if (_isSignUp && password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.passwordMinLength),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -79,11 +112,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       }
 
+      if (next.status == AuthStatus.emailConfirmationPending) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.emailConfirmationRequired),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        );
+      }
+
       if (next.status == AuthStatus.unauthenticated &&
           next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMessage!),
+            content: Text(_localizedAuthError(next.errorMessage, l10n)),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );

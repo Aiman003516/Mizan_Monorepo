@@ -1,29 +1,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // UPDATED import
-import 'package:feature_auth/src/data/auth_repository.dart'; 
+import 'package:feature_auth/src/data/auth_repository.dart';
 
 enum AuthStatus {
   initial,
   loading,
-  authenticated_online, 
+  authenticated_online,
   authenticated_offline,
-  unauthenticated
+  emailConfirmationPending,
+  unauthenticated,
 }
 
 class AuthState {
-  AuthState({
-    this.status = AuthStatus.initial,
-    this.errorMessage,
-  });
+  AuthState({this.status = AuthStatus.initial, this.errorMessage});
 
   final AuthStatus status;
   final String? errorMessage;
 }
 
-final authControllerProvider =
-StateNotifierProvider<AuthController, AuthState>((ref) {
-  return AuthController(ref.watch(authRepositoryProvider));
-});
+final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
+  (ref) {
+    return AuthController(ref.watch(authRepositoryProvider));
+  },
+);
 
 class AuthController extends StateNotifier<AuthState> {
   AuthController(this._authRepository) : super(AuthState()) {
@@ -31,27 +30,32 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   final AuthRepository _authRepository;
-// ignore: unused_field
+  // ignore: unused_field
 
   Future<void> _trySilentSignIn() async {
     state = AuthState(status: AuthStatus.loading);
     try {
-      final hasCredentials = await _authRepository.hasStoredCredentials();
+      if (await _authRepository.hasActiveSupabaseSession()) {
+        state = AuthState(status: AuthStatus.authenticated_online);
+        return;
+      }
 
-      if (hasCredentials) {
-        try {
-          final client = await _authRepository.signInSilently();
-          if (client != null) {
-            state = AuthState(status: AuthStatus.authenticated_online);
-          } else {
-            state = AuthState(status: AuthStatus.unauthenticated);
-          }
-        } catch (e) {
-          print('Silent sign-in failed (likely offline): $e');
-          state = AuthState(status: AuthStatus.authenticated_offline);
-        }
-      } else {
+      final hasDriveCredentials = await _authRepository.hasStoredCredentials();
+      if (!hasDriveCredentials) {
         state = AuthState(status: AuthStatus.unauthenticated);
+        return;
+      }
+
+      try {
+        final client = await _authRepository.signInSilently();
+        if (client != null && _authRepository.currentSupabaseUser != null) {
+          state = AuthState(status: AuthStatus.authenticated_online);
+        } else {
+          state = AuthState(status: AuthStatus.unauthenticated);
+        }
+      } catch (e) {
+        print('Silent sign-in failed (likely offline): $e');
+        state = AuthState(status: AuthStatus.authenticated_offline);
       }
     } catch (e) {
       state = AuthState(
@@ -81,10 +85,12 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> signInWithEmail(String email, String password) async {
     state = AuthState(status: AuthStatus.loading);
     try {
-      await _authRepository.signInWithEmail(email, password);
-      // Supabase signInWithEmail doesn't return the Google Drive client.
-      // But it does sign the user into Supabase.
-      state = AuthState(status: AuthStatus.authenticated_online);
+      final response = await _authRepository.signInWithEmail(email, password);
+      if (response.session == null) {
+        state = AuthState(status: AuthStatus.emailConfirmationPending);
+      } else {
+        state = AuthState(status: AuthStatus.authenticated_online);
+      }
     } catch (e) {
       state = AuthState(
         status: AuthStatus.unauthenticated,
@@ -96,9 +102,12 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> signUpWithEmail(String email, String password) async {
     state = AuthState(status: AuthStatus.loading);
     try {
-      await _authRepository.signUpWithEmail(email, password);
-      // After sign up, they are signed in (Supabase auto-logins after signup if email confirmations are disabled)
-      state = AuthState(status: AuthStatus.authenticated_online);
+      final response = await _authRepository.signUpWithEmail(email, password);
+      if (response.session == null) {
+        state = AuthState(status: AuthStatus.emailConfirmationPending);
+      } else {
+        state = AuthState(status: AuthStatus.authenticated_online);
+      }
     } catch (e) {
       state = AuthState(
         status: AuthStatus.unauthenticated,

@@ -29,13 +29,16 @@ class AuthRepository {
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: _scopes,
-    serverClientId: EnvConfig.hasGoogleWebClientId ? EnvConfig.googleWebClientId : null,
+    serverClientId: EnvConfig.hasGoogleWebClientId
+        ? EnvConfig.googleWebClientId
+        : null,
   );
   auth.AuthClient? _client;
   GoogleSignInAccount? _googleUser;
 
   GoogleSignInAccount? get currentGoogleUser => _googleUser;
   User? get currentSupabaseUser => _supabase.auth.currentUser;
+  Session? get currentSupabaseSession => _supabase.auth.currentSession;
 
   // --- 🛡️ SAAS IDENTITY LOGIC ---
 
@@ -44,86 +47,129 @@ class AuthRepository {
     return _supabase.auth.onAuthStateChange.switchMap((authState) {
       final user = authState.session?.user;
       if (user == null) return Stream.value(null);
-
-      // Listen to the User's Profile Document in Supabase Postgres
       return _supabase
           .from('user_profiles')
           .stream(primaryKey: ['id'])
           .eq('id', user.id)
-          .map((maps) {
-            if (maps.isEmpty) {
-              return AppUser(
-                uid: user.id,
-                email: user.email ?? '',
-                displayName: user.userMetadata?['full_name'] ?? 'Unknown',
-                role: 'owner',
-                tenantId: null,
-                isPro: false,
-              );
-            }
-            final data = maps.first;
-            return AppUser(
-              uid: user.id,
-              email: data['email'] ?? user.email ?? '',
-              displayName: data['display_name'] ?? user.userMetadata?['full_name'] ?? 'Unknown',
-              role: data['role'] ?? 'owner',
-              tenantId: data['tenant_id'],
-              isPro: data['is_pro'] ?? false,
-            );
-          });
+          .startWith(const <Map<String, dynamic>>[])
+          .asyncMap((_) => _loadCurrentUser(user));
     });
   }
 
+  Future<AppUser> _loadCurrentUser(User user) async {
+    final profile = await _supabase
+        .from('user_profiles')
+        .select('id,email,display_name,full_name,tenant_id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+    if (profile == null) {
+      return AppUser(
+        uid: user.id,
+        email: user.email ?? '',
+        displayName: user.userMetadata?['full_name'] as String? ?? user.email,
+        tenantId: null,
+        role: 'staff',
+        isPro: false,
+      );
+    }
+
+    final tenantId = profile['tenant_id'] as String?;
+    if (tenantId == null || tenantId.isEmpty) {
+      return AppUser(
+        uid: user.id,
+        email: profile['email'] as String? ?? user.email ?? '',
+        displayName:
+            (profile['display_name'] ?? profile['full_name']) as String? ??
+            user.email,
+        tenantId: null,
+        role: 'staff',
+        isPro: false,
+      );
+    }
+
+    final membership = await _supabase
+        .from('staff_members')
+        .select('role_id,roles(name,is_system_admin)')
+        .eq('tenant_id', tenantId)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+    final roleMap = membership?['roles'] is Map
+        ? Map<String, dynamic>.from(membership!['roles'] as Map)
+        : const <String, dynamic>{};
+    final isSystemAdmin = roleMap['is_system_admin'] == true;
+    final tenant = await _supabase
+        .from('tenants')
+        .select('subscription_status')
+        .eq('id', tenantId)
+        .maybeSingle();
+    final subscriptionStatus = tenant?['subscription_status'] as String?;
+
+    return AppUser(
+      uid: user.id,
+      email: profile['email'] as String? ?? user.email ?? '',
+      displayName: profile['display_name'] as String? ?? user.email,
+      tenantId: tenantId,
+      role: isSystemAdmin ? 'owner' : (roleMap['name'] as String? ?? 'staff'),
+      isPro: subscriptionStatus == 'trial' || subscriptionStatus == 'active',
+    );
+  }
+
   /// 🚀 ACTION: CREATE BUSINESS (Tenant Generation)
-  Future<void> createBusinessTenant({
+  Future<String> createBusinessTenant({
     required String businessName,
     required String taxId,
     required String phone,
+    String currencyCode = 'USD',
   }) async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) throw Exception("User must be logged in");
+    if (_supabase.auth.currentUser == null) {
+      throw const AuthException('Authentication is required.');
+    }
 
-    // 1. Generate ID (Supabase uses UUID)
-    final tenantId = const Uuid().v4();
-
-    // 2. Insert Tenant
-    await _supabase.from('tenants').insert({
-      'id': tenantId,
-      'name': businessName,
-      'tax_id': taxId,
-      'phone': phone,
-      'owner_uid': user.id,
-      'subscription_status': 'trial', 
-      'currency': 'USD', 
-    });
-
-    // 3. Link User to Tenant (The Promotion)
-    await _supabase.from('user_profiles').upsert({
-      'id': user.id,
-      'tenant_id': tenantId,
-      'role': 'owner',
-      'email': user.email,
-      'display_name': user.userMetadata?['full_name'] ?? user.email,
-      'is_pro': true,
-    });
+    final result = await _supabase.rpc(
+      'create_business',
+      params: {
+        'p_name': businessName.trim(),
+        'p_tax_id': taxId.trim().isEmpty ? null : taxId.trim(),
+        'p_phone': phone.trim().isEmpty ? null : phone.trim(),
+        'p_currency_code': currencyCode.toUpperCase(),
+      },
+    );
+    if (result is String && result.isNotEmpty) return result;
+    if (result is Map && result['id'] is String) return result['id'] as String;
+    throw const PostgrestException(
+      message: 'Business bootstrap returned no tenant identifier.',
+      code: 'MIZAN_BOOTSTRAP_INVALID_RESPONSE',
+    );
   }
 
   // --- 🔒 EMAIL & PHONE AUTH LOGIC ---
 
-  Future<void> signInWithEmail(String email, String password) async {
-    await _supabase.auth.signInWithPassword(email: email, password: password);
+  Future<AuthResponse> signInWithEmail(String email, String password) {
+    return _supabase.auth.signInWithPassword(
+      email: email.trim().toLowerCase(),
+      password: password,
+    );
   }
 
-  Future<void> signUpWithEmail(String email, String password) async {
-    await _supabase.auth.signUp(email: email, password: password);
+  Future<AuthResponse> signUpWithEmail(String email, String password) {
+    return _supabase.auth.signUp(
+      email: email.trim().toLowerCase(),
+      password: password,
+      data: {'full_name': email.trim().split('@').first},
+    );
   }
 
-  Future<void> signInWithPhone(String phone, String password) async {
-    await _supabase.auth.signInWithPassword(phone: phone, password: password);
+  Future<AuthResponse> signInWithPhone(String phone, String password) {
+    return _supabase.auth.signInWithPassword(
+      phone: phone.trim(),
+      password: password,
+    );
   }
 
-  Future<void> signUpWithPhone(String phone, String password) async {
-    await _supabase.auth.signUp(phone: phone, password: password);
+  Future<AuthResponse> signUpWithPhone(String phone, String password) {
+    return _supabase.auth.signUp(phone: phone.trim(), password: password);
   }
 
   // --- ☁️ DRIVE AUTH LOGIC (Existing Backup System) ---
@@ -151,7 +197,9 @@ class AuthRepository {
             accessToken: googleAuth.accessToken!,
           );
         }
-        print("✅ [Auth] Supabase Sign-In Successful: ${_supabase.auth.currentUser?.id}");
+        print(
+          "✅ [Auth] Supabase Sign-In Successful: ${_supabase.auth.currentUser?.id}",
+        );
 
         // C. Create Drive Client
         final authHeaders = await user.authHeaders;
@@ -163,7 +211,7 @@ class AuthRepository {
               authHeaders['Authorization']!.substring(7),
               DateTime.now().toUtc().add(const Duration(hours: 1)),
             ),
-            null, 
+            null,
             _scopes,
           ),
         );
@@ -177,28 +225,27 @@ class AuthRepository {
 
         final id = auth.ClientId(clientId, clientSecret);
 
-        _client = await auth_io.obtainAccessCredentialsViaUserConsent(
-          id,
-          _scopes,
-          http.Client(),
-          (url) async {
-            final uri = Uri.parse(url);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri);
-            } else {
-              throw 'Could not launch $url';
-            }
-          },
-        ).then((credentials) {
-          _secureStorage.write(
-            key: _windowsRefreshTokenKey,
-            value: credentials.refreshToken,
-          );
+        _client = await auth_io
+            .obtainAccessCredentialsViaUserConsent(id, _scopes, http.Client(), (
+              url,
+            ) async {
+              final uri = Uri.parse(url);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri);
+              } else {
+                throw 'Could not launch $url';
+              }
+            })
+            .then((credentials) {
+              _secureStorage.write(
+                key: _windowsRefreshTokenKey,
+                value: credentials.refreshToken,
+              );
 
-          _googleUser = null;
-          // Note: Windows Supabase Auth fallback logic would go here if needed.
-          return auth.authenticatedClient(http.Client(), credentials);
-        });
+              _googleUser = null;
+              // Note: Windows Supabase Auth fallback logic would go here if needed.
+              return auth.authenticatedClient(http.Client(), credentials);
+            });
       }
       return _client;
     } catch (e) {
@@ -220,14 +267,14 @@ class AuthRepository {
 
         // Ensure Supabase is also signed in silently
         if (_supabase.auth.currentUser == null) {
-           final googleAuth = await user.authentication;
-           if (googleAuth.idToken != null && googleAuth.accessToken != null) {
-              await _supabase.auth.signInWithIdToken(
-                provider: OAuthProvider.google,
-                idToken: googleAuth.idToken!,
-                accessToken: googleAuth.accessToken!,
-              );
-           }
+          final googleAuth = await user.authentication;
+          if (googleAuth.idToken != null && googleAuth.accessToken != null) {
+            await _supabase.auth.signInWithIdToken(
+              provider: OAuthProvider.google,
+              idToken: googleAuth.idToken!,
+              accessToken: googleAuth.accessToken!,
+            );
+          }
         }
 
         final authHeaders = await user.authHeaders;
@@ -244,8 +291,9 @@ class AuthRepository {
           ),
         );
       } else if (Platform.isWindows) {
-        final refreshToken =
-            await _secureStorage.read(key: _windowsRefreshTokenKey);
+        final refreshToken = await _secureStorage.read(
+          key: _windowsRefreshTokenKey,
+        );
         if (refreshToken == null) return null;
 
         final clientId = EnvConfig.googleWindowsClientId;
@@ -308,7 +356,13 @@ class AuthRepository {
     throw 'Authentication failed.';
   }
 
+  Future<bool> hasActiveSupabaseSession() async {
+    final session = _supabase.auth.currentSession;
+    return session != null && !session.isExpired;
+  }
+
   Future<bool> hasStoredCredentials() async {
+    if (await hasActiveSupabaseSession()) return true;
     if (Platform.isAndroid) {
       return await _googleSignIn.isSignedIn();
     } else if (Platform.isWindows) {
@@ -322,7 +376,9 @@ class AuthRepository {
   static Future<auth.AuthClient?> getSilentDriveClient() async {
     final googleSignIn = GoogleSignIn(
       scopes: _scopes,
-      serverClientId: EnvConfig.hasGoogleWebClientId ? EnvConfig.googleWebClientId : null,
+      serverClientId: EnvConfig.hasGoogleWebClientId
+          ? EnvConfig.googleWebClientId
+          : null,
     );
     final user = await googleSignIn.signInSilently();
     if (user == null) return null;

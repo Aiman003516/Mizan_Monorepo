@@ -27,6 +27,8 @@ export 'src/services/depreciation_service.dart';
 export 'src/services/inventory_costing_service.dart';
 // Phase 8: Accounts Receivable
 export 'src/repositories/ar_repository.dart';
+export 'src/repositories/cloud_crm_repository.dart';
+export 'src/services/sync_queue_service.dart';
 // Phase 8C: Accounts Payable
 export 'src/repositories/ap_repository.dart';
 // Phase E: Bank Reconciliation

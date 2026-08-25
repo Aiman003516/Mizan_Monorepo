@@ -1,28 +1,17 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/rbac_models.dart';
 
 final staffRepositoryProvider = Provider<StaffRepository>((ref) {
   return StaffRepository(Supabase.instance.client);
 });
 
-final staffStreamProvider = StreamProvider.autoDispose<List<StaffMember>>((ref) {
-  final supabase = Supabase.instance.client;
-  final user = supabase.auth.currentUser;
-  if (user == null) return Stream.value([]);
-  
-  return supabase
-      .from('user_profiles')
-      .stream(primaryKey: ['id'])
-      .eq('id', user.id)
-      .map((profiles) {
-        if (profiles.isEmpty) return null;
-        return profiles.first['tenant_id'] as String?;
-      })
-      .asyncExpand((tenantId) {
-        if (tenantId == null) return Stream.value(<StaffMember>[]);
-        return ref.watch(staffRepositoryProvider).watchAllStaff(tenantId);
-      });
+final staffStreamProvider = StreamProvider.autoDispose<List<StaffMember>>((
+  ref,
+) {
+  final repository = ref.watch(staffRepositoryProvider);
+  return repository.watchCurrentTenantStaff();
 });
 
 class StaffRepository {
@@ -30,125 +19,145 @@ class StaffRepository {
 
   StaffRepository(this._supabase);
 
-  Future<String> _getTenantId() async {
+  Stream<List<StaffMember>> watchCurrentTenantStaff() {
     final user = _supabase.auth.currentUser;
-    if (user == null) throw Exception('Not logged in');
-    final res = await _supabase.from('user_profiles').select('tenant_id').eq('id', user.id).maybeSingle();
-    if (res == null || res['tenant_id'] == null) throw Exception('Tenant ID not found');
-    return res['tenant_id'] as String;
-  }
+    if (user == null) return Stream.value(const <StaffMember>[]);
 
-  /// 🕵️‍♂️ Watch all members of this tenant
-  Stream<List<StaffMember>> watchAllStaff(String tenantId) {
-    // In our schema, user_profiles acts as members table
     return _supabase
         .from('user_profiles')
         .stream(primaryKey: ['id'])
-        .eq('tenant_id', tenantId)
-        .map((snapshot) {
-          return snapshot.map((doc) => StaffMember(
-            uid: doc['id'],
-            email: doc['email'] ?? '',
-            displayName: doc['display_name'] ?? 'Unknown',
-            roleId: doc['role'] ?? 'guest',
-            isOwner: doc['role'] == 'owner',
-            status: 'active',
-          )).toList();
+        .eq('id', user.id)
+        .asyncMap((profiles) async {
+          final tenantId = profiles.isEmpty
+              ? null
+              : profiles.first['tenant_id'] as String?;
+          if (tenantId == null || tenantId.isEmpty) {
+            return const <StaffMember>[];
+          }
+          return _fetchStaff(tenantId);
         });
   }
 
-  /// 🔄 Change a staff member's role
+  Stream<List<StaffMember>> watchAllStaff(String tenantId) {
+    return _supabase
+        .from('staff_members')
+        .stream(primaryKey: ['id'])
+        .eq('tenant_id', tenantId)
+        .eq('status', 'active')
+        .order('created_at')
+        .map((rows) => rows.map(StaffMember.fromJson).toList(growable: false));
+  }
+
+  Future<List<StaffMember>> _fetchStaff(String tenantId) async {
+    final rows = await _supabase
+        .from('staff_members')
+        .select(
+          'id,user_id,role_id,status,created_at,user_profiles(email,display_name)',
+        )
+        .eq('tenant_id', tenantId)
+        .eq('status', 'active')
+        .order('created_at');
+    return (rows as List)
+        .map(
+          (row) => StaffMember.fromJson(Map<String, dynamic>.from(row as Map)),
+        )
+        .toList(growable: false);
+  }
+
+  Future<String> _getTenantId() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) throw const AuthException('Authentication is required.');
+
+    final row = await _supabase
+        .from('staff_members')
+        .select('tenant_id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .order('created_at')
+        .limit(1)
+        .maybeSingle();
+    final tenantId = row?['tenant_id'] as String?;
+    if (tenantId == null || tenantId.isEmpty) {
+      throw const PostgrestException(
+        message: 'Tenant membership was not found.',
+        code: 'MIZAN_TENANT_NOT_FOUND',
+      );
+    }
+    return tenantId;
+  }
+
   Future<void> updateStaffRole(String uid, String newRoleId) async {
     final tenantId = await _getTenantId();
     await _supabase
-        .from('user_profiles')
-        .update({'role': newRoleId})
-        .eq('id', uid)
-        .eq('tenant_id', tenantId);
+        .from('staff_members')
+        .update({'role_id': newRoleId})
+        .eq('user_id', uid)
+        .eq('tenant_id', tenantId)
+        .eq('status', 'active');
   }
 
-  /// 🚫 Remove/Suspend a staff member
   Future<void> removeStaffMember(String uid) async {
     final tenantId = await _getTenantId();
-    // For Phase 4, we just remove them from the tenant by setting tenant_id to null
     await _supabase
-        .from('user_profiles')
-        .update({'tenant_id': null, 'role': 'guest'})
-        .eq('id', uid)
-        .eq('tenant_id', tenantId);
+        .from('staff_members')
+        .update({'status': 'removed'})
+        .eq('user_id', uid)
+        .eq('tenant_id', tenantId)
+        .eq('status', 'active');
   }
 
-  /// 🎟️ CREATE INVITE CODE
   Future<String> createInvite(String roleId) async {
-    final tenantId = await _getTenantId();
-    final String code = (100000 + DateTime.now().microsecondsSinceEpoch % 899999).toString();
-    final expiresAt = DateTime.now().add(const Duration(hours: 24));
-
-    await _supabase.from('invites').insert({
-      'code': code,
-      'tenant_id': tenantId,
-      'role_id': roleId,
-      'expires_at': expiresAt.toIso8601String(),
-      'created_by': _supabase.auth.currentUser?.id,
-      'is_used': false,
-    });
-
-    return code;
+    final result = await _supabase.rpc(
+      'create_invite',
+      params: {'p_role_id': roleId},
+    );
+    if (result is String && result.isNotEmpty) return result;
+    throw const PostgrestException(
+      message: 'Invite creation returned no code.',
+      code: 'MIZAN_INVITE_INVALID_RESPONSE',
+    );
   }
 
-  /// 🎟️ REDEEM INVITE CODE
   Future<String> redeemInvite({
     required String code,
     required String userId,
     required String displayName,
     String? email,
   }) async {
-    // 1. Get the invite document
-    final inviteDoc = await _supabase.from('invites').select().eq('code', code).maybeSingle();
+    final currentUser = _supabase.auth.currentUser;
+    if (currentUser == null) {
+      throw const AuthException('Authentication is required.');
+    }
+    if (currentUser.id != userId) {
+      throw const AuthException(
+        'The signed-in user does not match the invite request.',
+      );
+    }
 
-    if (inviteDoc == null) throw Exception('Invalid invite code');
-    if (inviteDoc['is_used'] == true) throw Exception('This invite code has already been used');
-
-    final expiresAt = DateTime.parse(inviteDoc['expires_at']);
-    if (DateTime.now().isAfter(expiresAt)) throw Exception('This invite code has expired');
-
-    final tenantId = inviteDoc['tenant_id'] as String;
-    final roleId = inviteDoc['role_id'] as String;
-
-    // 2. Add user to members collection (Update user_profiles)
-    await _supabase.from('user_profiles').upsert({
-      'id': userId,
-      'tenant_id': tenantId,
-      'display_name': displayName,
-      'email': email ?? '',
-      'role': roleId,
-    });
-
-    // 3. Mark invite as used
-    await _supabase.from('invites').update({
-      'is_used': true,
-      'used_by': userId,
-      'used_at': DateTime.now().toIso8601String(),
-    }).eq('code', code);
-
-    return roleId;
+    final result = await _supabase.rpc(
+      'redeem_invite',
+      params: {'p_code': code.trim(), 'p_display_name': displayName.trim()},
+    );
+    if (result is Map && result['role_id'] is String) {
+      return result['role_id'] as String;
+    }
+    throw const PostgrestException(
+      message: 'Invite redemption returned no role.',
+      code: 'MIZAN_INVITE_INVALID_RESPONSE',
+    );
   }
 
-  /// 🔍 VALIDATE INVITE CODE (without redeeming)
   Future<Map<String, dynamic>?> validateInviteCode(String code) async {
-    final inviteDoc = await _supabase.from('invites').select().eq('code', code).maybeSingle();
-
-    if (inviteDoc == null) return null;
-    if (inviteDoc['is_used'] == true) return null;
-
-    final expiresAt = DateTime.parse(inviteDoc['expires_at']);
-    if (DateTime.now().isAfter(expiresAt)) return null;
-
-    // Map back to camelCase for UI compatibility if needed
+    final result = await _supabase.rpc(
+      'validate_invite',
+      params: {'p_code': code.trim()},
+    );
+    if (result is! Map) return null;
+    final data = Map<String, dynamic>.from(result);
     return {
-      'roleId': inviteDoc['role_id'],
-      'tenantId': inviteDoc['tenant_id'],
-      'expiresAt': inviteDoc['expires_at'],
+      'roleId': data['role_id'],
+      'tenantId': data['tenant_id'],
+      'expiresAt': data['expires_at'],
     };
   }
 }

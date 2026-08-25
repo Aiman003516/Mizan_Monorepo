@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_data/core_data.dart';
 import 'package:feature_settings/src/presentation/roles/roles_list_screen.dart'; // ⚡ NEW: Import Roles Screen
+import 'package:feature_auth/feature_auth.dart';
 
 // Import Sync Feature
 import 'package:feature_sync/feature_sync.dart';
@@ -436,30 +437,12 @@ class SettingsScreen extends ConsumerWidget {
                       return;
                     }
 
-                    try {
-                      // 👑 RUN THE CLEAN GENESIS
-                      await ref
-                          .read(saasSeedingServiceProvider)
-                          .activateSystemForBuyer('test_tenant_123');
-
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.systemActivatedWelcome),
-                            backgroundColor: context.appColors.success,
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.activationFailed(e.toString())),
-                            backgroundColor: context.appColors.error,
-                          ),
-                        );
-                      }
-                    }
+                    if (!context.mounted) return;
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const BusinessSetupScreen(),
+                      ),
+                    );
                   },
                 );
               },

@@ -12,6 +12,7 @@ import 'package:core_data/core_data.dart';
 
 // --- Feature Packages ---
 import 'package:feature_dashboard/feature_dashboard.dart';
+import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_sync/feature_sync.dart';
 // 🟢 NEW: Import Settings to access Onboarding
 import 'package:feature_settings/feature_settings.dart';
@@ -40,9 +41,12 @@ Future<void> main() async {
     Workmanager().registerPeriodicTask(
       "1",
       "silentBackupTask",
-      frequency: const Duration(hours: 1), // Minimum is usually 15 mins on Android
+      frequency: const Duration(
+        hours: 1,
+      ), // Minimum is usually 15 mins on Android
       constraints: Constraints(
-        networkType: NetworkType.connected, // Only run when internet is available
+        networkType:
+            NetworkType.connected, // Only run when internet is available
       ),
     );
   }
@@ -50,7 +54,7 @@ Future<void> main() async {
   // 🖥️ WINDOWS: Initialize window manager for size/position retention
   if (!kIsWeb && Platform.isWindows) {
     await windowManager.ensureInitialized();
-    
+
     // Load saved window preferences or use defaults
     final prefs = await SharedPreferences.getInstance();
     final double width = prefs.getDouble('window_width') ?? 1280;
@@ -58,14 +62,14 @@ Future<void> main() async {
     final double? x = prefs.getDouble('window_x');
     final double? y = prefs.getDouble('window_y');
     final bool wasMaximized = prefs.getBool('window_maximized') ?? false;
-    
+
     final WindowOptions windowOptions = WindowOptions(
       size: Size(width, height),
       center: x == null || y == null, // Center if no saved position
       minimumSize: const Size(800, 600),
       title: 'Mizan',
     );
-    
+
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
       if (x != null && y != null) {
         await windowManager.setPosition(Offset(x, y));
@@ -135,20 +139,24 @@ class MyApp extends ConsumerWidget {
       // 🟢 ROUTING SWITCH
       home: showOnboarding
           ? const OnboardingScreen()
-          : _AuthenticatedApp(
-              child: Builder(
-                builder: (context) {
-                  return ProviderScope(
-                    overrides: [
-                      transactions_ui.appLocalizationsProvider.overrideWith(
-                        (ref) => ref.watch(
-                          app_l10n.contextualAppLocalizationsProvider(context),
+          : AuthGate(
+              authenticatedChild: _AuthenticatedApp(
+                child: Builder(
+                  builder: (context) {
+                    return ProviderScope(
+                      overrides: [
+                        transactions_ui.appLocalizationsProvider.overrideWith(
+                          (ref) => ref.watch(
+                            app_l10n.contextualAppLocalizationsProvider(
+                              context,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                    child: const MainScaffold(),
-                  );
-                },
+                      ],
+                      child: const MainScaffold(),
+                    );
+                  },
+                ),
               ),
             ),
     );
@@ -192,24 +200,24 @@ class _AuthenticatedAppState extends ConsumerState<_AuthenticatedApp>
   // 🖥️ WINDOW STATE SAVING: Save position/size when window moves or resizes
   @override
   void onWindowResized() => _saveWindowState();
-  
-  @override  
+
+  @override
   void onWindowMoved() => _saveWindowState();
-  
+
   @override
   void onWindowMaximize() => _saveWindowState();
-  
+
   @override
   void onWindowUnmaximize() => _saveWindowState();
 
   Future<void> _saveWindowState() async {
     if (!Platform.isWindows) return;
-    
+
     final prefs = await SharedPreferences.getInstance();
     final size = await windowManager.getSize();
     final position = await windowManager.getPosition();
     final isMaximized = await windowManager.isMaximized();
-    
+
     await prefs.setDouble('window_width', size.width);
     await prefs.setDouble('window_height', size.height);
     await prefs.setDouble('window_x', position.dx);

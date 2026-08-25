@@ -1,7 +1,7 @@
-import 'dart:async';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+
 import '../models/rbac_models.dart';
 
 final rolesRepositoryProvider = Provider<RolesRepository>((ref) {
@@ -9,22 +9,8 @@ final rolesRepositoryProvider = Provider<RolesRepository>((ref) {
 });
 
 final rolesStreamProvider = StreamProvider.autoDispose<List<AppRole>>((ref) {
-  final supabase = Supabase.instance.client;
-  final user = supabase.auth.currentUser;
-  if (user == null) return Stream.value([]);
-  
-  return supabase
-      .from('user_profiles')
-      .stream(primaryKey: ['id'])
-      .eq('id', user.id)
-      .map((profiles) {
-        if (profiles.isEmpty) return null;
-        return profiles.first['tenant_id'] as String?;
-      })
-      .asyncExpand((tenantId) {
-        if (tenantId == null) return Stream.value(<AppRole>[]);
-        return ref.watch(rolesRepositoryProvider).watchAllRoles(tenantId);
-      });
+  final repository = ref.watch(rolesRepositoryProvider);
+  return repository.watchCurrentTenantRoles();
 });
 
 class RolesRepository {
@@ -32,47 +18,116 @@ class RolesRepository {
 
   RolesRepository(this._supabase);
 
-  /// 🕵️‍♂️ Watch all roles for this tenant
+  Stream<List<AppRole>> watchCurrentTenantRoles() {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return Stream.value(const <AppRole>[]);
+
+    return _supabase
+        .from('user_profiles')
+        .stream(primaryKey: ['id'])
+        .eq('id', user.id)
+        .asyncMap((profiles) async {
+          final tenantId = profiles.isEmpty
+              ? null
+              : profiles.first['tenant_id'] as String?;
+          if (tenantId == null || tenantId.isEmpty) {
+            return const <AppRole>[];
+          }
+          return _fetchRoles(tenantId);
+        });
+  }
+
   Stream<List<AppRole>> watchAllRoles(String tenantId) {
     return _supabase
         .from('roles')
         .stream(primaryKey: ['id'])
         .eq('tenant_id', tenantId)
-        .map((snapshot) {
-      return snapshot
-          .map((doc) => AppRole.fromJson(doc, doc['id'] as String))
-          .toList();
-    });
+        .order('name')
+        .map(
+          (rows) => rows
+              .map(
+                (row) => AppRole.fromJson(
+                  Map<String, dynamic>.from(row),
+                  row['id'] as String,
+                ),
+              )
+              .toList(growable: false),
+        );
+  }
+
+  Future<List<AppRole>> _fetchRoles(String tenantId) async {
+    final rows = await _supabase
+        .from('roles')
+        .select('id,name,permissions,is_system_admin')
+        .eq('tenant_id', tenantId)
+        .order('name');
+    return (rows as List)
+        .map(
+          (row) => AppRole.fromJson(
+            Map<String, dynamic>.from(row as Map),
+            (row as Map)['id'] as String,
+          ),
+        )
+        .toList(growable: false);
   }
 
   Future<String> _getTenantId() async {
     final user = _supabase.auth.currentUser;
-    if (user == null) throw Exception('Not logged in');
-    final res = await _supabase.from('user_profiles').select('tenant_id').eq('id', user.id).maybeSingle();
-    if (res == null || res['tenant_id'] == null) throw Exception('Tenant ID not found');
-    return res['tenant_id'] as String;
+    if (user == null) throw const AuthException('Authentication is required.');
+
+    final row = await _supabase
+        .from('staff_members')
+        .select('tenant_id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .order('created_at')
+        .limit(1)
+        .maybeSingle();
+    final tenantId = row?['tenant_id'] as String?;
+    if (tenantId == null || tenantId.isEmpty) {
+      throw const PostgrestException(
+        message: 'Tenant membership was not found.',
+        code: 'MIZAN_TENANT_NOT_FOUND',
+      );
+    }
+    return tenantId;
   }
 
-  /// 📝 Create or Update a Role
   Future<void> saveRole(AppRole role) async {
     final tenantId = await _getTenantId();
-    final roleId = role.id.isEmpty ? const Uuid().v4() : role.id;
+    if (role.isSystemAdmin) {
+      throw const PostgrestException(
+        message: 'System administrator roles are managed by the system.',
+        code: 'MIZAN_SYSTEM_ROLE_PROTECTED',
+      );
+    }
 
+    final roleId = role.id.isEmpty ? const Uuid().v4() : role.id;
     await _supabase.from('roles').upsert({
       'id': roleId,
       'tenant_id': tenantId,
-      'name': role.name,
-      'permissions': role.permissions.map((e) => e.name).toList(),
-      'is_system_admin': role.isSystemAdmin,
-    });
+      'name': role.name.trim(),
+      'permissions': role.permissions
+          .map((permission) => permission.name)
+          .toList(),
+      'is_system_admin': false,
+      if (role.id.isEmpty) 'created_by': _supabase.auth.currentUser!.id,
+    }, onConflict: 'id');
   }
 
-  /// 🗑️ Delete a Role
   Future<void> deleteRole(String roleId) async {
     final tenantId = await _getTenantId();
-    // Safety: Don't allow deleting the Owner role
-    if (roleId == 'owner') {
-      throw Exception("Cannot delete the System Administrator role.");
+    final role = await _supabase
+        .from('roles')
+        .select('is_system_admin')
+        .eq('id', roleId)
+        .eq('tenant_id', tenantId)
+        .maybeSingle();
+    if (role?['is_system_admin'] == true) {
+      throw const PostgrestException(
+        message: 'System administrator roles are managed by the system.',
+        code: 'MIZAN_SYSTEM_ROLE_PROTECTED',
+      );
     }
 
     await _supabase

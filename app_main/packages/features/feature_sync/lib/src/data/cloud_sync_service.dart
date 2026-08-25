@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:core_data/core_data.dart';
-import 'package:feature_auth/feature_auth.dart'; 
+import 'package:feature_auth/feature_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 🔄 THE HYBRID SYNC ENGINE (Engine B - Phase 4.3 Billing Enforcer)
@@ -9,6 +9,7 @@ class CloudSyncService {
   final AppDatabase _localDb;
   final SupabaseClient _supabase;
   final PreferencesRepository _prefs;
+  final CloudCrmRepository _cloudCrm;
   final String? _currentTenantId;
 
   StreamSubscription? _outgoingSyncSub;
@@ -20,11 +21,13 @@ class CloudSyncService {
     required AppDatabase localDb,
     required SupabaseClient supabase,
     required PreferencesRepository prefs,
+    required CloudCrmRepository cloudCrm,
     String? tenantId,
-  })  : _localDb = localDb,
-        _supabase = supabase,
-        _prefs = prefs,
-        _currentTenantId = tenantId;
+  }) : _localDb = localDb,
+       _supabase = supabase,
+       _prefs = prefs,
+       _cloudCrm = cloudCrm,
+       _currentTenantId = tenantId;
 
   List<String> get _allSyncableTables => [
     _localDb.transactions.actualTableName,
@@ -39,13 +42,15 @@ class CloudSyncService {
 
   void startSync() {
     if (_currentTenantId == null) {
-      print('🔒 [Billing Enforcer] Cloud Sync Disabled (Free Tier / No Tenant).');
+      print(
+        '🔒 [Billing Enforcer] Cloud Sync Disabled (Free Tier / No Tenant).',
+      );
       return;
     }
-    
+
     print('🚀 [CloudSync] Starting Engine for Tenant: $_currentTenantId');
-    print('🕒 [CloudSync] Last Sync Time: ${_prefs.getLastSyncTime()}'); 
-    
+    print('🕒 [CloudSync] Last Sync Time: ${_prefs.getLastSyncTime()}');
+
     _startOutgoingSync();
     _startIncomingSync();
   }
@@ -64,12 +69,13 @@ class CloudSyncService {
     if (_currentTenantId == null) return;
     if (_isSyncing) return;
 
-    _isSyncing = true; 
-    _debounceTimer?.cancel(); 
+    _isSyncing = true;
+    _debounceTimer?.cancel();
 
     try {
       print('⚡ [CloudSync] Executing Bundled Sync...');
       final syncStartTime = DateTime.now();
+      await _cloudCrm.syncPendingMutations();
       bool anyDataPushed = false;
 
       for (final table in _allSyncableTables) {
@@ -85,7 +91,7 @@ class CloudSyncService {
       }
     } catch (e) {
       print('❌ [CloudSync] Sync Cycle Failed: $e');
-      rethrow; 
+      rethrow;
     } finally {
       _isSyncing = false;
     }
@@ -101,7 +107,10 @@ class CloudSyncService {
     });
   }
 
-  Future<bool> _processTable(String tableName, {required bool updatePrefs}) async {
+  Future<bool> _processTable(
+    String tableName, {
+    required bool updatePrefs,
+  }) async {
     if (_currentTenantId == null) return false;
 
     List<Map<String, dynamic>> rowsToPush = [];
@@ -142,19 +151,28 @@ class CloudSyncService {
         final lastUpdatedExpr = mizanTbl.lastUpdated as Expression<DateTime>;
         final tenantIdExpr = mizanTbl.tenantId as Expression<String>;
 
-        return lastUpdatedExpr.isBiggerThan(Variable(_prefs.getLastSyncTime())) &
-               tenantIdExpr.equals(tenantIdVal);
+        return lastUpdatedExpr.isBiggerThan(
+              Variable(_prefs.getLastSyncTime()),
+            ) &
+            tenantIdExpr.equals(tenantIdVal);
       });
 
+    query.limit(500);
     final results = await query.get();
-    return results.map((row) => (row as dynamic).toJson()).cast<Map<String, dynamic>>().toList();
+    return results
+        .map((row) => (row as dynamic).toJson())
+        .cast<Map<String, dynamic>>()
+        .toList();
   }
 
   String _getRemoteTableName(String localTableName) {
     return 'synced_$localTableName';
   }
 
-  Future<void> _pushToSupabase(String tableName, List<Map<String, dynamic>> rows) async {
+  Future<void> _pushToSupabase(
+    String tableName,
+    List<Map<String, dynamic>> rows,
+  ) async {
     if (_currentTenantId == null) return;
 
     final remoteName = _getRemoteTableName(tableName);
@@ -163,7 +181,9 @@ class CloudSyncService {
 
     for (int i = 0; i < chunks; i++) {
       final start = i * batchSize;
-      final end = (start + batchSize < rows.length) ? start + batchSize : rows.length;
+      final end = (start + batchSize < rows.length)
+          ? start + batchSize
+          : rows.length;
       final chunk = rows.sublist(start, end).map((row) {
         final lastUpdated = row['lastUpdated'];
         return <String, dynamic>{
@@ -179,7 +199,9 @@ class CloudSyncService {
 
       try {
         await _supabase.from(remoteName).upsert(chunk);
-        print('☁️ [CloudSync] Pushed Batch ${i + 1}/$chunks (${chunk.length} items)');
+        print(
+          '☁️ [CloudSync] Pushed Batch ${i + 1}/$chunks (${chunk.length} items)',
+        );
       } catch (e) {
         print('❌ [CloudSync] Batch Push Failed: $e');
         rethrow;
@@ -189,20 +211,27 @@ class CloudSyncService {
 
   void _startIncomingSync() async {
     if (_currentTenantId == null) return;
-    
+
     // 1. Initial catch-up
     final lastSync = _prefs.getLastSyncTime();
     for (final tableName in _allSyncableTables) {
       final remoteName = _getRemoteTableName(tableName);
       try {
-        final missedData = await _supabase
-          .from(remoteName)
-          .select()
-          .eq('tenant_id', _currentTenantId)
-          .gte('last_updated', lastSync.toIso8601String());
-          
-        if (missedData.isNotEmpty) {
-           await _upsertLocal(tableName, missedData);
+        var offset = 0;
+        while (true) {
+          final missedData = await _supabase
+              .from(remoteName)
+              .select()
+              .eq('tenant_id', _currentTenantId)
+              .gte('last_updated', lastSync.toIso8601String())
+              .order('last_updated')
+              .order('id')
+              .range(offset, offset + 499);
+
+          if (missedData.isEmpty) break;
+          await _upsertLocal(tableName, missedData);
+          if (missedData.length < 500) break;
+          offset += missedData.length;
         }
       } catch (e) {
         print('Catch-up sync failed for $tableName: $e');
@@ -220,31 +249,41 @@ class CloudSyncService {
     if (_currentTenantId == null) return;
 
     final remoteName = _getRemoteTableName(tableName);
-    final channel = _supabase.channel('public:$remoteName').onPostgresChanges(
-      event: PostgresChangeEvent.all,
-      schema: 'public',
-      table: remoteName,
-      filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'tenant_id', value: _currentTenantId),
-      callback: (payload) async {
-        final record = payload.eventType == PostgresChangeEvent.delete
-            ? payload.oldRecord
-            : payload.newRecord;
-        if (record.isEmpty) return;
+    final channel = _supabase
+        .channel('public:$remoteName')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: remoteName,
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'tenant_id',
+            value: _currentTenantId,
+          ),
+          callback: (payload) async {
+            final record = payload.eventType == PostgresChangeEvent.delete
+                ? payload.oldRecord
+                : payload.newRecord;
+            if (record.isEmpty) return;
 
-        print('📥 [CloudSync] Received realtime update for $remoteName');
-        final syncRecord = Map<String, dynamic>.from(record);
-        if (payload.eventType == PostgresChangeEvent.delete) {
-          syncRecord['is_deleted'] = true;
-        }
-        await _upsertLocal(tableName, [syncRecord]);
-        await _prefs.setLastSyncTime(DateTime.now());
-      }
-    ).subscribe();
+            print('📥 [CloudSync] Received realtime update for $remoteName');
+            final syncRecord = Map<String, dynamic>.from(record);
+            if (payload.eventType == PostgresChangeEvent.delete) {
+              syncRecord['is_deleted'] = true;
+            }
+            await _upsertLocal(tableName, [syncRecord]);
+            await _prefs.setLastSyncTime(DateTime.now());
+          },
+        )
+        .subscribe();
 
     _incomingChannels.add(channel);
   }
 
-  Future<void> _upsertLocal(String tableName, List<Map<String, dynamic>> docs) async {
+  Future<void> _upsertLocal(
+    String tableName,
+    List<Map<String, dynamic>> docs,
+  ) async {
     await _localDb.transaction(() async {
       for (final data in docs) {
         try {
@@ -257,21 +296,38 @@ class CloudSyncService {
           }
 
           if (tableName == _localDb.transactions.actualTableName) {
-             await _localDb.into(_localDb.transactions).insertOnConflictUpdate(Transaction.fromJson(localData));
+            await _localDb
+                .into(_localDb.transactions)
+                .insertOnConflictUpdate(Transaction.fromJson(localData));
           } else if (tableName == _localDb.products.actualTableName) {
-             await _localDb.into(_localDb.products).insertOnConflictUpdate(Product.fromJson(localData));
+            await _localDb
+                .into(_localDb.products)
+                .insertOnConflictUpdate(Product.fromJson(localData));
           } else if (tableName == _localDb.accounts.actualTableName) {
-             await _localDb.into(_localDb.accounts).insertOnConflictUpdate(Account.fromJson(localData));
+            await _localDb
+                .into(_localDb.accounts)
+                .insertOnConflictUpdate(Account.fromJson(localData));
           } else if (tableName == _localDb.transactionEntries.actualTableName) {
-             await _localDb.into(_localDb.transactionEntries).insertOnConflictUpdate(TransactionEntry.fromJson(localData));
+            await _localDb
+                .into(_localDb.transactionEntries)
+                .insertOnConflictUpdate(TransactionEntry.fromJson(localData));
           } else if (tableName == _localDb.orders.actualTableName) {
-             await _localDb.into(_localDb.orders).insertOnConflictUpdate(Order.fromJson(localData));
+            await _localDb
+                .into(_localDb.orders)
+                .insertOnConflictUpdate(Order.fromJson(localData));
           } else if (tableName == _localDb.orderItems.actualTableName) {
-             await _localDb.into(_localDb.orderItems).insertOnConflictUpdate(OrderItem.fromJson(localData));
+            await _localDb
+                .into(_localDb.orderItems)
+                .insertOnConflictUpdate(OrderItem.fromJson(localData));
           } else if (tableName == _localDb.categories.actualTableName) {
-             await _localDb.into(_localDb.categories).insertOnConflictUpdate(Category.fromJson(localData));
-          } else if (tableName == _localDb.inventoryCostLayers.actualTableName) {
-             await _localDb.into(_localDb.inventoryCostLayers).insertOnConflictUpdate(InventoryCostLayer.fromJson(localData));
+            await _localDb
+                .into(_localDb.categories)
+                .insertOnConflictUpdate(Category.fromJson(localData));
+          } else if (tableName ==
+              _localDb.inventoryCostLayers.actualTableName) {
+            await _localDb
+                .into(_localDb.inventoryCostLayers)
+                .insertOnConflictUpdate(InventoryCostLayer.fromJson(localData));
           }
         } catch (e) {
           print('❌ [CloudSync] Upsert Error for $tableName: $e');
@@ -283,20 +339,24 @@ class CloudSyncService {
 
 // 💉 REVISED PROVIDER
 final cloudSyncServiceProvider = Provider<CloudSyncService>((ref) {
-  final db = ref.watch(appDatabaseProvider); 
+  final db = ref.watch(appDatabaseProvider);
   final supabase = Supabase.instance.client;
   final prefs = ref.watch(preferencesRepositoryProvider);
-  
+  final cloudCrm = ref.watch(cloudCrmRepositoryProvider);
+
   final userAsync = ref.watch(currentUserStreamProvider);
   final user = userAsync.value;
 
-  final String? tenantId = (user?.hasCloudAccess == true) ? user?.tenantId : null;
+  final String? tenantId = (user?.hasCloudAccess == true)
+      ? user?.tenantId
+      : null;
 
   final service = CloudSyncService(
-    localDb: db, 
+    localDb: db,
     supabase: supabase,
-    prefs: prefs, 
-    tenantId: tenantId, 
+    prefs: prefs,
+    cloudCrm: cloudCrm,
+    tenantId: tenantId,
   );
 
   service.startSync();

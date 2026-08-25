@@ -1,7 +1,5 @@
 // FILE: packages/core/core_data/lib/src/models/rbac_models.dart
 
-
-
 /// 🛡️ THE APP USER (Enriched Identity)
 /// Combines Firebase Auth (Email/UID) with Firestore Data (Tenant/Role).
 class AppUser {
@@ -9,8 +7,8 @@ class AppUser {
   final String email;
   final String? displayName;
   final String? tenantId; // 👈 CRITICAL: Links user to a specific shop
-  final String role;      // e.g., 'owner', 'manager', 'staff'
-  final bool isPro;       // Lifetime License Flag
+  final String role; // e.g., 'owner', 'manager', 'staff'
+  final bool isPro; // Lifetime License Flag
 
   const AppUser({
     required this.uid,
@@ -24,17 +22,22 @@ class AppUser {
   /// ⚡ Computed Property: Is this user the Boss?
   bool get isOwner => role == 'owner';
 
-  /// ⚡ Computed Property: Can they use Cloud features?
-  bool get hasCloudAccess => true; // BYPASSED FOR TESTING
+  /// Cloud access requires a tenant membership. Subscription checks are
+  /// performed separately by the billing layer.
+  bool get hasCloudAccess => tenantId != null && tenantId!.isNotEmpty;
 
-  factory AppUser.fromMap(Map<String, dynamic> data, {required String uid, required String email}) {
+  factory AppUser.fromMap(
+    Map<String, dynamic> data, {
+    required String uid,
+    required String email,
+  }) {
     return AppUser(
       uid: uid,
       email: email,
-      displayName: data['displayName'] as String?,
-      tenantId: data['tenantId'] as String?,
+      displayName: (data['displayName'] ?? data['display_name']) as String?,
+      tenantId: (data['tenantId'] ?? data['tenant_id']) as String?,
       role: data['role'] as String? ?? 'staff',
-      isPro: data['isPro'] as bool? ?? false,
+      isPro: (data['isPro'] ?? data['is_pro']) as bool? ?? false,
     );
   }
 
@@ -56,21 +59,29 @@ enum AppPermission {
   // --- Dashboard & Analytics ---
   viewDashboard,
   viewFinancialReports,
-  
+
   // --- Sales & POS ---
   performSale,
   voidTransaction, // Delete/Cancel a sale
   processRefund,
   viewSalesHistory,
-  
+
   // --- Inventory ---
   viewInventory,
   manageProducts, // Add/Edit/Delete Products
   adjustInventory, // Stock take / corrections
-  
   // --- CRM & Admin ---
   manageStaff, // Invite users, change roles
   manageSettings, // Change currency, tax, company info
+  manageCrm,
+  manageCustomers,
+  manageVendors,
+  createInvoices,
+  manageInvoices,
+  createBills,
+  manageBills,
+  manageAccounting,
+  postJournalEntries,
   switchTenant, // For multi-branch users (Future proofing)
 }
 
@@ -79,7 +90,7 @@ class AppRole {
   final String id;
   final String name;
   final List<AppPermission> permissions;
-  final bool isSystemAdmin; 
+  final bool isSystemAdmin;
 
   const AppRole({
     required this.id,
@@ -97,22 +108,30 @@ class AppRole {
     );
   }
 
+  factory AppRole.guest() {
+    return const AppRole(id: 'guest', name: 'Guest', permissions: []);
+  }
+
   factory AppRole.fromJson(Map<String, dynamic> json, String id) {
     final permsData = json['permissions'] as List<dynamic>? ?? [];
-    
-    final permissions = permsData.map((p) {
-      try {
-        return AppPermission.values.byName(p as String);
-      } catch (e) {
-        return null; 
-      }
-    }).whereType<AppPermission>().toList();
+
+    final permissions = permsData
+        .map((p) {
+          try {
+            return AppPermission.values.byName(p as String);
+          } catch (e) {
+            return null;
+          }
+        })
+        .whereType<AppPermission>()
+        .toList();
 
     return AppRole(
       id: id,
       name: json['name'] as String? ?? 'Unknown Role',
       permissions: permissions,
-      isSystemAdmin: json['isSystemAdmin'] as bool? ?? false,
+      isSystemAdmin:
+          (json['isSystemAdmin'] ?? json['is_system_admin']) as bool? ?? false,
     );
   }
 
@@ -137,7 +156,7 @@ class StaffMember {
   final String displayName;
   final String roleId;
   final bool isOwner;
-  final String status; 
+  final String status;
   final DateTime? joinedAt;
 
   const StaffMember({
@@ -151,14 +170,25 @@ class StaffMember {
   });
 
   factory StaffMember.fromJson(Map<String, dynamic> json) {
+    final profile = json['user_profiles'] is Map
+        ? Map<String, dynamic>.from(json['user_profiles'] as Map)
+        : const <String, dynamic>{};
+    final joined = json['joinedAt'] ?? json['created_at'] ?? json['createdAt'];
     return StaffMember(
-      uid: json['uid'] as String? ?? '',
-      email: json['email'] as String? ?? '',
-      displayName: json['displayName'] as String? ?? 'Unknown',
-      roleId: json['roleId'] as String? ?? 'guest',
-      isOwner: json['isOwner'] as bool? ?? false,
+      uid: (json['uid'] ?? json['user_id'] ?? json['id']) as String? ?? '',
+      email: (json['email'] ?? profile['email']) as String? ?? '',
+      displayName:
+          (json['displayName'] ??
+                  json['display_name'] ??
+                  profile['display_name'])
+              as String? ??
+          'Unknown',
+      roleId: (json['roleId'] ?? json['role_id']) as String? ?? 'guest',
+      isOwner: (json['isOwner'] ?? json['is_owner']) as bool? ?? false,
       status: json['status'] as String? ?? 'active',
-      joinedAt: json['joinedAt'] != null ? DateTime.tryParse(json['joinedAt'] as String) : null, 
+      joinedAt: joined is DateTime
+          ? joined
+          : (joined is String ? DateTime.tryParse(joined) : null),
     );
   }
 

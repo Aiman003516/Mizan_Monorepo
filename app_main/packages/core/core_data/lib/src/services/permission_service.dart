@@ -1,16 +1,13 @@
-// FILE: packages/core/core_data/lib/src/services/permission_service.dart
-
 import 'dart:async';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/rbac_models.dart';
 
-/// 🛡️ THE GATEKEEPER PROVIDER
-/// This is the primary way the UI asks: "What can I do?"
-/// Usage: final role = ref.watch(userRoleProvider);
+/// The primary authorization stream used by PermissionGuard and Settings.
 final userRoleProvider = StreamProvider<AppRole>((ref) {
-  final service = ref.watch(permissionServiceProvider);
-  return service.watchCurrentUserRole();
+  return ref.watch(permissionServiceProvider).watchCurrentUserRole();
 });
 
 final permissionServiceProvider = Provider<PermissionService>((ref) {
@@ -22,57 +19,58 @@ class PermissionService {
 
   PermissionService(this._supabase);
 
-  /// 🕵️‍♂️ WATCHER: Live stream of the user's power level.
   Stream<AppRole> watchCurrentUserRole() {
     return _supabase.auth.onAuthStateChange.switchMap((authState) {
       final user = authState.session?.user;
-      if (user == null) {
-        // Not logged in? No powers.
-        return Stream.value(_guestRole());
-      }
+      if (user == null) return Stream.value(AppRole.guest());
 
-      // 1. Listen to the Staff Members table
       return _supabase
-          .from('staff_members')
+          .from('user_profiles')
           .stream(primaryKey: ['id'])
-          .eq('user_id', user.id)
-          .switchMap((staffMaps) {
-        if (staffMaps.isEmpty) {
-          return Stream.value(_guestRole());
-        }
+          .eq('id', user.id)
+          .asyncExpand((profiles) {
+            final tenantId = profiles.isEmpty
+                ? null
+                : profiles.first['tenant_id'] as String?;
+            if (tenantId == null || tenantId.isEmpty) {
+              return Stream.value(AppRole.guest());
+            }
 
-        final data = staffMaps.first;
-        final roleId = data['role_id'] as String?;
-
-        if (roleId == null) return Stream.value(_guestRole());
-
-        // 👑 OWNER OVERRIDE (For backward compatibility in testing)
-        if (roleId == 'owner') {
-          return Stream.value(AppRole.owner());
-        }
-
-        // 2. Fetch the Role Definition from 'roles' table
-        return _supabase
-            .from('roles')
-            .stream(primaryKey: ['id'])
-            .eq('id', roleId)
-            .map((roleMaps) {
-          if (roleMaps.isEmpty) return _guestRole();
-          return AppRole.fromJson(roleMaps.first, roleMaps.first['id']);
-        });
-      });
+            return _supabase
+                .from('staff_members')
+                .stream(primaryKey: ['id'])
+                .eq('tenant_id', tenantId)
+                .eq('user_id', user.id)
+                .eq('status', 'active')
+                .asyncExpand((memberships) {
+                  if (memberships.isEmpty) {
+                    return Stream.value(AppRole.guest());
+                  }
+                  final roleId = memberships.first['role_id'] as String?;
+                  if (roleId == null || roleId.isEmpty) {
+                    return Stream.value(AppRole.guest());
+                  }
+                  return _supabase
+                      .from('roles')
+                      .stream(primaryKey: ['id'])
+                      .eq('tenant_id', tenantId)
+                      .eq('id', roleId)
+                      .map(
+                        (roles) => roles.isEmpty
+                            ? AppRole.guest()
+                            : AppRole.fromJson(
+                                roles.first,
+                                roles.first['id'] as String,
+                              ),
+                      );
+                });
+          });
     });
-  }
-
-  /// 💀 FALLBACK: The Guest Role (Now bypassed for testing)
-  AppRole _guestRole() {
-    return AppRole.owner();
   }
 }
 
-// 🔧 UTILITY EXTENSION (RxDart-style switchMap for native Streams)
 extension _StreamSwitchMap<T> on Stream<T> {
   Stream<R> switchMap<R>(Stream<R> Function(T event) mapper) {
-    return map(mapper).asyncExpand((stream) => stream);
+    return asyncExpand(mapper);
   }
 }
