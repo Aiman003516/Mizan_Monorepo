@@ -26,6 +26,22 @@ void main() {
     expect(role.hasPermission(AppPermission.manageInvoices), isTrue);
   });
 
+  test('legacy JSONB permission objects parse safely', () {
+    final role = AppRole.fromJson({
+      'name': 'Legacy Manager',
+      'permissions': {
+        'manageCustomers': true,
+        'manageInvoices': true,
+        'manageBills': false,
+      },
+      'is_system_admin': false,
+    }, 'role-legacy');
+
+    expect(role.hasPermission(AppPermission.manageCustomers), isTrue);
+    expect(role.hasPermission(AppPermission.manageInvoices), isTrue);
+    expect(role.hasPermission(AppPermission.manageBills), isFalse);
+  });
+
   test('custom fields parse Supabase snake_case rows', () {
     final field = CustomFieldDefinition.fromJson({
       'key': 'customer_segment',

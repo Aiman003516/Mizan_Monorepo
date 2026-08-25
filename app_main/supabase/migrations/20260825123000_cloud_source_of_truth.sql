@@ -31,7 +31,7 @@ create table if not exists public.roles (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid not null references public.tenants(id) on delete cascade,
   name text not null check (length(btrim(name)) between 1 and 100),
-  permissions text[] not null default '{}',
+  permissions jsonb not null default '[]'::jsonb,
   is_system_admin boolean not null default false,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default timezone('utc', now()),
@@ -55,11 +55,6 @@ create table if not exists public.staff_members (
   foreign key (tenant_id, role_id) references public.roles(tenant_id, id) on delete restrict
 );
 
-create index if not exists staff_members_user_tenant_idx
-  on public.staff_members (user_id, tenant_id, status);
-create index if not exists staff_members_tenant_role_idx
-  on public.staff_members (tenant_id, role_id, status);
-
 create table if not exists public.invites (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid not null references public.tenants(id) on delete cascade,
@@ -73,11 +68,6 @@ create table if not exists public.invites (
   created_at timestamptz not null default timezone('utc', now()),
   foreign key (tenant_id, role_id) references public.roles(tenant_id, id) on delete restrict
 );
-
-create index if not exists invites_tenant_expiry_idx
-  on public.invites (tenant_id, expires_at, is_used);
-create index if not exists invites_code_lookup_idx
-  on public.invites (code, is_used, expires_at);
 
 create table if not exists public.currencies (
   id uuid primary key default gen_random_uuid(),
@@ -314,7 +304,7 @@ begin
   alter table public.user_profiles add column if not exists display_name text;
   alter table public.user_profiles add column if not exists updated_at timestamptz not null default timezone('utc', now());
   alter table public.roles add column if not exists tenant_id uuid;
-  alter table public.roles add column if not exists permissions text[] not null default '{}'::text[];
+  alter table public.roles add column if not exists permissions jsonb not null default '[]'::jsonb;
   alter table public.roles add column if not exists is_system_admin boolean not null default false;
   alter table public.roles add column if not exists created_by uuid;
   alter table public.roles add column if not exists updated_at timestamptz not null default timezone('utc', now());
@@ -328,7 +318,11 @@ begin
   alter table public.invites add column if not exists role_id uuid;
   alter table public.invites add column if not exists email text;
   alter table public.invites add column if not exists code_hash text;
+  alter table public.invites add column if not exists created_by uuid;
   alter table public.invites add column if not exists status text not null default 'pending';
+  alter table public.invites add column if not exists is_used boolean not null default false;
+  alter table public.invites add column if not exists used_by uuid;
+  alter table public.invites add column if not exists used_at timestamptz;
   alter table public.invites add column if not exists expires_at timestamptz not null default timezone('utc', now()) + interval '7 days';
   alter table public.invites add column if not exists accepted_at timestamptz;
   alter table public.invites add column if not exists invited_by uuid;
@@ -338,6 +332,14 @@ begin
   if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'tenants' and column_name = 'owner_id') then
     execute 'update public.tenants set owner_uid = nullif(owner_id::text, '''')::uuid where owner_uid is null and owner_id::text ~ ''^[0-9a-fA-F-]{36}$''';
   end if;
+  create index if not exists staff_members_user_tenant_idx
+    on public.staff_members (user_id, tenant_id, status);
+  create index if not exists staff_members_tenant_role_idx
+    on public.staff_members (tenant_id, role_id, status);
+  create index if not exists invites_tenant_expiry_idx
+    on public.invites (tenant_id, expires_at, is_used);
+  create index if not exists invites_code_lookup_idx
+    on public.invites (code, is_used, expires_at);
 end;
 $$;
 
@@ -379,8 +381,15 @@ as $$
           where required_permission in (
             select jsonb_array_elements_text(
               case
-                when jsonb_typeof(to_jsonb(r.permissions)) = 'array'
-                  then to_jsonb(r.permissions)
+                when jsonb_typeof(r.permissions) = 'array' then r.permissions
+                when jsonb_typeof(r.permissions) = 'object' then coalesce(
+                  (
+                    select jsonb_agg(permission_name)
+                    from jsonb_object_keys(r.permissions) as permission_name
+                    where (r.permissions -> permission_name) = 'true'::jsonb
+                  ),
+                  '[]'::jsonb
+                )
                 else '[]'::jsonb
               end
             )
@@ -648,12 +657,12 @@ begin
   returning id into v_tenant;
 
   insert into public.roles (tenant_id, name, permissions, is_system_admin, created_by)
-  values (v_tenant, 'Owner', array[
+  values (v_tenant, 'Owner', to_jsonb(array[
     'viewDashboard','viewFinancialReports','performSale','voidTransaction','processRefund',
     'viewSalesHistory','viewInventory','manageProducts','adjustInventory','manageStaff',
     'manageSettings','switchTenant','manageCrm','manageCustomers','manageVendors',
     'createInvoices','manageInvoices','createBills','manageBills'
-  ], true, v_user)
+  ]::text[]), true, v_user)
   returning id into v_role;
 
   insert into public.staff_members (tenant_id, user_id, role_id)
@@ -860,12 +869,12 @@ begin
 
   if v_role is null then
     insert into public.roles (tenant_id, name, permissions, is_system_admin, created_by)
-    values (p_tenant_id, 'Owner', array[
+    values (p_tenant_id, 'Owner', to_jsonb(array[
       'viewDashboard','viewFinancialReports','performSale','voidTransaction','processRefund',
       'viewSalesHistory','viewInventory','manageProducts','adjustInventory','manageStaff',
       'manageSettings','switchTenant','manageCrm','manageCustomers','manageVendors',
       'createInvoices','manageInvoices','createBills','manageBills','manageAccounting','postJournalEntries'
-    ], true, v_user)
+    ]::text[]), true, v_user)
     returning id into v_role;
   end if;
 

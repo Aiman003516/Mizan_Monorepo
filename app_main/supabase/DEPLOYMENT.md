@@ -4,9 +4,9 @@ The migration in `migrations/20260825123000_cloud_source_of_truth.sql` creates c
 
 ## Apply the migration
 
-The connected Supabase Data API accepts authenticated REST queries, but the current session key does not have DDL privileges and no direct Postgres connection is available in the build environment. Apply the migration once in the Supabase SQL Editor or with the Supabase CLI using the project’s database credentials. Apply the complete file as one migration; do not copy individual policy fragments out of order.
+The connected Supabase Data API accepts authenticated REST queries, but the current session key does not have DDL privileges and no direct Postgres connection is available in the build environment. Apply the migration once in the Supabase SQL Editor or with the Supabase CLI using the project’s database credentials. Apply the complete file as one migration; do not copy individual policy fragments out of order. If an earlier run stopped with `ERROR: 42703: column "status" does not exist`, pull the latest repository version and rerun the complete file: the compatibility block now adds legacy `staff_members.status` and invite lifecycle columns before creating their indexes and policies. The migration also uses JSONB for role permissions, matching the existing `roles.permissions` column.
 
-After applying it, run the SQL in `tests/cloud_source_of_truth.sql` with the project’s database test runner. The Data API probe should then return HTTP 200 for `currencies`, `custom_fields`, `customers`, `vendors`, `invoices`, `invoice_items`, `bills`, `bill_items`, and `audit_logs`.
+After applying it, run the SQL in `tests/cloud_source_of_truth.sql` with the project’s database test runner. The supplied schema export shows the legacy tables are currently empty, so no data conversion is expected for the first successful run; retain a database backup before applying to a populated project. The Data API probe should then return HTTP 200 for `currencies`, `custom_fields`, `customers`, `vendors`, `invoices`, `invoice_items`, `bills`, `bill_items`, and `audit_logs`.
 
 ## Realtime and client configuration
 

@@ -113,12 +113,20 @@ class AppRole {
   }
 
   factory AppRole.fromJson(Map<String, dynamic> json, String id) {
-    final permsData = json['permissions'] as List<dynamic>? ?? [];
+    final rawPermissions = json['permissions'];
+    final permsData = rawPermissions is List
+        ? rawPermissions.whereType<String>().toList()
+        : rawPermissions is Map
+        ? rawPermissions.entries
+              .where((entry) => entry.value == true)
+              .map((entry) => entry.key.toString())
+              .toList()
+        : const <String>[];
 
     final permissions = permsData
-        .map((p) {
+        .map((permissionName) {
           try {
-            return AppPermission.values.byName(p as String);
+            return AppPermission.values.byName(permissionName);
           } catch (e) {
             return null;
           }
