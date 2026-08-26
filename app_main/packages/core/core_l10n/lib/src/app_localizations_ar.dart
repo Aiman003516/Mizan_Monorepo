@@ -5630,6 +5630,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get closeChecklist => 'قائمة تحقق الإقفال';
 
   @override
+  String get closeThroughDate => 'الإقفال حتى تاريخ';
+
+  @override
+  String get invalidDate => 'أدخل تاريخاً صحيحاً بالتنسيق YYYY-MM-DD.';
+
+  @override
+  String get closeNotExecutedGuest =>
+      'يسجل وضع الضيف قائمة التحقق فقط، ولا يقفل الفترات المحاسبية أو ينشئ قيود الإقفال.';
+
+  @override
+  String get closeChecklistSaved => 'تم حفظ قائمة تحقق الإقفال';
+
+  @override
   String get closeRequiresReconciliation => 'يتطلب الإقفال إجراء التسوية';
 
   @override

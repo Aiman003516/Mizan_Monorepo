@@ -17,6 +17,7 @@ import 'owner_payment_settings_screen.dart';
 import 'owner_crm_settings_screen.dart';
 import 'owner_pos_settings_screen.dart';
 import 'owner_finance_operations_settings_screen.dart';
+import 'owner_close_management_screen.dart';
 import '../data/owner_control_center_contract.dart';
 import '../data/owner_control_center_repository.dart';
 
@@ -307,9 +308,7 @@ class OwnerControlCenterScreen extends ConsumerWidget {
       OwnerSettingSections.reports => OwnerPolicySettingsScreen(
         section: section.id,
       ),
-      OwnerSettingSections.close => OwnerPolicySettingsScreen(
-        section: section.id,
-      ),
+      OwnerSettingSections.close => const OwnerCloseManagementScreen(),
       _ => null,
     };
 

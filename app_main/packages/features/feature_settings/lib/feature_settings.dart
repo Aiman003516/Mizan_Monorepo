@@ -23,6 +23,7 @@ export 'src/presentation/owner_payment_settings_screen.dart';
 export 'src/presentation/owner_crm_settings_screen.dart';
 export 'src/presentation/owner_pos_settings_screen.dart';
 export 'src/presentation/owner_finance_operations_settings_screen.dart';
+export 'src/presentation/owner_close_management_screen.dart';
 export 'src/presentation/currency_controller.dart';
 export 'src/presentation/currency_settings_screen.dart';
 export 'src/presentation/fixed_assets_screen.dart';

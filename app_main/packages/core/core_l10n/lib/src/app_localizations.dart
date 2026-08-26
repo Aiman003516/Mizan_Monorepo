@@ -10694,6 +10694,30 @@ abstract class AppLocalizations {
   /// **'Close checklist'**
   String get closeChecklist;
 
+  /// No description provided for @closeThroughDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Close through date'**
+  String get closeThroughDate;
+
+  /// No description provided for @invalidDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid date in YYYY-MM-DD format.'**
+  String get invalidDate;
+
+  /// No description provided for @closeNotExecutedGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest mode records the checklist only. It does not lock accounting periods or post closing entries.'**
+  String get closeNotExecutedGuest;
+
+  /// No description provided for @closeChecklistSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Close checklist saved'**
+  String get closeChecklistSaved;
+
   /// No description provided for @closeRequiresReconciliation.
   ///
   /// In en, this message translates to:

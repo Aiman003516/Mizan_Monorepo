@@ -5639,6 +5639,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get closeChecklist => 'Close checklist';
 
   @override
+  String get closeThroughDate => 'Close through date';
+
+  @override
+  String get invalidDate => 'Enter a valid date in YYYY-MM-DD format.';
+
+  @override
+  String get closeNotExecutedGuest =>
+      'Guest mode records the checklist only. It does not lock accounting periods or post closing entries.';
+
+  @override
+  String get closeChecklistSaved => 'Close checklist saved';
+
+  @override
   String get closeRequiresReconciliation => 'Closing requires reconciliation';
 
   @override
