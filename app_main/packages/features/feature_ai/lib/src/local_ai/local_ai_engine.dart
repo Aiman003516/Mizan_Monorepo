@@ -93,6 +93,8 @@ class FixedProposalLocalAiEngine implements LocalAiEngine {
   }
 }
 
+/// The application default remains disabled. Product composition code may
+/// explicitly override this provider after the local-only setting is enabled.
 final localAiEngineProvider = Provider<LocalAiEngine>((ref) {
   return const DisabledLocalAiEngine();
 });

@@ -1,0 +1,12 @@
+{
+  "schema_version": "mizan.local-ai.model/v1",
+  "model_id": "proposal_extractor_ar_en",
+  "model_version": "1.0.0",
+  "artifact_name": "model.tflite",
+  "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "tokenizer_version": "rules-tokenizer-v1",
+  "supported_locales": ["ar", "en"],
+  "minimum_app_version": "0.1.0",
+  "task": "proposal_extraction",
+  "quantization": "int8"
+}

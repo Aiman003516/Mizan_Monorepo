@@ -4,6 +4,10 @@
 
 This document defines the final phase for deploying privacy-preserving AI on the Mizan end device. It is intentionally sequenced after the cloud action expansion, accounting validation, audit testing, Supabase rollout, and physical-device regression testing. No local model may bypass Mizan’s deterministic accounting validators, tenant isolation, permissions, confirmation tokens, or audit logging.
 
+## Step 2 implementation note
+
+The deterministic rule-based engine, Flutter native bridge contract, fail-closed Android channel scaffold, and future model manifest strategy are documented in [`local-ai-tflite-bridge.md`](local-ai-tflite-bridge.md). No native model binary or runtime dependency is enabled yet.
+
 ## Non-negotiable boundary
 
 > A local model may interpret language and prepare a typed proposal. It may never be the authority that calculates, authorizes, posts, edits, deletes, or reverses an accounting record.
