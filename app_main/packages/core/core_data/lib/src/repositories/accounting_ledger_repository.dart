@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../tenant_context.dart';
 import '../models/erp_domain_contracts.dart';
+import '../services/deterministic_tax_engine.dart';
 
 final accountingLedgerRepositoryProvider = Provider<AccountingLedgerRepository>(
   (ref) => AccountingLedgerRepository(
@@ -348,6 +349,62 @@ class AccountingLedgerRepository {
         .whereType<Map>()
         .map((row) => TaxCode.fromJson(Map<String, dynamic>.from(row)))
         .toList(growable: false);
+  }
+
+  Future<TaxCalculationResult> calculateTax({
+    required int taxableMinor,
+    required String taxCodeId,
+    required String currencyCode,
+    String? jurisdictionCode,
+    DateTime? asOf,
+  }) async {
+    final result = await _supabase.rpc(
+      'calculate_tax',
+      params: {
+        'p_taxable_minor': taxableMinor,
+        'p_tax_code_id': taxCodeId,
+        'p_currency_code': currencyCode.trim().toUpperCase(),
+        'p_jurisdiction_code': jurisdictionCode,
+        'p_as_of': (asOf ?? DateTime.now()).toIso8601String().substring(0, 10),
+      },
+    );
+    if (result is! Map) {
+      throw const PostgrestException(
+        message: 'Tax calculation returned no result.',
+        code: 'MIZAN_TAX_INVALID_RESPONSE',
+      );
+    }
+    return TaxCalculationResult.fromJson(Map<String, dynamic>.from(result));
+  }
+
+  Future<Map<String, dynamic>> recordTaxSnapshot({
+    required String sourceType,
+    required String sourceId,
+    required String taxCodeId,
+    required String currencyCode,
+    required int taxableMinor,
+    String? jurisdictionCode,
+    DateTime? asOf,
+  }) async {
+    final result = await _supabase.rpc(
+      'record_tax_snapshot',
+      params: {
+        'p_source_type': sourceType,
+        'p_source_id': sourceId,
+        'p_tax_code_id': taxCodeId,
+        'p_currency_code': currencyCode.trim().toUpperCase(),
+        'p_taxable_minor': taxableMinor,
+        'p_jurisdiction_code': jurisdictionCode,
+        'p_as_of': (asOf ?? DateTime.now()).toIso8601String().substring(0, 10),
+      },
+    );
+    if (result is! Map) {
+      throw const PostgrestException(
+        message: 'Tax snapshot returned no result.',
+        code: 'MIZAN_TAX_SNAPSHOT_INVALID_RESPONSE',
+      );
+    }
+    return Map<String, dynamic>.from(result);
   }
 
   Future<List<ChartAccount>> listAccounts({bool activeOnly = true}) async {

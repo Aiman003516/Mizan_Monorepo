@@ -24,6 +24,7 @@ export 'src/services/ghost_money_service.dart';
 export 'src/account_templates.dart';
 export 'src/services/journal_entry_service.dart';
 export 'src/services/currency_service.dart';
+export 'src/services/deterministic_tax_engine.dart';
 export 'src/providers/currency_providers.dart';
 export 'src/providers/cloud_data_mode_provider.dart';
 export 'src/services/accruals_service.dart';
