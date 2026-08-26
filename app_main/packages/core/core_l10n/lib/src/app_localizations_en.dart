@@ -18,7 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setupBusinessCloud => 'Setup Business Cloud';
 
   @override
-  String get manageRoles => 'Manage Roles';
+  String get manageRoles => 'Manage roles';
 
   @override
   String get settings => 'Settings';
@@ -4981,4 +4981,678 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aiActionCannotDeletePosted =>
       'Posted accounting records cannot be deleted; use void or reversal instead.';
+
+  @override
+  String get ownerControlCenter => 'Owner Control Center';
+
+  @override
+  String get ownerControlCenterIntro =>
+      'Configure company-wide rules, access, workflows, and privacy without changing source code.';
+
+  @override
+  String get companyAndBranches => 'Company and branches';
+
+  @override
+  String get accountingAndPeriods => 'Accounting and fiscal periods';
+
+  @override
+  String get currenciesAndExchangeRates => 'Currencies and exchange rates';
+
+  @override
+  String get taxSettings => 'Tax settings';
+
+  @override
+  String get documentsAndNumbering => 'Documents and numbering';
+
+  @override
+  String get employeesRolesInvitations => 'Employees, roles, and invitations';
+
+  @override
+  String get approvalWorkflows => 'Approval workflows';
+
+  @override
+  String get crmConfiguration => 'CRM configuration';
+
+  @override
+  String get productsInventoryWarehouses =>
+      'Products, inventory, and warehouses';
+
+  @override
+  String get posAndCashControl => 'POS and cash control';
+
+  @override
+  String get paymentMethodsSettings => 'Payment methods';
+
+  @override
+  String get notificationsSettings => 'Notifications';
+
+  @override
+  String get backupAndSyncSettings => 'Backup and synchronization';
+
+  @override
+  String get privacyAndLocalAiSettings => 'Privacy and local AI';
+
+  @override
+  String get securityAndAuditSettings => 'Security and audit';
+
+  @override
+  String get languageRegionAppearance => 'Language, region, and appearance';
+
+  @override
+  String get integrationsSettings => 'Integrations';
+
+  @override
+  String configuredCount(Object configured, Object total) {
+    return '$configured of $total configured';
+  }
+
+  @override
+  String get guestSettingsLocalOnly =>
+      'Guest settings are saved on this device. Sign in later to synchronize company data.';
+
+  @override
+  String get ownerSettingsSaved => 'Settings saved on this device.';
+
+  @override
+  String get ownerSettingsComingNext =>
+      'This control is defined in the Owner Control Center contract and will be connected to its module in the next implementation phase.';
+
+  @override
+  String get setupWizardTitle => 'Company setup';
+
+  @override
+  String get setupWizardDescription =>
+      'Set up the local company profile first. You can connect an account later to synchronize company data.';
+
+  @override
+  String get setupWizardCompanyStep => 'Company identity';
+
+  @override
+  String get setupWizardAccountingStep => 'Accounting defaults';
+
+  @override
+  String get setupWizardBranchStep => 'First branch';
+
+  @override
+  String get businessIndustry => 'Industry';
+
+  @override
+  String get fiscalYearStartMonth => 'Fiscal year starts in month';
+
+  @override
+  String get defaultBranchName => 'Default branch name';
+
+  @override
+  String get selectCurrency => 'Select base currency';
+
+  @override
+  String get selectIndustry => 'Select industry';
+
+  @override
+  String get finishSetup => 'Finish setup';
+
+  @override
+  String get setupSaved => 'Company setup saved on this device.';
+
+  @override
+  String get setupRequiredForOwner =>
+      'Complete company setup before configuring owner controls.';
+
+  @override
+  String get continueText => 'Continue';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get professionalServices => 'Professional services';
+
+  @override
+  String get roundingMode => 'Rounding mode';
+
+  @override
+  String get periodCloseRequiresOwner =>
+      'Period closing requires owner approval';
+
+  @override
+  String get openingBalanceStatus => 'Opening balance status';
+
+  @override
+  String get exchangeRateSource => 'Exchange-rate source';
+
+  @override
+  String get manualRateRequiresOwner => 'Manual rates require owner approval';
+
+  @override
+  String get revaluationEnabled => 'Foreign-currency revaluation enabled';
+
+  @override
+  String get enabledCurrencies => 'Enabled currencies';
+
+  @override
+  String get defaultTaxCode => 'Default tax code';
+
+  @override
+  String get taxInclusivePricing => 'Prices include tax';
+
+  @override
+  String get taxNumberRequired => 'Tax number required';
+
+  @override
+  String get taxPeriod => 'Tax reporting period';
+
+  @override
+  String get documentPrefix => 'Document prefix';
+
+  @override
+  String get nextNumber => 'Next number';
+
+  @override
+  String get saveSettings => 'Save settings';
+
+  @override
+  String get settingsSaved => 'Settings saved';
+
+  @override
+  String get settingsInvalid => 'Please correct the highlighted settings.';
+
+  @override
+  String get selectOption => 'Select an option';
+
+  @override
+  String get roundingHalfUp => 'Half up';
+
+  @override
+  String get roundingBankers => 'Banker’s rounding';
+
+  @override
+  String get exchangeRateManual => 'Manual';
+
+  @override
+  String get exchangeRateProvider => 'Provider';
+
+  @override
+  String get taxPeriodMonthly => 'Monthly';
+
+  @override
+  String get taxPeriodQuarterly => 'Quarterly';
+
+  @override
+  String get taxPeriodAnnual => 'Annual';
+
+  @override
+  String get statusNotStarted => 'Not started';
+
+  @override
+  String get statusInProgress => 'In progress';
+
+  @override
+  String get setupWizardOperationsStep => 'Operations and onboarding';
+
+  @override
+  String get defaultPaymentMethods => 'Default payment methods';
+
+  @override
+  String get firstEmployeeEmail => 'First employee email (optional)';
+
+  @override
+  String get inviteAfterConnect =>
+      'The invitation will be sent after the owner connects an account.';
+
+  @override
+  String get approvalExpenseThreshold => 'Expense approval threshold';
+
+  @override
+  String get approvalInvoiceThreshold => 'Invoice approval threshold';
+
+  @override
+  String get approvalBillThreshold => 'Bill approval threshold';
+
+  @override
+  String get journalSecondApprover => 'Journal requires a second approver';
+
+  @override
+  String get balanceAdjustmentOwner =>
+      'Balance adjustment requires owner approval';
+
+  @override
+  String get refundApprovalRequired => 'Refund requires approval';
+
+  @override
+  String get discountApprovalLimit => 'Discount allowed without approval (%)';
+
+  @override
+  String get crmSettings => 'CRM configuration';
+
+  @override
+  String get customerCategories => 'Customer categories';
+
+  @override
+  String get crmLeadStages => 'Lead stages';
+
+  @override
+  String get crmPipelineStages => 'Pipeline stages';
+
+  @override
+  String get crmInteractionTypes => 'Interaction types';
+
+  @override
+  String get followUpDays => 'Default follow-up days';
+
+  @override
+  String get stockValuationMethod => 'Stock valuation method';
+
+  @override
+  String get negativeStockPolicy => 'Negative-stock policy';
+
+  @override
+  String get lowStockThreshold => 'Default low-stock threshold';
+
+  @override
+  String get defaultWarehouse => 'Default warehouse';
+
+  @override
+  String get paymentInstructions => 'Merchant payment instructions';
+
+  @override
+  String get proofReviewRequired => 'Payment proof requires review';
+
+  @override
+  String get creditTermsEnabled => 'Credit terms enabled';
+
+  @override
+  String get notificationInvoiceDue => 'Invoice due reminders';
+
+  @override
+  String get notificationLowStock => 'Low-stock alerts';
+
+  @override
+  String get notificationApprovals => 'Approval alerts';
+
+  @override
+  String get notificationSyncFailures => 'Synchronization failure alerts';
+
+  @override
+  String get notificationInvitations => 'Invitation alerts';
+
+  @override
+  String get notificationBackups => 'Backup alerts';
+
+  @override
+  String get notificationSuspiciousLogin => 'Suspicious-login alerts';
+
+  @override
+  String get syncEnabled => 'Synchronization enabled';
+
+  @override
+  String get wifiOnlyBackup => 'Back up only on Wi-Fi';
+
+  @override
+  String get backupFrequencyHours => 'Backup frequency (hours)';
+
+  @override
+  String get restoreRequiresOwner => 'Restore requires owner approval';
+
+  @override
+  String get conflictPolicy => 'Conflict policy';
+
+  @override
+  String get aiMode => 'AI mode';
+
+  @override
+  String get localModelEnabled => 'Local model enabled';
+
+  @override
+  String get promptRetention => 'Prompt retention';
+
+  @override
+  String get employeeAiAccess => 'Allow employee AI access';
+
+  @override
+  String get sessionDurationHours => 'Session duration (hours)';
+
+  @override
+  String get auditRetentionDays => 'Audit retention (days)';
+
+  @override
+  String get exportRequiresOwner => 'Exports require owner approval';
+
+  @override
+  String get mfaPolicy => 'Multi-factor authentication policy';
+
+  @override
+  String get documentLanguage => 'Document language';
+
+  @override
+  String get rtlEnabled => 'Arabic RTL layout enabled';
+
+  @override
+  String get timezone => 'Timezone';
+
+  @override
+  String get emailIntegration => 'Email integration';
+
+  @override
+  String get smsIntegration => 'SMS integration';
+
+  @override
+  String get bankImportFormat => 'Bank import format';
+
+  @override
+  String get barcodeScanner => 'Barcode scanner';
+
+  @override
+  String get printerIntegration => 'Receipt printer';
+
+  @override
+  String get driveIntegration => 'Google Drive integration';
+
+  @override
+  String get enabled => 'Enabled';
+
+  @override
+  String get disabled => 'Disabled';
+
+  @override
+  String get policyStrict => 'Strict';
+
+  @override
+  String get policyWarn => 'Warn';
+
+  @override
+  String get policyAllow => 'Allow';
+
+  @override
+  String get aiDisabled => 'AI disabled';
+
+  @override
+  String get aiLocalOnly => 'Local-only AI';
+
+  @override
+  String get aiCloudOptIn => 'Cloud AI by explicit opt-in';
+
+  @override
+  String get retentionNone => 'Do not retain';
+
+  @override
+  String get retentionLocal => 'Retain locally';
+
+  @override
+  String get mfaOptional => 'Optional';
+
+  @override
+  String get mfaRequired => 'Required';
+
+  @override
+  String get conflictNewest => 'Newest revision wins';
+
+  @override
+  String get conflictReview => 'Require manual review';
+
+  @override
+  String get duplicateDetection => 'Duplicate matching fields';
+
+  @override
+  String get posTerminals => 'POS terminals';
+
+  @override
+  String get receiptTemplate => 'Receipt template';
+
+  @override
+  String get cashDrawer => 'Cash drawers';
+
+  @override
+  String get shiftCloseRequiresOwner => 'Shift closing requires owner approval';
+
+  @override
+  String get suspendSale => 'Allow suspended sales';
+
+  @override
+  String get defaultPaymentMethod => 'Default payment method';
+
+  @override
+  String get minimizeCloudAiIdentifiers =>
+      'Minimize identifiers sent to cloud AI';
+
+  @override
+  String get defaultCountry => 'Default country';
+
+  @override
+  String get bilingual => 'Bilingual';
+
+  @override
+  String get employeeGovernance => 'Employee governance';
+
+  @override
+  String get defaultRole => 'Default role';
+
+  @override
+  String get invitationExpiryHours => 'Invitation expiry (hours)';
+
+  @override
+  String get maxActiveStaff => 'Maximum active employees';
+
+  @override
+  String get requireMfaForStaff => 'Require MFA for employees';
+
+  @override
+  String get allowSelfServiceProfileEdit =>
+      'Allow employees to edit their profile';
+
+  @override
+  String get defaultBranchAssignment => 'Default branch assignment';
+
+  @override
+  String get manageEmployees => 'Manage employees';
+
+  @override
+  String get branchManagement => 'Branch management';
+
+  @override
+  String get addBranch => 'Add branch';
+
+  @override
+  String get editBranch => 'Edit branch';
+
+  @override
+  String get branchName => 'Branch name';
+
+  @override
+  String get branchCode => 'Branch code';
+
+  @override
+  String get branchAddress => 'Branch address';
+
+  @override
+  String get branchSaved => 'Branch saved';
+
+  @override
+  String get branchDeleted => 'Branch deleted';
+
+  @override
+  String get activeBranch => 'Active branch';
+
+  @override
+  String get noBranchesYet => 'No branches have been configured yet.';
+
+  @override
+  String get approvalCenter => 'Approval center';
+
+  @override
+  String get noPendingApprovals => 'No pending approval requests.';
+
+  @override
+  String get warehouseManagement => 'Warehouse management';
+
+  @override
+  String get addWarehouse => 'Add warehouse';
+
+  @override
+  String get warehouseName => 'Warehouse name';
+
+  @override
+  String get warehouseAddress => 'Warehouse address';
+
+  @override
+  String get warehouseCreated => 'Warehouse created';
+
+  @override
+  String get noWarehousesYet => 'No warehouses have been configured yet.';
+
+  @override
+  String get approvalStatusPending => 'Pending';
+
+  @override
+  String get approvalStatusApproved => 'Approved';
+
+  @override
+  String get approvalStatusRejected => 'Rejected';
+
+  @override
+  String get approveRequest => 'Approve';
+
+  @override
+  String get rejectRequest => 'Reject';
+
+  @override
+  String get approvalActionLocalOnly =>
+      'This local preview records the decision only. Authenticated business changes require server-side approval and audit validation.';
+
+  @override
+  String get requester => 'Requester';
+
+  @override
+  String get approvalAmount => 'Amount';
+
+  @override
+  String get approvalReason => 'Reason';
+
+  @override
+  String get approvalRequestDemo =>
+      'No production approval request is created in guest mode.';
+
+  @override
+  String get cashPayment => 'Cash';
+
+  @override
+  String get bankTransferPayment => 'Bank transfer';
+
+  @override
+  String get jaibPayment => 'Jaib';
+
+  @override
+  String get alKuraimiPayment => 'Al Kuraimi';
+
+  @override
+  String get yemenWalletPayment => 'Yemen Wallet';
+
+  @override
+  String get cardPayment => 'Card';
+
+  @override
+  String get creditPayment => 'Credit terms';
+
+  @override
+  String get paymentMethodCatalog => 'Payment method catalog';
+
+  @override
+  String get merchantInstructionHint =>
+      'Provide the merchant number and payment instructions without storing secrets.';
+
+  @override
+  String get merchantPaymentInstructions => 'Merchant payment instructions';
+
+  @override
+  String get paymentProofReview => 'Require manual payment-proof review';
+
+  @override
+  String get settingsAuditHistory => 'Settings audit history';
+
+  @override
+  String get noSettingsAuditEntries =>
+      'No settings changes have been recorded on this device.';
+
+  @override
+  String get localAuditScope =>
+      'This local log records setting sections and revisions only; it never stores sensitive setting values.';
+
+  @override
+  String get openSecuritySettings => 'Open security settings';
+
+  @override
+  String get expenseSettings => 'Expenses and reimbursements';
+
+  @override
+  String get defaultExpenseAccount => 'Default expense account';
+
+  @override
+  String get expenseCategories => 'Expense categories';
+
+  @override
+  String get receiptRequired => 'Receipt required';
+
+  @override
+  String get reimbursementApprovalRequired => 'Reimbursement requires approval';
+
+  @override
+  String get mileageEnabled => 'Mileage tracking enabled';
+
+  @override
+  String get bankingAndReconciliation => 'Banking and reconciliation';
+
+  @override
+  String get bankAccountIds => 'Bank account identifiers';
+
+  @override
+  String get statementImportFormat => 'Statement import format';
+
+  @override
+  String get reconciliationRequiresOwner =>
+      'Reconciliation requires owner approval';
+
+  @override
+  String get autoMatchEnabled => 'Automatic transaction matching';
+
+  @override
+  String get bankingCurrencies => 'Banking currencies';
+
+  @override
+  String get reportsSettings => 'Reports and analytics';
+
+  @override
+  String get defaultReportPeriod => 'Default report period';
+
+  @override
+  String get reportExportRequiresOwner =>
+      'Report exports require owner approval';
+
+  @override
+  String get dashboardMetrics => 'Dashboard metrics';
+
+  @override
+  String get scheduledReports => 'Scheduled reports';
+
+  @override
+  String get closeManagement => 'Month-end close management';
+
+  @override
+  String get closeChecklist => 'Close checklist';
+
+  @override
+  String get closeRequiresReconciliation => 'Closing requires reconciliation';
+
+  @override
+  String get closeRequiresBackup => 'Closing requires a successful backup';
+
+  @override
+  String get reopenRequiresOwner => 'Reopening requires owner approval';
+
+  @override
+  String get reportPeriodMonthly => 'Current month';
+
+  @override
+  String get reportPeriodQuarterly => 'Current quarter';
+
+  @override
+  String get reportPeriodAnnual => 'Current year';
 }

@@ -4979,4 +4979,671 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get aiActionCannotDeletePosted =>
       'لا يمكن حذف السجلات المحاسبية المرحلة؛ استخدم الإلغاء أو القيد العكسي بدلاً من ذلك.';
+
+  @override
+  String get ownerControlCenter => 'مركز تحكم المالك';
+
+  @override
+  String get ownerControlCenterIntro =>
+      'اضبط قواعد الشركة والصلاحيات وسير العمل والخصوصية دون تغيير الشفرة المصدرية.';
+
+  @override
+  String get companyAndBranches => 'الشركة والفروع';
+
+  @override
+  String get accountingAndPeriods => 'المحاسبة والفترات المالية';
+
+  @override
+  String get currenciesAndExchangeRates => 'العملات وأسعار الصرف';
+
+  @override
+  String get taxSettings => 'إعدادات الضرائب';
+
+  @override
+  String get documentsAndNumbering => 'المستندات والترقيم';
+
+  @override
+  String get employeesRolesInvitations => 'الموظفون والأدوار والدعوات';
+
+  @override
+  String get approvalWorkflows => 'سير عمل الموافقات';
+
+  @override
+  String get crmConfiguration => 'إعداد إدارة العملاء';
+
+  @override
+  String get productsInventoryWarehouses => 'المنتجات والمخزون والمستودعات';
+
+  @override
+  String get posAndCashControl => 'نقطة البيع والتحكم النقدي';
+
+  @override
+  String get paymentMethodsSettings => 'طرق الدفع';
+
+  @override
+  String get notificationsSettings => 'الإشعارات';
+
+  @override
+  String get backupAndSyncSettings => 'النسخ الاحتياطي والمزامنة';
+
+  @override
+  String get privacyAndLocalAiSettings => 'الخصوصية والذكاء الاصطناعي المحلي';
+
+  @override
+  String get securityAndAuditSettings => 'الأمان وسجل التدقيق';
+
+  @override
+  String get languageRegionAppearance => 'اللغة والمنطقة والمظهر';
+
+  @override
+  String get integrationsSettings => 'التكاملات';
+
+  @override
+  String configuredCount(Object configured, Object total) {
+    return 'تم إعداد $configured من أصل $total';
+  }
+
+  @override
+  String get guestSettingsLocalOnly =>
+      'تُحفظ إعدادات الضيف على هذا الجهاز. سجّل الدخول لاحقاً لمزامنة بيانات الشركة.';
+
+  @override
+  String get ownerSettingsSaved => 'تم حفظ الإعدادات على هذا الجهاز.';
+
+  @override
+  String get ownerSettingsComingNext =>
+      'هذا الخيار مُعرّف في عقد مركز تحكم المالك وسيتم ربطه بوحدته في المرحلة التالية.';
+
+  @override
+  String get setupWizardTitle => 'إعداد الشركة';
+
+  @override
+  String get setupWizardDescription =>
+      'ابدأ بإعداد ملف الشركة محلياً. يمكنك ربط الحساب لاحقاً لمزامنة بيانات الشركة.';
+
+  @override
+  String get setupWizardCompanyStep => 'هوية الشركة';
+
+  @override
+  String get setupWizardAccountingStep => 'الإعدادات المحاسبية الافتراضية';
+
+  @override
+  String get setupWizardBranchStep => 'الفرع الأول';
+
+  @override
+  String get businessIndustry => 'المجال';
+
+  @override
+  String get fiscalYearStartMonth => 'يبدأ العام المالي في الشهر';
+
+  @override
+  String get defaultBranchName => 'اسم الفرع الافتراضي';
+
+  @override
+  String get selectCurrency => 'اختر العملة الأساسية';
+
+  @override
+  String get selectIndustry => 'اختر المجال';
+
+  @override
+  String get finishSetup => 'إنهاء الإعداد';
+
+  @override
+  String get setupSaved => 'تم حفظ إعداد الشركة على هذا الجهاز.';
+
+  @override
+  String get setupRequiredForOwner =>
+      'أكمل إعداد الشركة قبل ضبط إعدادات المالك.';
+
+  @override
+  String get continueText => 'متابعة';
+
+  @override
+  String get back => 'رجوع';
+
+  @override
+  String get professionalServices => 'خدمات مهنية';
+
+  @override
+  String get roundingMode => 'طريقة التقريب';
+
+  @override
+  String get periodCloseRequiresOwner => 'يتطلب إقفال الفترة موافقة المالك';
+
+  @override
+  String get openingBalanceStatus => 'حالة الرصيد الافتتاحي';
+
+  @override
+  String get exchangeRateSource => 'مصدر سعر الصرف';
+
+  @override
+  String get manualRateRequiresOwner => 'تتطلب الأسعار اليدوية موافقة المالك';
+
+  @override
+  String get revaluationEnabled => 'إعادة تقييم العملات الأجنبية مفعّلة';
+
+  @override
+  String get enabledCurrencies => 'العملات المفعّلة';
+
+  @override
+  String get defaultTaxCode => 'رمز الضريبة الافتراضي';
+
+  @override
+  String get taxInclusivePricing => 'الأسعار شاملة الضريبة';
+
+  @override
+  String get taxNumberRequired => 'الرقم الضريبي مطلوب';
+
+  @override
+  String get taxPeriod => 'فترة الإقرار الضريبي';
+
+  @override
+  String get documentPrefix => 'بادئة المستند';
+
+  @override
+  String get nextNumber => 'الرقم التالي';
+
+  @override
+  String get saveSettings => 'حفظ الإعدادات';
+
+  @override
+  String get settingsSaved => 'تم حفظ الإعدادات';
+
+  @override
+  String get settingsInvalid => 'يرجى تصحيح الإعدادات المحددة.';
+
+  @override
+  String get selectOption => 'اختر خياراً';
+
+  @override
+  String get roundingHalfUp => 'التقريب للأعلى عند المنتصف';
+
+  @override
+  String get roundingBankers => 'تقريب المصرفيين';
+
+  @override
+  String get exchangeRateManual => 'يدوي';
+
+  @override
+  String get exchangeRateProvider => 'مزود';
+
+  @override
+  String get taxPeriodMonthly => 'شهري';
+
+  @override
+  String get taxPeriodQuarterly => 'ربع سنوي';
+
+  @override
+  String get taxPeriodAnnual => 'سنوي';
+
+  @override
+  String get statusNotStarted => 'لم يبدأ';
+
+  @override
+  String get statusInProgress => 'قيد التنفيذ';
+
+  @override
+  String get setupWizardOperationsStep => 'العمليات والتهيئة';
+
+  @override
+  String get defaultPaymentMethods => 'طرق الدفع الافتراضية';
+
+  @override
+  String get firstEmployeeEmail => 'بريد أول موظف (اختياري)';
+
+  @override
+  String get inviteAfterConnect => 'سيتم إرسال الدعوة بعد ربط حساب المالك.';
+
+  @override
+  String get approvalExpenseThreshold => 'حد الموافقة على المصروفات';
+
+  @override
+  String get approvalInvoiceThreshold => 'حد الموافقة على الفواتير';
+
+  @override
+  String get approvalBillThreshold => 'حد الموافقة على فواتير المشتريات';
+
+  @override
+  String get journalSecondApprover => 'يتطلب القيد موافقة ثانية';
+
+  @override
+  String get balanceAdjustmentOwner => 'تتطلب تسوية الرصيد موافقة المالك';
+
+  @override
+  String get refundApprovalRequired => 'تتطلب عملية الاسترداد موافقة';
+
+  @override
+  String get discountApprovalLimit => 'الخصم المسموح دون موافقة (%)';
+
+  @override
+  String get crmSettings => 'إعدادات إدارة علاقات العملاء';
+
+  @override
+  String get customerCategories => 'تصنيفات العملاء';
+
+  @override
+  String get crmLeadStages => 'مراحل العملاء المحتملين';
+
+  @override
+  String get crmPipelineStages => 'مراحل خط المبيعات';
+
+  @override
+  String get crmInteractionTypes => 'أنواع التفاعلات';
+
+  @override
+  String get followUpDays => 'أيام المتابعة الافتراضية';
+
+  @override
+  String get stockValuationMethod => 'طريقة تقييم المخزون';
+
+  @override
+  String get negativeStockPolicy => 'سياسة المخزون السالب';
+
+  @override
+  String get lowStockThreshold => 'حد انخفاض المخزون الافتراضي';
+
+  @override
+  String get defaultWarehouse => 'المستودع الافتراضي';
+
+  @override
+  String get paymentInstructions => 'تعليمات دفع التاجر';
+
+  @override
+  String get proofReviewRequired => 'تتطلب إثباتات الدفع مراجعة';
+
+  @override
+  String get creditTermsEnabled => 'شروط الائتمان مفعّلة';
+
+  @override
+  String get notificationInvoiceDue => 'تذكيرات استحقاق الفواتير';
+
+  @override
+  String get notificationLowStock => 'تنبيهات انخفاض المخزون';
+
+  @override
+  String get notificationApprovals => 'تنبيهات الموافقات';
+
+  @override
+  String get notificationSyncFailures => 'تنبيهات فشل المزامنة';
+
+  @override
+  String get notificationInvitations => 'تنبيهات الدعوات';
+
+  @override
+  String get notificationBackups => 'تنبيهات النسخ الاحتياطي';
+
+  @override
+  String get notificationSuspiciousLogin => 'تنبيهات تسجيل الدخول المشبوه';
+
+  @override
+  String get syncEnabled => 'المزامنة مفعّلة';
+
+  @override
+  String get wifiOnlyBackup => 'النسخ الاحتياطي عبر Wi-Fi فقط';
+
+  @override
+  String get backupFrequencyHours => 'تكرار النسخ الاحتياطي (بالساعات)';
+
+  @override
+  String get restoreRequiresOwner => 'تتطلب الاستعادة موافقة المالك';
+
+  @override
+  String get conflictPolicy => 'سياسة التعارض';
+
+  @override
+  String get aiMode => 'وضع الذكاء الاصطناعي';
+
+  @override
+  String get localModelEnabled => 'النموذج المحلي مفعّل';
+
+  @override
+  String get promptRetention => 'الاحتفاظ بالطلبات';
+
+  @override
+  String get employeeAiAccess => 'السماح للموظفين باستخدام الذكاء الاصطناعي';
+
+  @override
+  String get sessionDurationHours => 'مدة الجلسة (بالساعات)';
+
+  @override
+  String get auditRetentionDays => 'الاحتفاظ بسجل التدقيق (بالأيام)';
+
+  @override
+  String get exportRequiresOwner => 'تتطلب عمليات التصدير موافقة المالك';
+
+  @override
+  String get mfaPolicy => 'سياسة المصادقة متعددة العوامل';
+
+  @override
+  String get documentLanguage => 'لغة المستندات';
+
+  @override
+  String get rtlEnabled => 'تفعيل تخطيط RTL العربي';
+
+  @override
+  String get timezone => 'المنطقة الزمنية';
+
+  @override
+  String get emailIntegration => 'تكامل البريد الإلكتروني';
+
+  @override
+  String get smsIntegration => 'تكامل الرسائل النصية';
+
+  @override
+  String get bankImportFormat => 'تنسيق استيراد كشف البنك';
+
+  @override
+  String get barcodeScanner => 'ماسح الباركود';
+
+  @override
+  String get printerIntegration => 'طابعة الإيصالات';
+
+  @override
+  String get driveIntegration => 'تكامل Google Drive';
+
+  @override
+  String get enabled => 'مفعّل';
+
+  @override
+  String get disabled => 'معطّل';
+
+  @override
+  String get policyStrict => 'صارمة';
+
+  @override
+  String get policyWarn => 'تحذير';
+
+  @override
+  String get policyAllow => 'سماح';
+
+  @override
+  String get aiDisabled => 'الذكاء الاصطناعي معطّل';
+
+  @override
+  String get aiLocalOnly => 'ذكاء اصطناعي محلي فقط';
+
+  @override
+  String get aiCloudOptIn => 'الذكاء الاصطناعي السحابي بموافقة صريحة';
+
+  @override
+  String get retentionNone => 'عدم الاحتفاظ';
+
+  @override
+  String get retentionLocal => 'الاحتفاظ محلياً';
+
+  @override
+  String get mfaOptional => 'اختيارية';
+
+  @override
+  String get mfaRequired => 'مطلوبة';
+
+  @override
+  String get conflictNewest => 'يفوز الإصدار الأحدث';
+
+  @override
+  String get conflictReview => 'يتطلب مراجعة يدوية';
+
+  @override
+  String get duplicateDetection => 'حقول مطابقة التكرار';
+
+  @override
+  String get posTerminals => 'محطات نقاط البيع';
+
+  @override
+  String get receiptTemplate => 'قالب الإيصال';
+
+  @override
+  String get cashDrawer => 'أدراج النقدية';
+
+  @override
+  String get shiftCloseRequiresOwner => 'يتطلب إقفال الوردية موافقة المالك';
+
+  @override
+  String get suspendSale => 'السماح بالمبيعات المعلّقة';
+
+  @override
+  String get defaultPaymentMethod => 'طريقة الدفع الافتراضية';
+
+  @override
+  String get minimizeCloudAiIdentifiers =>
+      'تقليل المعرفات المرسلة إلى الذكاء الاصطناعي السحابي';
+
+  @override
+  String get defaultCountry => 'الدولة الافتراضية';
+
+  @override
+  String get bilingual => 'ثنائي اللغة';
+
+  @override
+  String get employeeGovernance => 'إدارة الموظفين';
+
+  @override
+  String get defaultRole => 'الدور الافتراضي';
+
+  @override
+  String get invitationExpiryHours => 'انتهاء الدعوة (بالساعات)';
+
+  @override
+  String get maxActiveStaff => 'الحد الأقصى للموظفين النشطين';
+
+  @override
+  String get requireMfaForStaff => 'طلب المصادقة متعددة العوامل للموظفين';
+
+  @override
+  String get allowSelfServiceProfileEdit => 'السماح للموظفين بتعديل ملفاتهم';
+
+  @override
+  String get defaultBranchAssignment => 'تعيين الفرع الافتراضي';
+
+  @override
+  String get manageEmployees => 'إدارة الموظفين';
+
+  @override
+  String get branchManagement => 'إدارة الفروع';
+
+  @override
+  String get addBranch => 'إضافة فرع';
+
+  @override
+  String get editBranch => 'تعديل الفرع';
+
+  @override
+  String get branchName => 'اسم الفرع';
+
+  @override
+  String get branchCode => 'رمز الفرع';
+
+  @override
+  String get branchAddress => 'عنوان الفرع';
+
+  @override
+  String get branchSaved => 'تم حفظ الفرع';
+
+  @override
+  String get branchDeleted => 'تم حذف الفرع';
+
+  @override
+  String get activeBranch => 'فرع نشط';
+
+  @override
+  String get noBranchesYet => 'لم يتم إعداد أي فروع بعد.';
+
+  @override
+  String get approvalCenter => 'مركز الموافقات';
+
+  @override
+  String get noPendingApprovals => 'لا توجد طلبات موافقة معلّقة.';
+
+  @override
+  String get warehouseManagement => 'إدارة المستودعات';
+
+  @override
+  String get addWarehouse => 'إضافة مستودع';
+
+  @override
+  String get warehouseName => 'اسم المستودع';
+
+  @override
+  String get warehouseAddress => 'عنوان المستودع';
+
+  @override
+  String get warehouseCreated => 'تم إنشاء المستودع';
+
+  @override
+  String get noWarehousesYet => 'لم يتم إعداد أي مستودعات بعد.';
+
+  @override
+  String get approvalStatusPending => 'معلّق';
+
+  @override
+  String get approvalStatusApproved => 'موافق عليه';
+
+  @override
+  String get approvalStatusRejected => 'مرفوض';
+
+  @override
+  String get approveRequest => 'موافقة';
+
+  @override
+  String get rejectRequest => 'رفض';
+
+  @override
+  String get approvalActionLocalOnly =>
+      'تسجل هذه المعاينة المحلية القرار فقط. تتطلب تغييرات الأعمال الموثقة موافقة وتحققاً وتدقيقاً من الخادم.';
+
+  @override
+  String get requester => 'مقدم الطلب';
+
+  @override
+  String get approvalAmount => 'المبلغ';
+
+  @override
+  String get approvalReason => 'السبب';
+
+  @override
+  String get approvalRequestDemo =>
+      'لا يتم إنشاء طلب موافقة إنتاجي في وضع الضيف.';
+
+  @override
+  String get cashPayment => 'نقداً';
+
+  @override
+  String get bankTransferPayment => 'تحويل بنكي';
+
+  @override
+  String get jaibPayment => 'جيب';
+
+  @override
+  String get alKuraimiPayment => 'الكريمي';
+
+  @override
+  String get yemenWalletPayment => 'محفظة اليمن';
+
+  @override
+  String get cardPayment => 'بطاقة';
+
+  @override
+  String get creditPayment => 'آجل';
+
+  @override
+  String get paymentMethodCatalog => 'دليل طرق الدفع';
+
+  @override
+  String get merchantInstructionHint =>
+      'أدخل رقم التاجر وتعليمات الدفع دون تخزين الأسرار.';
+
+  @override
+  String get merchantPaymentInstructions => 'تعليمات الدفع للتاجر';
+
+  @override
+  String get paymentProofReview => 'طلب مراجعة يدوية لإثبات الدفع';
+
+  @override
+  String get settingsAuditHistory => 'سجل تدقيق الإعدادات';
+
+  @override
+  String get noSettingsAuditEntries =>
+      'لم يتم تسجيل تغييرات للإعدادات على هذا الجهاز.';
+
+  @override
+  String get localAuditScope =>
+      'يسجل هذا السجل المحلي أقسام الإعدادات والإصدارات فقط، ولا يخزن قيم الإعدادات الحساسة.';
+
+  @override
+  String get openSecuritySettings => 'فتح إعدادات الأمان';
+
+  @override
+  String get expenseSettings => 'المصروفات والتعويضات';
+
+  @override
+  String get defaultExpenseAccount => 'حساب المصروفات الافتراضي';
+
+  @override
+  String get expenseCategories => 'تصنيفات المصروفات';
+
+  @override
+  String get receiptRequired => 'الإيصال مطلوب';
+
+  @override
+  String get reimbursementApprovalRequired => 'يتطلب التعويض موافقة';
+
+  @override
+  String get mileageEnabled => 'تتبع المسافة مفعّل';
+
+  @override
+  String get bankingAndReconciliation => 'البنوك والتسويات';
+
+  @override
+  String get bankAccountIds => 'معرفات الحسابات البنكية';
+
+  @override
+  String get statementImportFormat => 'تنسيق استيراد كشف الحساب';
+
+  @override
+  String get reconciliationRequiresOwner => 'تتطلب التسوية موافقة المالك';
+
+  @override
+  String get autoMatchEnabled => 'المطابقة التلقائية للمعاملات';
+
+  @override
+  String get bankingCurrencies => 'العملات البنكية';
+
+  @override
+  String get reportsSettings => 'التقارير والتحليلات';
+
+  @override
+  String get defaultReportPeriod => 'فترة التقرير الافتراضية';
+
+  @override
+  String get reportExportRequiresOwner => 'تتطلب صادرات التقارير موافقة المالك';
+
+  @override
+  String get dashboardMetrics => 'مقاييس لوحة المعلومات';
+
+  @override
+  String get scheduledReports => 'التقارير المجدولة';
+
+  @override
+  String get closeManagement => 'إدارة إقفال نهاية الشهر';
+
+  @override
+  String get closeChecklist => 'قائمة تحقق الإقفال';
+
+  @override
+  String get closeRequiresReconciliation => 'يتطلب الإقفال إجراء التسوية';
+
+  @override
+  String get closeRequiresBackup => 'يتطلب الإقفال نسخة احتياطية ناجحة';
+
+  @override
+  String get reopenRequiresOwner => 'تتطلب إعادة الفتح موافقة المالك';
+
+  @override
+  String get reportPeriodMonthly => 'الشهر الحالي';
+
+  @override
+  String get reportPeriodQuarterly => 'الربع الحالي';
+
+  @override
+  String get reportPeriodAnnual => 'السنة الحالية';
 }

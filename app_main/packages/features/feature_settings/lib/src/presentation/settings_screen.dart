@@ -205,6 +205,32 @@ class SettingsScreen extends ConsumerWidget {
 
     return ListView(
       children: [
+        Consumer(
+          builder: (context, ref, _) {
+            final roleAsync = ref.watch(userRoleProvider);
+            return roleAsync.maybeWhen(
+              data: (role) => role.isSystemAdmin
+                  ? ListTile(
+                      leading: Icon(
+                        Icons.admin_panel_settings,
+                        color: context.appColors.primary,
+                      ),
+                      title: Text(l10n.ownerControlCenter),
+                      subtitle: Text(l10n.ownerControlCenterIntro),
+                      trailing: const Icon(Icons.arrow_forward_ios),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const OwnerControlCenterScreen(),
+                          ),
+                        );
+                      },
+                    )
+                  : const SizedBox.shrink(),
+              orElse: () => const SizedBox.shrink(),
+            );
+          },
+        ),
         ListTile(
           leading: const Icon(Icons.person),
           title: Text(l10n.companyProfile),

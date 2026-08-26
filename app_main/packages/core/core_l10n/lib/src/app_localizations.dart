@@ -119,7 +119,7 @@ abstract class AppLocalizations {
   /// No description provided for @manageRoles.
   ///
   /// In en, this message translates to:
-  /// **'Manage Roles'**
+  /// **'Manage roles'**
   String get manageRoles;
 
   /// No description provided for @settings.
@@ -9421,6 +9421,1314 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Posted accounting records cannot be deleted; use void or reversal instead.'**
   String get aiActionCannotDeletePosted;
+
+  /// No description provided for @ownerControlCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner Control Center'**
+  String get ownerControlCenter;
+
+  /// No description provided for @ownerControlCenterIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure company-wide rules, access, workflows, and privacy without changing source code.'**
+  String get ownerControlCenterIntro;
+
+  /// No description provided for @companyAndBranches.
+  ///
+  /// In en, this message translates to:
+  /// **'Company and branches'**
+  String get companyAndBranches;
+
+  /// No description provided for @accountingAndPeriods.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounting and fiscal periods'**
+  String get accountingAndPeriods;
+
+  /// No description provided for @currenciesAndExchangeRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Currencies and exchange rates'**
+  String get currenciesAndExchangeRates;
+
+  /// No description provided for @taxSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax settings'**
+  String get taxSettings;
+
+  /// No description provided for @documentsAndNumbering.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents and numbering'**
+  String get documentsAndNumbering;
+
+  /// No description provided for @employeesRolesInvitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Employees, roles, and invitations'**
+  String get employeesRolesInvitations;
+
+  /// No description provided for @approvalWorkflows.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval workflows'**
+  String get approvalWorkflows;
+
+  /// No description provided for @crmConfiguration.
+  ///
+  /// In en, this message translates to:
+  /// **'CRM configuration'**
+  String get crmConfiguration;
+
+  /// No description provided for @productsInventoryWarehouses.
+  ///
+  /// In en, this message translates to:
+  /// **'Products, inventory, and warehouses'**
+  String get productsInventoryWarehouses;
+
+  /// No description provided for @posAndCashControl.
+  ///
+  /// In en, this message translates to:
+  /// **'POS and cash control'**
+  String get posAndCashControl;
+
+  /// No description provided for @paymentMethodsSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment methods'**
+  String get paymentMethodsSettings;
+
+  /// No description provided for @notificationsSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsSettings;
+
+  /// No description provided for @backupAndSyncSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup and synchronization'**
+  String get backupAndSyncSettings;
+
+  /// No description provided for @privacyAndLocalAiSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy and local AI'**
+  String get privacyAndLocalAiSettings;
+
+  /// No description provided for @securityAndAuditSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Security and audit'**
+  String get securityAndAuditSettings;
+
+  /// No description provided for @languageRegionAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Language, region, and appearance'**
+  String get languageRegionAppearance;
+
+  /// No description provided for @integrationsSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Integrations'**
+  String get integrationsSettings;
+
+  /// No description provided for @configuredCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{configured} of {total} configured'**
+  String configuredCount(Object configured, Object total);
+
+  /// No description provided for @guestSettingsLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest settings are saved on this device. Sign in later to synchronize company data.'**
+  String get guestSettingsLocalOnly;
+
+  /// No description provided for @ownerSettingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings saved on this device.'**
+  String get ownerSettingsSaved;
+
+  /// No description provided for @ownerSettingsComingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'This control is defined in the Owner Control Center contract and will be connected to its module in the next implementation phase.'**
+  String get ownerSettingsComingNext;
+
+  /// No description provided for @setupWizardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Company setup'**
+  String get setupWizardTitle;
+
+  /// No description provided for @setupWizardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up the local company profile first. You can connect an account later to synchronize company data.'**
+  String get setupWizardDescription;
+
+  /// No description provided for @setupWizardCompanyStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Company identity'**
+  String get setupWizardCompanyStep;
+
+  /// No description provided for @setupWizardAccountingStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounting defaults'**
+  String get setupWizardAccountingStep;
+
+  /// No description provided for @setupWizardBranchStep.
+  ///
+  /// In en, this message translates to:
+  /// **'First branch'**
+  String get setupWizardBranchStep;
+
+  /// No description provided for @businessIndustry.
+  ///
+  /// In en, this message translates to:
+  /// **'Industry'**
+  String get businessIndustry;
+
+  /// No description provided for @fiscalYearStartMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Fiscal year starts in month'**
+  String get fiscalYearStartMonth;
+
+  /// No description provided for @defaultBranchName.
+  ///
+  /// In en, this message translates to:
+  /// **'Default branch name'**
+  String get defaultBranchName;
+
+  /// No description provided for @selectCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Select base currency'**
+  String get selectCurrency;
+
+  /// No description provided for @selectIndustry.
+  ///
+  /// In en, this message translates to:
+  /// **'Select industry'**
+  String get selectIndustry;
+
+  /// No description provided for @finishSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish setup'**
+  String get finishSetup;
+
+  /// No description provided for @setupSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Company setup saved on this device.'**
+  String get setupSaved;
+
+  /// No description provided for @setupRequiredForOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete company setup before configuring owner controls.'**
+  String get setupRequiredForOwner;
+
+  /// No description provided for @continueText.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueText;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @professionalServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Professional services'**
+  String get professionalServices;
+
+  /// No description provided for @roundingMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Rounding mode'**
+  String get roundingMode;
+
+  /// No description provided for @periodCloseRequiresOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Period closing requires owner approval'**
+  String get periodCloseRequiresOwner;
+
+  /// No description provided for @openingBalanceStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening balance status'**
+  String get openingBalanceStatus;
+
+  /// No description provided for @exchangeRateSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange-rate source'**
+  String get exchangeRateSource;
+
+  /// No description provided for @manualRateRequiresOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual rates require owner approval'**
+  String get manualRateRequiresOwner;
+
+  /// No description provided for @revaluationEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Foreign-currency revaluation enabled'**
+  String get revaluationEnabled;
+
+  /// No description provided for @enabledCurrencies.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled currencies'**
+  String get enabledCurrencies;
+
+  /// No description provided for @defaultTaxCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Default tax code'**
+  String get defaultTaxCode;
+
+  /// No description provided for @taxInclusivePricing.
+  ///
+  /// In en, this message translates to:
+  /// **'Prices include tax'**
+  String get taxInclusivePricing;
+
+  /// No description provided for @taxNumberRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax number required'**
+  String get taxNumberRequired;
+
+  /// No description provided for @taxPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax reporting period'**
+  String get taxPeriod;
+
+  /// No description provided for @documentPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Document prefix'**
+  String get documentPrefix;
+
+  /// No description provided for @nextNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Next number'**
+  String get nextNumber;
+
+  /// No description provided for @saveSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Save settings'**
+  String get saveSettings;
+
+  /// No description provided for @settingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings saved'**
+  String get settingsSaved;
+
+  /// No description provided for @settingsInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please correct the highlighted settings.'**
+  String get settingsInvalid;
+
+  /// No description provided for @selectOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an option'**
+  String get selectOption;
+
+  /// No description provided for @roundingHalfUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Half up'**
+  String get roundingHalfUp;
+
+  /// No description provided for @roundingBankers.
+  ///
+  /// In en, this message translates to:
+  /// **'Banker’s rounding'**
+  String get roundingBankers;
+
+  /// No description provided for @exchangeRateManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get exchangeRateManual;
+
+  /// No description provided for @exchangeRateProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get exchangeRateProvider;
+
+  /// No description provided for @taxPeriodMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get taxPeriodMonthly;
+
+  /// No description provided for @taxPeriodQuarterly.
+  ///
+  /// In en, this message translates to:
+  /// **'Quarterly'**
+  String get taxPeriodQuarterly;
+
+  /// No description provided for @taxPeriodAnnual.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual'**
+  String get taxPeriodAnnual;
+
+  /// No description provided for @statusNotStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not started'**
+  String get statusNotStarted;
+
+  /// No description provided for @statusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get statusInProgress;
+
+  /// No description provided for @setupWizardOperationsStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Operations and onboarding'**
+  String get setupWizardOperationsStep;
+
+  /// No description provided for @defaultPaymentMethods.
+  ///
+  /// In en, this message translates to:
+  /// **'Default payment methods'**
+  String get defaultPaymentMethods;
+
+  /// No description provided for @firstEmployeeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'First employee email (optional)'**
+  String get firstEmployeeEmail;
+
+  /// No description provided for @inviteAfterConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'The invitation will be sent after the owner connects an account.'**
+  String get inviteAfterConnect;
+
+  /// No description provided for @approvalExpenseThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense approval threshold'**
+  String get approvalExpenseThreshold;
+
+  /// No description provided for @approvalInvoiceThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice approval threshold'**
+  String get approvalInvoiceThreshold;
+
+  /// No description provided for @approvalBillThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill approval threshold'**
+  String get approvalBillThreshold;
+
+  /// No description provided for @journalSecondApprover.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal requires a second approver'**
+  String get journalSecondApprover;
+
+  /// No description provided for @balanceAdjustmentOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance adjustment requires owner approval'**
+  String get balanceAdjustmentOwner;
+
+  /// No description provided for @refundApprovalRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund requires approval'**
+  String get refundApprovalRequired;
+
+  /// No description provided for @discountApprovalLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount allowed without approval (%)'**
+  String get discountApprovalLimit;
+
+  /// No description provided for @crmSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'CRM configuration'**
+  String get crmSettings;
+
+  /// No description provided for @customerCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer categories'**
+  String get customerCategories;
+
+  /// No description provided for @crmLeadStages.
+  ///
+  /// In en, this message translates to:
+  /// **'Lead stages'**
+  String get crmLeadStages;
+
+  /// No description provided for @crmPipelineStages.
+  ///
+  /// In en, this message translates to:
+  /// **'Pipeline stages'**
+  String get crmPipelineStages;
+
+  /// No description provided for @crmInteractionTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Interaction types'**
+  String get crmInteractionTypes;
+
+  /// No description provided for @followUpDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Default follow-up days'**
+  String get followUpDays;
+
+  /// No description provided for @stockValuationMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock valuation method'**
+  String get stockValuationMethod;
+
+  /// No description provided for @negativeStockPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative-stock policy'**
+  String get negativeStockPolicy;
+
+  /// No description provided for @lowStockThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Default low-stock threshold'**
+  String get lowStockThreshold;
+
+  /// No description provided for @defaultWarehouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Default warehouse'**
+  String get defaultWarehouse;
+
+  /// No description provided for @paymentInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Merchant payment instructions'**
+  String get paymentInstructions;
+
+  /// No description provided for @proofReviewRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment proof requires review'**
+  String get proofReviewRequired;
+
+  /// No description provided for @creditTermsEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit terms enabled'**
+  String get creditTermsEnabled;
+
+  /// No description provided for @notificationInvoiceDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice due reminders'**
+  String get notificationInvoiceDue;
+
+  /// No description provided for @notificationLowStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Low-stock alerts'**
+  String get notificationLowStock;
+
+  /// No description provided for @notificationApprovals.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval alerts'**
+  String get notificationApprovals;
+
+  /// No description provided for @notificationSyncFailures.
+  ///
+  /// In en, this message translates to:
+  /// **'Synchronization failure alerts'**
+  String get notificationSyncFailures;
+
+  /// No description provided for @notificationInvitations.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation alerts'**
+  String get notificationInvitations;
+
+  /// No description provided for @notificationBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup alerts'**
+  String get notificationBackups;
+
+  /// No description provided for @notificationSuspiciousLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspicious-login alerts'**
+  String get notificationSuspiciousLogin;
+
+  /// No description provided for @syncEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Synchronization enabled'**
+  String get syncEnabled;
+
+  /// No description provided for @wifiOnlyBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up only on Wi-Fi'**
+  String get wifiOnlyBackup;
+
+  /// No description provided for @backupFrequencyHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup frequency (hours)'**
+  String get backupFrequencyHours;
+
+  /// No description provided for @restoreRequiresOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore requires owner approval'**
+  String get restoreRequiresOwner;
+
+  /// No description provided for @conflictPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict policy'**
+  String get conflictPolicy;
+
+  /// No description provided for @aiMode.
+  ///
+  /// In en, this message translates to:
+  /// **'AI mode'**
+  String get aiMode;
+
+  /// No description provided for @localModelEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Local model enabled'**
+  String get localModelEnabled;
+
+  /// No description provided for @promptRetention.
+  ///
+  /// In en, this message translates to:
+  /// **'Prompt retention'**
+  String get promptRetention;
+
+  /// No description provided for @employeeAiAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow employee AI access'**
+  String get employeeAiAccess;
+
+  /// No description provided for @sessionDurationHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Session duration (hours)'**
+  String get sessionDurationHours;
+
+  /// No description provided for @auditRetentionDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit retention (days)'**
+  String get auditRetentionDays;
+
+  /// No description provided for @exportRequiresOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Exports require owner approval'**
+  String get exportRequiresOwner;
+
+  /// No description provided for @mfaPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-factor authentication policy'**
+  String get mfaPolicy;
+
+  /// No description provided for @documentLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Document language'**
+  String get documentLanguage;
+
+  /// No description provided for @rtlEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic RTL layout enabled'**
+  String get rtlEnabled;
+
+  /// No description provided for @timezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Timezone'**
+  String get timezone;
+
+  /// No description provided for @emailIntegration.
+  ///
+  /// In en, this message translates to:
+  /// **'Email integration'**
+  String get emailIntegration;
+
+  /// No description provided for @smsIntegration.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS integration'**
+  String get smsIntegration;
+
+  /// No description provided for @bankImportFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank import format'**
+  String get bankImportFormat;
+
+  /// No description provided for @barcodeScanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode scanner'**
+  String get barcodeScanner;
+
+  /// No description provided for @printerIntegration.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt printer'**
+  String get printerIntegration;
+
+  /// No description provided for @driveIntegration.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Drive integration'**
+  String get driveIntegration;
+
+  /// No description provided for @enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get enabled;
+
+  /// No description provided for @disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get disabled;
+
+  /// No description provided for @policyStrict.
+  ///
+  /// In en, this message translates to:
+  /// **'Strict'**
+  String get policyStrict;
+
+  /// No description provided for @policyWarn.
+  ///
+  /// In en, this message translates to:
+  /// **'Warn'**
+  String get policyWarn;
+
+  /// No description provided for @policyAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get policyAllow;
+
+  /// No description provided for @aiDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'AI disabled'**
+  String get aiDisabled;
+
+  /// No description provided for @aiLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Local-only AI'**
+  String get aiLocalOnly;
+
+  /// No description provided for @aiCloudOptIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud AI by explicit opt-in'**
+  String get aiCloudOptIn;
+
+  /// No description provided for @retentionNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not retain'**
+  String get retentionNone;
+
+  /// No description provided for @retentionLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Retain locally'**
+  String get retentionLocal;
+
+  /// No description provided for @mfaOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get mfaOptional;
+
+  /// No description provided for @mfaRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get mfaRequired;
+
+  /// No description provided for @conflictNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest revision wins'**
+  String get conflictNewest;
+
+  /// No description provided for @conflictReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Require manual review'**
+  String get conflictReview;
+
+  /// No description provided for @duplicateDetection.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate matching fields'**
+  String get duplicateDetection;
+
+  /// No description provided for @posTerminals.
+  ///
+  /// In en, this message translates to:
+  /// **'POS terminals'**
+  String get posTerminals;
+
+  /// No description provided for @receiptTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt template'**
+  String get receiptTemplate;
+
+  /// No description provided for @cashDrawer.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash drawers'**
+  String get cashDrawer;
+
+  /// No description provided for @shiftCloseRequiresOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift closing requires owner approval'**
+  String get shiftCloseRequiresOwner;
+
+  /// No description provided for @suspendSale.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow suspended sales'**
+  String get suspendSale;
+
+  /// No description provided for @defaultPaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Default payment method'**
+  String get defaultPaymentMethod;
+
+  /// No description provided for @minimizeCloudAiIdentifiers.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimize identifiers sent to cloud AI'**
+  String get minimizeCloudAiIdentifiers;
+
+  /// No description provided for @defaultCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Default country'**
+  String get defaultCountry;
+
+  /// No description provided for @bilingual.
+  ///
+  /// In en, this message translates to:
+  /// **'Bilingual'**
+  String get bilingual;
+
+  /// No description provided for @employeeGovernance.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee governance'**
+  String get employeeGovernance;
+
+  /// No description provided for @defaultRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Default role'**
+  String get defaultRole;
+
+  /// No description provided for @invitationExpiryHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation expiry (hours)'**
+  String get invitationExpiryHours;
+
+  /// No description provided for @maxActiveStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum active employees'**
+  String get maxActiveStaff;
+
+  /// No description provided for @requireMfaForStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Require MFA for employees'**
+  String get requireMfaForStaff;
+
+  /// No description provided for @allowSelfServiceProfileEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow employees to edit their profile'**
+  String get allowSelfServiceProfileEdit;
+
+  /// No description provided for @defaultBranchAssignment.
+  ///
+  /// In en, this message translates to:
+  /// **'Default branch assignment'**
+  String get defaultBranchAssignment;
+
+  /// No description provided for @manageEmployees.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage employees'**
+  String get manageEmployees;
+
+  /// No description provided for @branchManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch management'**
+  String get branchManagement;
+
+  /// No description provided for @addBranch.
+  ///
+  /// In en, this message translates to:
+  /// **'Add branch'**
+  String get addBranch;
+
+  /// No description provided for @editBranch.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit branch'**
+  String get editBranch;
+
+  /// No description provided for @branchName.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch name'**
+  String get branchName;
+
+  /// No description provided for @branchCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch code'**
+  String get branchCode;
+
+  /// No description provided for @branchAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch address'**
+  String get branchAddress;
+
+  /// No description provided for @branchSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch saved'**
+  String get branchSaved;
+
+  /// No description provided for @branchDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Branch deleted'**
+  String get branchDeleted;
+
+  /// No description provided for @activeBranch.
+  ///
+  /// In en, this message translates to:
+  /// **'Active branch'**
+  String get activeBranch;
+
+  /// No description provided for @noBranchesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No branches have been configured yet.'**
+  String get noBranchesYet;
+
+  /// No description provided for @approvalCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval center'**
+  String get approvalCenter;
+
+  /// No description provided for @noPendingApprovals.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending approval requests.'**
+  String get noPendingApprovals;
+
+  /// No description provided for @warehouseManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Warehouse management'**
+  String get warehouseManagement;
+
+  /// No description provided for @addWarehouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Add warehouse'**
+  String get addWarehouse;
+
+  /// No description provided for @warehouseName.
+  ///
+  /// In en, this message translates to:
+  /// **'Warehouse name'**
+  String get warehouseName;
+
+  /// No description provided for @warehouseAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Warehouse address'**
+  String get warehouseAddress;
+
+  /// No description provided for @warehouseCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Warehouse created'**
+  String get warehouseCreated;
+
+  /// No description provided for @noWarehousesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No warehouses have been configured yet.'**
+  String get noWarehousesYet;
+
+  /// No description provided for @approvalStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get approvalStatusPending;
+
+  /// No description provided for @approvalStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get approvalStatusApproved;
+
+  /// No description provided for @approvalStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get approvalStatusRejected;
+
+  /// No description provided for @approveRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get approveRequest;
+
+  /// No description provided for @rejectRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get rejectRequest;
+
+  /// No description provided for @approvalActionLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'This local preview records the decision only. Authenticated business changes require server-side approval and audit validation.'**
+  String get approvalActionLocalOnly;
+
+  /// No description provided for @requester.
+  ///
+  /// In en, this message translates to:
+  /// **'Requester'**
+  String get requester;
+
+  /// No description provided for @approvalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get approvalAmount;
+
+  /// No description provided for @approvalReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get approvalReason;
+
+  /// No description provided for @approvalRequestDemo.
+  ///
+  /// In en, this message translates to:
+  /// **'No production approval request is created in guest mode.'**
+  String get approvalRequestDemo;
+
+  /// No description provided for @cashPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get cashPayment;
+
+  /// No description provided for @bankTransferPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank transfer'**
+  String get bankTransferPayment;
+
+  /// No description provided for @jaibPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Jaib'**
+  String get jaibPayment;
+
+  /// No description provided for @alKuraimiPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Al Kuraimi'**
+  String get alKuraimiPayment;
+
+  /// No description provided for @yemenWalletPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Yemen Wallet'**
+  String get yemenWalletPayment;
+
+  /// No description provided for @cardPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Card'**
+  String get cardPayment;
+
+  /// No description provided for @creditPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit terms'**
+  String get creditPayment;
+
+  /// No description provided for @paymentMethodCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment method catalog'**
+  String get paymentMethodCatalog;
+
+  /// No description provided for @merchantInstructionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Provide the merchant number and payment instructions without storing secrets.'**
+  String get merchantInstructionHint;
+
+  /// No description provided for @merchantPaymentInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Merchant payment instructions'**
+  String get merchantPaymentInstructions;
+
+  /// No description provided for @paymentProofReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Require manual payment-proof review'**
+  String get paymentProofReview;
+
+  /// No description provided for @settingsAuditHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings audit history'**
+  String get settingsAuditHistory;
+
+  /// No description provided for @noSettingsAuditEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'No settings changes have been recorded on this device.'**
+  String get noSettingsAuditEntries;
+
+  /// No description provided for @localAuditScope.
+  ///
+  /// In en, this message translates to:
+  /// **'This local log records setting sections and revisions only; it never stores sensitive setting values.'**
+  String get localAuditScope;
+
+  /// No description provided for @openSecuritySettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open security settings'**
+  String get openSecuritySettings;
+
+  /// No description provided for @expenseSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses and reimbursements'**
+  String get expenseSettings;
+
+  /// No description provided for @defaultExpenseAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Default expense account'**
+  String get defaultExpenseAccount;
+
+  /// No description provided for @expenseCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense categories'**
+  String get expenseCategories;
+
+  /// No description provided for @receiptRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt required'**
+  String get receiptRequired;
+
+  /// No description provided for @reimbursementApprovalRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Reimbursement requires approval'**
+  String get reimbursementApprovalRequired;
+
+  /// No description provided for @mileageEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Mileage tracking enabled'**
+  String get mileageEnabled;
+
+  /// No description provided for @bankingAndReconciliation.
+  ///
+  /// In en, this message translates to:
+  /// **'Banking and reconciliation'**
+  String get bankingAndReconciliation;
+
+  /// No description provided for @bankAccountIds.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank account identifiers'**
+  String get bankAccountIds;
+
+  /// No description provided for @statementImportFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement import format'**
+  String get statementImportFormat;
+
+  /// No description provided for @reconciliationRequiresOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconciliation requires owner approval'**
+  String get reconciliationRequiresOwner;
+
+  /// No description provided for @autoMatchEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic transaction matching'**
+  String get autoMatchEnabled;
+
+  /// No description provided for @bankingCurrencies.
+  ///
+  /// In en, this message translates to:
+  /// **'Banking currencies'**
+  String get bankingCurrencies;
+
+  /// No description provided for @reportsSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports and analytics'**
+  String get reportsSettings;
+
+  /// No description provided for @defaultReportPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Default report period'**
+  String get defaultReportPeriod;
+
+  /// No description provided for @reportExportRequiresOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Report exports require owner approval'**
+  String get reportExportRequiresOwner;
+
+  /// No description provided for @dashboardMetrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard metrics'**
+  String get dashboardMetrics;
+
+  /// No description provided for @scheduledReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled reports'**
+  String get scheduledReports;
+
+  /// No description provided for @closeManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Month-end close management'**
+  String get closeManagement;
+
+  /// No description provided for @closeChecklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Close checklist'**
+  String get closeChecklist;
+
+  /// No description provided for @closeRequiresReconciliation.
+  ///
+  /// In en, this message translates to:
+  /// **'Closing requires reconciliation'**
+  String get closeRequiresReconciliation;
+
+  /// No description provided for @closeRequiresBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Closing requires a successful backup'**
+  String get closeRequiresBackup;
+
+  /// No description provided for @reopenRequiresOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopening requires owner approval'**
+  String get reopenRequiresOwner;
+
+  /// No description provided for @reportPeriodMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Current month'**
+  String get reportPeriodMonthly;
+
+  /// No description provided for @reportPeriodQuarterly.
+  ///
+  /// In en, this message translates to:
+  /// **'Current quarter'**
+  String get reportPeriodQuarterly;
+
+  /// No description provided for @reportPeriodAnnual.
+  ///
+  /// In en, this message translates to:
+  /// **'Current year'**
+  String get reportPeriodAnnual;
 }
 
 class _AppLocalizationsDelegate
