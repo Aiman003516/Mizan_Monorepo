@@ -2403,6 +2403,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revenueRecognition => 'Revenue Recognition';
 
   @override
+  String get arApAging => 'AR/AP Aging';
+
+  @override
+  String get createSettlementDraft => 'Create settlement draft';
+
+  @override
+  String get settlementDraftCreated =>
+      'Settlement draft created. Review and post it through the accounting workflow.';
+
+  @override
+  String get settlementAccountsLoadFailed =>
+      'Could not load accounting accounts.';
+
+  @override
+  String get settlementAmount => 'Settlement amount';
+
+  @override
+  String get settlementAmountHint =>
+      'Enter an amount no greater than the outstanding balance.';
+
+  @override
+  String get cashAccount => 'Cash or bank account';
+
+  @override
+  String get receivableAccount => 'Receivable account';
+
+  @override
+  String get payableAccount => 'Payable account';
+
+  @override
+  String get paymentMethod => 'Payment method';
+
+  @override
+  String get reference => 'Reference';
+
+  @override
+  String get settlementAmountInvalid =>
+      'Enter a positive amount within the outstanding balance.';
+
+  @override
+  String get settlementFieldsRequired =>
+      'Complete the amount, accounts, payment method, and journal number.';
+
+  @override
+  String get settlementDraftFailed => 'Could not create the settlement draft.';
+
+  @override
+  String get arApAgingLoadFailed => 'Could not load the aging report.';
+
+  @override
+  String get arApAgingNoOutstanding =>
+      'No outstanding documents are available.';
+
+  @override
+  String get aging1To30 => '1–30 days';
+
+  @override
+  String get aging31To60 => '31–60 days';
+
+  @override
+  String get aging61To90 => '61–90 days';
+
+  @override
+  String get agingOver90 => 'Over 90 days';
+
+  @override
+  String get daysOverdue => 'days overdue';
+
+  @override
   String get revenueRecognitionIntro =>
       'Review planned recognition amounts. Creating a draft does not post it; posting remains a separately authorized accounting action.';
 

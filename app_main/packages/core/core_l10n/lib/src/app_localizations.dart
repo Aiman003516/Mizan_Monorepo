@@ -4646,6 +4646,132 @@ abstract class AppLocalizations {
   /// **'Revenue Recognition'**
   String get revenueRecognition;
 
+  /// No description provided for @arApAging.
+  ///
+  /// In en, this message translates to:
+  /// **'AR/AP Aging'**
+  String get arApAging;
+
+  /// No description provided for @createSettlementDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Create settlement draft'**
+  String get createSettlementDraft;
+
+  /// No description provided for @settlementDraftCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement draft created. Review and post it through the accounting workflow.'**
+  String get settlementDraftCreated;
+
+  /// No description provided for @settlementAccountsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load accounting accounts.'**
+  String get settlementAccountsLoadFailed;
+
+  /// No description provided for @settlementAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement amount'**
+  String get settlementAmount;
+
+  /// No description provided for @settlementAmountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount no greater than the outstanding balance.'**
+  String get settlementAmountHint;
+
+  /// No description provided for @cashAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash or bank account'**
+  String get cashAccount;
+
+  /// No description provided for @receivableAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Receivable account'**
+  String get receivableAccount;
+
+  /// No description provided for @payableAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Payable account'**
+  String get payableAccount;
+
+  /// No description provided for @paymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment method'**
+  String get paymentMethod;
+
+  /// No description provided for @reference.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference'**
+  String get reference;
+
+  /// No description provided for @settlementAmountInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a positive amount within the outstanding balance.'**
+  String get settlementAmountInvalid;
+
+  /// No description provided for @settlementFieldsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the amount, accounts, payment method, and journal number.'**
+  String get settlementFieldsRequired;
+
+  /// No description provided for @settlementDraftFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the settlement draft.'**
+  String get settlementDraftFailed;
+
+  /// No description provided for @arApAgingLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the aging report.'**
+  String get arApAgingLoadFailed;
+
+  /// No description provided for @arApAgingNoOutstanding.
+  ///
+  /// In en, this message translates to:
+  /// **'No outstanding documents are available.'**
+  String get arApAgingNoOutstanding;
+
+  /// No description provided for @aging1To30.
+  ///
+  /// In en, this message translates to:
+  /// **'1–30 days'**
+  String get aging1To30;
+
+  /// No description provided for @aging31To60.
+  ///
+  /// In en, this message translates to:
+  /// **'31–60 days'**
+  String get aging31To60;
+
+  /// No description provided for @aging61To90.
+  ///
+  /// In en, this message translates to:
+  /// **'61–90 days'**
+  String get aging61To90;
+
+  /// No description provided for @agingOver90.
+  ///
+  /// In en, this message translates to:
+  /// **'Over 90 days'**
+  String get agingOver90;
+
+  /// No description provided for @daysOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'days overdue'**
+  String get daysOverdue;
+
   /// No description provided for @revenueRecognitionIntro.
   ///
   /// In en, this message translates to:

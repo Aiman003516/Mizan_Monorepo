@@ -1819,10 +1819,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get receivablesTurnover => 'معدل دوران الذمم المدينة';
 
   @override
-  String get receivables => 'المستحقات';
+  String get receivables => 'الذمم المدينة';
 
   @override
-  String get payables => 'المدفوعات';
+  String get payables => 'الذمم الدائنة';
 
   @override
   String get currentAmount => 'حالية';
@@ -2393,6 +2393,72 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get revenueRecognition => 'إثبات الإيرادات';
+
+  @override
+  String get arApAging => 'أعمار الذمم المدينة والدائنة';
+
+  @override
+  String get createSettlementDraft => 'إنشاء مسودة تسوية';
+
+  @override
+  String get settlementDraftCreated =>
+      'تم إنشاء مسودة التسوية. راجعها وانشرها من خلال سير عمل المحاسبة.';
+
+  @override
+  String get settlementAccountsLoadFailed => 'تعذر تحميل الحسابات المحاسبية.';
+
+  @override
+  String get settlementAmount => 'مبلغ التسوية';
+
+  @override
+  String get settlementAmountHint => 'أدخل مبلغاً لا يتجاوز الرصيد المستحق.';
+
+  @override
+  String get cashAccount => 'حساب النقد أو البنك';
+
+  @override
+  String get receivableAccount => 'حساب الذمم المدينة';
+
+  @override
+  String get payableAccount => 'حساب الذمم الدائنة';
+
+  @override
+  String get paymentMethod => 'طريقة الدفع';
+
+  @override
+  String get reference => 'المرجع';
+
+  @override
+  String get settlementAmountInvalid =>
+      'أدخل مبلغاً موجباً ضمن الرصيد المستحق.';
+
+  @override
+  String get settlementFieldsRequired =>
+      'أكمل المبلغ والحسابات وطريقة الدفع ورقم القيد.';
+
+  @override
+  String get settlementDraftFailed => 'تعذر إنشاء مسودة التسوية.';
+
+  @override
+  String get arApAgingLoadFailed => 'تعذر تحميل تقرير الأعمار.';
+
+  @override
+  String get arApAgingNoOutstanding => 'لا توجد مستندات مستحقة.';
+
+  @override
+  String get aging1To30 => 'من 1 إلى 30 يوماً';
+
+  @override
+  String get aging31To60 => 'من 31 إلى 60 يوماً';
+
+  @override
+  String get aging61To90 => 'من 61 إلى 90 يوماً';
+
+  @override
+  String get agingOver90 => 'أكثر من 90 يوماً';
+
+  @override
+  String get daysOverdue => 'يوماً متأخراً';
 
   @override
   String get revenueRecognitionIntro =>

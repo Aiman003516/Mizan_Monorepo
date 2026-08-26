@@ -10,6 +10,7 @@ import 'balance_sheet_screen.dart';
 import 'trial_balance_screen.dart';
 import 'ledger_control_screen.dart';
 import 'revenue_recognition_screen.dart';
+import 'ar_ap_aging_screen.dart';
 import 'total_amounts_screen.dart';
 import 'monthly_amounts_screen.dart';
 import 'total_classifications_screen.dart';
@@ -125,6 +126,12 @@ class ReportsHubScreen extends ConsumerWidget {
                 icon: Icons.event_repeat,
                 color: Colors.green,
                 onTap: () => _nav(context, const RevenueRecognitionScreen()),
+              ),
+              _ReportCard(
+                title: l10n.arApAging,
+                icon: Icons.account_tree,
+                color: Colors.orange,
+                onTap: () => _nav(context, const ArApAgingScreen()),
               ),
             ]),
 

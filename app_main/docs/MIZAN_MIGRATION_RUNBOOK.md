@@ -29,6 +29,7 @@ Run the files in filename order. The current sequence is:
 | 17 | `20260827210000_dimensions_books_fx.sql` | Accounting books, controlled dimensions, worktags, and exchange-rate provenance fields | Added in the current upgrade; not applied |
 | 18 | `20260827220000_tax_engine_foundation.sql` | Effective-dated tax metadata, deterministic calculation, tax snapshots, RLS, and audit hooks | Added in the current upgrade; not applied |
 | 19 | `20260827230000_revenue_recognition_foundation.sql` | Tenant-scoped contracts, deterministic schedules, recognition drafts, posting synchronization, RLS, and audit hooks | Added in the current upgrade; not applied |
+| 20 | `20260827240000_ar_ap_settlement_aging.sql` | AR/AP settlement drafts, outstanding-balance guards, posting synchronization, receivables/payables aging, RLS, and audit hooks | Added in the current upgrade; not applied |
 
 ## Preflight checklist
 
