@@ -559,7 +559,15 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                   Navigator.pop(context);
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
+                      builder: (context) => LoginScreen(
+                        onJoinOrganization: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const EmployeeSignInScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   );
                 },

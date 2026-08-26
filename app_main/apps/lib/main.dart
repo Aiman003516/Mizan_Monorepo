@@ -91,6 +91,42 @@ Future<void> main() async {
   runApp(ProviderScope(overrides: overrides, child: const MyApp()));
 }
 
+class _PendingInvitationStartupRouter extends ConsumerStatefulWidget {
+  const _PendingInvitationStartupRouter({required this.child});
+
+  final Widget child;
+
+  @override
+  ConsumerState<_PendingInvitationStartupRouter> createState() =>
+      _PendingInvitationStartupRouterState();
+}
+
+class _PendingInvitationStartupRouterState
+    extends ConsumerState<_PendingInvitationStartupRouter> {
+  bool _didOfferInvitation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeOpenInvitation());
+  }
+
+  Future<void> _maybeOpenInvitation() async {
+    if (_didOfferInvitation || !mounted) return;
+    final pending = ref.read(pendingInvitationProvider);
+    if (pending == null || Supabase.instance.client.auth.currentUser == null) {
+      return;
+    }
+    _didOfferInvitation = true;
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const EmployeeSignInScreen()));
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
@@ -143,19 +179,23 @@ class MyApp extends ConsumerWidget {
       home: showOnboarding
           ? const OnboardingScreen()
           : _AuthenticatedApp(
-              child: Builder(
-                builder: (context) {
-                  return ProviderScope(
-                    overrides: [
-                      transactions_ui.appLocalizationsProvider.overrideWith(
-                        (ref) => ref.watch(
-                          app_l10n.contextualAppLocalizationsProvider(context),
+              child: _PendingInvitationStartupRouter(
+                child: Builder(
+                  builder: (context) {
+                    return ProviderScope(
+                      overrides: [
+                        transactions_ui.appLocalizationsProvider.overrideWith(
+                          (ref) => ref.watch(
+                            app_l10n.contextualAppLocalizationsProvider(
+                              context,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                    child: const MainScaffold(),
-                  );
-                },
+                      ],
+                      child: const MainScaffold(),
+                    );
+                  },
+                ),
               ),
             ),
     );

@@ -9,7 +9,9 @@ import 'package:feature_auth/src/presentation/auth_controller.dart';
 import 'package:shared_ui/shared_ui.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.onJoinOrganization});
+
+  final VoidCallback? onJoinOrganization;
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -106,10 +108,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     const String logoAsset = 'assets/images/mizan_full.png';
 
     ref.listen<AuthState>(authControllerProvider, (previous, next) {
-      if (next.status == AuthStatus.authenticated_online) {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
+      if (next.status == AuthStatus.authenticated_online &&
+          ModalRoute.of(context)?.isCurrent == true &&
+          Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
       }
 
       if (next.status == AuthStatus.emailConfirmationPending) {
@@ -253,6 +255,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   _isSignUp ? l10n.alreadyHaveAccount : l10n.needAccount,
                 ),
               ),
+
+              if (widget.onJoinOrganization != null) ...[
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: widget.onJoinOrganization,
+                  icon: const Icon(Icons.group_add_outlined),
+                  label: Text(l10n.joinOrganization),
+                ),
+              ],
 
               const SizedBox(height: 24),
               Row(

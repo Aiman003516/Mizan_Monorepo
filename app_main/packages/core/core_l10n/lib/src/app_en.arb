@@ -1930,7 +1930,9 @@
   "stepShareCode": "2. Share Code",
   "validFor24Hours": "Valid for 24 hours",
   "shareViaApp": "Share via WhatsApp / Telegram",
-  "inviteShareText": "Join my business on Mizan!\n\n1. Download the App\n2. Sign In\n3. Select 'Join Business' and enter code: {code}\n\n(Valid for 24 hours)",
+  "copyInviteCode": "Copy invite code",
+  "inviteCodeCopied": "Invite code copied",
+  "inviteShareText": "You are invited to join my business on Mizan!\n\n1. Download or open the app\n2. Tap Sign In / Create Account\n3. Tap Join Organization and enter code: {code}\n\nDo not forward this invitation. It is valid for 24 hours.",
   "@inviteShareText": {
     "placeholders": {
       "code": {

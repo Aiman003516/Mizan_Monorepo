@@ -141,7 +141,30 @@ class StaffRepository {
         .eq('status', 'active');
   }
 
-  Future<String> createInvite(String roleId) async {
+  Future<String> createInvite(String roleId, {String? recipientEmail}) async {
+    try {
+      final result = await _supabase.rpc(
+        'create_invitation',
+        params: {
+          'p_role_id': roleId,
+          'p_recipient_email': recipientEmail?.trim().toLowerCase(),
+        },
+      );
+      if (result is Map && result['code'] is String) {
+        return result['code'] as String;
+      }
+      throw const PostgrestException(
+        message: 'Invitation creation returned no code.',
+        code: 'MIZAN_INVITE_INVALID_RESPONSE',
+      );
+    } on PostgrestException catch (error) {
+      // Do not silently downgrade an email-bound invite to an unbound code.
+      if (!_isMissingInvitationFunction(error, 'create_invitation') ||
+          recipientEmail?.trim().isNotEmpty == true) {
+        rethrow;
+      }
+    }
+
     final result = await _supabase.rpc(
       'create_invite',
       params: {'p_role_id': roleId},
@@ -151,6 +174,17 @@ class StaffRepository {
       message: 'Invite creation returned no code.',
       code: 'MIZAN_INVITE_INVALID_RESPONSE',
     );
+  }
+
+  bool _isMissingInvitationFunction(
+    PostgrestException error,
+    String functionName,
+  ) {
+    final message = error.message.toLowerCase();
+    return error.code == '42883' ||
+        message.contains(functionName) &&
+            (message.contains('does not exist') ||
+                message.contains('function'));
   }
 
   Future<String> redeemInvite({
@@ -169,6 +203,18 @@ class StaffRepository {
       );
     }
 
+    try {
+      final result = await _supabase.rpc(
+        'redeem_invitation',
+        params: {'p_code': code.trim(), 'p_display_name': displayName.trim()},
+      );
+      if (result is Map && result['role_id'] is String) {
+        return result['role_id'] as String;
+      }
+    } on PostgrestException catch (error) {
+      if (!_isMissingInvitationFunction(error, 'redeem_invitation')) rethrow;
+    }
+
     final result = await _supabase.rpc(
       'redeem_invite',
       params: {'p_code': code.trim(), 'p_display_name': displayName.trim()},
@@ -183,6 +229,27 @@ class StaffRepository {
   }
 
   Future<Map<String, dynamic>?> validateInviteCode(String code) async {
+    try {
+      final result = await _supabase.rpc(
+        'validate_invitation',
+        params: {'p_code': code.trim()},
+      );
+      if (result is! Map) return null;
+      final data = Map<String, dynamic>.from(result);
+      return {
+        'id': data['id'],
+        'roleId': data['role_id'],
+        'roleName': data['role_name'],
+        'tenantId': data['tenant_id'],
+        'tenantName': data['tenant_name'],
+        'recipientEmail': data['recipient_email'],
+        'displayName': data['display_name'],
+        'expiresAt': data['expires_at'],
+      };
+    } on PostgrestException catch (error) {
+      if (!_isMissingInvitationFunction(error, 'validate_invitation')) rethrow;
+    }
+
     final result = await _supabase.rpc(
       'validate_invite',
       params: {'p_code': code.trim()},

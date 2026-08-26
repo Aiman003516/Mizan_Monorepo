@@ -4195,8 +4195,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareViaApp => 'Share via WhatsApp / Telegram';
 
   @override
+  String get copyInviteCode => 'Copy invite code';
+
+  @override
+  String get inviteCodeCopied => 'Invite code copied';
+
+  @override
   String inviteShareText(String code) {
-    return 'Join my business on Mizan!\n\n1. Download the App\n2. Sign In\n3. Select \'Join Business\' and enter code: $code\n\n(Valid for 24 hours)';
+    return 'You are invited to join my business on Mizan!\n\n1. Download or open the app\n2. Tap Sign In / Create Account\n3. Tap Join Organization and enter code: $code\n\nDo not forward this invitation. It is valid for 24 hours.';
   }
 
   @override

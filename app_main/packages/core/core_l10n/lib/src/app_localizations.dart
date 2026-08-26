@@ -7958,10 +7958,22 @@ abstract class AppLocalizations {
   /// **'Share via WhatsApp / Telegram'**
   String get shareViaApp;
 
+  /// No description provided for @copyInviteCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy invite code'**
+  String get copyInviteCode;
+
+  /// No description provided for @inviteCodeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite code copied'**
+  String get inviteCodeCopied;
+
   /// No description provided for @inviteShareText.
   ///
   /// In en, this message translates to:
-  /// **'Join my business on Mizan!\n\n1. Download the App\n2. Sign In\n3. Select \'Join Business\' and enter code: {code}\n\n(Valid for 24 hours)'**
+  /// **'You are invited to join my business on Mizan!\n\n1. Download or open the app\n2. Tap Sign In / Create Account\n3. Tap Join Organization and enter code: {code}\n\nDo not forward this invitation. It is valid for 24 hours.'**
   String inviteShareText(String code);
 
   /// No description provided for @validInviteCodeTitle.

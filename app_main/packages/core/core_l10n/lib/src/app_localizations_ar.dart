@@ -4194,8 +4194,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareViaApp => 'المشاركة عبر واتساب / تيليجرام';
 
   @override
+  String get copyInviteCode => 'نسخ رمز الدعوة';
+
+  @override
+  String get inviteCodeCopied => 'تم نسخ رمز الدعوة';
+
+  @override
   String inviteShareText(String code) {
-    return 'انضم إلى نشاطي التجاري على ميزان!\n\n1. نزّل التطبيق\n2. سجّل الدخول\n3. اختر \"الانضمام إلى نشاط تجاري\" وأدخل الرمز: $code\n\n(صالح لمدة 24 ساعة)';
+    return 'تمت دعوتك للانضمام إلى نشاطي التجاري على ميزان!\n\n1. نزّل التطبيق أو افتحه\n2. اضغط على تسجيل الدخول / إنشاء حساب\n3. اضغط على الانضمام إلى منظمة وأدخل الرمز: $code\n\nلا تشارك هذه الدعوة مع الآخرين. الرمز صالح لمدة 24 ساعة.';
   }
 
   @override
