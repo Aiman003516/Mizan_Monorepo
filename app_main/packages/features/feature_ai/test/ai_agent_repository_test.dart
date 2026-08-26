@@ -30,6 +30,29 @@ void main() {
     );
   });
 
+  test('parses a typed action draft', () {
+    final draft = AiActionRequest.fromJson({
+      'id': 'action-1',
+      'action_type': 'customer_draft',
+      'payload': {'name': 'Acme'},
+      'preview': {'action_type': 'customer_draft'},
+      'status': 'pending',
+      'expires_at': '2026-08-26T12:00:00Z',
+    });
+
+    expect(draft.actionType, 'customer_draft');
+    expect(draft.payload['name'], 'Acme');
+    expect(draft.status, 'pending');
+    expect(draft.expiresAt, isNotNull);
+  });
+
+  test('rejects an incomplete action draft', () {
+    expect(
+      () => AiActionRequest.fromJson(const {}),
+      throwsA(isA<AiAgentException>()),
+    );
+  });
+
   test('guest mode exception is explicit and safe', () {
     const error = AiGuestModeException();
 

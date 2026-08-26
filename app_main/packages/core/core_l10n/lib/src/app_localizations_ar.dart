@@ -4861,4 +4861,73 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get aiAssistantRetry => 'إعادة المحاولة';
+
+  @override
+  String get aiActionPreview => 'معاينة الإجراء';
+
+  @override
+  String get aiActionDraftCreated => 'تم إعداد المسودة لمراجعتك.';
+
+  @override
+  String get aiActionDraftPending => 'بانتظار التأكيد';
+
+  @override
+  String get aiActionDraftConfirmed => 'مؤكدة للتنفيذ مستقبلاً';
+
+  @override
+  String get aiActionDraftCancelled => 'ملغاة';
+
+  @override
+  String get aiActionCancelDraft => 'إلغاء المسودة';
+
+  @override
+  String get aiActionConfirmDraft => 'تأكيد الإجراء';
+
+  @override
+  String get aiActionExecutionDisabled =>
+      'لم يتم تفعيل التنفيذ بعد. لم تُعدّل المسودة أي سجل.';
+
+  @override
+  String get aiActionCancelled => 'تم إلغاء المسودة.';
+
+  @override
+  String get aiActionInvalid => 'مسودة الإجراء غير صالحة أو منتهية.';
+
+  @override
+  String get aiActionPermissionDenied => 'لا تملك صلاحية إعداد هذا الإجراء.';
+
+  @override
+  String get aiActionTypeInvoice => 'مسودة فاتورة';
+
+  @override
+  String get aiActionTypeBill => 'مسودة فاتورة مورد';
+
+  @override
+  String get aiActionTypeCustomer => 'مسودة عميل';
+
+  @override
+  String get aiActionTypeVendor => 'مسودة مورد';
+
+  @override
+  String get aiActionTypeStaffInvitation => 'مسودة دعوة موظفين';
+
+  @override
+  String get aiActionPrepareDraft => 'إعداد المسودة';
+
+  @override
+  String get aiActionPayloadHint => 'أدخل بيانات المسودة المعتمدة بصيغة JSON';
+
+  @override
+  String get aiActionDraftPayload => 'بيانات المسودة';
+
+  @override
+  String get aiActionDraftForReview =>
+      'لم تغيّر هذه المسودة أي سجل. راجعها قبل أي تنفيذ مستقبلي.';
+
+  @override
+  String get aiActionInvalidPayload =>
+      'أدخل كائناً صالحاً بصيغة JSON للإجراء المحدد.';
+
+  @override
+  String get aiActionDraftStatus => 'الحالة';
 }

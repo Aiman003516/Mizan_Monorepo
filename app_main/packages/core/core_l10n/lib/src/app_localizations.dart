@@ -9199,6 +9199,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try again'**
   String get aiAssistantRetry;
+
+  /// No description provided for @aiActionPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Action preview'**
+  String get aiActionPreview;
+
+  /// No description provided for @aiActionDraftCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft prepared for your review.'**
+  String get aiActionDraftCreated;
+
+  /// No description provided for @aiActionDraftPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending confirmation'**
+  String get aiActionDraftPending;
+
+  /// No description provided for @aiActionDraftConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed for future execution'**
+  String get aiActionDraftConfirmed;
+
+  /// No description provided for @aiActionDraftCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get aiActionDraftCancelled;
+
+  /// No description provided for @aiActionCancelDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel draft'**
+  String get aiActionCancelDraft;
+
+  /// No description provided for @aiActionConfirmDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm action'**
+  String get aiActionConfirmDraft;
+
+  /// No description provided for @aiActionExecutionDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Execution is not enabled yet. The draft has not changed any records.'**
+  String get aiActionExecutionDisabled;
+
+  /// No description provided for @aiActionCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft cancelled.'**
+  String get aiActionCancelled;
+
+  /// No description provided for @aiActionInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'The action draft is invalid or expired.'**
+  String get aiActionInvalid;
+
+  /// No description provided for @aiActionPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to prepare this action.'**
+  String get aiActionPermissionDenied;
+
+  /// No description provided for @aiActionTypeInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice draft'**
+  String get aiActionTypeInvoice;
+
+  /// No description provided for @aiActionTypeBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill draft'**
+  String get aiActionTypeBill;
+
+  /// No description provided for @aiActionTypeCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer draft'**
+  String get aiActionTypeCustomer;
+
+  /// No description provided for @aiActionTypeVendor.
+  ///
+  /// In en, this message translates to:
+  /// **'Vendor draft'**
+  String get aiActionTypeVendor;
+
+  /// No description provided for @aiActionTypeStaffInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff invitation draft'**
+  String get aiActionTypeStaffInvitation;
+
+  /// No description provided for @aiActionPrepareDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare draft'**
+  String get aiActionPrepareDraft;
+
+  /// No description provided for @aiActionPayloadHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the validated draft payload as JSON'**
+  String get aiActionPayloadHint;
+
+  /// No description provided for @aiActionDraftPayload.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft payload'**
+  String get aiActionDraftPayload;
+
+  /// No description provided for @aiActionDraftForReview.
+  ///
+  /// In en, this message translates to:
+  /// **'This draft has not changed any records. Review it before any future execution.'**
+  String get aiActionDraftForReview;
+
+  /// No description provided for @aiActionInvalidPayload.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid JSON object for the selected action.'**
+  String get aiActionInvalidPayload;
+
+  /// No description provided for @aiActionDraftStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get aiActionDraftStatus;
 }
 
 class _AppLocalizationsDelegate

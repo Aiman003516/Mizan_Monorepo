@@ -1,6 +1,7 @@
 import 'package:core_data/core_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class AiAgentException implements Exception {
   const AiAgentException(this.code, this.message);
@@ -123,6 +124,83 @@ class AiAgentRepository {
     return AiAgentResponse.fromData(Map<String, dynamic>.from(data));
   }
 
+  Future<AiActionRequest> createActionDraft({
+    required String actionType,
+    required Map<String, dynamic> payload,
+    String? conversationId,
+  }) async {
+    if (!_cloudMode || _supabase.auth.currentSession == null) {
+      throw const AiGuestModeException();
+    }
+    final tenantId = await _tenantContext.currentTenantId();
+    final response = await _supabase.functions.invoke(
+      'mizan-ai-action',
+      body: {
+        'action': 'create_draft',
+        'action_type': actionType,
+        'payload': payload,
+        'tenant_id': tenantId,
+        'idempotency_key': const Uuid().v4(),
+        if (conversationId != null) 'conversation_id': conversationId,
+      },
+    );
+    return _parseActionResponse(response);
+  }
+
+  Future<AiActionRequest> cancelActionDraft(String actionRequestId) async {
+    if (!_cloudMode || _supabase.auth.currentSession == null) {
+      throw const AiGuestModeException();
+    }
+    final tenantId = await _tenantContext.currentTenantId();
+    final response = await _supabase.functions.invoke(
+      'mizan-ai-action',
+      body: {
+        'action': 'cancel',
+        'action_request_id': actionRequestId,
+        'tenant_id': tenantId,
+      },
+    );
+    return _parseActionResponse(response);
+  }
+
+  Future<AiActionRequest> confirmActionDraft(String actionRequestId) async {
+    if (!_cloudMode || _supabase.auth.currentSession == null) {
+      throw const AiGuestModeException();
+    }
+    final tenantId = await _tenantContext.currentTenantId();
+    final response = await _supabase.functions.invoke(
+      'mizan-ai-action',
+      body: {
+        'action': 'confirm',
+        'action_request_id': actionRequestId,
+        'tenant_id': tenantId,
+      },
+    );
+    return _parseActionResponse(response);
+  }
+
+  AiActionRequest _parseActionResponse(FunctionResponse response) {
+    final data = response.data;
+    if (response.status < 200 || response.status >= 300) {
+      final errorData = data is Map
+          ? Map<String, dynamic>.from(data)
+          : const {};
+      throw AiAgentException(
+        'MIZAN_AI_ACTION_HTTP_${response.status}',
+        _safeError(errorData['error']),
+      );
+    }
+    if (data is! Map || data['action_request'] is! Map) {
+      throw const AiAgentException(
+        'MIZAN_AI_INVALID_ACTION_RESPONSE',
+        'The AI action draft returned an invalid response.',
+      );
+    }
+    return AiActionRequest.fromJson(
+      Map<String, dynamic>.from(data['action_request'] as Map),
+    );
+  }
+
   String _safeError(Object? value) {
     switch (value) {
       case 'Authentication required':
@@ -139,6 +217,57 @@ class AiAgentRepository {
         return 'The AI assistant could not complete this request.';
     }
   }
+}
+
+class AiActionRequest {
+  const AiActionRequest({
+    required this.id,
+    required this.actionType,
+    required this.payload,
+    required this.preview,
+    required this.status,
+    required this.expiresAt,
+    this.createdAt,
+  });
+
+  factory AiActionRequest.fromJson(Map<String, dynamic> json) {
+    final id = json['id'];
+    final actionType = json['action_type'];
+    final status = json['status'];
+    final payload = json['payload'];
+    final preview = json['preview'];
+    final expiresAt = json['expires_at'];
+    if (id is! String ||
+        actionType is! String ||
+        status is! String ||
+        payload is! Map ||
+        preview is! Map ||
+        expiresAt is! String) {
+      throw const AiAgentException(
+        'MIZAN_AI_INVALID_ACTION_RESPONSE',
+        'The AI action draft returned an invalid response.',
+      );
+    }
+    return AiActionRequest(
+      id: id,
+      actionType: actionType,
+      payload: Map<String, dynamic>.from(payload),
+      preview: Map<String, dynamic>.from(preview),
+      status: status,
+      expiresAt: DateTime.tryParse(expiresAt),
+      createdAt: json['created_at'] is String
+          ? DateTime.tryParse(json['created_at'] as String)
+          : null,
+    );
+  }
+
+  final String id;
+  final String actionType;
+  final Map<String, dynamic> payload;
+  final Map<String, dynamic> preview;
+  final String status;
+  final DateTime? expiresAt;
+  final DateTime? createdAt;
 }
 
 final aiAgentRepositoryProvider = Provider<AiAgentRepository>((ref) {

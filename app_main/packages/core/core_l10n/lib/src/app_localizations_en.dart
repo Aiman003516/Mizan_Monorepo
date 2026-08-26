@@ -4862,4 +4862,74 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiAssistantRetry => 'Try again';
+
+  @override
+  String get aiActionPreview => 'Action preview';
+
+  @override
+  String get aiActionDraftCreated => 'Draft prepared for your review.';
+
+  @override
+  String get aiActionDraftPending => 'Pending confirmation';
+
+  @override
+  String get aiActionDraftConfirmed => 'Confirmed for future execution';
+
+  @override
+  String get aiActionDraftCancelled => 'Cancelled';
+
+  @override
+  String get aiActionCancelDraft => 'Cancel draft';
+
+  @override
+  String get aiActionConfirmDraft => 'Confirm action';
+
+  @override
+  String get aiActionExecutionDisabled =>
+      'Execution is not enabled yet. The draft has not changed any records.';
+
+  @override
+  String get aiActionCancelled => 'Draft cancelled.';
+
+  @override
+  String get aiActionInvalid => 'The action draft is invalid or expired.';
+
+  @override
+  String get aiActionPermissionDenied =>
+      'You do not have permission to prepare this action.';
+
+  @override
+  String get aiActionTypeInvoice => 'Invoice draft';
+
+  @override
+  String get aiActionTypeBill => 'Bill draft';
+
+  @override
+  String get aiActionTypeCustomer => 'Customer draft';
+
+  @override
+  String get aiActionTypeVendor => 'Vendor draft';
+
+  @override
+  String get aiActionTypeStaffInvitation => 'Staff invitation draft';
+
+  @override
+  String get aiActionPrepareDraft => 'Prepare draft';
+
+  @override
+  String get aiActionPayloadHint => 'Enter the validated draft payload as JSON';
+
+  @override
+  String get aiActionDraftPayload => 'Draft payload';
+
+  @override
+  String get aiActionDraftForReview =>
+      'This draft has not changed any records. Review it before any future execution.';
+
+  @override
+  String get aiActionInvalidPayload =>
+      'Enter a valid JSON object for the selected action.';
+
+  @override
+  String get aiActionDraftStatus => 'Status';
 }

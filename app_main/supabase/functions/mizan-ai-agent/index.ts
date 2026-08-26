@@ -206,9 +206,18 @@ async function executeTool(
     const query = asString(args.query);
     if (!query || query.length > 120) throw new Error("Invalid customer search");
     const pattern = `%${query.replace(/[%_]/g, "")}%`;
-    const { data, error } = await client.from("customers").select("id,name,email,phone,balance,is_on_hold").eq("tenant_id", tenantId).eq("is_deleted", false).or(`name.ilike.${pattern},email.ilike.${pattern},phone.ilike.${pattern}`).limit(MAX_TOOL_ROWS);
-    if (error) throw new Error("Customer data unavailable");
-    return { count: data?.length || 0, customers: data || [] };
+    const [nameMatches, emailMatches, phoneMatches] = await Promise.all([
+      client.from("customers").select("id,name,email,phone,balance,is_on_hold").eq("tenant_id", tenantId).eq("is_deleted", false).ilike("name", pattern).limit(MAX_TOOL_ROWS),
+      client.from("customers").select("id,name,email,phone,balance,is_on_hold").eq("tenant_id", tenantId).eq("is_deleted", false).ilike("email", pattern).limit(MAX_TOOL_ROWS),
+      client.from("customers").select("id,name,email,phone,balance,is_on_hold").eq("tenant_id", tenantId).eq("is_deleted", false).ilike("phone", pattern).limit(MAX_TOOL_ROWS),
+    ]);
+    if (nameMatches.error || emailMatches.error || phoneMatches.error) throw new Error("Customer data unavailable");
+    const merged = new Map<string, Record<string, unknown>>();
+    for (const row of [...(nameMatches.data || []), ...(emailMatches.data || []), ...(phoneMatches.data || [])]) {
+      const id = row.id as string | undefined;
+      if (id) merged.set(id, row as Record<string, unknown>);
+    }
+    return { count: merged.size, customers: [...merged.values()].slice(0, MAX_TOOL_ROWS) };
   }
 
   if (name === "search_vendors") {
@@ -216,9 +225,18 @@ async function executeTool(
     const query = asString(args.query);
     if (!query || query.length > 120) throw new Error("Invalid vendor search");
     const pattern = `%${query.replace(/[%_]/g, "")}%`;
-    const { data, error } = await client.from("vendors").select("id,name,email,phone,balance").eq("tenant_id", tenantId).eq("is_deleted", false).or(`name.ilike.${pattern},email.ilike.${pattern},phone.ilike.${pattern}`).limit(MAX_TOOL_ROWS);
-    if (error) throw new Error("Vendor data unavailable");
-    return { count: data?.length || 0, vendors: data || [] };
+    const [nameMatches, emailMatches, phoneMatches] = await Promise.all([
+      client.from("vendors").select("id,name,email,phone,balance").eq("tenant_id", tenantId).eq("is_deleted", false).ilike("name", pattern).limit(MAX_TOOL_ROWS),
+      client.from("vendors").select("id,name,email,phone,balance").eq("tenant_id", tenantId).eq("is_deleted", false).ilike("email", pattern).limit(MAX_TOOL_ROWS),
+      client.from("vendors").select("id,name,email,phone,balance").eq("tenant_id", tenantId).eq("is_deleted", false).ilike("phone", pattern).limit(MAX_TOOL_ROWS),
+    ]);
+    if (nameMatches.error || emailMatches.error || phoneMatches.error) throw new Error("Vendor data unavailable");
+    const merged = new Map<string, Record<string, unknown>>();
+    for (const row of [...(nameMatches.data || []), ...(emailMatches.data || []), ...(phoneMatches.data || [])]) {
+      const id = row.id as string | undefined;
+      if (id) merged.set(id, row as Record<string, unknown>);
+    }
+    return { count: merged.size, vendors: [...merged.values()].slice(0, MAX_TOOL_ROWS) };
   }
 
   if (name === "get_invoice_status") {

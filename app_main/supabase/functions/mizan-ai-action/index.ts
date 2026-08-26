@@ -77,6 +77,13 @@ async function normalizePayload(
   if (!ACTIONS.has(actionType) || !rawPayload || typeof rawPayload !== "object" || Array.isArray(rawPayload)) throw new Error("Unsupported action draft");
   const input = rawPayload as Record<string, unknown>;
   if (actionType === "invoice_draft" || actionType === "bill_draft") {
+    await permission(
+      client,
+      tenantId,
+      actionType === "invoice_draft"
+        ? ["manageCrm", "createInvoices", "manageInvoices", "manageSettings"]
+        : ["manageCrm", "createBills", "manageBills", "manageSettings"],
+    );
     const partyId = uuid(input[actionType === "invoice_draft" ? "customer_id" : "vendor_id"]);
     const start = date(input.invoice_date ?? input.bill_date);
     const due = date(input.due_date);
@@ -100,6 +107,13 @@ async function normalizePayload(
       : { vendor_id: partyId, bill_date: start, due_date: due, currency_code: currency, vendor_bill_number: stringValue(input.vendor_bill_number, 120) || null, notes: stringValue(input.notes, 2000) || null, items: normalizedItems };
   }
   if (actionType === "customer_draft" || actionType === "vendor_draft") {
+    await permission(
+      client,
+      tenantId,
+      actionType === "customer_draft"
+        ? ["manageCrm", "manageCustomers", "manageSettings"]
+        : ["manageCrm", "manageVendors", "manageSettings"],
+    );
     const name = stringValue(input.name, 200);
     if (!name) throw new Error("Party name is required");
     const normalizedEmail = input.email == null || input.email === "" ? null : email(input.email);
@@ -142,17 +156,39 @@ Deno.serve(async (request) => {
   } catch {
     return response({ error: "Invalid request body" }, 400);
   }
-  const tenantId = await tenantForUser(userClient, auth.user, uuid(body.tenant_id));
+  let tenantId: string;
+  try {
+    tenantId = await tenantForUser(userClient, auth.user, uuid(body.tenant_id));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Tenant access unavailable";
+    return response({ error: message === "Tenant selection is required" ? message : "Active tenant membership required" }, 403);
+  }
   const action = stringValue(body.action, 32) || "create_draft";
   const idempotencyKey = uuid(body.idempotency_key) || crypto.randomUUID();
   if (action === "cancel") {
     const requestId = uuid(body.action_request_id);
     if (!requestId) return response({ error: "Action request id is required" }, 400);
-    const { data, error } = await adminClient.from("ai_action_requests").update({ status: "cancelled" }).eq("id", requestId).eq("tenant_id", tenantId).eq("user_id", auth.user.id).eq("status", "pending").select("id,status").maybeSingle();
+    const { data, error } = await adminClient.from("ai_action_requests").update({ status: "cancelled" }).eq("id", requestId).eq("tenant_id", tenantId).eq("user_id", auth.user.id).eq("status", "pending").gt("expires_at", new Date().toISOString()).select("id,action_type,payload,preview,status,expires_at,created_at").maybeSingle();
     if (error || !data) return response({ error: "Action request could not be cancelled" }, 404);
     return response({ action_request: data });
   }
-  if (action === "confirm") return response({ error: "Action execution is not enabled yet; the request remains read-only" }, 409);
+  if (action === "confirm") {
+    const requestId = uuid(body.action_request_id);
+    if (!requestId) return response({ error: "Action request id is required" }, 400);
+    const { data, error } = await adminClient
+      .from("ai_action_requests")
+      .update({ status: "confirmed", confirmed_at: new Date().toISOString() })
+      .eq("id", requestId)
+      .eq("tenant_id", tenantId)
+      .eq("user_id", auth.user.id)
+      .eq("status", "pending")
+      .gt("expires_at", new Date().toISOString())
+      .select("id,action_type,payload,preview,status,expires_at,created_at")
+      .maybeSingle();
+    if (error || !data) return response({ error: "Action request is invalid or expired" }, 409);
+    await adminClient.from("ai_audit_events").insert({ request_id: requestId, tenant_id: tenantId, user_id: auth.user.id, conversation_id: null, event_type: "response", tool_name: "confirm_action_draft", success: true, metadata: { action_type: data.action_type, execution: "disabled" } });
+    return response({ action_request: data, execution: "disabled" });
+  }
   if (action !== "create_draft") return response({ error: "Unsupported action" }, 400);
   const actionType = stringValue(body.action_type, 64);
   if (!actionType || !ACTIONS.has(actionType)) return response({ error: "Unsupported action draft" }, 400);
