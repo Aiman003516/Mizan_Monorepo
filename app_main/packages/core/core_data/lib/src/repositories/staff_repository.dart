@@ -19,33 +19,68 @@ class StaffRepository {
 
   StaffRepository(this._supabase);
 
-  Stream<List<StaffMember>> watchCurrentTenantStaff() {
+  Stream<List<StaffMember>> watchCurrentTenantStaff() async* {
     final user = _supabase.auth.currentUser;
-    if (user == null) return Stream.value(const <StaffMember>[]);
+    if (user == null) {
+      yield const <StaffMember>[];
+      return;
+    }
 
-    return _supabase
-        .from('user_profiles')
-        .stream(primaryKey: ['id'])
-        .eq('id', user.id)
-        .asyncMap((profiles) async {
-          final tenantId = profiles.isEmpty
-              ? null
-              : profiles.first['tenant_id'] as String?;
-          if (tenantId == null || tenantId.isEmpty) {
-            return const <StaffMember>[];
-          }
-          return _fetchStaff(tenantId);
-        });
+    String tenantId;
+    try {
+      // REST is the source for the first render. A user_profiles Realtime
+      // channel must not be required just to open Employee Management.
+      tenantId = await _getTenantId();
+      yield await _fetchStaff(tenantId);
+    } catch (_) {
+      yield const <StaffMember>[];
+      return;
+    }
+
+    try {
+      // Realtime is an optional refresh enhancement. If the project has not
+      // enabled the publication, the REST snapshot above remains usable.
+      await for (final _
+          in _supabase
+              .from('staff_members')
+              .stream(primaryKey: ['id'])
+              .eq('tenant_id', tenantId)
+              .eq('status', 'active')) {
+        try {
+          yield await _fetchStaff(tenantId);
+        } catch (_) {
+          // Preserve the last successful staff snapshot.
+        }
+      }
+    } catch (_) {
+      // Nonfatal when Realtime is unavailable or not configured.
+    }
   }
 
-  Stream<List<StaffMember>> watchAllStaff(String tenantId) {
-    return _supabase
-        .from('staff_members')
-        .stream(primaryKey: ['id'])
-        .eq('tenant_id', tenantId)
-        .eq('status', 'active')
-        .order('created_at')
-        .map((rows) => rows.map(StaffMember.fromJson).toList(growable: false));
+  Stream<List<StaffMember>> watchAllStaff(String tenantId) async* {
+    try {
+      yield await _fetchStaff(tenantId);
+    } catch (_) {
+      yield const <StaffMember>[];
+      return;
+    }
+
+    try {
+      await for (final _
+          in _supabase
+              .from('staff_members')
+              .stream(primaryKey: ['id'])
+              .eq('tenant_id', tenantId)
+              .eq('status', 'active')) {
+        try {
+          yield await _fetchStaff(tenantId);
+        } catch (_) {
+          // Preserve the last successful snapshot.
+        }
+      }
+    } catch (_) {
+      // Nonfatal Realtime enhancement failure.
+    }
   }
 
   Future<List<StaffMember>> _fetchStaff(String tenantId) async {

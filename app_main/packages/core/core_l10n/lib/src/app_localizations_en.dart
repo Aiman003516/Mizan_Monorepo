@@ -2294,6 +2294,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get taxLiabilityTitle => 'Tax Liability';
 
   @override
+  String get reportNoData => 'No data for this period.';
+
+  @override
+  String get dateRange => 'Date range';
+
+  @override
+  String get fromDate => 'From';
+
+  @override
+  String get toDate => 'To';
+
+  @override
+  String get cashier => 'Cashier';
+
+  @override
+  String get unassigned => 'Unassigned';
+
+  @override
+  String ordersCount(Object count) {
+    return '$count orders';
+  }
+
+  @override
+  String get soldQuantity => 'Sold quantity';
+
+  @override
+  String get reorderPoint => 'Reorder point';
+
+  @override
+  String get salesTaxCollected => 'Sales tax collected';
+
+  @override
+  String get purchaseTaxPaid => 'Purchase tax paid';
+
+  @override
+  String get netTaxDue => 'Net tax due';
+
+  @override
+  String reportInvoicesCount(Object count) {
+    return '$count invoices';
+  }
+
+  @override
+  String reportBillsCount(Object count) {
+    return '$count bills';
+  }
+
+  @override
   String get reportHubTitle => 'Report Hub';
 
   @override

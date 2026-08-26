@@ -4430,6 +4430,90 @@ abstract class AppLocalizations {
   /// **'Tax Liability'**
   String get taxLiabilityTitle;
 
+  /// No description provided for @reportNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data for this period.'**
+  String get reportNoData;
+
+  /// No description provided for @dateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Date range'**
+  String get dateRange;
+
+  /// No description provided for @fromDate.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get fromDate;
+
+  /// No description provided for @toDate.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get toDate;
+
+  /// No description provided for @cashier.
+  ///
+  /// In en, this message translates to:
+  /// **'Cashier'**
+  String get cashier;
+
+  /// No description provided for @unassigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassigned'**
+  String get unassigned;
+
+  /// No description provided for @ordersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} orders'**
+  String ordersCount(Object count);
+
+  /// No description provided for @soldQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold quantity'**
+  String get soldQuantity;
+
+  /// No description provided for @reorderPoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder point'**
+  String get reorderPoint;
+
+  /// No description provided for @salesTaxCollected.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales tax collected'**
+  String get salesTaxCollected;
+
+  /// No description provided for @purchaseTaxPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase tax paid'**
+  String get purchaseTaxPaid;
+
+  /// No description provided for @netTaxDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Net tax due'**
+  String get netTaxDue;
+
+  /// No description provided for @reportInvoicesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} invoices'**
+  String reportInvoicesCount(Object count);
+
+  /// No description provided for @reportBillsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} bills'**
+  String reportBillsCount(Object count);
+
   /// No description provided for @reportHubTitle.
   ///
   /// In en, this message translates to:

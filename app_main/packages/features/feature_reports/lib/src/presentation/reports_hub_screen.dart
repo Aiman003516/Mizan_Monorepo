@@ -21,6 +21,7 @@ import 'tools/fraud_detection_screen.dart';
 import 'tools/standard_costing_screen.dart';
 import 'tools/financial_ratios_screen.dart';
 import 'budget_screen.dart';
+import 'operations_report_screens.dart';
 
 class ReportsHubScreen extends ConsumerWidget {
   final bool isStandalone;
@@ -198,7 +199,7 @@ class ReportsHubScreen extends ConsumerWidget {
 
             const SizedBox(height: 24),
 
-            // SECTION 4: UPCOMING (The "Power 10" Placeholders)
+            // SECTION 4: INVENTORY AND OPERATIONS
             _buildSectionHeader(
               context,
               l10n.inventoryOperationsSection,
@@ -208,30 +209,26 @@ class ReportsHubScreen extends ConsumerWidget {
               _ReportCard(
                 title: l10n.stockVelocityTitle,
                 icon: Icons.speed,
-                color: Colors.grey,
-                isLocked: true,
-                subtitle: l10n.featureNotImplemented,
+                color: Colors.indigo,
+                onTap: () => _nav(context, const StockVelocityReportScreen()),
               ),
               _ReportCard(
                 title: l10n.lowStockAlertTitle,
                 icon: Icons.warning_amber,
-                color: Colors.grey,
-                isLocked: true,
-                subtitle: l10n.featureNotImplemented,
+                color: Colors.orange,
+                onTap: () => _nav(context, const LowStockReportScreen()),
               ),
               _ReportCard(
                 title: l10n.salesByCashierTitle,
                 icon: Icons.badge,
-                color: Colors.grey,
-                isLocked: true,
-                subtitle: l10n.featureNotImplemented,
+                color: Colors.teal,
+                onTap: () => _nav(context, const SalesByCashierReportScreen()),
               ),
               _ReportCard(
                 title: l10n.taxLiabilityTitle,
                 icon: Icons.receipt_long,
-                color: Colors.grey,
-                isLocked: true,
-                subtitle: l10n.featureNotImplemented,
+                color: Colors.deepPurple,
+                onTap: () => _nav(context, const TaxLiabilityReportScreen()),
               ),
             ]),
           ],
@@ -290,17 +287,13 @@ class _ReportCard extends StatelessWidget {
   final String title;
   final IconData icon;
   final Color color;
-  final VoidCallback? onTap;
-  final String? subtitle;
-  final bool isLocked;
+  final VoidCallback onTap;
 
   const _ReportCard({
     required this.title,
     required this.icon,
     required this.color,
-    this.onTap,
-    this.subtitle,
-    this.isLocked = false,
+    required this.onTap,
   });
 
   @override
@@ -310,59 +303,39 @@ class _ReportCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: isLocked ? null : onTap,
+        onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            border: Border(
-              left: BorderSide(color: isLocked ? Colors.grey : color, width: 4),
-            ),
+            border: Border(left: BorderSide(color: color, width: 4)),
           ),
           padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                icon,
-                size: 32,
-                color: isLocked ? Colors.grey.shade400 : color,
-              ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              Icon(icon, size: 32, color: color),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              title,
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: isLocked ? Colors.grey : null,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (isLocked)
-                            const Icon(
-                              Icons.lock_outline,
-                              size: 16,
-                              color: Colors.grey,
-                            ),
-                        ],
-                      ),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle!,
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.grey,
-                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
+                      ),
                     ],
                   ),
+                ],
+              ),
             ],
           ),
         ),

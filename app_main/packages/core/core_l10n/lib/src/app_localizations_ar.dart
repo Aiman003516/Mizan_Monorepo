@@ -2286,6 +2286,54 @@ class AppLocalizationsAr extends AppLocalizations {
   String get taxLiabilityTitle => 'الالتزام الضريبي';
 
   @override
+  String get reportNoData => 'لا توجد بيانات لهذه الفترة.';
+
+  @override
+  String get dateRange => 'النطاق الزمني';
+
+  @override
+  String get fromDate => 'من';
+
+  @override
+  String get toDate => 'إلى';
+
+  @override
+  String get cashier => 'الكاشير';
+
+  @override
+  String get unassigned => 'غير محدد';
+
+  @override
+  String ordersCount(Object count) {
+    return '$count طلبات';
+  }
+
+  @override
+  String get soldQuantity => 'الكمية المباعة';
+
+  @override
+  String get reorderPoint => 'نقطة إعادة الطلب';
+
+  @override
+  String get salesTaxCollected => 'ضريبة المبيعات المحصلة';
+
+  @override
+  String get purchaseTaxPaid => 'ضريبة المشتريات المدفوعة';
+
+  @override
+  String get netTaxDue => 'صافي الضريبة المستحقة';
+
+  @override
+  String reportInvoicesCount(Object count) {
+    return '$count فواتير';
+  }
+
+  @override
+  String reportBillsCount(Object count) {
+    return '$count فواتير مشتريات';
+  }
+
+  @override
   String get reportHubTitle => 'مركز التقارير';
 
   @override
