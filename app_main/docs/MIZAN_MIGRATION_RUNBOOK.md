@@ -34,6 +34,7 @@ Run the files in filename order. The current sequence is:
 | 22 | `20260827250000_inventory_pos_accounting_bridge.sql` | Server inventory balances, receipt/sale drafts, weighted-average costing, posting-time stock guards, RLS, and audit hooks | Added in the current upgrade; not applied |
 | 23 | `20260827260000_crm_360_health_cpq.sql` | Customer 360 metrics, deterministic advisory health scores, interaction recording, draft-only quote/CPQ contracts, RLS, and audit hooks | Added in the current upgrade; not applied |
 | 24 | `20260827270000_transactional_outbox_events.sql` | Transactional ERP events, idempotent outbox delivery claims, retry completion, sync conflicts, RLS, and audit hooks | Added in the current upgrade; not applied |
+| 25 | `20260827280000_document_intake_anomaly_policy.sql` | Protected document intake references, extraction drafts, deterministic anomaly rules, and AI policy-context retrieval | Added in the current upgrade; not applied |
 
 ## Preflight checklist
 
