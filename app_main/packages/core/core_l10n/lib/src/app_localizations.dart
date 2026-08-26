@@ -9349,6 +9349,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A valid confirmation token is required.'**
   String get aiActionConfirmationRequired;
+
+  /// No description provided for @aiActionTypeCustomerUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit customer'**
+  String get aiActionTypeCustomerUpdate;
+
+  /// No description provided for @aiActionTypeVendorUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit vendor'**
+  String get aiActionTypeVendorUpdate;
+
+  /// No description provided for @aiActionTypeInvoiceUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit invoice'**
+  String get aiActionTypeInvoiceUpdate;
+
+  /// No description provided for @aiActionTypeBillUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit bill'**
+  String get aiActionTypeBillUpdate;
+
+  /// No description provided for @aiActionTypeBalanceAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance adjustment'**
+  String get aiActionTypeBalanceAdjustment;
+
+  /// No description provided for @aiActionTypeJournalPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post journal entry'**
+  String get aiActionTypeJournalPost;
+
+  /// No description provided for @aiActionTypeCustomerArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive customer'**
+  String get aiActionTypeCustomerArchive;
+
+  /// No description provided for @aiActionTypeVendorArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive vendor'**
+  String get aiActionTypeVendorArchive;
+
+  /// No description provided for @aiActionTypeInvoiceVoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Void invoice'**
+  String get aiActionTypeInvoiceVoid;
+
+  /// No description provided for @aiActionTypeBillVoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Void bill'**
+  String get aiActionTypeBillVoid;
+
+  /// No description provided for @aiActionFinancialWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This action changes accounting data and will be revalidated before execution.'**
+  String get aiActionFinancialWarning;
+
+  /// No description provided for @aiActionCannotDeletePosted.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted accounting records cannot be deleted; use void or reversal instead.'**
+  String get aiActionCannotDeletePosted;
 }
 
 class _AppLocalizationsDelegate

@@ -28,10 +28,22 @@ The Mizan AI Copilot requires migration `20260827100000_ai_agent_phase1.sql` and
 
 ```bash
 supabase functions deploy mizan-ai-agent --project-ref eawkctancunjpatujzpu
-supabase secrets set --project-ref eawkctancunjpatujzpu OPENROUTER_API_KEY=... MIZAN_AI_BASE_URL=https://openrouter.ai/api/v1 MIZAN_AI_MODELS=...
+supabase functions secrets set --project-ref eawkctancunjpatujzpu OPENROUTER_API_KEY=... MIZAN_AI_BASE_URL=https://openrouter.ai/api/v1 MIZAN_AI_MODELS=...
 ```
 
 Before enabling the feature for users, test an owner, an ordinary member, a guest, and a user from a second tenant. Confirm read-only answers, structured draft proposals only for explicit create requests, permission-safe failures, provider-unavailable handling, no cross-tenant data, no secrets in logs, and audit events for request/tool/response/error outcomes. After the user reviews a proposal, confirm that the Flutter client calls `mizan-ai-action`, receives a one-time confirmation token, and displays the committed or safely failed result. Mutation and scheduled-agent phases require separate review and migrations.
+
+## AI action expansion Phase 4
+
+Phase 4 adds typed proposals and confirmed execution for `customer_update`, `vendor_update`, `invoice_update`, `bill_update`, `balance_adjustment`, `journal_entry_post`, `customer_archive`, `vendor_archive`, `invoice_void`, and `bill_void`. The action service revalidates the exact target tenant and permission, captures an `updated_at` concurrency value, and rejects a stale preview. Invoice edits are limited to draft invoices; bill edits are limited to pending bills. Paid or previously voided documents cannot be deleted or voided through AI.
+
+Balance adjustments are not direct arbitrary balance writes. They require a positive amount, a debit account, a credit account, a reason, the tenant base currency, and an exact target timestamp. The server inserts two equal and opposite ledger entries and updates the customer/vendor balance in one transaction. Journal posting requires two to 100 non-zero lines, tenant-owned accounts, and a debit-credit sum of zero. Hard-delete AI RPCs do not exist; posted accounting records must use a protected void or reversal workflow.
+
+Apply `migrations/20260827150000_ai_action_expansion_phase4.sql` after the Phase 3 migration, or use the refreshed `AI_PHASE_1_2_3_COMBINED.sql` file. The internal tenant-explicit helper RPCs are revoked from direct client execution; authenticated clients receive access only to `execute_ai_action(uuid,uuid)`. Run `tests/ai_action_expansion_phase4.sql` in a disposable project.
+
+The Phase 4 rollout must test, in order, a CRM edit, a draft-invoice edit, a draft-bill edit, a base-currency balance adjustment, a balanced journal, an unbalanced journal rejection, a stale-preview rejection, an unauthorized-user rejection, a cross-tenant identifier rejection, a paid-document void rejection, and a repeated confirmation. Confirm that each successful mutation has both an `ai_audit_events` row and an `audit_logs` row, and that failed actions leave no partial business data.
+
+Application source-code editing remains outside the accounting Copilot. If a developer assistant is introduced later, it must be a separate local-only patch generator with no production database credentials and no automatic file application.
 
 ## Production checks
 
@@ -52,9 +64,9 @@ supabase functions deploy mizan-ai-agent --project-ref eawkctancunjpatujzpu
 supabase functions deploy mizan-ai-action --project-ref eawkctancunjpatujzpu
 ```
 
-If the project contains migrations that were applied manually and are not present in the local migration history, do not run `supabase db push` blindly. Use the SQL Editor for the three AI migration files, or reconcile migration history first. The repository sandbox does not contain a Supabase CLI, so the SQL Editor procedure is the safe available path here.
+If the project contains migrations that were applied manually and are not present in the local migration history, do not run `supabase db push` blindly. Use the SQL Editor for the four AI migration files, or use the refreshed combined script, or reconcile migration history first. The repository sandbox does not contain a Supabase CLI, so the SQL Editor procedure is the safe available path here. The combined file now contains AI Phase 1, Phase 2, Phase 3, and Phase 4 in order.
 
-After applying Phase 3, verify the schema and privileges with:
+After applying Phase 3 and Phase 4, verify the schema and privileges with:
 
 ```sql
 select to_regclass('public.ai_action_requests') as action_requests,
@@ -70,6 +82,6 @@ select has_table_privilege('anon', 'public.ai_action_requests', 'SELECT') as ano
        has_function_privilege('authenticated', 'public.execute_ai_action(uuid,uuid)', 'EXECUTE') as authenticated_can_execute;
 ```
 
-The expected privilege results are `false`, `false`, `false`, and `true`, respectively. Run the pgTAP file `tests/ai_action_execution_phase3.sql` in a disposable or test project before production. Then test the runtime matrix with an owner, a restricted staff member, a guest session, and users belonging to separate tenants: create a draft, confirm it once with its token, retry the same confirmation, attempt a wrong token, attempt an expired draft, and verify that a failed action leaves no partial invoice, bill, CRM, or invitation records. Review `ai_action_requests`, `ai_audit_events`, and the relevant business audit rows after every test.
+The expected AI-table/execution privilege results are `false`, `false`, `false`, and `true`, respectively. The Phase 4 direct-helper check must also be `false`. Run the pgTAP file `tests/ai_action_execution_phase3.sql` in a disposable or test project before production. Then test the runtime matrix with an owner, a restricted staff member, a guest session, and users belonging to separate tenants: create a draft, confirm it once with its token, retry the same confirmation, attempt a wrong token, attempt an expired draft, and verify that a failed action leaves no partial invoice, bill, CRM, or invitation records. Review `ai_action_requests`, `ai_audit_events`, and the relevant business audit rows after every test.
 
 Keep the provider secret server-side. Configure `OPENAI_API_KEY`, and optionally `MIZAN_AI_MODEL` and `MIZAN_AI_BASE_URL`, with Supabase Function Secrets. Never put the service-role key or provider key in Flutter, SQL payloads, Git, or client logs. Take a database backup before applying Phase 3 to populated production data and deploy `mizan-ai-action` only after the SQL migration succeeds.

@@ -1,6 +1,6 @@
 # Mizan AI Agent Edge Function
 
-This function is the server-side gateway for the first Mizan AI Copilot release. It accepts authenticated requests from the Flutter app, derives and validates the active tenant, checks existing Mizan permissions, executes only bounded read-only tools through the user-scoped Supabase client, calls the configured LLM provider, and writes minimal conversation/audit records with the service-role client.
+This function is the server-side gateway for the Mizan AI Copilot. It accepts authenticated requests from the Flutter app, derives and validates the active tenant, checks existing Mizan permissions, executes only bounded read-only tools through the user-scoped Supabase client, calls the configured LLM provider, and writes minimal conversation/audit records with the service-role client. It never performs business mutations directly.
 
 ## Required Supabase secrets
 
@@ -30,7 +30,7 @@ From a machine authenticated to the correct Supabase project:
 supabase functions deploy mizan-ai-agent --project-ref eawkctancunjpatujzpu
 supabase functions deploy mizan-ai-action --project-ref eawkctancunjpatujzpu
 # Prefer the Supabase Dashboard secret manager for the provider key.
-supabase secrets set --project-ref eawkctancunjpatujzpu OPENROUTER_API_KEY=... MIZAN_AI_BASE_URL=https://openrouter.ai/api/v1 MIZAN_AI_MODELS=...
+supabase functions secrets set --project-ref eawkctancunjpatujzpu OPENROUTER_API_KEY=... MIZAN_AI_BASE_URL=https://openrouter.ai/api/v1 MIZAN_AI_MODELS=...
 ```
 
 Prefer setting the provider key through the Supabase Dashboard secret manager so it is not placed in shell history. The function is not usable until migration `20260827100000_ai_agent_phase1.sql` is applied and the provider secret is configured.
@@ -48,7 +48,13 @@ Use an authenticated Supabase session:
 }
 ```
 
-The response contains `conversation_id`, `request_id`, `message`, `model`, `read_only: true`, and, when the user explicitly requests creation, an optional `action_proposal` containing `action_type`, `payload`, and `requires_confirmation: true`. The proposal never writes a record. The Flutter client sends it to `mizan-ai-action`, displays the validated preview, and requires a one-time confirmation token. The action function then calls the protected Phase 3 execution RPC and returns an audited result; guests and users without the required tenant permission remain blocked.
+The response contains `conversation_id`, `request_id`, `message`, `model`, `read_only: true`, and, when the user explicitly requests a supported operation, an optional `action_proposal` containing `action_type`, `payload`, and `requires_confirmation: true`. The proposal never writes a record. The Flutter client sends it to `mizan-ai-action`, displays the validated preview, and requires a one-time confirmation token. The action function then calls the protected execution RPC and returns an audited result; guests and users without the required tenant permission remain blocked.
+
+## Supported confirmed actions
+
+The current action registry supports creation of invoices, bills, customers, vendors, and staff invitation batches. The expansion migration adds `customer_update`, `vendor_update`, `invoice_update`, `bill_update`, `balance_adjustment`, `journal_entry_post`, `customer_archive`, `vendor_archive`, `invoice_void`, and `bill_void`. Updates require an exact `updated_at` value captured when the preview is prepared. Balance adjustments require a positive base-currency amount and two equal/opposite accounts. Journal posting requires tenant-owned accounts and a zero debit-credit sum. Paid or posted records are not hard-deleted; they must use a protected void or reversal workflow. Internal helper RPCs are revoked from direct client execution, so all mutations pass through the one-time confirmation token in `execute_ai_action`.
+
+Application source-code and arbitrary filesystem editing are deliberately not part of this accounting Copilot. A future developer assistant would need a separate local-only workflow that emits a patch for human review and has no production database authority.
 
 ## Reference OpenRouter models
 

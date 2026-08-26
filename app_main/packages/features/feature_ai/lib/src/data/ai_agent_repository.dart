@@ -83,7 +83,25 @@ class AiActionProposal {
   factory AiActionProposal.fromJson(Map<String, dynamic> json) {
     final actionType = json['action_type'];
     final payload = json['payload'];
+    const supportedActionTypes = {
+      'invoice_draft',
+      'bill_draft',
+      'customer_draft',
+      'vendor_draft',
+      'staff_invitation_batch_draft',
+      'customer_update',
+      'vendor_update',
+      'invoice_update',
+      'bill_update',
+      'balance_adjustment',
+      'journal_entry_post',
+      'customer_archive',
+      'vendor_archive',
+      'invoice_void',
+      'bill_void',
+    };
     if (actionType is! String ||
+        !supportedActionTypes.contains(actionType) ||
         payload is! Map ||
         json['requires_confirmation'] != true) {
       throw const AiAgentException(

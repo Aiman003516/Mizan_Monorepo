@@ -76,6 +76,46 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
                                 value: 'staff_invitation_batch_draft',
                                 child: Text(l10n.aiActionTypeStaffInvitation),
                               ),
+                              DropdownMenuItem(
+                                value: 'customer_update',
+                                child: Text(l10n.aiActionTypeCustomerUpdate),
+                              ),
+                              DropdownMenuItem(
+                                value: 'vendor_update',
+                                child: Text(l10n.aiActionTypeVendorUpdate),
+                              ),
+                              DropdownMenuItem(
+                                value: 'invoice_update',
+                                child: Text(l10n.aiActionTypeInvoiceUpdate),
+                              ),
+                              DropdownMenuItem(
+                                value: 'bill_update',
+                                child: Text(l10n.aiActionTypeBillUpdate),
+                              ),
+                              DropdownMenuItem(
+                                value: 'balance_adjustment',
+                                child: Text(l10n.aiActionTypeBalanceAdjustment),
+                              ),
+                              DropdownMenuItem(
+                                value: 'journal_entry_post',
+                                child: Text(l10n.aiActionTypeJournalPost),
+                              ),
+                              DropdownMenuItem(
+                                value: 'customer_archive',
+                                child: Text(l10n.aiActionTypeCustomerArchive),
+                              ),
+                              DropdownMenuItem(
+                                value: 'vendor_archive',
+                                child: Text(l10n.aiActionTypeVendorArchive),
+                              ),
+                              DropdownMenuItem(
+                                value: 'invoice_void',
+                                child: Text(l10n.aiActionTypeInvoiceVoid),
+                              ),
+                              DropdownMenuItem(
+                                value: 'bill_void',
+                                child: Text(l10n.aiActionTypeBillVoid),
+                              ),
                             ],
                             onChanged: (value) {
                               if (value != null) {
@@ -286,7 +326,17 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
       'customer_draft' => l10n.aiActionTypeCustomer,
       'vendor_draft' => l10n.aiActionTypeVendor,
       'staff_invitation_batch_draft' => l10n.aiActionTypeStaffInvitation,
-      _ => l10n.aiActionPreview,
+      'customer_update' => l10n.aiActionTypeCustomerUpdate,
+      'vendor_update' => l10n.aiActionTypeVendorUpdate,
+      'invoice_update' => l10n.aiActionTypeInvoiceUpdate,
+      'bill_update' => l10n.aiActionTypeBillUpdate,
+      'balance_adjustment' => l10n.aiActionTypeBalanceAdjustment,
+      'journal_entry_post' => l10n.aiActionTypeJournalPost,
+      'customer_archive' => l10n.aiActionTypeCustomerArchive,
+      'vendor_archive' => l10n.aiActionTypeVendorArchive,
+      'invoice_void' => l10n.aiActionTypeInvoiceVoid,
+      'bill_void' => l10n.aiActionTypeBillVoid,
+      _ => actionType,
     };
   }
 
@@ -325,6 +375,30 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
                   ? l10n.aiActionExecuted
                   : l10n.aiActionDraftForReview,
             ),
+            if (draft.actionType == 'balance_adjustment' ||
+                draft.actionType == 'journal_entry_post') ...[
+              const SizedBox(height: 8),
+              Text(
+                l10n.aiActionFinancialWarning,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+            if (draft.actionType == 'customer_archive' ||
+                draft.actionType == 'vendor_archive' ||
+                draft.actionType == 'invoice_void' ||
+                draft.actionType == 'bill_void') ...[
+              const SizedBox(height: 8),
+              Text(
+                l10n.aiActionCannotDeletePosted,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
             const SizedBox(height: 8),
             SelectableText(prettyPayload),
             if (draft.executionResult != null) ...[

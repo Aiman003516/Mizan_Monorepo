@@ -2262,5 +2262,17 @@
   "aiActionDraftStatus": "Status",
   "aiActionExecuted": "Action executed successfully and audited.",
   "aiActionExecutionFailed": "Execution failed safely. No partial business change was kept.",
-  "aiActionConfirmationRequired": "A valid confirmation token is required."
+  "aiActionConfirmationRequired": "A valid confirmation token is required.",
+  "aiActionTypeCustomerUpdate": "Edit customer",
+  "aiActionTypeVendorUpdate": "Edit vendor",
+  "aiActionTypeInvoiceUpdate": "Edit invoice",
+  "aiActionTypeBillUpdate": "Edit bill",
+  "aiActionTypeBalanceAdjustment": "Balance adjustment",
+  "aiActionTypeJournalPost": "Post journal entry",
+  "aiActionTypeCustomerArchive": "Archive customer",
+  "aiActionTypeVendorArchive": "Archive vendor",
+  "aiActionTypeInvoiceVoid": "Void invoice",
+  "aiActionTypeBillVoid": "Void bill",
+  "aiActionFinancialWarning": "This action changes accounting data and will be revalidated before execution.",
+  "aiActionCannotDeletePosted": "Posted accounting records cannot be deleted; use void or reversal instead."
 }

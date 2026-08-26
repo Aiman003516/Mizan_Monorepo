@@ -133,6 +133,66 @@ void main() {
     );
   });
 
+  test('accepts every approved typed mutation action', () {
+    const actionTypes = [
+      'customer_update',
+      'vendor_update',
+      'invoice_update',
+      'bill_update',
+      'balance_adjustment',
+      'journal_entry_post',
+      'customer_archive',
+      'vendor_archive',
+      'invoice_void',
+      'bill_void',
+    ];
+
+    for (final actionType in actionTypes) {
+      final proposal = AiActionProposal.fromJson({
+        'action_type': actionType,
+        'payload': const {'id': 'record-1'},
+        'requires_confirmation': true,
+      });
+      expect(proposal.actionType, actionType);
+    }
+  });
+
+  test('rejects unknown model actions before confirmation', () {
+    expect(
+      () => AiActionProposal.fromJson({
+        'action_type': 'delete_everything',
+        'payload': const {'table': 'customers'},
+        'requires_confirmation': true,
+      }),
+      throwsA(
+        isA<AiAgentException>().having(
+          (error) => error.code,
+          'code',
+          'MIZAN_AI_INVALID_PROPOSAL',
+        ),
+      ),
+    );
+  });
+
+  test(
+    'parses a safely failed execution result without treating it as success',
+    () {
+      final draft = AiActionRequest.fromJson({
+        'id': 'action-4',
+        'action_type': 'journal_entry_post',
+        'payload': {'description': 'Unbalanced entry'},
+        'preview': {'action_type': 'journal_entry_post'},
+        'status': 'failed',
+        'expires_at': '2026-08-26T12:00:00Z',
+        'execution_error': 'Action execution failed',
+      });
+
+      expect(draft.status, 'failed');
+      expect(draft.executionError, 'Action execution failed');
+      expect(draft.confirmationToken, isNull);
+    },
+  );
+
   test('guest mode exception is explicit and safe', () {
     const error = AiGuestModeException();
 

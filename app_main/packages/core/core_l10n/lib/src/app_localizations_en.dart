@@ -4943,4 +4943,42 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aiActionConfirmationRequired =>
       'A valid confirmation token is required.';
+
+  @override
+  String get aiActionTypeCustomerUpdate => 'Edit customer';
+
+  @override
+  String get aiActionTypeVendorUpdate => 'Edit vendor';
+
+  @override
+  String get aiActionTypeInvoiceUpdate => 'Edit invoice';
+
+  @override
+  String get aiActionTypeBillUpdate => 'Edit bill';
+
+  @override
+  String get aiActionTypeBalanceAdjustment => 'Balance adjustment';
+
+  @override
+  String get aiActionTypeJournalPost => 'Post journal entry';
+
+  @override
+  String get aiActionTypeCustomerArchive => 'Archive customer';
+
+  @override
+  String get aiActionTypeVendorArchive => 'Archive vendor';
+
+  @override
+  String get aiActionTypeInvoiceVoid => 'Void invoice';
+
+  @override
+  String get aiActionTypeBillVoid => 'Void bill';
+
+  @override
+  String get aiActionFinancialWarning =>
+      'This action changes accounting data and will be revalidated before execution.';
+
+  @override
+  String get aiActionCannotDeletePosted =>
+      'Posted accounting records cannot be deleted; use void or reversal instead.';
 }

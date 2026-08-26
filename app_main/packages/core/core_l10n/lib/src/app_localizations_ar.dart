@@ -4941,4 +4941,42 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get aiActionConfirmationRequired => 'يلزم استخدام رمز تأكيد صالح.';
+
+  @override
+  String get aiActionTypeCustomerUpdate => 'تعديل عميل';
+
+  @override
+  String get aiActionTypeVendorUpdate => 'تعديل مورد';
+
+  @override
+  String get aiActionTypeInvoiceUpdate => 'تعديل فاتورة';
+
+  @override
+  String get aiActionTypeBillUpdate => 'تعديل فاتورة مورد';
+
+  @override
+  String get aiActionTypeBalanceAdjustment => 'تسوية رصيد';
+
+  @override
+  String get aiActionTypeJournalPost => 'ترحيل قيد يومية';
+
+  @override
+  String get aiActionTypeCustomerArchive => 'أرشفة عميل';
+
+  @override
+  String get aiActionTypeVendorArchive => 'أرشفة مورد';
+
+  @override
+  String get aiActionTypeInvoiceVoid => 'إلغاء فاتورة';
+
+  @override
+  String get aiActionTypeBillVoid => 'إلغاء فاتورة مورد';
+
+  @override
+  String get aiActionFinancialWarning =>
+      'يغيّر هذا الإجراء بيانات محاسبية، وسيتم التحقق منه مرة أخرى قبل التنفيذ.';
+
+  @override
+  String get aiActionCannotDeletePosted =>
+      'لا يمكن حذف السجلات المحاسبية المرحلة؛ استخدم الإلغاء أو القيد العكسي بدلاً من ذلك.';
 }
