@@ -163,7 +163,10 @@ class AiAgentRepository {
     return _parseActionResponse(response);
   }
 
-  Future<AiActionRequest> confirmActionDraft(String actionRequestId) async {
+  Future<AiActionRequest> confirmActionDraft({
+    required String actionRequestId,
+    required String confirmationToken,
+  }) async {
     if (!_cloudMode || _supabase.auth.currentSession == null) {
       throw const AiGuestModeException();
     }
@@ -173,6 +176,7 @@ class AiAgentRepository {
       body: {
         'action': 'confirm',
         'action_request_id': actionRequestId,
+        'confirmation_token': confirmationToken,
         'tenant_id': tenantId,
       },
     );
@@ -227,6 +231,11 @@ class AiActionRequest {
     required this.preview,
     required this.status,
     required this.expiresAt,
+    this.confirmationToken,
+    this.confirmedAt,
+    this.executedAt,
+    this.executionResult,
+    this.executionError,
     this.createdAt,
   });
 
@@ -237,12 +246,22 @@ class AiActionRequest {
     final payload = json['payload'];
     final preview = json['preview'];
     final expiresAt = json['expires_at'];
+    final confirmationToken = json['confirmation_token'];
+    final confirmedAt = json['confirmed_at'];
+    final executedAt = json['executed_at'];
+    final executionResult = json['execution_result'];
+    final executionError = json['execution_error'];
     if (id is! String ||
         actionType is! String ||
         status is! String ||
         payload is! Map ||
         preview is! Map ||
-        expiresAt is! String) {
+        expiresAt is! String ||
+        (confirmationToken != null && confirmationToken is! String) ||
+        (confirmedAt != null && confirmedAt is! String) ||
+        (executedAt != null && executedAt is! String) ||
+        (executionResult != null && executionResult is! Map) ||
+        (executionError != null && executionError is! String)) {
       throw const AiAgentException(
         'MIZAN_AI_INVALID_ACTION_RESPONSE',
         'The AI action draft returned an invalid response.',
@@ -255,6 +274,15 @@ class AiActionRequest {
       preview: Map<String, dynamic>.from(preview),
       status: status,
       expiresAt: DateTime.tryParse(expiresAt),
+      confirmationToken: confirmationToken as String?,
+      confirmedAt: confirmedAt is String
+          ? DateTime.tryParse(confirmedAt)
+          : null,
+      executedAt: executedAt is String ? DateTime.tryParse(executedAt) : null,
+      executionResult: executionResult is Map
+          ? Map<String, dynamic>.from(executionResult)
+          : null,
+      executionError: executionError as String?,
       createdAt: json['created_at'] is String
           ? DateTime.tryParse(json['created_at'] as String)
           : null,
@@ -267,6 +295,11 @@ class AiActionRequest {
   final Map<String, dynamic> preview;
   final String status;
   final DateTime? expiresAt;
+  final String? confirmationToken;
+  final DateTime? confirmedAt;
+  final DateTime? executedAt;
+  final Map<String, dynamic>? executionResult;
+  final String? executionError;
   final DateTime? createdAt;
 }
 

@@ -2259,5 +2259,8 @@
   "aiActionDraftPayload": "Draft payload",
   "aiActionDraftForReview": "This draft has not changed any records. Review it before any future execution.",
   "aiActionInvalidPayload": "Enter a valid JSON object for the selected action.",
-  "aiActionDraftStatus": "Status"
+  "aiActionDraftStatus": "Status",
+  "aiActionExecuted": "Action executed successfully and audited.",
+  "aiActionExecutionFailed": "Execution failed safely. No partial business change was kept.",
+  "aiActionConfirmationRequired": "A valid confirmation token is required."
 }

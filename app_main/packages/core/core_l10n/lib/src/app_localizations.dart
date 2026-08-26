@@ -9331,6 +9331,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status'**
   String get aiActionDraftStatus;
+
+  /// No description provided for @aiActionExecuted.
+  ///
+  /// In en, this message translates to:
+  /// **'Action executed successfully and audited.'**
+  String get aiActionExecuted;
+
+  /// No description provided for @aiActionExecutionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Execution failed safely. No partial business change was kept.'**
+  String get aiActionExecutionFailed;
+
+  /// No description provided for @aiActionConfirmationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A valid confirmation token is required.'**
+  String get aiActionConfirmationRequired;
 }
 
 class _AppLocalizationsDelegate

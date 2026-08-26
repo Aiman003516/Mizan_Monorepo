@@ -36,3 +36,40 @@ Before enabling the feature for users, test an owner, an ordinary member, a gues
 ## Production checks
 
 Before release, verify email-confirmation behavior, session refresh, tenant bootstrap, invite validation/redemption, RLS isolation with two test users from different tenants, system-admin immutability, role permission enforcement, atomic invoice/bill creation, duplicate currency/custom-field constraints, pagination behavior, offline creation and replay, and Google Drive backup/restore on a physical Android device. Confirm that the SQL migration is applied before enabling the cloud-mode build flag.
+
+## AI action execution Phase 3
+
+Phase 3 enables actual execution only after an authenticated user supplies the one-time confirmation token issued with the draft. The database function revalidates the request owner, exact tenant membership, expiry, status, and permissions, then calls the protected invoice, bill, CRM, or bulk-invitation RPC inside the same transaction. It records `executed` or `failed` state and writes an AI audit event. Guest sessions cannot call the function, and direct client access to AI tables remains revoked.
+
+Apply `migrations/20260827130000_ai_action_execution_phase3.sql` only after `20260827110000_ai_action_requests_phase2.sql`. Run `tests/ai_action_execution_phase3.sql` after the migration. In the Supabase SQL Editor, use one query tab per migration, paste the complete file contents from the repository, run each file in order, and stop immediately if any statement fails. Do not enable the production UI action button until the verification query passes.
+
+The CLI sequence, when the Supabase CLI is installed and authenticated, is:
+
+```bash
+supabase link --project-ref eawkctancunjpatujzpu
+supabase db push
+supabase functions deploy mizan-ai-agent --project-ref eawkctancunjpatujzpu
+supabase functions deploy mizan-ai-action --project-ref eawkctancunjpatujzpu
+```
+
+If the project contains migrations that were applied manually and are not present in the local migration history, do not run `supabase db push` blindly. Use the SQL Editor for the three AI migration files, or reconcile migration history first. The repository sandbox does not contain a Supabase CLI, so the SQL Editor procedure is the safe available path here.
+
+After applying Phase 3, verify the schema and privileges with:
+
+```sql
+select to_regclass('public.ai_action_requests') as action_requests,
+       to_regprocedure('public.execute_ai_action(uuid,uuid)') as execute_function;
+select attname, attnotnull
+from pg_attribute
+where attrelid = 'public.ai_action_requests'::regclass
+  and attname in ('confirmation_token', 'execution_result', 'execution_error')
+  and not attisdropped;
+select has_table_privilege('anon', 'public.ai_action_requests', 'SELECT') as anon_can_read,
+       has_table_privilege('authenticated', 'public.ai_action_requests', 'SELECT') as authenticated_can_read,
+       has_function_privilege('anon', 'public.execute_ai_action(uuid,uuid)', 'EXECUTE') as anon_can_execute,
+       has_function_privilege('authenticated', 'public.execute_ai_action(uuid,uuid)', 'EXECUTE') as authenticated_can_execute;
+```
+
+The expected privilege results are `false`, `false`, `false`, and `true`, respectively. Run the pgTAP file `tests/ai_action_execution_phase3.sql` in a disposable or test project before production. Then test the runtime matrix with an owner, a restricted staff member, a guest session, and users belonging to separate tenants: create a draft, confirm it once with its token, retry the same confirmation, attempt a wrong token, attempt an expired draft, and verify that a failed action leaves no partial invoice, bill, CRM, or invitation records. Review `ai_action_requests`, `ai_audit_events`, and the relevant business audit rows after every test.
+
+Keep the provider secret server-side. Configure `OPENAI_API_KEY`, and optionally `MIZAN_AI_MODEL` and `MIZAN_AI_BASE_URL`, with Supabase Function Secrets. Never put the service-role key or provider key in Flutter, SQL payloads, Git, or client logs. Take a database backup before applying Phase 3 to populated production data and deploy `mizan-ai-action` only after the SQL migration succeeds.

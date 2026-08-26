@@ -4930,4 +4930,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get aiActionDraftStatus => 'الحالة';
+
+  @override
+  String get aiActionExecuted =>
+      'تم تنفيذ الإجراء بنجاح وتسجيله في سجل التدقيق.';
+
+  @override
+  String get aiActionExecutionFailed =>
+      'فشل التنفيذ بأمان. لم يتم الاحتفاظ بأي تغيير جزئي.';
+
+  @override
+  String get aiActionConfirmationRequired => 'يلزم استخدام رمز تأكيد صالح.';
 }

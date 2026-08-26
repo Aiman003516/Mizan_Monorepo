@@ -168,36 +168,44 @@ Deno.serve(async (request) => {
   if (action === "cancel") {
     const requestId = uuid(body.action_request_id);
     if (!requestId) return response({ error: "Action request id is required" }, 400);
-    const { data, error } = await adminClient.from("ai_action_requests").update({ status: "cancelled" }).eq("id", requestId).eq("tenant_id", tenantId).eq("user_id", auth.user.id).eq("status", "pending").gt("expires_at", new Date().toISOString()).select("id,action_type,payload,preview,status,expires_at,created_at").maybeSingle();
+    const { data, error } = await adminClient.from("ai_action_requests").update({ status: "cancelled" }).eq("id", requestId).eq("tenant_id", tenantId).eq("user_id", auth.user.id).eq("status", "pending").gt("expires_at", new Date().toISOString()).select("id,action_type,payload,preview,status,expires_at,created_at,confirmation_token,confirmed_at,executed_at,execution_result,execution_error").maybeSingle();
     if (error || !data) return response({ error: "Action request could not be cancelled" }, 404);
     return response({ action_request: data });
   }
   if (action === "confirm") {
     const requestId = uuid(body.action_request_id);
-    if (!requestId) return response({ error: "Action request id is required" }, 400);
-    const { data, error } = await adminClient
+    const confirmationToken = uuid(body.confirmation_token);
+    if (!requestId || !confirmationToken) return response({ error: "Confirmation is required" }, 400);
+
+    const { data: execution, error: executionError } = await userClient.rpc("execute_ai_action", {
+      p_action_request_id: requestId,
+      p_confirmation_token: confirmationToken,
+    });
+    if (executionError) {
+      const message = executionError.message || "Action execution failed";
+      const status = /expired|no longer pending|invalid|unavailable/i.test(message) ? 409 : 422;
+      return response({ error: "Action execution could not be completed" }, status);
+    }
+
+    const { data: request, error: requestError } = await adminClient
       .from("ai_action_requests")
-      .update({ status: "confirmed", confirmed_at: new Date().toISOString() })
+      .select("id,action_type,payload,preview,status,expires_at,created_at,confirmation_token,confirmed_at,executed_at,execution_result,execution_error")
       .eq("id", requestId)
       .eq("tenant_id", tenantId)
       .eq("user_id", auth.user.id)
-      .eq("status", "pending")
-      .gt("expires_at", new Date().toISOString())
-      .select("id,action_type,payload,preview,status,expires_at,created_at")
       .maybeSingle();
-    if (error || !data) return response({ error: "Action request is invalid or expired" }, 409);
-    await adminClient.from("ai_audit_events").insert({ request_id: requestId, tenant_id: tenantId, user_id: auth.user.id, conversation_id: null, event_type: "response", tool_name: "confirm_action_draft", success: true, metadata: { action_type: data.action_type, execution: "disabled" } });
-    return response({ action_request: data, execution: "disabled" });
+    if (requestError || !request) return response({ error: "Action execution result is unavailable" }, 500);
+    return response({ action_request: request, execution });
   }
   if (action !== "create_draft") return response({ error: "Unsupported action" }, 400);
   const actionType = stringValue(body.action_type, 64);
   if (!actionType || !ACTIONS.has(actionType)) return response({ error: "Unsupported action draft" }, 400);
   try {
     const payload = await normalizePayload(actionType, body.payload, userClient, tenantId);
-    const existing = await adminClient.from("ai_action_requests").select("id,action_type,payload,preview,status,expires_at").eq("tenant_id", tenantId).eq("user_id", auth.user.id).eq("idempotency_key", idempotencyKey).maybeSingle();
+    const existing = await adminClient.from("ai_action_requests").select("id,action_type,payload,preview,status,expires_at,created_at,confirmation_token,confirmed_at,executed_at,execution_result,execution_error").eq("tenant_id", tenantId).eq("user_id", auth.user.id).eq("idempotency_key", idempotencyKey).maybeSingle();
     if (existing.data) return response({ action_request: existing.data });
     const conversationId = uuid(body.conversation_id);
-    const insert = await adminClient.from("ai_action_requests").insert({ tenant_id: tenantId, user_id: auth.user.id, conversation_id: conversationId, action_type: actionType, payload, preview: { action_type: actionType, payload }, idempotency_key: idempotencyKey }).select("id,action_type,payload,preview,status,expires_at,created_at").single();
+    const insert = await adminClient.from("ai_action_requests").insert({ tenant_id: tenantId, user_id: auth.user.id, conversation_id: conversationId, action_type: actionType, payload, preview: { action_type: actionType, payload }, idempotency_key: idempotencyKey }).select("id,action_type,payload,preview,status,expires_at,created_at,confirmation_token,confirmed_at,executed_at,execution_result,execution_error").single();
     if (insert.error || !insert.data) return response({ error: "Action draft could not be saved" }, 500);
     await adminClient.from("ai_audit_events").insert({ request_id: idempotencyKey, tenant_id: tenantId, user_id: auth.user.id, conversation_id: conversationId, event_type: "tool_call", tool_name: "create_action_draft", success: true, metadata: { action_type: actionType } });
     return response({ action_request: insert.data });

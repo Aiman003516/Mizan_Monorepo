@@ -46,6 +46,44 @@ void main() {
     expect(draft.expiresAt, isNotNull);
   });
 
+  test('parses confirmation token and execution result', () {
+    final draft = AiActionRequest.fromJson({
+      'id': 'action-2',
+      'action_type': 'invoice_draft',
+      'payload': {'customer_id': 'customer-1'},
+      'preview': {'action_type': 'invoice_draft'},
+      'status': 'executed',
+      'expires_at': '2026-08-26T12:00:00Z',
+      'confirmation_token': 'token-1',
+      'confirmed_at': '2026-08-26T11:59:00Z',
+      'executed_at': '2026-08-26T11:59:01Z',
+      'execution_result': {
+        'invoice': {'id': 'invoice-1'},
+      },
+    });
+
+    expect(draft.confirmationToken, 'token-1');
+    expect(draft.status, 'executed');
+    expect(draft.executionResult?['invoice'], isA<Map>());
+    expect(draft.confirmedAt, isNotNull);
+    expect(draft.executedAt, isNotNull);
+  });
+
+  test('rejects malformed confirmation or execution fields', () {
+    expect(
+      () => AiActionRequest.fromJson({
+        'id': 'action-3',
+        'action_type': 'customer_draft',
+        'payload': {'name': 'Acme'},
+        'preview': {'action_type': 'customer_draft'},
+        'status': 'pending',
+        'expires_at': '2026-08-26T12:00:00Z',
+        'confirmation_token': 42,
+      }),
+      throwsA(isA<AiAgentException>()),
+    );
+  });
+
   test('rejects an incomplete action draft', () {
     expect(
       () => AiActionRequest.fromJson(const {}),

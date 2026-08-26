@@ -4932,4 +4932,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiActionDraftStatus => 'Status';
+
+  @override
+  String get aiActionExecuted => 'Action executed successfully and audited.';
+
+  @override
+  String get aiActionExecutionFailed =>
+      'Execution failed safely. No partial business change was kept.';
+
+  @override
+  String get aiActionConfirmationRequired =>
+      'A valid confirmation token is required.';
 }

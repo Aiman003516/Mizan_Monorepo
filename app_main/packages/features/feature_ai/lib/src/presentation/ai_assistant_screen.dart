@@ -23,6 +23,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   final _messages = <AiChatMessage>[];
   String? _conversationId;
   AiActionRequest? _actionDraft;
+  String? _confirmationToken;
   bool _isSending = false;
   bool _isCreatingDraft = false;
 
@@ -167,7 +168,10 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
             conversationId: _conversationId,
           );
       if (!mounted) return;
-      setState(() => _actionDraft = draft);
+      setState(() {
+        _actionDraft = draft;
+        _confirmationToken = draft.confirmationToken;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(AppLocalizations.of(context)!.aiActionDraftCreated),
@@ -197,7 +201,10 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
           .read(aiAgentRepositoryProvider)
           .cancelActionDraft(draft.id);
       if (!mounted) return;
-      setState(() => _actionDraft = cancelled);
+      setState(() {
+        _actionDraft = cancelled;
+        _confirmationToken = null;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(AppLocalizations.of(context)!.aiActionCancelled),
@@ -213,17 +220,37 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
 
   Future<void> _confirmActionDraft() async {
     final draft = _actionDraft;
+    final token = _confirmationToken;
     if (draft == null) return;
-    try {
-      final confirmed = await ref
-          .read(aiAgentRepositoryProvider)
-          .confirmActionDraft(draft.id);
-      if (!mounted) return;
-      setState(() => _actionDraft = confirmed);
+    if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context)!.aiActionExecutionDisabled,
+            AppLocalizations.of(context)!.aiActionConfirmationRequired,
+          ),
+        ),
+      );
+      return;
+    }
+    try {
+      final confirmed = await ref
+          .read(aiAgentRepositoryProvider)
+          .confirmActionDraft(
+            actionRequestId: draft.id,
+            confirmationToken: token,
+          );
+      if (!mounted) return;
+      setState(() {
+        _actionDraft = confirmed;
+        _confirmationToken = null;
+      });
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            confirmed.status == 'executed'
+                ? l10n.aiActionExecuted
+                : l10n.aiActionExecutionFailed,
           ),
         ),
       );
@@ -231,10 +258,9 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
       final message =
-          error is AiAgentException &&
-              error.code == 'MIZAN_AI_ACTION_NOT_ENABLED'
-          ? l10n.aiActionExecutionDisabled
-          : l10n.aiActionInvalid;
+          error is AiAgentException && error.code == 'MIZAN_AI_ACTION_HTTP_400'
+          ? l10n.aiActionConfirmationRequired
+          : l10n.aiActionExecutionFailed;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
@@ -246,6 +272,9 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
       'pending' => l10n.aiActionDraftPending,
       'confirmed' => l10n.aiActionDraftConfirmed,
       'cancelled' => l10n.aiActionDraftCancelled,
+      'executed' => l10n.aiActionExecuted,
+      'failed' => l10n.aiActionExecutionFailed,
+      'expired' => l10n.aiActionInvalid,
       _ => l10n.aiActionInvalid,
     };
   }
@@ -268,6 +297,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
     ).convert(draft.payload);
     final canAct =
         draft.status == 'pending' &&
+        _confirmationToken != null &&
         (draft.expiresAt == null || draft.expiresAt!.isAfter(DateTime.now()));
     return Card(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -290,9 +320,21 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            Text(l10n.aiActionDraftForReview),
+            Text(
+              draft.status == 'executed'
+                  ? l10n.aiActionExecuted
+                  : l10n.aiActionDraftForReview,
+            ),
             const SizedBox(height: 8),
             SelectableText(prettyPayload),
+            if (draft.executionResult != null) ...[
+              const SizedBox(height: 8),
+              SelectableText(
+                const JsonEncoder.withIndent(
+                  '  ',
+                ).convert(draft.executionResult),
+              ),
+            ],
             if (canAct) ...[
               const SizedBox(height: 12),
               Wrap(
