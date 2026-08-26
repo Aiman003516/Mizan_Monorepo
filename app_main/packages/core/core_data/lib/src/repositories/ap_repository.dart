@@ -255,6 +255,110 @@ class APRepository {
     );
   }
 
+  /// Records a manual supplier balance adjustment in the local ledger.
+  ///
+  /// A positive adjustment increases the amount owed to the supplier and is
+  /// posted as debit Expense/Equity + credit Accounts Payable. A negative
+  /// adjustment reduces the payable and is posted as debit Accounts Payable +
+  /// credit Cash. The vendor balance and its journal transaction are written
+  /// atomically.
+  ///
+  /// The current cloud schema does not expose a tenant-scoped journal-posting
+  /// RPC, so authenticated cloud mode is rejected rather than silently writing
+  /// to the local cache. This matches the existing AR limitation and keeps
+  /// cloud source-of-truth integrity explicit until that RPC is added.
+  Future<void> recordQuickAdjustment({
+    required String vendorId,
+    required int amount,
+    required bool increasePayable,
+    String? notes,
+  }) async {
+    if (amount <= 0) {
+      throw ArgumentError.value(amount, 'amount');
+    }
+    if (_useCloud) {
+      throw StateError('Cloud supplier journal adjustment is not available');
+    }
+
+    await _db.transaction(() async {
+      final vendor = await getVendor(vendorId);
+      if (vendor == null) return;
+
+      final accountsList = await _db.select(_db.accounts).get();
+      final apAccount =
+          accountsList.firstWhereOrNull(
+            (account) =>
+                account.name == 'Accounts Payable' ||
+                account.name.contains('Payable'),
+          ) ??
+          accountsList.firstWhereOrNull(
+            (account) => account.type == 'liability',
+          );
+      final offsetAccount = increasePayable
+          ? accountsList.firstWhereOrNull(
+                  (account) => account.type == 'expense',
+                ) ??
+                accountsList.firstWhereOrNull(
+                  (account) => account.type == 'equity',
+                )
+          : accountsList.firstWhereOrNull(
+                  (account) =>
+                      account.name == 'Cash' || account.name.contains('Cash'),
+                ) ??
+                accountsList.firstWhereOrNull(
+                  (account) => account.type == 'asset',
+                );
+
+      if (apAccount == null || offsetAccount == null) {
+        throw StateError(
+          'Required Accounts Payable and offset accounts are missing from the database',
+        );
+      }
+
+      final transactionId = _uuid.v4();
+      await _db
+          .into(_db.transactions)
+          .insert(
+            TransactionsCompanion.insert(
+              id: Value(transactionId),
+              transactionDate: DateTime.now(),
+              description: notes?.trim().isNotEmpty == true
+                  ? notes!.trim()
+                  : 'Supplier Balance Adjustment for ${vendor.name}',
+            ),
+          );
+
+      final debitAccountId = increasePayable ? offsetAccount.id : apAccount.id;
+      final creditAccountId = increasePayable ? apAccount.id : offsetAccount.id;
+      await _db
+          .into(_db.transactionEntries)
+          .insert(
+            TransactionEntriesCompanion.insert(
+              transactionId: transactionId,
+              accountId: debitAccountId,
+              amount: amount,
+            ),
+          );
+      await _db
+          .into(_db.transactionEntries)
+          .insert(
+            TransactionEntriesCompanion.insert(
+              transactionId: transactionId,
+              accountId: creditAccountId,
+              amount: -amount,
+            ),
+          );
+
+      await (_db.update(
+        _db.vendors,
+      )..where((row) => row.id.equals(vendorId))).write(
+        VendorsCompanion(
+          balance: Value(vendor.balance + (increasePayable ? amount : -amount)),
+        ),
+      );
+    });
+  }
+
   // ==================== BILLS ====================
 
   /// Watch all bills for a vendor

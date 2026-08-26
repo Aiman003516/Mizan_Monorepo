@@ -7,6 +7,7 @@ import 'package:shared_ui/shared_ui.dart';
 
 import 'vendor_form_screen.dart';
 import 'bill_form_screen.dart';
+import 'vendor_quick_adjustment_dialog.dart';
 
 /// 📋 Vendor Detail Screen
 class VendorDetailScreen extends ConsumerWidget {
@@ -53,6 +54,20 @@ class VendorDetailScreen extends ConsumerWidget {
           balance: vendor.balance,
           currencyCode: currencyCode,
           outstandingBalanceLabel: l10n.outstandingBalance,
+          quickAdjustmentLabel: l10n.quickLedgerAdjustment,
+          onQuickAdjustment: () async {
+            final updated = await showDialog<bool>(
+              context: context,
+              builder: (_) => VendorQuickAdjustmentDialog(
+                vendorId: vendor.id,
+                vendorName: vendor.name,
+              ),
+            );
+            if (updated == true) {
+              ref.invalidate(vendorsStreamProvider);
+              ref.invalidate(vendorBillsProvider(vendor.id));
+            }
+          },
           onEdit: () async {
             final updated = await Navigator.of(context).push<bool>(
               MaterialPageRoute(

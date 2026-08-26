@@ -34,13 +34,16 @@ class _QuickAdjustmentDialogState extends ConsumerState<QuickAdjustmentDialog> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
     final amountText = _amountController.text.trim();
     if (amountText.isEmpty) return;
 
     final amountDouble = double.tryParse(amountText);
     if (amountDouble == null || amountDouble <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseEnterValidAmount)),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.pleaseEnterValidAmount),
+        ),
       );
       return;
     }
@@ -63,9 +66,12 @@ class _QuickAdjustmentDialogState extends ConsumerState<QuickAdjustmentDialog> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorLoadingData),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
         setState(() => _isLoading = false);
       }
     }
@@ -115,11 +121,10 @@ class _QuickAdjustmentDialogState extends ConsumerState<QuickAdjustmentDialog> {
               controller: _amountController,
               decoration: InputDecoration(
                 labelText: l10n.amount,
-                prefixText: '${CurrencyFormatter.getCurrencySymbol(ref.watch(currentCurrencyCodeProvider))} ',
+                prefixText:
+                    '${CurrencyFormatter.getCurrencySymbol(ref.watch(currentCurrencyCodeProvider))} ',
                 border: const OutlineInputBorder(),
-                helperText: _isCharge
-                    ? l10n.increasesDebt
-                    : l10n.decreasesDebt,
+                helperText: _isCharge ? l10n.increasesDebt : l10n.decreasesDebt,
               ),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,

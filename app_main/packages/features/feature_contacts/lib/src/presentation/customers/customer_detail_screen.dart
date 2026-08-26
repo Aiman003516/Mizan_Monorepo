@@ -83,14 +83,18 @@ class CustomerDetailScreen extends ConsumerWidget {
               ref.invalidate(customerInvoicesProvider(customer.id));
             }
           },
-          onQuickAdjustment: () {
-            showDialog(
+          onQuickAdjustment: () async {
+            final updated = await showDialog<bool>(
               context: context,
               builder: (context) => QuickAdjustmentDialog(
                 customerId: customer.id,
                 customerName: customer.name,
               ),
             );
+            if (updated == true) {
+              ref.invalidate(customersStreamProvider);
+              ref.invalidate(customerInvoicesProvider(customer.id));
+            }
           },
           newDocumentLabel: l10n.newInvoice,
           newDocumentIcon: Icons.receipt_long,

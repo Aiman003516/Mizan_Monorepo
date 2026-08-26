@@ -4638,5 +4638,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveAdjustment => 'Save Adjustment';
 
   @override
+  String get increasePayable => 'Increase payable (+)';
+
+  @override
+  String get decreasePayable => 'Reduce payable (-)';
+
+  @override
+  String get increasesPayable => 'Increases the amount owed to this supplier';
+
+  @override
+  String get decreasesPayable => 'Decreases the amount owed to this supplier';
+
+  @override
+  String get supplierAdjustmentFailed =>
+      'Could not update the supplier balance';
+
+  @override
   String get crmSectionTitle => 'Customer & Vendor Management';
 }

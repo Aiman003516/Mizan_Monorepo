@@ -8798,6 +8798,36 @@ abstract class AppLocalizations {
   /// **'Save Adjustment'**
   String get saveAdjustment;
 
+  /// No description provided for @increasePayable.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase payable (+)'**
+  String get increasePayable;
+
+  /// No description provided for @decreasePayable.
+  ///
+  /// In en, this message translates to:
+  /// **'Reduce payable (-)'**
+  String get decreasePayable;
+
+  /// No description provided for @increasesPayable.
+  ///
+  /// In en, this message translates to:
+  /// **'Increases the amount owed to this supplier'**
+  String get increasesPayable;
+
+  /// No description provided for @decreasesPayable.
+  ///
+  /// In en, this message translates to:
+  /// **'Decreases the amount owed to this supplier'**
+  String get decreasesPayable;
+
+  /// No description provided for @supplierAdjustmentFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update the supplier balance'**
+  String get supplierAdjustmentFailed;
+
   /// No description provided for @crmSectionTitle.
   ///
   /// In en, this message translates to:

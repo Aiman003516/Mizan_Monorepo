@@ -2147,5 +2147,10 @@
   "increasesDebt": "Increases their debt to you",
   "decreasesDebt": "Decreases their debt (routes to Cash)",
   "saveAdjustment": "Save Adjustment",
+  "increasePayable": "Increase payable (+)",
+  "decreasePayable": "Reduce payable (-)",
+  "increasesPayable": "Increases the amount owed to this supplier",
+  "decreasesPayable": "Decreases the amount owed to this supplier",
+  "supplierAdjustmentFailed": "Could not update the supplier balance",
   "crmSectionTitle": "Customer & Vendor Management"
 }

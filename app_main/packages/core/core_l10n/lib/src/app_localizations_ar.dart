@@ -4639,5 +4639,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get saveAdjustment => 'حفظ التعديل';
 
   @override
+  String get increasePayable => 'زيادة المبلغ المستحق (+)';
+
+  @override
+  String get decreasePayable => 'خفض المبلغ المستحق (-)';
+
+  @override
+  String get increasesPayable => 'يزيد المبلغ المستحق لهذا المورد';
+
+  @override
+  String get decreasesPayable => 'يخفض المبلغ المستحق لهذا المورد';
+
+  @override
+  String get supplierAdjustmentFailed => 'تعذر تحديث رصيد المورد';
+
+  @override
   String get crmSectionTitle => 'إدارة العملاء والموردين';
 }
