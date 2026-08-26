@@ -9,6 +9,7 @@ import 'profit_and_loss_screen.dart';
 import 'balance_sheet_screen.dart';
 import 'trial_balance_screen.dart';
 import 'ledger_control_screen.dart';
+import 'revenue_recognition_screen.dart';
 import 'total_amounts_screen.dart';
 import 'monthly_amounts_screen.dart';
 import 'total_classifications_screen.dart';
@@ -118,6 +119,12 @@ class ReportsHubScreen extends ConsumerWidget {
                 icon: Icons.admin_panel_settings_outlined,
                 color: Colors.deepPurple,
                 onTap: () => _nav(context, const LedgerControlScreen()),
+              ),
+              _ReportCard(
+                title: l10n.revenueRecognition,
+                icon: Icons.event_repeat,
+                color: Colors.green,
+                onTap: () => _nav(context, const RevenueRecognitionScreen()),
               ),
             ]),
 

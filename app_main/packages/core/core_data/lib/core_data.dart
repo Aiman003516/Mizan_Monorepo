@@ -68,4 +68,5 @@ export 'src/repositories/attachments_repository.dart';
 export 'src/repositories/comments_repository.dart';
 export 'src/repositories/crm_pipeline_repository.dart';
 export 'src/repositories/accounting_ledger_repository.dart';
+export 'src/repositories/revenue_recognition_repository.dart';
 export 'src/repositories/schema_health_repository.dart';

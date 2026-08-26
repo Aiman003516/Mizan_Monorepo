@@ -2392,6 +2392,48 @@ class AppLocalizationsAr extends AppLocalizations {
   String get taxLiabilityTitle => 'الالتزام الضريبي';
 
   @override
+  String get revenueRecognition => 'إثبات الإيرادات';
+
+  @override
+  String get revenueRecognitionIntro =>
+      'راجع مبالغ الإثبات المخططة. إنشاء المسودة لا ينشرها؛ ويظل النشر إجراءً محاسبياً منفصلاً ومصرحاً به.';
+
+  @override
+  String get revenueRecognitionLoadFailed => 'تعذر تحميل جدول إثبات الإيرادات.';
+
+  @override
+  String get revenueRecognitionNoSchedules =>
+      'لا توجد جداول إثبات إيرادات متاحة.';
+
+  @override
+  String get revenueRecognitionCreateDraft => 'إنشاء مسودة';
+
+  @override
+  String get revenueRecognitionDraftCreated =>
+      'تم إنشاء مسودة الإثبات. راجعها وانشرها من خلال سير عمل المحاسبة.';
+
+  @override
+  String get revenueRecognitionDraftFailed => 'تعذر إنشاء مسودة الإثبات.';
+
+  @override
+  String get revenueRecognitionPlannedStatus => 'مخطط';
+
+  @override
+  String get revenueRecognitionDraftStatus => 'تم إنشاء المسودة';
+
+  @override
+  String get revenueRecognitionRecognizedStatus => 'مثبت';
+
+  @override
+  String get journalEntryNumber => 'رقم قيد اليومية';
+
+  @override
+  String get createDraft => 'إنشاء مسودة';
+
+  @override
+  String get cancelled => 'ملغاة';
+
+  @override
   String get reportNoData => 'لا توجد بيانات لهذه الفترة.';
 
   @override

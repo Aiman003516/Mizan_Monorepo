@@ -2400,6 +2400,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get taxLiabilityTitle => 'Tax Liability';
 
   @override
+  String get revenueRecognition => 'Revenue Recognition';
+
+  @override
+  String get revenueRecognitionIntro =>
+      'Review planned recognition amounts. Creating a draft does not post it; posting remains a separately authorized accounting action.';
+
+  @override
+  String get revenueRecognitionLoadFailed =>
+      'Could not load the revenue schedule.';
+
+  @override
+  String get revenueRecognitionNoSchedules =>
+      'No revenue-recognition schedules are available.';
+
+  @override
+  String get revenueRecognitionCreateDraft => 'Create draft';
+
+  @override
+  String get revenueRecognitionDraftCreated =>
+      'Recognition draft created. Review and post it through the accounting workflow.';
+
+  @override
+  String get revenueRecognitionDraftFailed =>
+      'Could not create the recognition draft.';
+
+  @override
+  String get revenueRecognitionPlannedStatus => 'Planned';
+
+  @override
+  String get revenueRecognitionDraftStatus => 'Draft created';
+
+  @override
+  String get revenueRecognitionRecognizedStatus => 'Recognized';
+
+  @override
+  String get journalEntryNumber => 'Journal entry number';
+
+  @override
+  String get createDraft => 'Create draft';
+
+  @override
+  String get cancelled => 'Cancelled';
+
+  @override
   String get reportNoData => 'No data for this period.';
 
   @override

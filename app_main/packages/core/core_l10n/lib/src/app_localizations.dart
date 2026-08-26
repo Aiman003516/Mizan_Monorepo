@@ -4640,6 +4640,84 @@ abstract class AppLocalizations {
   /// **'Tax Liability'**
   String get taxLiabilityTitle;
 
+  /// No description provided for @revenueRecognition.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue Recognition'**
+  String get revenueRecognition;
+
+  /// No description provided for @revenueRecognitionIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Review planned recognition amounts. Creating a draft does not post it; posting remains a separately authorized accounting action.'**
+  String get revenueRecognitionIntro;
+
+  /// No description provided for @revenueRecognitionLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the revenue schedule.'**
+  String get revenueRecognitionLoadFailed;
+
+  /// No description provided for @revenueRecognitionNoSchedules.
+  ///
+  /// In en, this message translates to:
+  /// **'No revenue-recognition schedules are available.'**
+  String get revenueRecognitionNoSchedules;
+
+  /// No description provided for @revenueRecognitionCreateDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Create draft'**
+  String get revenueRecognitionCreateDraft;
+
+  /// No description provided for @revenueRecognitionDraftCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Recognition draft created. Review and post it through the accounting workflow.'**
+  String get revenueRecognitionDraftCreated;
+
+  /// No description provided for @revenueRecognitionDraftFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the recognition draft.'**
+  String get revenueRecognitionDraftFailed;
+
+  /// No description provided for @revenueRecognitionPlannedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get revenueRecognitionPlannedStatus;
+
+  /// No description provided for @revenueRecognitionDraftStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft created'**
+  String get revenueRecognitionDraftStatus;
+
+  /// No description provided for @revenueRecognitionRecognizedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Recognized'**
+  String get revenueRecognitionRecognizedStatus;
+
+  /// No description provided for @journalEntryNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal entry number'**
+  String get journalEntryNumber;
+
+  /// No description provided for @createDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Create draft'**
+  String get createDraft;
+
+  /// No description provided for @cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelled;
+
   /// No description provided for @reportNoData.
   ///
   /// In en, this message translates to:
