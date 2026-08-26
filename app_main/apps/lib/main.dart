@@ -84,10 +84,17 @@ Future<void> main() async {
     });
   }
 
-  await Supabase.initialize(
-    url: EnvConfig.supabaseUrl,
-    publishableKey: EnvConfig.supabaseAnonKey,
-  );
+  if (EnvConfig.supabaseUrl.isNotEmpty &&
+      EnvConfig.supabaseAnonKey.isNotEmpty) {
+    await Supabase.initialize(
+      url: EnvConfig.supabaseUrl,
+      publishableKey: EnvConfig.supabaseAnonKey,
+    );
+  } else {
+    debugPrint(
+      'Cloud Supabase credentials are not configured; starting in local guest mode.',
+    );
+  }
 
   final overrides = await Bootstrap.init();
 

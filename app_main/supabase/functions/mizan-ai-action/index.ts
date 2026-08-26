@@ -407,7 +407,7 @@ Deno.serve(async (request) => {
     const conversationId = uuid(body.conversation_id);
     const insert = await adminClient.from("ai_action_requests").insert({ tenant_id: tenantId, user_id: auth.user.id, conversation_id: conversationId, action_type: actionType, payload, preview: previewFor(actionType, payload), idempotency_key: idempotencyKey }).select("id,action_type,payload,preview,status,expires_at,created_at,confirmation_token,confirmed_at,executed_at,execution_result,execution_error").single();
     if (insert.error || !insert.data) return response({ error: "Action draft could not be saved" }, 500);
-    await adminClient.from("ai_audit_events").insert({ request_id: idempotencyKey, tenant_id: tenantId, user_id: auth.user.id, conversation_id: conversationId, event_type: "tool_call", tool_name: "create_action_draft", success: true, metadata: { action_type: actionType } });
+    await adminClient.from("ai_audit_events").insert({ request_id: insert.data.id, tenant_id: tenantId, user_id: auth.user.id, conversation_id: conversationId, event_type: "tool_call", tool_name: "create_action_draft", success: true, metadata: { action_type: actionType } });
     return response({ action_request: insert.data });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Action draft is invalid";

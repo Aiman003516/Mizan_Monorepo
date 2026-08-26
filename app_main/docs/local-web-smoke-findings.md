@@ -1,0 +1,2 @@
+
+Additional browser diagnostics: the served page remained at the Flutter loader with no `flt-glass-pane`. Browser console capture returned no errors. The Flutter bootstrap object and `window.initSqlJs` were present, and the sql.js CDN script was loaded. Therefore the blank screen is not caused by a missing script tag; it is likely an application initialization promise or a later runtime condition. A subsequent device run with real app credentials and browser DevTools/network tracing is still required. The local run used a dummy publishable key and did not call OpenRouter.
