@@ -18,6 +18,7 @@ import 'owner_crm_settings_screen.dart';
 import 'owner_pos_settings_screen.dart';
 import 'owner_finance_operations_settings_screen.dart';
 import 'owner_close_management_screen.dart';
+import 'schema_health_screen.dart';
 import '../data/owner_control_center_contract.dart';
 import '../data/owner_control_center_repository.dart';
 
@@ -122,6 +123,22 @@ class OwnerControlCenterScreen extends ConsumerWidget {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: OutlinedButton.icon(
+                      onPressed: isGuest
+                          ? null
+                          : () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const SchemaHealthScreen(),
+                              ),
+                            ),
+                      icon: const Icon(Icons.health_and_safety_outlined),
+                      label: Text(l10n.schemaHealth),
+                    ),
                   ),
                 ],
               ),

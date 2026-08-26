@@ -984,6 +984,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ledgerControl => 'Ledger Control';
 
   @override
+  String get schemaHealth => 'Schema health';
+
+  @override
+  String get schemaHealthLoadFailed => 'Could not load schema health checks.';
+
+  @override
+  String get schemaHealthNeedsAttention => 'Attention required';
+
+  @override
+  String get schemaHealthHealthy => 'Schema health looks good';
+
+  @override
+  String get schemaHealthChecksPassed => 'checks passed';
+
+  @override
+  String get requiredTable => 'Required table';
+
+  @override
+  String get rowLevelSecurity => 'Row-Level Security';
+
+  @override
+  String get tenantReferences => 'Tenant references';
+
+  @override
+  String get tenantIndex => 'Tenant-leading index';
+
+  @override
+  String get tenantContext => 'Tenant context';
+
+  @override
+  String get postedJournalBalance => 'Posted journal balance';
+
+  @override
+  String get currencyCodeFormat => 'Currency-code format';
+
+  @override
+  String get preflightComplete => 'Preflight complete';
+
+  @override
+  String get schemaHealthCheck => 'Schema health check';
+
+  @override
   String get ledgerControlIntro =>
       'Review cloud accounting periods, tax codes, and the chart of accounts. Posting and closing are server-authorized.';
 

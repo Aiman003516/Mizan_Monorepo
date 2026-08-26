@@ -983,6 +983,48 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ledgerControl => 'إدارة دفتر الأستاذ';
 
   @override
+  String get schemaHealth => 'سلامة المخطط';
+
+  @override
+  String get schemaHealthLoadFailed => 'تعذر تحميل فحوصات سلامة المخطط.';
+
+  @override
+  String get schemaHealthNeedsAttention => 'يتطلب الانتباه';
+
+  @override
+  String get schemaHealthHealthy => 'سلامة المخطط جيدة';
+
+  @override
+  String get schemaHealthChecksPassed => 'فحوصات ناجحة';
+
+  @override
+  String get requiredTable => 'الجدول المطلوب';
+
+  @override
+  String get rowLevelSecurity => 'أمان مستوى الصفوف';
+
+  @override
+  String get tenantReferences => 'مراجع المستأجر';
+
+  @override
+  String get tenantIndex => 'فهرس المستأجر الرئيسي';
+
+  @override
+  String get tenantContext => 'سياق المستأجر';
+
+  @override
+  String get postedJournalBalance => 'توازن القيود المرحلة';
+
+  @override
+  String get currencyCodeFormat => 'تنسيق رمز العملة';
+
+  @override
+  String get preflightComplete => 'اكتمل الفحص الأولي';
+
+  @override
+  String get schemaHealthCheck => 'فحص سلامة المخطط';
+
+  @override
   String get ledgerControlIntro =>
       'راجع الفترات المحاسبية السحابية وأكواد الضرائب ودليل الحسابات. النشر والإغلاق مصرح بهما من الخادم.';
 

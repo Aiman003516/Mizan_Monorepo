@@ -1964,6 +1964,90 @@ abstract class AppLocalizations {
   /// **'Ledger Control'**
   String get ledgerControl;
 
+  /// No description provided for @schemaHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Schema health'**
+  String get schemaHealth;
+
+  /// No description provided for @schemaHealthLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load schema health checks.'**
+  String get schemaHealthLoadFailed;
+
+  /// No description provided for @schemaHealthNeedsAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Attention required'**
+  String get schemaHealthNeedsAttention;
+
+  /// No description provided for @schemaHealthHealthy.
+  ///
+  /// In en, this message translates to:
+  /// **'Schema health looks good'**
+  String get schemaHealthHealthy;
+
+  /// No description provided for @schemaHealthChecksPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'checks passed'**
+  String get schemaHealthChecksPassed;
+
+  /// No description provided for @requiredTable.
+  ///
+  /// In en, this message translates to:
+  /// **'Required table'**
+  String get requiredTable;
+
+  /// No description provided for @rowLevelSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Row-Level Security'**
+  String get rowLevelSecurity;
+
+  /// No description provided for @tenantReferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Tenant references'**
+  String get tenantReferences;
+
+  /// No description provided for @tenantIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'Tenant-leading index'**
+  String get tenantIndex;
+
+  /// No description provided for @tenantContext.
+  ///
+  /// In en, this message translates to:
+  /// **'Tenant context'**
+  String get tenantContext;
+
+  /// No description provided for @postedJournalBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted journal balance'**
+  String get postedJournalBalance;
+
+  /// No description provided for @currencyCodeFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency-code format'**
+  String get currencyCodeFormat;
+
+  /// No description provided for @preflightComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Preflight complete'**
+  String get preflightComplete;
+
+  /// No description provided for @schemaHealthCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Schema health check'**
+  String get schemaHealthCheck;
+
   /// No description provided for @ledgerControlIntro.
   ///
   /// In en, this message translates to:

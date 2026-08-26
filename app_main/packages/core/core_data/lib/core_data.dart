@@ -18,6 +18,7 @@ export 'src/models/billing_models.dart';
 export 'src/models/custom_field_model.dart';
 // Phase 1C: Ghost Money Handling
 export 'src/models/money_value.dart';
+export 'src/models/erp_domain_contracts.dart';
 export 'src/services/ghost_money_service.dart';
 // Phase 2: Account Templates & Core Engine
 export 'src/account_templates.dart';
@@ -66,3 +67,4 @@ export 'src/repositories/attachments_repository.dart';
 export 'src/repositories/comments_repository.dart';
 export 'src/repositories/crm_pipeline_repository.dart';
 export 'src/repositories/accounting_ledger_repository.dart';
+export 'src/repositories/schema_health_repository.dart';

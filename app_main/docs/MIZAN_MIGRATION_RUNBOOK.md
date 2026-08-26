@@ -25,6 +25,7 @@ Run the files in filename order. The current sequence is:
 | 13 | `20260827170000_accounting_ledger_foundation.sql` | Accounting periods, tax codes, chart of accounts, journal entries/lines, balanced posting, and trial balance | Added in the current upgrade; not applied |
 | 14 | `20260827180000_crm_pipeline_foundation.sql` | CRM leads, pipeline, opportunities, activities, and interaction history | Added in the current upgrade; not applied |
 | 15 | `20260827190000_accounting_flutter_contract.sql` | Flutter RPCs for journal drafts, P&L, balance sheet, and accounting-period closing | Added in the current upgrade; not applied |
+| 16 | `20260827200000_schema_health_preflight.sql` | Read-only tenant-scoped schema, RLS, index, currency, orphan-reference, and posted-journal health checks | Added in the current upgrade; not applied |
 
 ## Preflight checklist
 
