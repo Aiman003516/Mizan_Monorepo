@@ -41,6 +41,9 @@ dependencies:
   intl: any
   shared_preferences: any
   feature_auth: any
+  feature_data_import:
+    path: ../feature_data_import
+  file_picker: ^8.0.0+1
 dev_dependencies:
   flutter_test:
     sdk: flutter

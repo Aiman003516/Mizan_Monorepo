@@ -9836,6 +9836,82 @@ abstract class AppLocalizations {
   /// **'The invitation will be sent after the owner connects an account.'**
   String get inviteAfterConnect;
 
+  /// No description provided for @invitationContactRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least one valid email address or phone number.'**
+  String get invitationContactRequired;
+
+  /// No description provided for @invitationCreationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The invitation could not be created. Check the role and recipient details, then try again.'**
+  String get invitationCreationFailed;
+
+  /// No description provided for @invitationRecipientDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipient details'**
+  String get invitationRecipientDetails;
+
+  /// No description provided for @invitationDeliveryIntent.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery preference'**
+  String get invitationDeliveryIntent;
+
+  /// No description provided for @deliveryChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery channel'**
+  String get deliveryChannel;
+
+  /// No description provided for @manualDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual sharing'**
+  String get manualDelivery;
+
+  /// No description provided for @emailDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Email intent'**
+  String get emailDelivery;
+
+  /// No description provided for @smsDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS intent'**
+  String get smsDelivery;
+
+  /// No description provided for @deliveryIntentDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'This records how you intend to deliver the code. Automatic email or SMS requires a configured and approved provider.'**
+  String get deliveryIntentDisclaimer;
+
+  /// No description provided for @deliveryIntentRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'The delivery preference is recorded as an intent. Share the code manually until a provider is configured.'**
+  String get deliveryIntentRecorded;
+
+  /// No description provided for @invitationCreatedFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation created for {recipient}'**
+  String invitationCreatedFor(Object recipient);
+
+  /// No description provided for @inviteShareTextWithRecipient.
+  ///
+  /// In en, this message translates to:
+  /// **'You are invited to join my business on Mizan.\n\nRecipient: {recipient}\nContact: {contact}\n\nOpen the app, choose Join Organization, and enter this code: {code}\n\nDo not forward this invitation. It is valid for 24 hours.'**
+  String inviteShareTextWithRecipient(
+    Object recipient,
+    Object contact,
+    Object code,
+  );
+
   /// No description provided for @approvalExpenseThreshold.
   ///
   /// In en, this message translates to:
@@ -10753,6 +10829,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current year'**
   String get reportPeriodAnnual;
+
+  /// No description provided for @chooseImportFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose CSV or Excel file'**
+  String get chooseImportFile;
+
+  /// No description provided for @fileImportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The file could not be imported.'**
+  String get fileImportFailed;
+
+  /// No description provided for @mapImportColumns.
+  ///
+  /// In en, this message translates to:
+  /// **'Map recipient columns'**
+  String get mapImportColumns;
+
+  /// No description provided for @emailColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Email column (optional)'**
+  String get emailColumn;
+
+  /// No description provided for @phoneColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone column (optional)'**
+  String get phoneColumn;
+
+  /// No description provided for @nameColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Name column (optional)'**
+  String get nameColumn;
+
+  /// No description provided for @importMappingConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm the columns before creating invitations. Each row needs a valid email or phone number.'**
+  String get importMappingConfirmation;
+
+  /// No description provided for @duplicateImportRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate recipient'**
+  String get duplicateImportRow;
+
+  /// No description provided for @importRowsRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} rows were rejected'**
+  String importRowsRejected(int count);
+
+  /// No description provided for @invitationStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get invitationStatusPending;
+
+  /// No description provided for @invitationStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get invitationStatusExpired;
+
+  /// No description provided for @invitationStatusRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoked'**
+  String get invitationStatusRevoked;
+
+  /// No description provided for @invitationStatusAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get invitationStatusAccepted;
+
+  /// No description provided for @invitationExpiresAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires {date}'**
+  String invitationExpiresAt(Object date);
+
+  /// No description provided for @resendInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get resendInvitation;
+
+  /// No description provided for @invitationResentAndCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'A new invitation code was generated and copied.'**
+  String get invitationResentAndCopied;
+
+  /// No description provided for @paste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get paste;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPassword;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// No description provided for @inviteEmailCodeIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email address assigned to the invitation and the six-digit code.'**
+  String get inviteEmailCodeIntro;
+
+  /// No description provided for @setPasswordAndJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Set password and join'**
+  String get setPasswordAndJoin;
+
+  /// No description provided for @accountSetupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The account could not be set up. Please check your details and try again.'**
+  String get accountSetupFailed;
+
+  /// No description provided for @accountAlreadyExistsUseSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'This email already has an account. Sign in with that account, then return to join.'**
+  String get accountAlreadyExistsUseSignIn;
+
+  /// No description provided for @passwordSetupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The password could not be set. Please try again.'**
+  String get passwordSetupFailed;
+
+  /// No description provided for @googleInviteAndroidOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Google invitation continuation is currently supported on Android. Use password setup on this platform.'**
+  String get googleInviteAndroidOnly;
+
+  /// No description provided for @invitationEmailMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation is assigned to a different email address.'**
+  String get invitationEmailMismatch;
+
+  /// No description provided for @confirmInviteCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify invitation code'**
+  String get confirmInviteCode;
+
+  /// No description provided for @aiAssistantUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI service is not deployed or is currently unavailable. Ask an administrator to deploy the approved service, then try again.'**
+  String get aiAssistantUnavailable;
+
+  /// No description provided for @aiAssistantPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to use this AI operation.'**
+  String get aiAssistantPermissionDenied;
+
+  /// No description provided for @aiAssistantRetryLater.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI assistant is temporarily unavailable. Please try again later.'**
+  String get aiAssistantRetryLater;
+
+  /// No description provided for @aiAssistantRequestUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This AI request is not supported yet. You can use the read-only assistant or prepare a confirmed draft instead.'**
+  String get aiAssistantRequestUnsupported;
 }
 
 class _AppLocalizationsDelegate

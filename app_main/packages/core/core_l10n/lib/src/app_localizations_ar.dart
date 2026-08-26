@@ -5195,6 +5195,54 @@ class AppLocalizationsAr extends AppLocalizations {
   String get inviteAfterConnect => 'سيتم إرسال الدعوة بعد ربط حساب المالك.';
 
   @override
+  String get invitationContactRequired =>
+      'أدخل بريداً إلكترونياً أو رقم هاتف صالحاً واحداً على الأقل.';
+
+  @override
+  String get invitationCreationFailed =>
+      'تعذر إنشاء الدعوة. تحقق من الدور وبيانات المستلم ثم حاول مرة أخرى.';
+
+  @override
+  String get invitationRecipientDetails => 'بيانات المستلم';
+
+  @override
+  String get invitationDeliveryIntent => 'تفضيل التسليم';
+
+  @override
+  String get deliveryChannel => 'قناة التسليم';
+
+  @override
+  String get manualDelivery => 'مشاركة يدوية';
+
+  @override
+  String get emailDelivery => 'نية إرسال بالبريد الإلكتروني';
+
+  @override
+  String get smsDelivery => 'نية إرسال برسالة SMS';
+
+  @override
+  String get deliveryIntentDisclaimer =>
+      'يسجل هذا الخيار طريقة التسليم المقصودة فقط. يتطلب الإرسال التلقائي بالبريد أو SMS مزوداً مفعلاً ومعتمداً.';
+
+  @override
+  String get deliveryIntentRecorded =>
+      'تم تسجيل تفضيل التسليم كنية فقط. شارك الرمز يدوياً إلى أن يتم إعداد مزود معتمد.';
+
+  @override
+  String invitationCreatedFor(Object recipient) {
+    return 'تم إنشاء الدعوة للمستلم $recipient';
+  }
+
+  @override
+  String inviteShareTextWithRecipient(
+    Object recipient,
+    Object contact,
+    Object code,
+  ) {
+    return 'تمت دعوتك للانضمام إلى نشاطي التجاري على ميزان.\n\nالمستلم: $recipient\nجهة الاتصال: $contact\n\nافتح التطبيق واختر الانضمام إلى منظمة ثم أدخل هذا الرمز: $code\n\nلا تعِد توجيه هذه الدعوة. الرمز صالح لمدة 24 ساعة.';
+  }
+
+  @override
   String get approvalExpenseThreshold => 'حد الموافقة على المصروفات';
 
   @override
@@ -5659,4 +5707,114 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reportPeriodAnnual => 'السنة الحالية';
+
+  @override
+  String get chooseImportFile => 'اختر ملف CSV أو Excel';
+
+  @override
+  String get fileImportFailed => 'تعذر استيراد الملف.';
+
+  @override
+  String get mapImportColumns => 'تعيين أعمدة المستلمين';
+
+  @override
+  String get emailColumn => 'عمود البريد الإلكتروني (اختياري)';
+
+  @override
+  String get phoneColumn => 'عمود الهاتف (اختياري)';
+
+  @override
+  String get nameColumn => 'عمود الاسم (اختياري)';
+
+  @override
+  String get importMappingConfirmation =>
+      'أكد الأعمدة قبل إنشاء الدعوات. يجب أن يحتوي كل صف على بريد إلكتروني أو رقم هاتف صالح.';
+
+  @override
+  String get duplicateImportRow => 'المستلم مكرر';
+
+  @override
+  String importRowsRejected(int count) {
+    return 'تم رفض $count صفوف';
+  }
+
+  @override
+  String get invitationStatusPending => 'قيد الانتظار';
+
+  @override
+  String get invitationStatusExpired => 'منتهية';
+
+  @override
+  String get invitationStatusRevoked => 'ملغاة';
+
+  @override
+  String get invitationStatusAccepted => 'مقبولة';
+
+  @override
+  String invitationExpiresAt(Object date) {
+    return 'تنتهي في $date';
+  }
+
+  @override
+  String get resendInvitation => 'إعادة إرسال الرمز';
+
+  @override
+  String get invitationResentAndCopied => 'تم إنشاء رمز دعوة جديد ونسخه.';
+
+  @override
+  String get paste => 'لصق';
+
+  @override
+  String get confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get passwordsDoNotMatch => 'كلمتا المرور غير متطابقتين.';
+
+  @override
+  String get continueWithGoogle => 'المتابعة باستخدام Google';
+
+  @override
+  String get inviteEmailCodeIntro =>
+      'أدخل البريد الإلكتروني المرتبط بالدعوة والرمز المكون من ستة أرقام.';
+
+  @override
+  String get setPasswordAndJoin => 'تعيين كلمة المرور والانضمام';
+
+  @override
+  String get accountSetupFailed =>
+      'تعذر إعداد الحساب. تحقق من البيانات ثم حاول مرة أخرى.';
+
+  @override
+  String get accountAlreadyExistsUseSignIn =>
+      'هذا البريد لديه حساب بالفعل. سجّل الدخول بهذا الحساب ثم عُد للانضمام.';
+
+  @override
+  String get passwordSetupFailed => 'تعذر تعيين كلمة المرور. حاول مرة أخرى.';
+
+  @override
+  String get googleInviteAndroidOnly =>
+      'المتابعة بدعوة Google مدعومة حالياً على Android. استخدم إعداد كلمة المرور على هذه المنصة.';
+
+  @override
+  String get invitationEmailMismatch =>
+      'هذه الدعوة مخصصة لبريد إلكتروني مختلف.';
+
+  @override
+  String get confirmInviteCode => 'تحقق من رمز الدعوة';
+
+  @override
+  String get aiAssistantUnavailable =>
+      'خدمة الذكاء الاصطناعي غير منشورة أو غير متاحة حالياً. اطلب من المسؤول نشر الخدمة المعتمدة ثم حاول مرة أخرى.';
+
+  @override
+  String get aiAssistantPermissionDenied =>
+      'ليس لديك صلاحية لاستخدام عملية الذكاء الاصطناعي هذه.';
+
+  @override
+  String get aiAssistantRetryLater =>
+      'مساعد الذكاء الاصطناعي غير متاح مؤقتاً. حاول مرة أخرى لاحقاً.';
+
+  @override
+  String get aiAssistantRequestUnsupported =>
+      'طلب الذكاء الاصطناعي هذا غير مدعوم بعد. يمكنك استخدام المساعد للقراءة فقط أو إعداد مسودة تتطلب تأكيداً.';
 }

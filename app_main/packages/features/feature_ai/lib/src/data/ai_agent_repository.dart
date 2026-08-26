@@ -167,7 +167,7 @@ class AiAgentRepository {
           : const {};
       throw AiAgentException(
         'MIZAN_AI_HTTP_${response.status}',
-        _safeError(errorData['error']),
+        _safeHttpError(response.status, errorData['error']),
       );
     }
     if (data is! Map) {
@@ -246,7 +246,7 @@ class AiAgentRepository {
           : const {};
       throw AiAgentException(
         'MIZAN_AI_ACTION_HTTP_${response.status}',
-        _safeError(errorData['error']),
+        _safeHttpError(response.status, errorData['error']),
       );
     }
     if (data is! Map || data['action_request'] is! Map) {
@@ -258,6 +258,18 @@ class AiAgentRepository {
     return AiActionRequest.fromJson(
       Map<String, dynamic>.from(data['action_request'] as Map),
     );
+  }
+
+  String _safeHttpError(int status, Object? value) {
+    if (status == 401) return 'Authentication is required for the AI Copilot.';
+    if (status == 403)
+      return 'You do not have permission to use this AI operation.';
+    if (status == 404)
+      return 'The AI service is not deployed or is unavailable.';
+    if (status == 408 || status == 429 || status >= 500) {
+      return 'The AI assistant is temporarily unavailable. Please try again later.';
+    }
+    return _safeError(value);
   }
 
   String _safeError(Object? value) {
@@ -272,6 +284,12 @@ class AiAgentRepository {
         return 'The AI service is not configured yet.';
       case 'AI assistant is temporarily unavailable':
         return 'The AI assistant is temporarily unavailable. Please try again later.';
+      case 'AI operation is not supported':
+        return 'This AI operation is not supported yet.';
+      case 'You do not have permission to use this AI operation.':
+        return 'You do not have permission to use this AI operation.';
+      case 'The AI service is not deployed or is unavailable.':
+        return 'The AI service is not deployed or is unavailable.';
       default:
         return 'The AI assistant could not complete this request.';
     }

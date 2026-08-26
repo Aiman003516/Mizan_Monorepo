@@ -19,18 +19,33 @@ class PendingInvitation {
     required this.code,
     this.tenantId,
     this.roleId,
+    this.recipientEmail,
+    this.recipientPhone,
+    this.displayName,
+    this.token,
+    this.stage = 'code',
     this.expiresAt,
   });
 
   final String code;
   final String? tenantId;
   final String? roleId;
+  final String? recipientEmail;
+  final String? recipientPhone;
+  final String? displayName;
+  final String? token;
+  final String stage;
   final DateTime? expiresAt;
 
   Map<String, dynamic> toJson() => {
     'code': code,
     if (tenantId != null) 'tenantId': tenantId,
     if (roleId != null) 'roleId': roleId,
+    if (recipientEmail != null) 'recipientEmail': recipientEmail,
+    if (recipientPhone != null) 'recipientPhone': recipientPhone,
+    if (displayName != null) 'displayName': displayName,
+    if (token != null) 'token': token,
+    'stage': stage,
     if (expiresAt != null) 'expiresAt': expiresAt!.toUtc().toIso8601String(),
   };
 
@@ -46,6 +61,11 @@ class PendingInvitation {
       code: code,
       tenantId: json['tenantId'] as String?,
       roleId: json['roleId'] as String?,
+      recipientEmail: json['recipientEmail'] as String?,
+      recipientPhone: json['recipientPhone'] as String?,
+      displayName: json['displayName'] as String?,
+      token: json['token'] as String?,
+      stage: json['stage'] as String? ?? 'code',
       expiresAt: expiresAt,
     );
   }
@@ -78,12 +98,22 @@ class PendingInvitationService {
     required String code,
     String? tenantId,
     String? roleId,
+    String? recipientEmail,
+    String? recipientPhone,
+    String? displayName,
+    String? token,
+    String stage = 'code',
     DateTime? expiresAt,
   }) async {
     final invitation = PendingInvitation(
       code: code.trim(),
       tenantId: tenantId,
       roleId: roleId,
+      recipientEmail: recipientEmail,
+      recipientPhone: recipientPhone,
+      displayName: displayName,
+      token: token,
+      stage: stage,
       expiresAt: expiresAt,
     );
     await _preferences.setString(_key, jsonEncode(invitation.toJson()));

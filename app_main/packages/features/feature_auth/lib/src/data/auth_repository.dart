@@ -170,6 +170,13 @@ class AuthRepository {
     );
   }
 
+  Future<UserResponse> updatePassword(String password) {
+    if (_supabase.auth.currentUser == null) {
+      throw const AuthException('Authentication is required.');
+    }
+    return _supabase.auth.updateUser(UserAttributes(password: password));
+  }
+
   Future<AuthResponse> signInWithPhone(String phone, String password) {
     return _supabase.auth.signInWithPassword(
       phone: phone.trim(),

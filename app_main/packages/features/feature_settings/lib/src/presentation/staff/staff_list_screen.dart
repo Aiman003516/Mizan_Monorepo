@@ -2,6 +2,7 @@ import 'package:core_data/core_data.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'bulk_invite_staff_screen.dart';
@@ -226,9 +227,14 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
             'revoked' => normalizedStatus == 'revoked',
             _ => false,
           };
+          final searchable = [
+            invitation.readableName,
+            invitation.email,
+            invitation.phone,
+            invitation.roleName,
+          ].join(' ').toLowerCase();
           return matchesStatus &&
-              (_search.isEmpty ||
-                  invitation.email.toLowerCase().contains(_search));
+              (_search.isEmpty || searchable.contains(_search));
         }).toList();
         if (filtered.isEmpty) {
           return Center(child: Text(l10n.noStaffFound));
@@ -239,19 +245,77 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
           separatorBuilder: (_, __) => const Divider(height: 1),
           itemBuilder: (_, index) {
             final invitation = filtered[index];
+            final contact = invitation.email.isNotEmpty
+                ? invitation.email
+                : invitation.phone;
+            final title = invitation.readableName.isNotEmpty
+                ? invitation.readableName
+                : l10n.inviteStaff;
+            final role = invitation.roleName.isNotEmpty
+                ? invitation.roleName
+                : l10n.role;
+            final channel = switch (invitation.deliveryChannel) {
+              'email' => l10n.emailDelivery,
+              'sms' => l10n.smsDelivery,
+              _ => l10n.manualDelivery,
+            };
+            final readableStatus = invitation.isExpired
+                ? l10n.invitationStatusExpired
+                : switch (invitation.status.toLowerCase()) {
+                    'revoked' => l10n.invitationStatusRevoked,
+                    'accepted' => l10n.invitationStatusAccepted,
+                    _ => l10n.invitationStatusPending,
+                  };
             return ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.mail_outline)),
-              title: Text(
-                invitation.email,
-                textDirection: TextDirection.ltr,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              leading: CircleAvatar(
+                child: Icon(
+                  invitation.phone.isNotEmpty
+                      ? Icons.phone_outlined
+                      : Icons.mail_outline,
+                ),
               ),
-              subtitle: Text(invitation.roleId),
+              title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (contact.isNotEmpty)
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: Text(
+                        contact,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  Text('$role • $readableStatus'),
+                  Text('${l10n.deliveryChannel}: $channel'),
+                  if (invitation.expiresAt != null)
+                    Text(
+                      l10n.invitationExpiresAt(
+                        invitation.expiresAt!
+                            .toLocal()
+                            .toString()
+                            .split('.')
+                            .first,
+                      ),
+                    ),
+                ],
+              ),
+              isThreeLine: true,
               trailing: status == 'pending'
                   ? PopupMenuButton<String>(
-                      onSelected: (_) => _revokeInvitation(invitation),
+                      onSelected: (value) {
+                        if (value == 'revoke') {
+                          _revokeInvitation(invitation);
+                        } else if (value == 'resend') {
+                          _resendInvitation(invitation);
+                        }
+                      },
                       itemBuilder: (_) => [
+                        PopupMenuItem(
+                          value: 'resend',
+                          child: Text(l10n.resendInvitation),
+                        ),
                         PopupMenuItem(
                           value: 'revoke',
                           child: Text(l10n.revokeInvitation),
@@ -388,6 +452,23 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
       ref.invalidate(invitationsStreamProvider);
     } catch (_) {
       _showError(l10n.errorLoadingData);
+    }
+  }
+
+  Future<void> _resendInvitation(StaffInvitation invitation) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final code = await ref
+          .read(staffRepositoryProvider)
+          .resendInvitation(invitation.id);
+      if (!mounted) return;
+      await Clipboard.setData(ClipboardData(text: code));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.invitationResentAndCopied)));
+      ref.invalidate(invitationsStreamProvider);
+    } catch (_) {
+      _showError(l10n.invitationCreationFailed);
     }
   }
 

@@ -474,9 +474,10 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
       }
     } catch (error) {
       if (!mounted) return;
-      final message = error is AiGuestModeException
-          ? l10n.aiAssistantSignInRequired
-          : l10n.aiAssistantError;
+      final message = _aiErrorMessage(error, l10n);
+      setState(() {
+        _messages.add(AiChatMessage(role: 'assistant', content: message));
+      });
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
@@ -486,6 +487,29 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
         _scrollToEnd();
       }
     }
+  }
+
+  String _aiErrorMessage(Object error, AppLocalizations l10n) {
+    if (error is AiGuestModeException) return l10n.aiAssistantSignInRequired;
+    if (error is AiAgentException) {
+      final code = error.code;
+      if (code.contains('404') || error.message.contains('not deployed')) {
+        return l10n.aiAssistantUnavailable;
+      }
+      if (code.contains('401') || code.contains('AUTH')) {
+        return l10n.aiAssistantSignInRequired;
+      }
+      if (code.contains('403') || code.contains('PERMISSION')) {
+        return l10n.aiAssistantPermissionDenied;
+      }
+      if (code.contains('408') || code.contains('429') || code.contains('5')) {
+        return l10n.aiAssistantRetryLater;
+      }
+      if (code.contains('INVALID_MESSAGE') || code.contains('UNSUPPORTED')) {
+        return l10n.aiAssistantRequestUnsupported;
+      }
+    }
+    return l10n.aiAssistantError;
   }
 
   void _scrollToEnd() {

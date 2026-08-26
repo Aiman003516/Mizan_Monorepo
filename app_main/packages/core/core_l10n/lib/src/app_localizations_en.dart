@@ -5200,6 +5200,54 @@ class AppLocalizationsEn extends AppLocalizations {
       'The invitation will be sent after the owner connects an account.';
 
   @override
+  String get invitationContactRequired =>
+      'Enter at least one valid email address or phone number.';
+
+  @override
+  String get invitationCreationFailed =>
+      'The invitation could not be created. Check the role and recipient details, then try again.';
+
+  @override
+  String get invitationRecipientDetails => 'Recipient details';
+
+  @override
+  String get invitationDeliveryIntent => 'Delivery preference';
+
+  @override
+  String get deliveryChannel => 'Delivery channel';
+
+  @override
+  String get manualDelivery => 'Manual sharing';
+
+  @override
+  String get emailDelivery => 'Email intent';
+
+  @override
+  String get smsDelivery => 'SMS intent';
+
+  @override
+  String get deliveryIntentDisclaimer =>
+      'This records how you intend to deliver the code. Automatic email or SMS requires a configured and approved provider.';
+
+  @override
+  String get deliveryIntentRecorded =>
+      'The delivery preference is recorded as an intent. Share the code manually until a provider is configured.';
+
+  @override
+  String invitationCreatedFor(Object recipient) {
+    return 'Invitation created for $recipient';
+  }
+
+  @override
+  String inviteShareTextWithRecipient(
+    Object recipient,
+    Object contact,
+    Object code,
+  ) {
+    return 'You are invited to join my business on Mizan.\n\nRecipient: $recipient\nContact: $contact\n\nOpen the app, choose Join Organization, and enter this code: $code\n\nDo not forward this invitation. It is valid for 24 hours.';
+  }
+
+  @override
   String get approvalExpenseThreshold => 'Expense approval threshold';
 
   @override
@@ -5668,4 +5716,116 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportPeriodAnnual => 'Current year';
+
+  @override
+  String get chooseImportFile => 'Choose CSV or Excel file';
+
+  @override
+  String get fileImportFailed => 'The file could not be imported.';
+
+  @override
+  String get mapImportColumns => 'Map recipient columns';
+
+  @override
+  String get emailColumn => 'Email column (optional)';
+
+  @override
+  String get phoneColumn => 'Phone column (optional)';
+
+  @override
+  String get nameColumn => 'Name column (optional)';
+
+  @override
+  String get importMappingConfirmation =>
+      'Confirm the columns before creating invitations. Each row needs a valid email or phone number.';
+
+  @override
+  String get duplicateImportRow => 'Duplicate recipient';
+
+  @override
+  String importRowsRejected(int count) {
+    return '$count rows were rejected';
+  }
+
+  @override
+  String get invitationStatusPending => 'Pending';
+
+  @override
+  String get invitationStatusExpired => 'Expired';
+
+  @override
+  String get invitationStatusRevoked => 'Revoked';
+
+  @override
+  String get invitationStatusAccepted => 'Accepted';
+
+  @override
+  String invitationExpiresAt(Object date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String get resendInvitation => 'Resend code';
+
+  @override
+  String get invitationResentAndCopied =>
+      'A new invitation code was generated and copied.';
+
+  @override
+  String get paste => 'Paste';
+
+  @override
+  String get confirmPassword => 'Confirm password';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match.';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get inviteEmailCodeIntro =>
+      'Enter the email address assigned to the invitation and the six-digit code.';
+
+  @override
+  String get setPasswordAndJoin => 'Set password and join';
+
+  @override
+  String get accountSetupFailed =>
+      'The account could not be set up. Please check your details and try again.';
+
+  @override
+  String get accountAlreadyExistsUseSignIn =>
+      'This email already has an account. Sign in with that account, then return to join.';
+
+  @override
+  String get passwordSetupFailed =>
+      'The password could not be set. Please try again.';
+
+  @override
+  String get googleInviteAndroidOnly =>
+      'Google invitation continuation is currently supported on Android. Use password setup on this platform.';
+
+  @override
+  String get invitationEmailMismatch =>
+      'This invitation is assigned to a different email address.';
+
+  @override
+  String get confirmInviteCode => 'Verify invitation code';
+
+  @override
+  String get aiAssistantUnavailable =>
+      'The AI service is not deployed or is currently unavailable. Ask an administrator to deploy the approved service, then try again.';
+
+  @override
+  String get aiAssistantPermissionDenied =>
+      'You do not have permission to use this AI operation.';
+
+  @override
+  String get aiAssistantRetryLater =>
+      'The AI assistant is temporarily unavailable. Please try again later.';
+
+  @override
+  String get aiAssistantRequestUnsupported =>
+      'This AI request is not supported yet. You can use the read-only assistant or prepare a confirmed draft instead.';
 }

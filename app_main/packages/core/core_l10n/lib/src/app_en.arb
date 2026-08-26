@@ -2345,6 +2345,30 @@
   "defaultPaymentMethods": "Default payment methods",
   "firstEmployeeEmail": "First employee email (optional)",
   "inviteAfterConnect": "The invitation will be sent after the owner connects an account.",
+  "invitationContactRequired": "Enter at least one valid email address or phone number.",
+  "invitationCreationFailed": "The invitation could not be created. Check the role and recipient details, then try again.",
+  "invitationRecipientDetails": "Recipient details",
+  "invitationDeliveryIntent": "Delivery preference",
+  "deliveryChannel": "Delivery channel",
+  "manualDelivery": "Manual sharing",
+  "emailDelivery": "Email intent",
+  "smsDelivery": "SMS intent",
+  "deliveryIntentDisclaimer": "This records how you intend to deliver the code. Automatic email or SMS requires a configured and approved provider.",
+  "deliveryIntentRecorded": "The delivery preference is recorded as an intent. Share the code manually until a provider is configured.",
+  "invitationCreatedFor": "Invitation created for {recipient}",
+  "@invitationCreatedFor": {
+    "placeholders": {
+      "recipient": {}
+    }
+  },
+  "inviteShareTextWithRecipient": "You are invited to join my business on Mizan.\n\nRecipient: {recipient}\nContact: {contact}\n\nOpen the app, choose Join Organization, and enter this code: {code}\n\nDo not forward this invitation. It is valid for 24 hours.",
+  "@inviteShareTextWithRecipient": {
+    "placeholders": {
+      "recipient": {},
+      "contact": {},
+      "code": {}
+    }
+  },
   "approvalExpenseThreshold": "Expense approval threshold",
   "approvalInvoiceThreshold": "Invoice approval threshold",
   "approvalBillThreshold": "Bill approval threshold",
@@ -2498,5 +2522,49 @@
   "reopenRequiresOwner": "Reopening requires owner approval",
   "reportPeriodMonthly": "Current month",
   "reportPeriodQuarterly": "Current quarter",
-  "reportPeriodAnnual": "Current year"
+  "reportPeriodAnnual": "Current year",
+  "chooseImportFile": "Choose CSV or Excel file",
+  "fileImportFailed": "The file could not be imported.",
+  "mapImportColumns": "Map recipient columns",
+  "emailColumn": "Email column (optional)",
+  "phoneColumn": "Phone column (optional)",
+  "nameColumn": "Name column (optional)",
+  "importMappingConfirmation": "Confirm the columns before creating invitations. Each row needs a valid email or phone number.",
+  "duplicateImportRow": "Duplicate recipient",
+  "importRowsRejected": "{count} rows were rejected",
+  "@importRowsRejected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invitationStatusPending": "Pending",
+  "invitationStatusExpired": "Expired",
+  "invitationStatusRevoked": "Revoked",
+  "invitationStatusAccepted": "Accepted",
+  "invitationExpiresAt": "Expires {date}",
+  "@invitationExpiresAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "resendInvitation": "Resend code",
+  "invitationResentAndCopied": "A new invitation code was generated and copied.",
+  "paste": "Paste",
+  "confirmPassword": "Confirm password",
+  "passwordsDoNotMatch": "Passwords do not match.",
+  "continueWithGoogle": "Continue with Google",
+  "inviteEmailCodeIntro": "Enter the email address assigned to the invitation and the six-digit code.",
+  "setPasswordAndJoin": "Set password and join",
+  "accountSetupFailed": "The account could not be set up. Please check your details and try again.",
+  "accountAlreadyExistsUseSignIn": "This email already has an account. Sign in with that account, then return to join.",
+  "passwordSetupFailed": "The password could not be set. Please try again.",
+  "googleInviteAndroidOnly": "Google invitation continuation is currently supported on Android. Use password setup on this platform.",
+  "invitationEmailMismatch": "This invitation is assigned to a different email address.",
+  "confirmInviteCode": "Verify invitation code",
+  "aiAssistantUnavailable": "The AI service is not deployed or is currently unavailable. Ask an administrator to deploy the approved service, then try again.",
+  "aiAssistantPermissionDenied": "You do not have permission to use this AI operation.",
+  "aiAssistantRetryLater": "The AI assistant is temporarily unavailable. Please try again later.",
+  "aiAssistantRequestUnsupported": "This AI request is not supported yet. You can use the read-only assistant or prepare a confirmed draft instead."
 }

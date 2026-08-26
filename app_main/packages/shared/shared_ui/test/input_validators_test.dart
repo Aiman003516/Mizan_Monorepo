@@ -45,11 +45,51 @@ void main() {
         isNull,
       );
       expect(
+        InputValidators.optionalPhone(
+          '+967 (7) 123-4567',
+          invalidMessage: 'invalid',
+        ),
+        isNull,
+      );
+      expect(
         InputValidators.optionalPhone('not a phone', invalidMessage: 'invalid'),
+        'invalid',
+      );
+      expect(
+        InputValidators.optionalPhone('+123456', invalidMessage: 'invalid'),
+        'invalid',
+      );
+      expect(
+        InputValidators.optionalPhone(
+          '+1234567890123456',
+          invalidMessage: 'invalid',
+        ),
         'invalid',
       );
     },
   );
+
+  test('email trims outer whitespace but rejects malformed structure', () {
+    expect(
+      InputValidators.optionalEmail(
+        ' a@example.com ',
+        invalidMessage: 'invalid',
+      ),
+      isNull,
+    );
+    for (final value in [
+      'a b@example.com',
+      'a@.com',
+      'a@@example.com',
+      'a@b',
+      '@example.com',
+    ]) {
+      expect(
+        InputValidators.optionalEmail(value, invalidMessage: 'invalid'),
+        'invalid',
+      );
+    }
+  });
 
   test('currencyCode requires three to five uppercase letters', () {
     expect(

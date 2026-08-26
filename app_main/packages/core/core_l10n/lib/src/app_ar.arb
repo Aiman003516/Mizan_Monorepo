@@ -2450,6 +2450,30 @@
   "defaultPaymentMethods": "طرق الدفع الافتراضية",
   "firstEmployeeEmail": "بريد أول موظف (اختياري)",
   "inviteAfterConnect": "سيتم إرسال الدعوة بعد ربط حساب المالك.",
+  "invitationContactRequired": "أدخل بريداً إلكترونياً أو رقم هاتف صالحاً واحداً على الأقل.",
+  "invitationCreationFailed": "تعذر إنشاء الدعوة. تحقق من الدور وبيانات المستلم ثم حاول مرة أخرى.",
+  "invitationRecipientDetails": "بيانات المستلم",
+  "invitationDeliveryIntent": "تفضيل التسليم",
+  "deliveryChannel": "قناة التسليم",
+  "manualDelivery": "مشاركة يدوية",
+  "emailDelivery": "نية إرسال بالبريد الإلكتروني",
+  "smsDelivery": "نية إرسال برسالة SMS",
+  "deliveryIntentDisclaimer": "يسجل هذا الخيار طريقة التسليم المقصودة فقط. يتطلب الإرسال التلقائي بالبريد أو SMS مزوداً مفعلاً ومعتمداً.",
+  "deliveryIntentRecorded": "تم تسجيل تفضيل التسليم كنية فقط. شارك الرمز يدوياً إلى أن يتم إعداد مزود معتمد.",
+  "invitationCreatedFor": "تم إنشاء الدعوة للمستلم {recipient}",
+  "@invitationCreatedFor": {
+    "placeholders": {
+      "recipient": {}
+    }
+  },
+  "inviteShareTextWithRecipient": "تمت دعوتك للانضمام إلى نشاطي التجاري على ميزان.\n\nالمستلم: {recipient}\nجهة الاتصال: {contact}\n\nافتح التطبيق واختر الانضمام إلى منظمة ثم أدخل هذا الرمز: {code}\n\nلا تعِد توجيه هذه الدعوة. الرمز صالح لمدة 24 ساعة.",
+  "@inviteShareTextWithRecipient": {
+    "placeholders": {
+      "recipient": {},
+      "contact": {},
+      "code": {}
+    }
+  },
   "approvalExpenseThreshold": "حد الموافقة على المصروفات",
   "approvalInvoiceThreshold": "حد الموافقة على الفواتير",
   "approvalBillThreshold": "حد الموافقة على فواتير المشتريات",
@@ -2603,5 +2627,49 @@
   "reopenRequiresOwner": "تتطلب إعادة الفتح موافقة المالك",
   "reportPeriodMonthly": "الشهر الحالي",
   "reportPeriodQuarterly": "الربع الحالي",
-  "reportPeriodAnnual": "السنة الحالية"
+  "reportPeriodAnnual": "السنة الحالية",
+  "chooseImportFile": "اختر ملف CSV أو Excel",
+  "fileImportFailed": "تعذر استيراد الملف.",
+  "mapImportColumns": "تعيين أعمدة المستلمين",
+  "emailColumn": "عمود البريد الإلكتروني (اختياري)",
+  "phoneColumn": "عمود الهاتف (اختياري)",
+  "nameColumn": "عمود الاسم (اختياري)",
+  "importMappingConfirmation": "أكد الأعمدة قبل إنشاء الدعوات. يجب أن يحتوي كل صف على بريد إلكتروني أو رقم هاتف صالح.",
+  "duplicateImportRow": "المستلم مكرر",
+  "importRowsRejected": "تم رفض {count} صفوف",
+  "@importRowsRejected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invitationStatusPending": "قيد الانتظار",
+  "invitationStatusExpired": "منتهية",
+  "invitationStatusRevoked": "ملغاة",
+  "invitationStatusAccepted": "مقبولة",
+  "invitationExpiresAt": "تنتهي في {date}",
+  "@invitationExpiresAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "resendInvitation": "إعادة إرسال الرمز",
+  "invitationResentAndCopied": "تم إنشاء رمز دعوة جديد ونسخه.",
+  "paste": "لصق",
+  "confirmPassword": "تأكيد كلمة المرور",
+  "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين.",
+  "continueWithGoogle": "المتابعة باستخدام Google",
+  "inviteEmailCodeIntro": "أدخل البريد الإلكتروني المرتبط بالدعوة والرمز المكون من ستة أرقام.",
+  "setPasswordAndJoin": "تعيين كلمة المرور والانضمام",
+  "accountSetupFailed": "تعذر إعداد الحساب. تحقق من البيانات ثم حاول مرة أخرى.",
+  "accountAlreadyExistsUseSignIn": "هذا البريد لديه حساب بالفعل. سجّل الدخول بهذا الحساب ثم عُد للانضمام.",
+  "passwordSetupFailed": "تعذر تعيين كلمة المرور. حاول مرة أخرى.",
+  "googleInviteAndroidOnly": "المتابعة بدعوة Google مدعومة حالياً على Android. استخدم إعداد كلمة المرور على هذه المنصة.",
+  "invitationEmailMismatch": "هذه الدعوة مخصصة لبريد إلكتروني مختلف.",
+  "confirmInviteCode": "تحقق من رمز الدعوة",
+  "aiAssistantUnavailable": "خدمة الذكاء الاصطناعي غير منشورة أو غير متاحة حالياً. اطلب من المسؤول نشر الخدمة المعتمدة ثم حاول مرة أخرى.",
+  "aiAssistantPermissionDenied": "ليس لديك صلاحية لاستخدام عملية الذكاء الاصطناعي هذه.",
+  "aiAssistantRetryLater": "مساعد الذكاء الاصطناعي غير متاح مؤقتاً. حاول مرة أخرى لاحقاً.",
+  "aiAssistantRequestUnsupported": "طلب الذكاء الاصطناعي هذا غير مدعوم بعد. يمكنك استخدام المساعد للقراءة فقط أو إعداد مسودة تتطلب تأكيداً."
 }
