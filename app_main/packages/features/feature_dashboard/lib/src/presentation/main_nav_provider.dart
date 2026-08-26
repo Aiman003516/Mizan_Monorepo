@@ -17,6 +17,7 @@ enum MainPage {
   settings,
   customers, // 🟢 NEW
   vendors, // 🟢 NEW
+  crmPipeline,
 }
 
 final mainNavProvider = StateProvider<MainPage>((ref) {

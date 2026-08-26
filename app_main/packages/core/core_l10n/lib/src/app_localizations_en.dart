@@ -4819,6 +4819,62 @@ class AppLocalizationsEn extends AppLocalizations {
   String get crmSectionTitle => 'Customer & Vendor Management';
 
   @override
+  String get crmPipeline => 'Sales Pipeline';
+
+  @override
+  String get crmPipelineIntro =>
+      'Track leads, opportunities, next actions, and stage progress in one place.';
+
+  @override
+  String get crmPipelineLoadFailed => 'Could not load the CRM pipeline.';
+
+  @override
+  String get crmPipelineEmpty => 'No opportunities yet.';
+
+  @override
+  String get crmPipelineNoStages =>
+      'Create an active pipeline stage before moving opportunities.';
+
+  @override
+  String get crmStage => 'Stage';
+
+  @override
+  String get crmAmount => 'Amount';
+
+  @override
+  String get crmProbability => 'Probability';
+
+  @override
+  String get crmExpectedClose => 'Expected close';
+
+  @override
+  String get crmMoveOpportunity => 'Move opportunity';
+
+  @override
+  String get crmTransitionNote => 'Transition note (optional)';
+
+  @override
+  String get crmTransitionSaved => 'Opportunity stage updated.';
+
+  @override
+  String get crmTransitionFailed => 'Could not update the opportunity stage.';
+
+  @override
+  String get crmOpen => 'Open';
+
+  @override
+  String get crmWon => 'Won';
+
+  @override
+  String get crmLost => 'Lost';
+
+  @override
+  String get crmCancelled => 'Cancelled';
+
+  @override
+  String get crmNoDate => 'No date';
+
+  @override
   String get aiAssistantTitle => 'Mizan AI Copilot';
 
   @override

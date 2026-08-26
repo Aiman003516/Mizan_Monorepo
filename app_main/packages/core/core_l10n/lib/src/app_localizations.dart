@@ -9122,6 +9122,114 @@ abstract class AppLocalizations {
   /// **'Customer & Vendor Management'**
   String get crmSectionTitle;
 
+  /// No description provided for @crmPipeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales Pipeline'**
+  String get crmPipeline;
+
+  /// No description provided for @crmPipelineIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Track leads, opportunities, next actions, and stage progress in one place.'**
+  String get crmPipelineIntro;
+
+  /// No description provided for @crmPipelineLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the CRM pipeline.'**
+  String get crmPipelineLoadFailed;
+
+  /// No description provided for @crmPipelineEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No opportunities yet.'**
+  String get crmPipelineEmpty;
+
+  /// No description provided for @crmPipelineNoStages.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an active pipeline stage before moving opportunities.'**
+  String get crmPipelineNoStages;
+
+  /// No description provided for @crmStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage'**
+  String get crmStage;
+
+  /// No description provided for @crmAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get crmAmount;
+
+  /// No description provided for @crmProbability.
+  ///
+  /// In en, this message translates to:
+  /// **'Probability'**
+  String get crmProbability;
+
+  /// No description provided for @crmExpectedClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected close'**
+  String get crmExpectedClose;
+
+  /// No description provided for @crmMoveOpportunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Move opportunity'**
+  String get crmMoveOpportunity;
+
+  /// No description provided for @crmTransitionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Transition note (optional)'**
+  String get crmTransitionNote;
+
+  /// No description provided for @crmTransitionSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Opportunity stage updated.'**
+  String get crmTransitionSaved;
+
+  /// No description provided for @crmTransitionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update the opportunity stage.'**
+  String get crmTransitionFailed;
+
+  /// No description provided for @crmOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get crmOpen;
+
+  /// No description provided for @crmWon.
+  ///
+  /// In en, this message translates to:
+  /// **'Won'**
+  String get crmWon;
+
+  /// No description provided for @crmLost.
+  ///
+  /// In en, this message translates to:
+  /// **'Lost'**
+  String get crmLost;
+
+  /// No description provided for @crmCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get crmCancelled;
+
+  /// No description provided for @crmNoDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No date'**
+  String get crmNoDate;
+
   /// No description provided for @aiAssistantTitle.
   ///
   /// In en, this message translates to:

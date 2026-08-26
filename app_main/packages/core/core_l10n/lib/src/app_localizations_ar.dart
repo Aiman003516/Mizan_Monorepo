@@ -4819,6 +4819,61 @@ class AppLocalizationsAr extends AppLocalizations {
   String get crmSectionTitle => 'إدارة العملاء والموردين';
 
   @override
+  String get crmPipeline => 'مسار المبيعات';
+
+  @override
+  String get crmPipelineIntro =>
+      'تابع العملاء المحتملين والفرص والإجراءات التالية وتقدم المراحل في مكان واحد.';
+
+  @override
+  String get crmPipelineLoadFailed => 'تعذر تحميل مسار CRM.';
+
+  @override
+  String get crmPipelineEmpty => 'لا توجد فرص بعد.';
+
+  @override
+  String get crmPipelineNoStages => 'أنشئ مرحلة مسار نشطة قبل نقل الفرص.';
+
+  @override
+  String get crmStage => 'المرحلة';
+
+  @override
+  String get crmAmount => 'المبلغ';
+
+  @override
+  String get crmProbability => 'الاحتمالية';
+
+  @override
+  String get crmExpectedClose => 'الإغلاق المتوقع';
+
+  @override
+  String get crmMoveOpportunity => 'نقل الفرصة';
+
+  @override
+  String get crmTransitionNote => 'ملاحظة النقل (اختياري)';
+
+  @override
+  String get crmTransitionSaved => 'تم تحديث مرحلة الفرصة.';
+
+  @override
+  String get crmTransitionFailed => 'تعذر تحديث مرحلة الفرصة.';
+
+  @override
+  String get crmOpen => 'مفتوحة';
+
+  @override
+  String get crmWon => 'ناجحة';
+
+  @override
+  String get crmLost => 'خاسرة';
+
+  @override
+  String get crmCancelled => 'ملغاة';
+
+  @override
+  String get crmNoDate => 'لا يوجد تاريخ';
+
+  @override
   String get aiAssistantTitle => 'مساعد ميزان الذكي';
 
   @override

@@ -64,3 +64,4 @@ export 'src/repositories/mileage_repository.dart';
 export 'src/repositories/warehouse_repository.dart';
 export 'src/repositories/attachments_repository.dart';
 export 'src/repositories/comments_repository.dart';
+export 'src/repositories/crm_pipeline_repository.dart';

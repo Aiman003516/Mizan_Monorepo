@@ -137,6 +137,8 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         return Text(l10n.customersAr);
       case MainPage.vendors:
         return Text(l10n.vendorsAp);
+      case MainPage.crmPipeline:
+        return Text(l10n.crmPipeline);
     }
   }
 
@@ -449,6 +451,14 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                 ref.read(mainNavProvider.notifier).state = MainPage.vendors;
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.filter_alt_outlined),
+              title: Text(l10n.crmPipeline),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state = MainPage.crmPipeline;
+              },
+            ),
 
             const Divider(),
             Padding(
@@ -635,6 +645,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         MainPage.reportTrialBalance => const TrialBalanceScreen(),
         MainPage.customers => const CustomersTableScreen(),
         MainPage.vendors => const VendorsTableScreen(),
+        MainPage.crmPipeline => const CrmPipelineScreen(),
       },
     );
 
