@@ -17,6 +17,8 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
       List<AccountingPeriod> periods,
       List<TaxCode> taxCodes,
       List<ChartAccount> accounts,
+      List<AccountingBook> books,
+      List<AccountingDimension> dimensions,
     })
   >
   _loadFuture;
@@ -32,6 +34,8 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
       List<AccountingPeriod> periods,
       List<TaxCode> taxCodes,
       List<ChartAccount> accounts,
+      List<AccountingBook> books,
+      List<AccountingDimension> dimensions,
     })
   >
   _load() async {
@@ -40,11 +44,15 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
       repository.listPeriods(),
       repository.listTaxCodes(),
       repository.listAccounts(),
+      repository.listBooks(),
+      repository.listDimensions(),
     ]);
     return (
       periods: values[0] as List<AccountingPeriod>,
       taxCodes: values[1] as List<TaxCode>,
       accounts: values[2] as List<ChartAccount>,
+      books: values[3] as List<AccountingBook>,
+      dimensions: values[4] as List<AccountingDimension>,
     );
   }
 
@@ -98,6 +106,8 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
         List<AccountingPeriod> periods,
         List<TaxCode> taxCodes,
         List<ChartAccount> accounts,
+        List<AccountingBook> books,
+        List<AccountingDimension> dimensions,
       })
     >(
       future: _loadFuture,
@@ -148,6 +158,45 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
                                     child: Text(l10n.closePeriod),
                                   )
                                 : Chip(label: Text(period.status)),
+                          ),
+                      ],
+              ),
+              const SizedBox(height: 16),
+              _buildSection(
+                context,
+                title: l10n.accountingBooks,
+                icon: Icons.menu_book_outlined,
+                children: data.books.isEmpty
+                    ? [Text(l10n.noBooks)]
+                    : [
+                        for (final book in data.books)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text('${book.code} — ${book.name}'),
+                            subtitle: Text(book.bookType.wireValue),
+                            leading: Icon(
+                              book.isActive
+                                  ? Icons.check_circle_outline
+                                  : Icons.archive_outlined,
+                            ),
+                          ),
+                      ],
+              ),
+              const SizedBox(height: 16),
+              _buildSection(
+                context,
+                title: l10n.accountingDimensions,
+                icon: Icons.label_outline,
+                children: data.dimensions.isEmpty
+                    ? [Text(l10n.noDimensions)]
+                    : [
+                        for (final dimension in data.dimensions)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: Text(
+                              '${dimension.code} — ${dimension.name}',
+                            ),
+                            subtitle: Text(dimension.dimensionType),
                           ),
                       ],
               ),

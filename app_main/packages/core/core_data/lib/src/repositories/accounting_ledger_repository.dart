@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../tenant_context.dart';
+import '../models/erp_domain_contracts.dart';
 
 final accountingLedgerRepositoryProvider = Provider<AccountingLedgerRepository>(
   (ref) => AccountingLedgerRepository(
@@ -9,6 +10,63 @@ final accountingLedgerRepositoryProvider = Provider<AccountingLedgerRepository>(
     ref.watch(tenantContextProvider),
   ),
 );
+
+class AccountingBook {
+  const AccountingBook({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.bookType,
+    required this.baseBookId,
+    required this.status,
+  });
+
+  final String id;
+  final String code;
+  final String name;
+  final LedgerBookType bookType;
+  final String? baseBookId;
+  final String status;
+
+  bool get isActive => status == 'active';
+
+  factory AccountingBook.fromJson(Map<String, dynamic> json) {
+    return AccountingBook(
+      id: json['id']?.toString() ?? '',
+      code: json['code']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      bookType: LedgerBookTypeCodec.fromWire(json['book_type']?.toString()),
+      baseBookId: json['base_book_id']?.toString(),
+      status: json['status']?.toString() ?? 'active',
+    );
+  }
+}
+
+class AccountingDimension {
+  const AccountingDimension({
+    required this.id,
+    required this.dimensionType,
+    required this.code,
+    required this.name,
+    required this.isActive,
+  });
+
+  final String id;
+  final String dimensionType;
+  final String code;
+  final String name;
+  final bool isActive;
+
+  factory AccountingDimension.fromJson(Map<String, dynamic> json) {
+    return AccountingDimension(
+      id: json['id']?.toString() ?? '',
+      dimensionType: json['dimension_type']?.toString() ?? '',
+      code: json['code']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      isActive: json['is_active'] != false,
+    );
+  }
+}
 
 class AccountingPeriod {
   const AccountingPeriod({
@@ -232,6 +290,41 @@ class AccountingLedgerRepository {
   final TenantContext _tenantContext;
 
   Future<String> _tenantId() => _tenantContext.currentTenantId();
+
+  Future<List<AccountingBook>> listBooks() async {
+    final result = await _supabase.rpc('list_accounting_books');
+    if (result is! List) {
+      throw const PostgrestException(
+        message: 'Accounting books returned no result.',
+        code: 'MIZAN_BOOKS_INVALID_RESPONSE',
+      );
+    }
+    return result
+        .whereType<Map>()
+        .map((row) => AccountingBook.fromJson(Map<String, dynamic>.from(row)))
+        .toList(growable: false);
+  }
+
+  Future<List<AccountingDimension>> listDimensions({
+    String? dimensionType,
+  }) async {
+    final result = await _supabase.rpc(
+      'list_accounting_dimensions',
+      params: {'p_dimension_type': dimensionType},
+    );
+    if (result is! List) {
+      throw const PostgrestException(
+        message: 'Accounting dimensions returned no result.',
+        code: 'MIZAN_DIMENSIONS_INVALID_RESPONSE',
+      );
+    }
+    return result
+        .whereType<Map>()
+        .map(
+          (row) => AccountingDimension.fromJson(Map<String, dynamic>.from(row)),
+        )
+        .toList(growable: false);
+  }
 
   Future<List<AccountingPeriod>> listPeriods() async {
     final tenantId = await _tenantId();

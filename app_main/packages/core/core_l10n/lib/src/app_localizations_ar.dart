@@ -1035,6 +1035,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get accountingPeriods => 'الفترات المحاسبية';
 
   @override
+  String get accountingBooks => 'دفاتر المحاسبة';
+
+  @override
+  String get accountingDimensions => 'الأبعاد المحاسبية';
+
+  @override
+  String get noBooks => 'لم يتم إعداد دفاتر محاسبية.';
+
+  @override
+  String get noDimensions => 'لم يتم إعداد أبعاد محاسبية.';
+
+  @override
   String get chartOfAccounts => 'دليل الحسابات';
 
   @override

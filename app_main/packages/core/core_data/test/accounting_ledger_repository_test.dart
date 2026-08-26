@@ -48,6 +48,28 @@ void main() {
     expect(account.currencyCode, 'SAR');
   });
 
+  test('parses accounting books and dimensions', () {
+    final book = AccountingBook.fromJson({
+      'id': 'book-1',
+      'code': 'LEADING',
+      'name': 'Leading book',
+      'book_type': 'leading',
+      'status': 'active',
+    });
+    final dimension = AccountingDimension.fromJson({
+      'id': 'dimension-1',
+      'dimension_type': 'cost_center',
+      'code': 'OPS',
+      'name': 'Operations',
+      'is_active': true,
+    });
+
+    expect(book.bookType, LedgerBookType.leading);
+    expect(book.isActive, isTrue);
+    expect(dimension.dimensionType, 'cost_center');
+    expect(dimension.name, 'Operations');
+  });
+
   test('serializes a journal line without leaking blank optional fields', () {
     const line = JournalLineInput(
       accountId: 'account-1',

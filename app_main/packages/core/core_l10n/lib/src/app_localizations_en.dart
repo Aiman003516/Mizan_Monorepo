@@ -1036,6 +1036,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountingPeriods => 'Accounting periods';
 
   @override
+  String get accountingBooks => 'Accounting books';
+
+  @override
+  String get accountingDimensions => 'Accounting dimensions';
+
+  @override
+  String get noBooks => 'No accounting books configured.';
+
+  @override
+  String get noDimensions => 'No accounting dimensions configured.';
+
+  @override
   String get chartOfAccounts => 'Chart of accounts';
 
   @override

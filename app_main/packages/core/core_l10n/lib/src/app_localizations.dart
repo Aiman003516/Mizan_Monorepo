@@ -2066,6 +2066,30 @@ abstract class AppLocalizations {
   /// **'Accounting periods'**
   String get accountingPeriods;
 
+  /// No description provided for @accountingBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounting books'**
+  String get accountingBooks;
+
+  /// No description provided for @accountingDimensions.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounting dimensions'**
+  String get accountingDimensions;
+
+  /// No description provided for @noBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'No accounting books configured.'**
+  String get noBooks;
+
+  /// No description provided for @noDimensions.
+  ///
+  /// In en, this message translates to:
+  /// **'No accounting dimensions configured.'**
+  String get noDimensions;
+
   /// No description provided for @chartOfAccounts.
   ///
   /// In en, this message translates to:
