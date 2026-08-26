@@ -264,7 +264,9 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${l10n.failedToSaveAccount} $e'),
+              content: Text(
+                l10n.errorWithDetails(l10n.failedToSaveAccount, e.toString()),
+              ),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
@@ -327,7 +329,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                   decoration: InputDecoration(
                     labelText: l10n.exchangeRateShort,
                     border: const OutlineInputBorder(),
-                    helperText: '1 From = X To',
+                    helperText: l10n.exchangeRateHelperText,
                   ),
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
@@ -799,9 +801,14 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
                                       leading: const Icon(
                                         Icons.currency_exchange,
                                       ),
-                                      title: Text('$from → $to'),
+                                      title: Text(
+                                        l10n.exchangeRateSummary(from, to),
+                                      ),
                                       subtitle: Text(
-                                        '1 $from = ${entry.value.toStringAsFixed(4)} $to',
+                                        l10n.exchangeRateSummary(
+                                          from,
+                                          '${entry.value.toStringAsFixed(4)} $to',
+                                        ),
                                       ),
                                       trailing: IconButton(
                                         icon: const Icon(

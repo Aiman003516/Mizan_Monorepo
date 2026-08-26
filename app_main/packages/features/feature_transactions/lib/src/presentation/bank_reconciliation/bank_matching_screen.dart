@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class BankMatchingScreen extends ConsumerStatefulWidget {
@@ -34,17 +35,16 @@ class _BankMatchingScreenState extends ConsumerState<BankMatchingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_pendingTransactions.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text("Bank Reconciliation")),
-        body: const Center(
-          child: Text("All caught up! No transactions to reconcile."),
-        ),
+        appBar: AppBar(title: Text(l10n.bankReconciliationTitle)),
+        body: Center(child: Text(l10n.allCaughtUpNoTransactions)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Bank Matching")),
+      appBar: AppBar(title: Text(l10n.bankMatchingTitle)),
       backgroundColor: context.appColors.border,
       body: Column(
         children: [
@@ -52,10 +52,10 @@ class _BankMatchingScreenState extends ConsumerState<BankMatchingScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              "Swipe RIGHT to Match, LEFT to Skip",
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: context.appColors.subtleText),
+              l10n.swipeMatchSkip,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: context.appColors.subtleText,
+              ),
             ),
           ),
           Expanded(
@@ -100,16 +100,18 @@ class _BankMatchingScreenState extends ConsumerState<BankMatchingScreen> {
             const SizedBox(height: 12),
             Text(
               DateFormat.yMMMd().format(transaction.date),
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(color: context.appColors.subtleText),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: context.appColors.subtleText,
+              ),
             ),
             const SizedBox(height: 32),
             Text(
               transaction.amount.toStringAsFixed(2),
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: transaction.amount < 0 ? context.appColors.error : context.appColors.success,
+                color: transaction.amount < 0
+                    ? context.appColors.error
+                    : context.appColors.success,
               ),
             ),
             const Spacer(),
@@ -118,12 +120,18 @@ class _BankMatchingScreenState extends ConsumerState<BankMatchingScreen> {
               decoration: BoxDecoration(
                 color: context.appColors.info.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: context.appColors.info.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: context.appColors.info.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.lightbulb, size: 16, color: context.appColors.info),
+                  Icon(
+                    Icons.lightbulb,
+                    size: 16,
+                    color: context.appColors.info,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     "Mizan suggests: ${ref.read(bankReconciliationRepositoryProvider).suggestCategory(transaction.description) ?? 'Uncategorized'}",

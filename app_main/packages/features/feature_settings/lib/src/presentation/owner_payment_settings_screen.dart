@@ -101,7 +101,7 @@ class _OwnerPaymentSettingsScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${l10n.error} $error'),
+            content: Text(l10n.errorWithDetails(l10n.error, error.toString())),
             backgroundColor: context.appColors.error,
           ),
         );

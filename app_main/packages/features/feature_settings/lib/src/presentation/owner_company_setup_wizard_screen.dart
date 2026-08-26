@@ -179,7 +179,7 @@ class _OwnerCompanySetupWizardScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${l10n.error} $error'),
+          content: Text(l10n.errorWithDetails(l10n.error, error.toString())),
           backgroundColor: context.appColors.error,
         ),
       );
@@ -389,7 +389,7 @@ class _OwnerCompanySetupWizardScreenState
                     controller: _paymentMethodsController,
                     decoration: InputDecoration(
                       labelText: l10n.defaultPaymentMethods,
-                      hintText: 'cash, bank_transfer, jaib',
+                      hintText: l10n.paymentMethodsExample,
                       prefixIcon: const Icon(Icons.payments),
                     ),
                     validator: (value) => value == null || value.trim().isEmpty

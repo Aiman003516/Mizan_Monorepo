@@ -110,7 +110,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     children: [
                       Expanded(
                         child: _LanguageCard(
-                          title: "English",
+                          title: l10n.english,
                           isSelected: locale?.languageCode == 'en',
                           onTap: () => ref
                               .read(localeControllerProvider.notifier)
@@ -120,7 +120,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: _LanguageCard(
-                          title: "العربية",
+                          title: l10n.arabic,
                           isSelected: locale?.languageCode == 'ar',
                           onTap: () => ref
                               .read(localeControllerProvider.notifier)
@@ -309,7 +309,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       if (_isCustomCurrency) {
         if (_customCodeCtrl.text.isEmpty || _customSymbolCtrl.text.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please enter currency details")),
+            SnackBar(content: Text(l10n.pleaseEnterCurrencyDetails)),
           );
           setState(() {
             _isLoading = false;

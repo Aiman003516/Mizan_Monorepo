@@ -3719,7 +3719,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectedCleared.
   ///
   /// In en, this message translates to:
-  /// **'Selected Cleared:'**
+  /// **'Selected cleared'**
   String get selectedCleared;
 
   /// No description provided for @differenceAmount.
@@ -8621,7 +8621,7 @@ abstract class AppLocalizations {
   /// No description provided for @requiredField.
   ///
   /// In en, this message translates to:
-  /// **'This field is required'**
+  /// **'Required'**
   String get requiredField;
 
   /// No description provided for @category.
@@ -11543,6 +11543,504 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This AI request is not supported yet. You can use the read-only assistant or prepare a confirmed draft instead.'**
   String get aiAssistantRequestUnsupported;
+
+  /// No description provided for @errorWithDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'{message} {details}'**
+  String errorWithDetails(Object details, Object message);
+
+  /// No description provided for @salesTrendLast30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales trend (last 30 days)'**
+  String get salesTrendLast30Days;
+
+  /// No description provided for @salesByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales by category'**
+  String get salesByCategory;
+
+  /// No description provided for @topFiveProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Top 5 products'**
+  String get topFiveProducts;
+
+  /// No description provided for @noCategoryData.
+  ///
+  /// In en, this message translates to:
+  /// **'No category data.'**
+  String get noCategoryData;
+
+  /// No description provided for @soldQuantityValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{quantity} sold'**
+  String soldQuantityValue(Object quantity);
+
+  /// No description provided for @skipThisColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'(Skip this column)'**
+  String get skipThisColumn;
+
+  /// No description provided for @requiredFieldMarker.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} *'**
+  String requiredFieldMarker(Object label);
+
+  /// No description provided for @createCustomField.
+  ///
+  /// In en, this message translates to:
+  /// **'Create custom field'**
+  String get createCustomField;
+
+  /// No description provided for @recordsImportedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records imported successfully'**
+  String recordsImportedSuccessfully(Object count);
+
+  /// No description provided for @importDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration: {seconds}s'**
+  String importDuration(Object seconds);
+
+  /// No description provided for @importRowError.
+  ///
+  /// In en, this message translates to:
+  /// **'Row {row}'**
+  String importRowError(Object row);
+
+  /// No description provided for @moreImportErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'... and {count} more errors'**
+  String moreImportErrors(Object count);
+
+  /// No description provided for @adjustmentsAndClosing.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustments & closing'**
+  String get adjustmentsAndClosing;
+
+  /// No description provided for @allAdjustmentsApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'All adjustments approved!'**
+  String get allAdjustmentsApproved;
+
+  /// No description provided for @whatNeedToRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you need to record?'**
+  String get whatNeedToRecord;
+
+  /// No description provided for @accrueExpenseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Accrue expense\\n(Unpaid wages)'**
+  String get accrueExpenseLabel;
+
+  /// No description provided for @usePrepaidAssetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Use prepaid asset\\n(Rent/insurance)'**
+  String get usePrepaidAssetLabel;
+
+  /// No description provided for @errorLoadingAccountsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading accounts'**
+  String get errorLoadingAccountsShort;
+
+  /// No description provided for @bankReconciliationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank reconciliation'**
+  String get bankReconciliationTitle;
+
+  /// No description provided for @allCaughtUpNoTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up! No transactions to reconcile.'**
+  String get allCaughtUpNoTransactions;
+
+  /// No description provided for @bankMatchingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank matching'**
+  String get bankMatchingTitle;
+
+  /// No description provided for @pleaseEnterCurrencyDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter currency details'**
+  String get pleaseEnterCurrencyDetails;
+
+  /// No description provided for @failedToPickImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pick image: {details}'**
+  String failedToPickImage(Object details);
+
+  /// No description provided for @englishLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get englishLanguage;
+
+  /// No description provided for @arabicLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get arabicLanguage;
+
+  /// No description provided for @syncWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync warning'**
+  String get syncWarningTitle;
+
+  /// No description provided for @syncWarningAcknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand'**
+  String get syncWarningAcknowledge;
+
+  /// No description provided for @revisionNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Revision {number}'**
+  String revisionNumber(Object number);
+
+  /// No description provided for @deliveryChannelValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{channel}'**
+  String deliveryChannelValue(Object channel);
+
+  /// No description provided for @dateFormatYyyyMmDd.
+  ///
+  /// In en, this message translates to:
+  /// **'YYYY-MM-DD'**
+  String get dateFormatYyyyMmDd;
+
+  /// No description provided for @paymentMethodsExample.
+  ///
+  /// In en, this message translates to:
+  /// **'cash, bank transfer, Jaib'**
+  String get paymentMethodsExample;
+
+  /// No description provided for @localAiNotEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Local AI is not enabled on this device.'**
+  String get localAiNotEnabled;
+
+  /// No description provided for @localAiModelUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The local AI model is unavailable.'**
+  String get localAiModelUnavailable;
+
+  /// No description provided for @localAiRuntimeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The Android local AI runtime failed.'**
+  String get localAiRuntimeFailed;
+
+  /// No description provided for @reconciledTransactionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} transactions'**
+  String reconciledTransactionsCount(Object count);
+
+  /// No description provided for @noBankAccountsCreateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No bank accounts found. Create a bank or cash account first.'**
+  String get noBankAccountsCreateHint;
+
+  /// No description provided for @importRowCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} rows'**
+  String importRowCount(Object count);
+
+  /// No description provided for @importMappingSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {rows} rows with {columns} columns.'**
+  String importMappingSummary(Object columns, Object rows);
+
+  /// No description provided for @importErrorCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} errors'**
+  String importErrorCount(Object count);
+
+  /// No description provided for @recordAssetUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Record asset usage'**
+  String get recordAssetUsage;
+
+  /// No description provided for @accrueUnpaidExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Accrue unpaid expense'**
+  String get accrueUnpaidExpense;
+
+  /// No description provided for @expenseAccountWhereValueWent.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense account (where did the value go?)'**
+  String get expenseAccountWhereValueWent;
+
+  /// No description provided for @expenseAccountWhatCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense account (what is the cost?)'**
+  String get expenseAccountWhatCost;
+
+  /// No description provided for @assetAccountWhatWasUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset account (what was used?)'**
+  String get assetAccountWhatWasUsed;
+
+  /// No description provided for @liabilityAccountWhoOwed.
+  ///
+  /// In en, this message translates to:
+  /// **'Liability account (who do we owe?)'**
+  String get liabilityAccountWhoOwed;
+
+  /// No description provided for @runReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Run report'**
+  String get runReport;
+
+  /// No description provided for @setParametersAndRunReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Set parameters and run the report.'**
+  String get setParametersAndRunReport;
+
+  /// No description provided for @noDataForCriteria.
+  ///
+  /// In en, this message translates to:
+  /// **'No data found for these criteria.'**
+  String get noDataForCriteria;
+
+  /// No description provided for @selectPeriodAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Select period'**
+  String get selectPeriodAction;
+
+  /// No description provided for @refreshData.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refreshData;
+
+  /// No description provided for @analysisPeriodLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis period'**
+  String get analysisPeriodLabel;
+
+  /// No description provided for @changePeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get changePeriod;
+
+  /// No description provided for @createRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get createRecord;
+
+  /// No description provided for @syncWarningMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We saved your data locally, but could not confirm it with the cloud.\n\nReason: This device may be offline.\n\nYour data is safe, but other devices will not see it until you reconnect.'**
+  String get syncWarningMessage;
+
+  /// No description provided for @exchangeRateFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange rate'**
+  String get exchangeRateFieldLabel;
+
+  /// No description provided for @confirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmAction;
+
+  /// No description provided for @swipeMatchSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe right to match, left to skip'**
+  String get swipeMatchSkip;
+
+  /// No description provided for @proposeAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Propose adjustment'**
+  String get proposeAdjustment;
+
+  /// No description provided for @approveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get approveAction;
+
+  /// No description provided for @importCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Import complete'**
+  String get importCompleted;
+
+  /// No description provided for @rejectAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get rejectAction;
+
+  /// No description provided for @depreciationConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate and record depreciation for \"{assetName}\"?'**
+  String depreciationConfirmMessage(Object assetName);
+
+  /// No description provided for @depreciationRecordedForAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Depreciation recorded: {amount} for {assetName}'**
+  String depreciationRecordedForAsset(Object amount, Object assetName);
+
+  /// No description provided for @depreciationBatchProcessed.
+  ///
+  /// In en, this message translates to:
+  /// **'Processed {count} assets. Total: {total}'**
+  String depreciationBatchProcessed(Object count, Object total);
+
+  /// No description provided for @labelValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value}'**
+  String labelValue(Object label, Object value);
+
+  /// No description provided for @optionalFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} (optional)'**
+  String optionalFieldLabel(Object label);
+
+  /// No description provided for @createCustomFieldAction.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Create custom field'**
+  String get createCustomFieldAction;
+
+  /// No description provided for @exchangeRateSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'1 {from} = {to}'**
+  String exchangeRateSummary(Object from, Object to);
+
+  /// No description provided for @exchangeRateHelperText.
+  ///
+  /// In en, this message translates to:
+  /// **'1 From = X To'**
+  String get exchangeRateHelperText;
+
+  /// No description provided for @yearNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Year {year}'**
+  String yearNumber(Object year);
+
+  /// No description provided for @roleStatusValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{role} • {status}'**
+  String roleStatusValue(Object role, Object status);
+
+  /// No description provided for @labelWithColon.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}:'**
+  String labelWithColon(Object label);
+
+  /// No description provided for @unexpectedImportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected import error'**
+  String get unexpectedImportError;
+
+  /// No description provided for @importFieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'{field} is required'**
+  String importFieldRequired(Object field);
+
+  /// No description provided for @localAiDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Local AI is not enabled on this device.'**
+  String get localAiDisabled;
+
+  /// No description provided for @localAiRuntimeNotPackaged.
+  ///
+  /// In en, this message translates to:
+  /// **'No Android local AI runtime is packaged.'**
+  String get localAiRuntimeNotPackaged;
+
+  /// No description provided for @localAiInvalidRuntimeResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'The local AI runtime returned an invalid response.'**
+  String get localAiInvalidRuntimeResponse;
+
+  /// No description provided for @localAiUnsupportedLocale.
+  ///
+  /// In en, this message translates to:
+  /// **'Local AI supports Arabic and English only.'**
+  String get localAiUnsupportedLocale;
+
+  /// No description provided for @localAiLocaleNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'The packaged local model does not support this language.'**
+  String get localAiLocaleNotSupported;
+
+  /// No description provided for @localAiModelLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The local AI model could not be loaded.'**
+  String get localAiModelLoadFailed;
+
+  /// No description provided for @localAiInferenceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Local AI inference failed.'**
+  String get localAiInferenceFailed;
+
+  /// No description provided for @localAiGenericFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'The local AI assistant could not complete this request.'**
+  String get localAiGenericFailure;
 }
 
 class _AppLocalizationsDelegate

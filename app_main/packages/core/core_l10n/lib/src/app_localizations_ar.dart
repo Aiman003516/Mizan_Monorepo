@@ -1899,7 +1899,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookBalance => 'الرصيد الدفتري';
 
   @override
-  String get selectedCleared => 'المحدد كمقاصة:';
+  String get selectedCleared => 'المحدد والمسوّى';
 
   @override
   String get differenceAmount => 'الفرق';
@@ -3360,7 +3360,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get roleNameHint => 'مثال: كاشير أول';
 
   @override
-  String get mapTo => 'ربط بـ';
+  String get mapTo => 'تعيين إلى';
 
   @override
   String get addAssetComingSoon => 'ميزة إضافة الأصول قريبًا';
@@ -4549,7 +4549,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get invalidNumber => 'رقم غير صالح';
 
   @override
-  String get requiredField => 'هذا الحقل مطلوب';
+  String get requiredField => 'مطلوب';
 
   @override
   String get category => 'التصنيف';
@@ -6086,4 +6086,315 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get aiAssistantRequestUnsupported =>
       'طلب الذكاء الاصطناعي هذا غير مدعوم بعد. يمكنك استخدام المساعد للقراءة فقط أو إعداد مسودة تتطلب تأكيداً.';
+
+  @override
+  String errorWithDetails(Object details, Object message) {
+    return '$message $details';
+  }
+
+  @override
+  String get salesTrendLast30Days => 'اتجاه المبيعات (آخر 30 يوماً)';
+
+  @override
+  String get salesByCategory => 'المبيعات حسب الفئة';
+
+  @override
+  String get topFiveProducts => 'أفضل 5 منتجات';
+
+  @override
+  String get noCategoryData => 'لا توجد بيانات للفئات.';
+
+  @override
+  String soldQuantityValue(Object quantity) {
+    return 'تم بيع $quantity';
+  }
+
+  @override
+  String get skipThisColumn => '(تخطي هذا العمود)';
+
+  @override
+  String requiredFieldMarker(Object label) {
+    return '$label *';
+  }
+
+  @override
+  String get createCustomField => 'إنشاء حقل مخصص';
+
+  @override
+  String recordsImportedSuccessfully(Object count) {
+    return 'تم استيراد $count سجلاً بنجاح';
+  }
+
+  @override
+  String importDuration(Object seconds) {
+    return 'المدة: $seconds ثوانٍ';
+  }
+
+  @override
+  String importRowError(Object row) {
+    return 'الصف $row';
+  }
+
+  @override
+  String moreImportErrors(Object count) {
+    return '... و$count أخطاء أخرى';
+  }
+
+  @override
+  String get adjustmentsAndClosing => 'التسويات والإقفال';
+
+  @override
+  String get allAdjustmentsApproved => 'تمت الموافقة على جميع التسويات!';
+
+  @override
+  String get whatNeedToRecord => 'ما الذي تريد تسجيله؟';
+
+  @override
+  String get accrueExpenseLabel => 'استحقاق مصروف\\n(أجور غير مدفوعة)';
+
+  @override
+  String get usePrepaidAssetLabel => 'استخدام أصل مدفوع مقدماً\\n(إيجار/تأمين)';
+
+  @override
+  String get errorLoadingAccountsShort => 'خطأ في تحميل الحسابات';
+
+  @override
+  String get bankReconciliationTitle => 'تسوية البنك';
+
+  @override
+  String get allCaughtUpNoTransactions =>
+      'تمت المراجعة! لا توجد معاملات للتسوية.';
+
+  @override
+  String get bankMatchingTitle => 'مطابقة البنك';
+
+  @override
+  String get pleaseEnterCurrencyDetails => 'يرجى إدخال تفاصيل العملة';
+
+  @override
+  String failedToPickImage(Object details) {
+    return 'تعذر اختيار الصورة: $details';
+  }
+
+  @override
+  String get englishLanguage => 'الإنجليزية';
+
+  @override
+  String get arabicLanguage => 'العربية';
+
+  @override
+  String get syncWarningTitle => 'تحذير المزامنة';
+
+  @override
+  String get syncWarningAcknowledge => 'أفهم ذلك';
+
+  @override
+  String revisionNumber(Object number) {
+    return 'المراجعة $number';
+  }
+
+  @override
+  String deliveryChannelValue(Object channel) {
+    return '$channel';
+  }
+
+  @override
+  String get dateFormatYyyyMmDd => 'YYYY-MM-DD';
+
+  @override
+  String get paymentMethodsExample => 'نقداً، تحويل بنكي، جيب';
+
+  @override
+  String get localAiNotEnabled =>
+      'الذكاء الاصطناعي المحلي غير مفعّل على هذا الجهاز.';
+
+  @override
+  String get localAiModelUnavailable =>
+      'النموذج المحلي للذكاء الاصطناعي غير متاح.';
+
+  @override
+  String get localAiRuntimeFailed =>
+      'فشلت بيئة تشغيل الذكاء الاصطناعي المحلية على أندرويد.';
+
+  @override
+  String reconciledTransactionsCount(Object count) {
+    return '$count معاملات';
+  }
+
+  @override
+  String get noBankAccountsCreateHint =>
+      'لا توجد حسابات بنكية. أنشئ حساباً بنكياً أو حساباً نقدياً أولاً.';
+
+  @override
+  String importRowCount(Object count) {
+    return '$count صفوف';
+  }
+
+  @override
+  String importMappingSummary(Object columns, Object rows) {
+    return 'تم العثور على $rows صفوف مع $columns أعمدة.';
+  }
+
+  @override
+  String importErrorCount(Object count) {
+    return '$count أخطاء';
+  }
+
+  @override
+  String get recordAssetUsage => 'تسجيل استخدام الأصل';
+
+  @override
+  String get accrueUnpaidExpense => 'إثبات مصروف غير مدفوع';
+
+  @override
+  String get expenseAccountWhereValueWent => 'حساب المصروف (أين ذهبت القيمة؟)';
+
+  @override
+  String get expenseAccountWhatCost => 'حساب المصروف (ما هي التكلفة؟)';
+
+  @override
+  String get assetAccountWhatWasUsed => 'حساب الأصل (ما الذي تم استخدامه؟)';
+
+  @override
+  String get liabilityAccountWhoOwed => 'حساب الالتزام (لمن علينا المبلغ؟)';
+
+  @override
+  String get runReport => 'تشغيل التقرير';
+
+  @override
+  String get setParametersAndRunReport => 'أدخل المعايير وشغّل التقرير.';
+
+  @override
+  String get noDataForCriteria => 'لا توجد بيانات لهذه المعايير.';
+
+  @override
+  String get selectPeriodAction => 'اختيار الفترة';
+
+  @override
+  String get refreshData => 'تحديث';
+
+  @override
+  String get analysisPeriodLabel => 'فترة التحليل';
+
+  @override
+  String get changePeriod => 'تغيير';
+
+  @override
+  String get createRecord => 'إنشاء';
+
+  @override
+  String get syncWarningMessage =>
+      'تم حفظ بياناتك محلياً، ولكن تعذر تأكيدها مع السحابة.\n\nالسبب: قد يكون هذا الجهاز غير متصل بالإنترنت.\n\nبياناتك آمنة، لكن الأجهزة الأخرى لن تراها حتى تعيد الاتصال.';
+
+  @override
+  String get exchangeRateFieldLabel => 'سعر الصرف';
+
+  @override
+  String get confirmAction => 'تأكيد';
+
+  @override
+  String get swipeMatchSkip => 'اسحب يميناً للمطابقة ويساراً للتخطي';
+
+  @override
+  String get proposeAdjustment => 'اقتراح تسوية';
+
+  @override
+  String get approveAction => 'موافقة';
+
+  @override
+  String get importCompleted => 'اكتمل الاستيراد';
+
+  @override
+  String get rejectAction => 'رفض';
+
+  @override
+  String depreciationConfirmMessage(Object assetName) {
+    return 'حساب وتسجيل إهلاك \"$assetName\"؟';
+  }
+
+  @override
+  String depreciationRecordedForAsset(Object amount, Object assetName) {
+    return 'تم تسجيل الإهلاك: $amount لـ $assetName';
+  }
+
+  @override
+  String depreciationBatchProcessed(Object count, Object total) {
+    return 'تمت معالجة $count أصول. الإجمالي: $total';
+  }
+
+  @override
+  String labelValue(Object label, Object value) {
+    return '$label: $value';
+  }
+
+  @override
+  String optionalFieldLabel(Object label) {
+    return '$label (اختياري)';
+  }
+
+  @override
+  String get createCustomFieldAction => '+ إنشاء حقل مخصص';
+
+  @override
+  String exchangeRateSummary(Object from, Object to) {
+    return '1 $from = $to';
+  }
+
+  @override
+  String get exchangeRateHelperText => '1 من = س إلى';
+
+  @override
+  String yearNumber(Object year) {
+    return 'السنة $year';
+  }
+
+  @override
+  String roleStatusValue(Object role, Object status) {
+    return '$role • $status';
+  }
+
+  @override
+  String labelWithColon(Object label) {
+    return '$label:';
+  }
+
+  @override
+  String get unexpectedImportError => 'خطأ غير متوقع في الاستيراد';
+
+  @override
+  String importFieldRequired(Object field) {
+    return 'الحقل $field مطلوب';
+  }
+
+  @override
+  String get localAiDisabled =>
+      'الذكاء الاصطناعي المحلي غير مفعّل على هذا الجهاز.';
+
+  @override
+  String get localAiRuntimeNotPackaged =>
+      'لم يتم تضمين بيئة تشغيل الذكاء الاصطناعي المحلي لنظام أندرويد.';
+
+  @override
+  String get localAiInvalidRuntimeResponse =>
+      'أعادت بيئة الذكاء الاصطناعي المحلية استجابة غير صالحة.';
+
+  @override
+  String get localAiUnsupportedLocale =>
+      'يدعم الذكاء الاصطناعي المحلي العربية والإنجليزية فقط.';
+
+  @override
+  String get localAiLocaleNotSupported =>
+      'لا يدعم النموذج المحلي المضمّن هذه اللغة.';
+
+  @override
+  String get localAiModelLoadFailed =>
+      'تعذر تحميل نموذج الذكاء الاصطناعي المحلي.';
+
+  @override
+  String get localAiInferenceFailed =>
+      'فشل الاستدلال بالذكاء الاصطناعي المحلي.';
+
+  @override
+  String get localAiGenericFailure =>
+      'تعذر على المساعد المحلي إكمال هذا الطلب.';
 }

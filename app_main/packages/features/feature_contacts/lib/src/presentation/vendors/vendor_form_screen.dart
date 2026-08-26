@@ -191,7 +191,7 @@ class _VendorFormScreenState extends ConsumerState<VendorFormScreen> {
                     TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        labelText: '${l10n.vendorName} *',
+                        labelText: l10n.requiredFieldMarker(l10n.vendorName),
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.business),
                       ),

@@ -169,7 +169,11 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
                     },
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
-                    error: (err, _) => Center(child: Text('Error: $err')),
+                    error: (err, _) => Center(
+                      child: Text(
+                        l10n.errorWithDetails(l10n.error, err.toString()),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -241,8 +245,11 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
             loading: () => const SliverToBoxAdapter(
               child: Center(child: CircularProgressIndicator()),
             ),
-            error: (err, _) =>
-                SliverToBoxAdapter(child: Center(child: Text('Error: $err'))),
+            error: (err, _) => SliverToBoxAdapter(
+              child: Center(
+                child: Text(l10n.errorWithDetails(l10n.error, err.toString())),
+              ),
+            ),
           ),
         ],
       ),
@@ -320,7 +327,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
             backgroundColor: context.appColors.error,
           ),
         );
@@ -346,7 +353,7 @@ class _GhostMoneyScreenState extends ConsumerState<GhostMoneyScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
             backgroundColor: context.appColors.error,
           ),
         );

@@ -56,7 +56,7 @@ class OwnerSecurityAuditScreen extends ConsumerWidget {
               (entry) => Card(
                 child: ListTile(
                   leading: const Icon(Icons.history),
-                  title: Text('Revision ${entry.revision}'),
+                  title: Text(l10n.revisionNumber(entry.revision.toString())),
                   subtitle: Text(
                     '${entry.createdAt.toLocal()}\n${entry.sectionNames.join(', ')}',
                   ),

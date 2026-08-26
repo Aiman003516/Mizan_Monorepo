@@ -155,7 +155,7 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${l10n.error} $e'),
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -197,7 +197,7 @@ class _CustomerFormScreenState extends ConsumerState<CustomerFormScreen> {
                     TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        labelText: '${l10n.customerName} *',
+                        labelText: l10n.requiredFieldMarker(l10n.customerName),
                         border: const OutlineInputBorder(),
                         prefixIcon: const Icon(Icons.person),
                       ),

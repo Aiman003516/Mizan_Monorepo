@@ -200,9 +200,11 @@ class _BankReconciliationScreenState
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('${l10n.error} $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
+        ),
+      );
     }
   }
 
@@ -242,7 +244,7 @@ class _BankReconciliationScreenState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${l10n.clearedBalance}:'),
+                  Text(l10n.labelWithColon(l10n.clearedBalance)),
                   Text(
                     CurrencyFormatter.formatCentsToCurrency(
                       _clearedBalanceCents,
@@ -396,9 +398,11 @@ class _BankReconciliationScreenState
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${l10n.error} $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
+          ),
+        );
       }
     }
   }

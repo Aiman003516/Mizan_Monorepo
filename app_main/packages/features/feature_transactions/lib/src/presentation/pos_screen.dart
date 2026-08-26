@@ -362,7 +362,8 @@ class _PosScreenState extends ConsumerState<PosScreen> {
                   ],
                 );
               },
-              error: (e, s) => Text("Error: $e"),
+              error: (e, s) =>
+                  Text(l10n.errorWithDetails(l10n.error, e.toString())),
               loading: () => const CircularProgressIndicator(),
             ),
           ),
@@ -478,7 +479,11 @@ class _PosScreenState extends ConsumerState<PosScreen> {
       );
     } catch (e) {
       messenger.showSnackBar(
-        SnackBar(content: Text('${l10n.transactionFailed} $e')),
+        SnackBar(
+          content: Text(
+            l10n.errorWithDetails(l10n.transactionFailed, e.toString()),
+          ),
+        ),
       );
     } finally {}
   }
@@ -666,7 +671,9 @@ class _PosScreenState extends ConsumerState<PosScreen> {
               onAddToCart: _dummyAdd,
               isLoading: true,
             ),
-            error: (error, _) => Center(child: Text('${l10n.error}: $error')),
+            error: (error, _) => Center(
+              child: Text(l10n.errorWithDetails(l10n.error, error.toString())),
+            ),
           ),
         ),
       ],

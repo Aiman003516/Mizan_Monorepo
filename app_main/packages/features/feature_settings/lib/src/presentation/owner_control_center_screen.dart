@@ -114,7 +114,12 @@ class OwnerControlCenterScreen extends ConsumerWidget {
                       ),
                       Chip(
                         avatar: const Icon(Icons.storefront, size: 18),
-                        label: Text('${l10n.branchManagement}: $branchCount'),
+                        label: Text(
+                          l10n.labelValue(
+                            l10n.branchManagement,
+                            branchCount.toString(),
+                          ),
+                        ),
                       ),
                       Chip(
                         avatar: const Icon(Icons.history, size: 18),

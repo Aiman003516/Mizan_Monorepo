@@ -1,9 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:core_l10n/app_localizations.dart';
+
 import 'local_ai_proposal.dart';
 import 'local_ai_validator.dart';
 
 enum LocalAiEngineStatus { unavailable, ready, failed }
+
+enum LocalAiDiagnosticCode {
+  disabled,
+  runtimeNotPackaged,
+  invalidRuntimeResponse,
+  modelUnavailable,
+  runtimeFailed,
+  unsupportedLocale,
+  localeNotInManifest,
+  modelLoadFailed,
+  inferenceFailed,
+}
 
 class LocalAiRequest {
   const LocalAiRequest({
@@ -22,20 +36,48 @@ class LocalAiEngineResult {
     required this.status,
     this.proposal,
     this.message,
+    this.code,
   });
 
-  const LocalAiEngineResult.unavailable({String? message})
-    : this._(status: LocalAiEngineStatus.unavailable, message: message);
+  const LocalAiEngineResult.unavailable({
+    String? message,
+    LocalAiDiagnosticCode? code,
+  }) : this._(
+         status: LocalAiEngineStatus.unavailable,
+         message: message,
+         code: code,
+       );
 
   const LocalAiEngineResult.ready(LocalAiProposal proposal)
     : this._(status: LocalAiEngineStatus.ready, proposal: proposal);
 
-  const LocalAiEngineResult.failed(String message)
-    : this._(status: LocalAiEngineStatus.failed, message: message);
+  const LocalAiEngineResult.failed(
+    String message, {
+    LocalAiDiagnosticCode? code,
+  }) : this._(status: LocalAiEngineStatus.failed, message: message, code: code);
 
   final LocalAiEngineStatus status;
   final LocalAiProposal? proposal;
   final String? message;
+  final LocalAiDiagnosticCode? code;
+
+  String localizedMessage(AppLocalizations l10n) {
+    return switch (code) {
+      LocalAiDiagnosticCode.disabled => l10n.localAiDisabled,
+      LocalAiDiagnosticCode.runtimeNotPackaged =>
+        l10n.localAiRuntimeNotPackaged,
+      LocalAiDiagnosticCode.invalidRuntimeResponse =>
+        l10n.localAiInvalidRuntimeResponse,
+      LocalAiDiagnosticCode.modelUnavailable => l10n.localAiModelUnavailable,
+      LocalAiDiagnosticCode.runtimeFailed => l10n.localAiRuntimeFailed,
+      LocalAiDiagnosticCode.unsupportedLocale => l10n.localAiUnsupportedLocale,
+      LocalAiDiagnosticCode.localeNotInManifest =>
+        l10n.localAiLocaleNotSupported,
+      LocalAiDiagnosticCode.modelLoadFailed => l10n.localAiModelLoadFailed,
+      LocalAiDiagnosticCode.inferenceFailed => l10n.localAiInferenceFailed,
+      null => message ?? l10n.localAiGenericFailure,
+    };
+  }
 
   bool get isReady => status == LocalAiEngineStatus.ready && proposal != null;
 }
@@ -65,7 +107,7 @@ class DisabledLocalAiEngine implements LocalAiEngine {
   @override
   Future<LocalAiEngineResult> propose(LocalAiRequest request) async {
     return const LocalAiEngineResult.unavailable(
-      message: 'Local AI is not enabled on this device.',
+      code: LocalAiDiagnosticCode.disabled,
     );
   }
 }

@@ -12,7 +12,9 @@ import 'package:core_l10n/app_localizations.dart';
 
 // Feature Imports
 import 'package:feature_accounts/feature_accounts.dart';
-import 'package:feature_products/feature_products.dart' hide accountsRepositoryProvider;
+import 'package:feature_products/feature_products.dart'
+    hide accountsRepositoryProvider;
+
 // FIX: Un-hide databaseProvider so we can use it!
 
 const _uuid = Uuid();
@@ -29,9 +31,9 @@ class PurchaseItem {
 }
 
 final _supplierAccountsProvider = StreamProvider<List<Account>>((ref) {
-  return ref.watch(accountsRepositoryProvider).watchAccountsByClassification(
-    kClassificationSuppliers,
-  );
+  return ref
+      .watch(accountsRepositoryProvider)
+      .watchAccountsByClassification(kClassificationSuppliers);
 });
 
 final _allProductsProvider = StreamProvider<List<Product>>((ref) {
@@ -63,11 +65,13 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
 
       if (quantity != null && cost != null && quantity > 0 && cost >= 0) {
         setState(() {
-          _items.add(PurchaseItem(
-            product: _selectedProduct!,
-            quantity: quantity,
-            cost: cost,
-          ));
+          _items.add(
+            PurchaseItem(
+              product: _selectedProduct!,
+              quantity: quantity,
+              cost: cost,
+            ),
+          );
         });
         _selectedProduct = null;
         _quantityController.clear();
@@ -93,12 +97,16 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
       final productsRepo = ref.read(productsRepositoryProvider);
       final accountsRepo = ref.read(accountsRepositoryProvider);
 
-      final inventoryAccountId = await accountsRepo.getAccountIdByName(kInventoryAccountName);
+      final inventoryAccountId = await accountsRepo.getAccountIdByName(
+        kInventoryAccountName,
+      );
       if (inventoryAccountId == null) {
-        scaffoldMessenger.showSnackBar(SnackBar(
-          content: Text(l10n.criticalAccountError),
-          backgroundColor: context.appColors.error,
-        ));
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.criticalAccountError),
+            backgroundColor: context.appColors.error,
+          ),
+        );
         return;
       }
 
@@ -107,7 +115,7 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
       for (final item in _items) {
         totalCost += item.cost * item.quantity;
       }
-      
+
       // FIX: Convert Double Total to Cents (Int)
       final int totalCostCents = (totalCost * 100).round();
 
@@ -116,44 +124,59 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
           final now = DateTime.now();
           final newTransactionId = _uuid.v4();
 
-          await db.into(db.transactions).insert(TransactionsCompanion.insert(
-            id: d.Value(newTransactionId),
-            description: l10n.purchaseFrom(supplier.name),
-            transactionDate: now,
-          ));
+          await db
+              .into(db.transactions)
+              .insert(
+                TransactionsCompanion.insert(
+                  id: d.Value(newTransactionId),
+                  description: l10n.purchaseFrom(supplier.name),
+                  transactionDate: now,
+                ),
+              );
 
-          await db.into(db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-            transactionId: newTransactionId,
-            accountId: inventoryAccountId,
-            amount: totalCostCents, // Pass Int
-          ));
+          await db
+              .into(db.transactionEntries)
+              .insert(
+                TransactionEntriesCompanion.insert(
+                  transactionId: newTransactionId,
+                  accountId: inventoryAccountId,
+                  amount: totalCostCents, // Pass Int
+                ),
+              );
 
-          await db.into(db.transactionEntries).insert(TransactionEntriesCompanion.insert(
-            transactionId: newTransactionId,
-            accountId: supplier.id,
-            amount: -totalCostCents, // Pass Int
-          ));
+          await db
+              .into(db.transactionEntries)
+              .insert(
+                TransactionEntriesCompanion.insert(
+                  transactionId: newTransactionId,
+                  accountId: supplier.id,
+                  amount: -totalCostCents, // Pass Int
+                ),
+              );
 
           for (final item in _items) {
             await productsRepo.addStockToProduct(
               productId: item.product.id,
               quantityPurchased: item.quantity,
-              costPerItem: item.cost, 
+              costPerItem: item.cost,
             );
           }
         });
 
-        scaffoldMessenger.showSnackBar(SnackBar(
-          content: Text(l10n.purchaseSaved),
-          backgroundColor: context.appColors.success,
-        ));
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.purchaseSaved),
+            backgroundColor: context.appColors.success,
+          ),
+        );
         navigator.pop();
-
       } catch (e) {
-        scaffoldMessenger.showSnackBar(SnackBar(
-          content: Text(l10n.failedToSavePurchase(e.toString())),
-          backgroundColor: context.appColors.error,
-        ));
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(l10n.failedToSavePurchase(e.toString())),
+            backgroundColor: context.appColors.error,
+          ),
+        );
       }
     }
   }
@@ -203,7 +226,8 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
                       value == null ? l10n.pleaseSelectSupplier : null,
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, s) => Text("Error: ${e.toString()}"),
+                error: (e, s) =>
+                    Text(l10n.errorWithDetails(l10n.error, e.toString())),
               ),
             ),
             const Divider(height: 1),
@@ -223,7 +247,10 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
                           items: products.map((product) {
                             return DropdownMenuItem<Product>(
                               value: product,
-                              child: Text(product.name, overflow: TextOverflow.ellipsis),
+                              child: Text(
+                                product.name,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             );
                           }).toList(),
                           onChanged: (value) {
@@ -238,7 +265,9 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
                         flex: 2,
                         child: TextFormField(
                           controller: _quantityController,
-                          decoration: InputDecoration(labelText: l10n.quantityShort),
+                          decoration: InputDecoration(
+                            labelText: l10n.quantityShort,
+                          ),
                           keyboardType: TextInputType.number,
                         ),
                       ),
@@ -247,7 +276,9 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
                         flex: 2,
                         child: TextFormField(
                           controller: _costController,
-                          decoration: InputDecoration(labelText: l10n.costPerItem),
+                          decoration: InputDecoration(
+                            labelText: l10n.costPerItem,
+                          ),
                           keyboardType: TextInputType.number,
                         ),
                       ),
@@ -259,7 +290,8 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
                   );
                 },
                 loading: () => const SizedBox.shrink(),
-                error: (e, s) => Text("Error: ${e.toString()}"),
+                error: (e, s) =>
+                    Text(l10n.errorWithDetails(l10n.error, e.toString())),
               ),
             ),
             const Divider(height: 1),
@@ -272,13 +304,17 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
                   return ListTile(
                     title: Text(item.product.name),
                     subtitle: Text(
-                        "${l10n.quantityShort}: ${item.quantity} @ ${l10n.cost}: ${item.cost.toStringAsFixed(2)}"),
+                      "${l10n.quantityShort}: ${item.quantity} @ ${l10n.cost}: ${item.cost.toStringAsFixed(2)}",
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(total.toStringAsFixed(2)),
                         IconButton(
-                          icon: Icon(Icons.remove_circle, color: context.appColors.error),
+                          icon: Icon(
+                            Icons.remove_circle,
+                            color: context.appColors.error,
+                          ),
                           onPressed: () => _removeItem(index),
                         ),
                       ],

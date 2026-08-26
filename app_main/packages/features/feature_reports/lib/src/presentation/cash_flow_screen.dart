@@ -127,9 +127,14 @@ class _CashFlowScreenState extends ConsumerState<CashFlowScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error loading data: $e')));
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.errorWithDetails(l10n.errorLoadingData, e.toString()),
+            ),
+          ),
+        );
       }
     }
   }

@@ -285,7 +285,7 @@ class _CapitalBudgetingScreenState extends State<CapitalBudgetingScreen>
                       child: TextField(
                         controller: _cashFlowControllers[index],
                         decoration: InputDecoration(
-                          labelText: 'Year ${index + 1}',
+                          labelText: l10n.yearNumber((index + 1).toString()),
                           prefixText: '\$ ',
                           border: const OutlineInputBorder(),
                         ),

@@ -37,9 +37,7 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.importData),
-      ),
+      appBar: AppBar(title: Text(l10n.importData)),
       body: Stepper(
         currentStep: _currentStep,
         onStepContinue: _onStepContinue,
@@ -58,7 +56,11 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(_currentStep == 2 ? l10n.importBtn : l10n.continueBtn),
+                        : Text(
+                            _currentStep == 2
+                                ? l10n.importBtn
+                                : l10n.continueBtn,
+                          ),
                   ),
                 if (_currentStep > 0 && _currentStep < 3)
                   Padding(
@@ -97,7 +99,11 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
           Step(
             title: Text(l10n.mapColumns),
             subtitle: _preview != null
-                ? Text('${_preview!.parsedData.rowCount} rows')
+                ? Text(
+                    l10n.importRowCount(
+                      _preview!.parsedData.rowCount.toString(),
+                    ),
+                  )
                 : null,
             content: _buildMappingStep(),
             isActive: _currentStep >= 2,
@@ -130,8 +136,9 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
           Card(
             child: ListTile(
               leading: const Icon(Icons.description),
-              title:
-                  Text(_selectedFile!.path.split(Platform.pathSeparator).last),
+              title: Text(
+                _selectedFile!.path.split(Platform.pathSeparator).last,
+              ),
               trailing: IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: () => setState(() => _selectedFile = null),
@@ -149,17 +156,19 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
       children: [
         Text(l10n.whatDataImporting),
         const SizedBox(height: 16),
-        ...EntityFieldDefinitions.entityNames
-            .map((entity) => RadioListTile<String>.adaptive(
-                  title: Text(_formatEntityName(entity)),
-                  subtitle: Text(
-                      '${EntityFieldDefinitions.getFieldsFor(entity).length} fields'),
-                  value: entity,
-                  // ignore: deprecated_member_use
-                  groupValue: _targetEntity,
-                  // ignore: deprecated_member_use
-                  onChanged: (value) => setState(() => _targetEntity = value!),
-                )),
+        ...EntityFieldDefinitions.entityNames.map(
+          (entity) => RadioListTile<String>.adaptive(
+            title: Text(_formatEntityName(entity)),
+            subtitle: Text(
+              '${EntityFieldDefinitions.getFieldsFor(entity).length} fields',
+            ),
+            value: entity,
+            // ignore: deprecated_member_use
+            groupValue: _targetEntity,
+            // ignore: deprecated_member_use
+            onChanged: (value) => setState(() => _targetEntity = value!),
+          ),
+        ),
       ],
     );
   }
@@ -173,10 +182,13 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-            'Found ${_preview!.parsedData.rowCount} rows with ${_preview!.parsedData.columnCount} columns.'),
+          l10n.importMappingSummary(
+            _preview!.parsedData.rowCount.toString(),
+            _preview!.parsedData.columnCount.toString(),
+          ),
+        ),
         const SizedBox(height: 16),
-        Text(l10n.mapEachColumn,
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        Text(l10n.mapEachColumn, style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         ..._buildMappingRows(),
       ],
@@ -206,40 +218,49 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
                 initialValue: mapping.isSkipped
                     ? 'skip'
                     : mapping.isExistingField
-                        ? mapping.targetField
-                        : 'custom:${mapping.customField?.name}',
-                decoration: const InputDecoration(
-                  labelText: 'Map to',
-                  border: OutlineInputBorder(),
+                    ? mapping.targetField
+                    : 'custom:${mapping.customField?.name}',
+                decoration: InputDecoration(
+                  labelText: l10n.mapTo,
+                  border: const OutlineInputBorder(),
                   isDense: true,
                 ),
                 items: [
-                  const DropdownMenuItem(
-                      value: 'skip', child: Text('(Skip this column)')),
-                  ...availableFields.map((f) => DropdownMenuItem(
-                        value: f.name,
-                        child: Text('${f.label}${f.required ? ' *' : ''}'),
-                      )),
+                  DropdownMenuItem(
+                    value: 'skip',
+                    child: Text(l10n.skipThisColumn),
+                  ),
+                  ...availableFields.map(
+                    (f) => DropdownMenuItem(
+                      value: f.name,
+                      child: Text(
+                        l10n.requiredFieldMarker(
+                          '${f.label}${f.required ? ' *' : ''}',
+                        ),
+                      ),
+                    ),
+                  ),
                   DropdownMenuItem(
                     value:
                         'custom:${mapping.customField?.name ?? mapping.sourceColumn}',
-                    child: const Text('+ Create Custom Field'),
+                    child: Text(l10n.createCustomFieldAction),
                   ),
                 ],
                 onChanged: (value) {
                   setState(() {
                     if (value == 'skip') {
-                      _mappings[index] =
-                          FieldMapping.skipped(mapping.sourceColumn);
+                      _mappings[index] = FieldMapping.skipped(
+                        mapping.sourceColumn,
+                      );
                     } else if (value?.startsWith('custom:') == true) {
                       _mappings[index] = FieldMapping.toCustomField(
                         sourceColumn: mapping.sourceColumn,
                         targetEntity: _targetEntity,
                         customField: CustomFieldDef(
-                          name: FieldMapperService.autoSuggestMappings(
-                                [mapping.sourceColumn],
-                                _targetEntity,
-                              ).first.customField?.name ??
+                          name:
+                              FieldMapperService.autoSuggestMappings([
+                                mapping.sourceColumn,
+                              ], _targetEntity).first.customField?.name ??
                               mapping.sourceColumn.toLowerCase(),
                           type: 'text',
                           label: mapping.sourceColumn,
@@ -271,8 +292,9 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Card(
-          color:
-              _result!.hasErrors ? context.appColors.primary : context.appColors.primary,
+          color: _result!.hasErrors
+              ? context.appColors.primary
+              : context.appColors.primary,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -280,21 +302,29 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
                 Icon(
                   _result!.hasErrors ? Icons.warning : Icons.check_circle,
                   size: 48,
-                  color: _result!.hasErrors ? context.appColors.warning : context.appColors.success,
+                  color: _result!.hasErrors
+                      ? context.appColors.warning
+                      : context.appColors.success,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Import Complete',
+                  l10n.importCompleted,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
-                Text('${_result!.successCount} records imported successfully'),
+                Text(
+                  l10n.recordsImportedSuccessfully(
+                    _result!.successCount.toString(),
+                  ),
+                ),
                 if (_result!.hasErrors)
                   Text(
-                    '${_result!.errorCount} errors',
+                    l10n.importErrorCount(_result!.errorCount.toString()),
                     style: TextStyle(color: context.appColors.error),
                   ),
-                Text('Duration: ${_result!.duration.inSeconds}s'),
+                Text(
+                  l10n.importDuration(_result!.duration.inSeconds.toString()),
+                ),
               ],
             ),
           ),
@@ -303,16 +333,22 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
           const SizedBox(height: 16),
           Text(l10n.errorsLabel, style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          ...(_result!.errors.take(10).map((e) => Card(
-                color: context.appColors.primary,
-                child: ListTile(
-                  leading: Icon(Icons.error, color: context.appColors.error),
-                  title: Text('Row ${e.rowNumber}'),
-                  subtitle: Text(e.message),
+          ...(_result!.errors
+              .take(10)
+              .map(
+                (e) => Card(
+                  color: context.appColors.primary,
+                  child: ListTile(
+                    leading: Icon(Icons.error, color: context.appColors.error),
+                    title: Text(l10n.importRowError(e.rowNumber.toString())),
+                    subtitle: Text(e.localizedMessage(l10n)),
+                  ),
                 ),
-              ))),
+              )),
           if (_result!.errors.length > 10)
-            Text('... and ${_result!.errors.length - 10} more errors'),
+            Text(
+              l10n.moreImportErrors((_result!.errors.length - 10).toString()),
+            ),
         ],
       ],
     );
@@ -346,7 +382,9 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
         try {
           final importService = ref.read(importServiceProvider);
           _preview = await importService.parseAndPreview(
-              _selectedFile!, _targetEntity);
+            _selectedFile!,
+            _targetEntity,
+          );
           _mappings = List.from(_preview!.suggestedMappings);
           setState(() {
             _currentStep = 2;
@@ -387,7 +425,10 @@ class _ImportWizardScreenState extends ConsumerState<ImportWizardScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: context.appColors.error),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: context.appColors.error,
+      ),
     );
   }
 

@@ -183,7 +183,7 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${l10n.error} $e'),
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -244,7 +244,7 @@ class _DocumentFormBodyState extends ConsumerState<DocumentFormBody> {
                     TextFormField(
                       controller: _vendorDocumentNumberController,
                       decoration: InputDecoration(
-                        labelText: '${l10n.vendorInvoice} (${l10n.optional})',
+                        labelText: l10n.optionalFieldLabel(l10n.vendorInvoice),
                         border: const OutlineInputBorder(),
                       ),
                     ),

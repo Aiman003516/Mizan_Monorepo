@@ -834,16 +834,16 @@ class _FixedAssetsScreenState extends ConsumerState<FixedAssetsScreen>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Run Depreciation'),
-        content: Text('Calculate and record depreciation for "${asset.name}"?'),
+        title: Text(l10n.runDepreciation),
+        content: Text(l10n.depreciationConfirmMessage(asset.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Run Depreciation'),
+            child: Text(l10n.runDepreciation),
           ),
         ],
       ),

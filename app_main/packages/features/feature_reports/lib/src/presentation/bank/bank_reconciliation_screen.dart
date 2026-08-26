@@ -183,7 +183,7 @@ class _BankReconciliationScreenState
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Statement Balance:'),
+                          Text(l10n.statementBalanceLabel),
                           Text(
                             '\$${((_reconciliation?.statementEndingBalance ?? 0) / 100).toStringAsFixed(2)}',
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -194,7 +194,7 @@ class _BankReconciliationScreenState
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Book Balance:'),
+                          Text(l10n.bookBalance),
                           Text(
                             '\$${_bookBalance.toStringAsFixed(2)}',
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -205,7 +205,7 @@ class _BankReconciliationScreenState
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Selected Cleared:'),
+                          Text(l10n.selectedCleared),
                           Text(
                             '\$${_selectedTotal.toStringAsFixed(2)}',
                             style: TextStyle(

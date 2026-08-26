@@ -183,7 +183,8 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
         // FIX: Convert to Cents (Int) for Database
         final int amountCents = (amountDouble * 100).round();
 
-        final double exRate = double.tryParse(_exchangeRateController.text) ?? 1.0;
+        final double exRate =
+            double.tryParse(_exchangeRateController.text) ?? 1.0;
 
         entries.add(
           TransactionEntriesCompanion.insert(
@@ -230,7 +231,10 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
         navigator.pop();
       } catch (e) {
         scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: context.appColors.error),
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: context.appColors.error,
+          ),
         );
       }
     }
@@ -259,106 +263,106 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: _descriptionController,
-                    decoration: InputDecoration(
-                      labelText: l10n.description,
-                      border: const OutlineInputBorder(),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _descriptionController,
+                      decoration: InputDecoration(
+                        labelText: l10n.description,
+                        border: const OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return l10n.pleaseEnterName;
+                        }
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return l10n.pleaseEnterName;
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      labelText: l10n.date,
-                      border: const OutlineInputBorder(),
-                      suffixIcon: const Icon(Icons.calendar_today),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        labelText: l10n.date,
+                        border: const OutlineInputBorder(),
+                        suffixIcon: const Icon(Icons.calendar_today),
+                      ),
+                      controller: TextEditingController(
+                        text: DateFormat.yMd().format(_transactionDate),
+                      ),
+                      onTap: () => _selectDate(context),
                     ),
-                    controller: TextEditingController(
-                      text: DateFormat.yMd().format(_transactionDate),
-                    ),
-                    onTap: () => _selectDate(context),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _currencyCodeController,
-                          decoration: InputDecoration(
-                            labelText: 'Currency Code', // Ideally from l10n
-                            border: const OutlineInputBorder(),
-                            hintText: 'e.g. USD',
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _currencyCodeController,
+                            decoration: InputDecoration(
+                              labelText: l10n.currencyCodeLabel,
+                              border: const OutlineInputBorder(),
+                              hintText: l10n.currencyCodeHint,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _exchangeRateController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'Exchange Rate', // Ideally from l10n
-                            border: const OutlineInputBorder(),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _exchangeRateController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: l10n.exchangeRateFieldLabel,
+                              border: const OutlineInputBorder(),
+                            ),
                           ),
                         ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        l10n.account,
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8.0,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Text(
-                      l10n.account,
-                      style: Theme.of(context).textTheme.titleSmall,
                     ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      l10n.debit,
-                      textAlign: TextAlign.right,
-                      style: Theme.of(context).textTheme.titleSmall,
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        l10n.debit,
+                        textAlign: TextAlign.right,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      l10n.credit,
-                      textAlign: TextAlign.right,
-                      style: Theme.of(context).textTheme.titleSmall,
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        l10n.credit,
+                        textAlign: TextAlign.right,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 48),
-                ],
+                    const SizedBox(width: 48),
+                  ],
+                ),
               ),
-            ),
-            allAccountsAsync.when(
-              data: (accounts) {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _lines.length,
+              allAccountsAsync.when(
+                data: (accounts) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _lines.length,
                     itemBuilder: (context, index) {
                       final line = _lines[index];
                       return Padding(
@@ -434,73 +438,86 @@ class _GeneralJournalScreenState extends ConsumerState<GeneralJournalScreen> {
                     },
                   );
                 },
-                loading: () => const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator())),
-                error: (e, s) => Padding(padding: const EdgeInsets.all(16.0), child: Text(e.toString())),
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                error: (e, s) => Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(e.toString()),
+                ),
               ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        l10n.total,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Text(
-                        "${l10n.drLabel} ${_totalDebits.toStringAsFixed(2)}",
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Text(
-                        "${l10n.crLabel} ${_totalCredits.toStringAsFixed(2)}",
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        l10n.balance,
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Text(
-                        _balance.toStringAsFixed(2),
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: isBalanced ? context.appColors.success : context.appColors.error,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ],
-                  ),
-                  if (!isBalanced && _totalDebits > 0)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        'Transaction is unbalanced by ${_balance.abs().toStringAsFixed(2)}',
-                        style: TextStyle(color: context.appColors.error, fontSize: 12),
-                      ),
+              const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.total,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(
+                          "${l10n.drLabel} ${_totalDebits.toStringAsFixed(2)}",
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(
+                          "${l10n.crLabel} ${_totalCredits.toStringAsFixed(2)}",
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
                     ),
-                ],
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.balance,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(
+                          _balance.toStringAsFixed(2),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: isBalanced
+                                    ? context.appColors.success
+                                    : context.appColors.error,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                    ),
+                    if (!isBalanced && _totalDebits > 0)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'Transaction is unbalanced by ${_balance.abs().toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: context.appColors.error,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextButton.icon(
-                icon: const Icon(Icons.add),
-                label: Text(
-                  l10n.addProduct,
-                ), // Ideally this should be "Add Line" in l10n
-                onPressed: _addLine,
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextButton.icon(
+                  icon: const Icon(Icons.add),
+                  label: Text(
+                    l10n.addProduct,
+                  ), // Ideally this should be "Add Line" in l10n
+                  onPressed: _addLine,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }

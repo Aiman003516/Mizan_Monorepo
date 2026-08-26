@@ -172,7 +172,7 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
                         for (final book in data.books)
                           ListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: Text('${book.code} — ${book.name}'),
+                            title: Text(l10n.labelValue(book.code, book.name)),
                             subtitle: Text(book.bookType.wireValue),
                             leading: Icon(
                               book.isActive
@@ -194,7 +194,7 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
                           ListTile(
                             contentPadding: EdgeInsets.zero,
                             title: Text(
-                              '${dimension.code} — ${dimension.name}',
+                              l10n.labelValue(dimension.code, dimension.name),
                             ),
                             subtitle: Text(dimension.dimensionType),
                           ),
@@ -211,7 +211,9 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
                         for (final account in data.accounts)
                           ListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: Text('${account.code} — ${account.name}'),
+                            title: Text(
+                              l10n.labelValue(account.code, account.name),
+                            ),
                             subtitle: Text(
                               '${account.accountType} · ${account.normalBalance} · ${account.currencyCode}',
                             ),
@@ -229,7 +231,7 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
                         for (final tax in data.taxCodes)
                           ListTile(
                             contentPadding: EdgeInsets.zero,
-                            title: Text('${tax.code} — ${tax.name}'),
+                            title: Text(l10n.labelValue(tax.code, tax.name)),
                             subtitle: Text(
                               '${tax.ratePercent.toStringAsFixed(2)}% · ${tax.isInclusive ? l10n.taxInclusive : l10n.taxExclusive}',
                             ),

@@ -21,7 +21,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
           children: [
             // --- SECTION 1: SALES TREND ---
             Text(
-              "Sales Trend (Last 30 Days)",
+              l10n.salesTrendLast30Days,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
@@ -31,7 +31,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
 
             // --- SECTION 2: CATEGORY SHARE ---
             Text(
-              "Sales by Category",
+              l10n.salesByCategory,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
@@ -41,7 +41,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
 
             // --- SECTION 3: TOP PRODUCTS ---
             Text(
-              "Top 5 Products",
+              l10n.topFiveProducts,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
@@ -60,12 +60,13 @@ class _SalesLineChart extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final dataAsync = ref.watch(dailySalesProvider);
 
     return dataAsync.when(
       data: (points) {
         if (points.isEmpty) {
-          return const Center(child: Text("No sales data yet."));
+          return Center(child: Text(l10n.noSalesYet));
         }
 
         // Normalize Data for Chart
@@ -130,7 +131,8 @@ class _SalesLineChart extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text("Error: $e")),
+      error: (e, _) =>
+          Center(child: Text(l10n.errorWithDetails(l10n.error, e.toString()))),
     );
   }
 }
@@ -142,12 +144,13 @@ class _CategoryPieChart extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final dataAsync = ref.watch(categorySalesProvider);
 
     return dataAsync.when(
       data: (categories) {
         if (categories.isEmpty) {
-          return const Center(child: Text("No category data."));
+          return Center(child: Text(l10n.noCategoryData));
         }
 
         final total = categories.fold(
@@ -204,7 +207,7 @@ class _CategoryPieChart extends ConsumerWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        "${item.categoryName} (\$${item.totalRevenue.toStringAsFixed(0)})",
+                        '${item.categoryName} (\$${item.totalRevenue.toStringAsFixed(0)})',
                         style: const TextStyle(fontSize: 12),
                       ),
                     ],
@@ -216,7 +219,8 @@ class _CategoryPieChart extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text("Error: $e")),
+      error: (e, _) =>
+          Center(child: Text(l10n.errorWithDetails(l10n.error, e.toString()))),
     );
   }
 }
@@ -228,11 +232,12 @@ class _TopProductsList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final dataAsync = ref.watch(topProductsProvider);
 
     return dataAsync.when(
       data: (products) {
-        if (products.isEmpty) return const Text("No sales data.");
+        if (products.isEmpty) return Text(l10n.noSalesYet);
         return Column(
           children: products.map((p) {
             return ListTile(
@@ -246,7 +251,7 @@ class _TopProductsList extends ConsumerWidget {
               ),
               title: Text(p.productName),
               trailing: Text(
-                "${p.quantitySold.toStringAsFixed(0)} sold",
+                l10n.soldQuantityValue(p.quantitySold.toStringAsFixed(0)),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             );
@@ -254,7 +259,7 @@ class _TopProductsList extends ConsumerWidget {
         );
       },
       loading: () => const LinearProgressIndicator(),
-      error: (e, _) => Text("Error: $e"),
+      error: (e, _) => Text(l10n.errorWithDetails(l10n.error, e.toString())),
     );
   }
 }

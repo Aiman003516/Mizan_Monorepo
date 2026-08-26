@@ -74,13 +74,15 @@ class _MakePaymentScreenState extends ConsumerState<MakePaymentScreen> {
 
     final paymentAmount = double.tryParse(_amountController.text) ?? 0.0;
     if (paymentAmount <= 0) {
-      scaffoldMessenger.showSnackBar(SnackBar(
-        content: Text(l10n.pleaseEnterValidAmount),
-        backgroundColor: context.appColors.error,
-      ));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.pleaseEnterValidAmount),
+          backgroundColor: context.appColors.error,
+        ),
+      );
       return;
     }
-    
+
     // FIX: Convert Double to Cents (Int)
     final int amountCents = (paymentAmount * 100).round();
 
@@ -100,26 +102,35 @@ class _MakePaymentScreenState extends ConsumerState<MakePaymentScreen> {
     ];
 
     try {
-      if (_descriptionController.text == 'Payment to ${widget.supplierAccount.name}') {
-         _descriptionController.text = l10n.purchaseFrom(widget.supplierAccount.name); 
+      if (_descriptionController.text ==
+          'Payment to ${widget.supplierAccount.name}') {
+        _descriptionController.text = l10n.purchaseFrom(
+          widget.supplierAccount.name,
+        );
       }
 
-      await ref.read(transactionsRepositoryProvider).createJournalTransaction(
+      await ref
+          .read(transactionsRepositoryProvider)
+          .createJournalTransaction(
             description: _descriptionController.text,
             transactionDate: _transactionDate,
             entries: entries,
           );
 
-      scaffoldMessenger.showSnackBar(SnackBar(
-        content: Text(l10n.transactionSaved),
-        backgroundColor: context.appColors.success,
-      ));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.transactionSaved),
+          backgroundColor: context.appColors.success,
+        ),
+      );
       navigator.pop();
     } catch (e) {
-      scaffoldMessenger.showSnackBar(SnackBar(
-        content: Text(e.toString()),
-        backgroundColor: context.appColors.error,
-      ));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: context.appColors.error,
+        ),
+      );
     }
   }
 
@@ -147,8 +158,9 @@ class _MakePaymentScreenState extends ConsumerState<MakePaymentScreen> {
             children: [
               allAccountsAsync.when(
                 data: (accounts) {
-                  final assetAccounts =
-                      accounts.where((a) => a.type == 'asset').toList();
+                  final assetAccounts = accounts
+                      .where((a) => a.type == 'asset')
+                      .toList();
                   return DropdownButtonFormField<Account>(
                     initialValue: _selectedPaymentAccount,
                     hint: Text(l10n.selectAccount),
@@ -172,7 +184,12 @@ class _MakePaymentScreenState extends ConsumerState<MakePaymentScreen> {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, s) => Text('Error loading accounts: $e'),
+                error: (e, s) => Text(
+                  l10n.errorWithDetails(
+                    l10n.errorLoadingAccounts,
+                    e.toString(),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               TextFormField(

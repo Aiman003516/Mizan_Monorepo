@@ -80,7 +80,11 @@ class _BulkInviteStaffScreenState extends ConsumerState<BulkInviteStaffScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${l10n.fileImportFailed}: $error')),
+        SnackBar(
+          content: Text(
+            l10n.errorWithDetails(l10n.fileImportFailed, error.toString()),
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _isParsing = false);

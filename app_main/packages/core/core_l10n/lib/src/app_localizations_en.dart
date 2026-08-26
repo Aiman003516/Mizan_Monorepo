@@ -1901,7 +1901,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookBalance => 'Book Balance';
 
   @override
-  String get selectedCleared => 'Selected Cleared:';
+  String get selectedCleared => 'Selected cleared';
 
   @override
   String get differenceAmount => 'Difference';
@@ -4555,7 +4555,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalidNumber => 'Invalid number';
 
   @override
-  String get requiredField => 'This field is required';
+  String get requiredField => 'Required';
 
   @override
   String get category => 'Category';
@@ -6103,4 +6103,311 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aiAssistantRequestUnsupported =>
       'This AI request is not supported yet. You can use the read-only assistant or prepare a confirmed draft instead.';
+
+  @override
+  String errorWithDetails(Object details, Object message) {
+    return '$message $details';
+  }
+
+  @override
+  String get salesTrendLast30Days => 'Sales trend (last 30 days)';
+
+  @override
+  String get salesByCategory => 'Sales by category';
+
+  @override
+  String get topFiveProducts => 'Top 5 products';
+
+  @override
+  String get noCategoryData => 'No category data.';
+
+  @override
+  String soldQuantityValue(Object quantity) {
+    return '$quantity sold';
+  }
+
+  @override
+  String get skipThisColumn => '(Skip this column)';
+
+  @override
+  String requiredFieldMarker(Object label) {
+    return '$label *';
+  }
+
+  @override
+  String get createCustomField => 'Create custom field';
+
+  @override
+  String recordsImportedSuccessfully(Object count) {
+    return '$count records imported successfully';
+  }
+
+  @override
+  String importDuration(Object seconds) {
+    return 'Duration: ${seconds}s';
+  }
+
+  @override
+  String importRowError(Object row) {
+    return 'Row $row';
+  }
+
+  @override
+  String moreImportErrors(Object count) {
+    return '... and $count more errors';
+  }
+
+  @override
+  String get adjustmentsAndClosing => 'Adjustments & closing';
+
+  @override
+  String get allAdjustmentsApproved => 'All adjustments approved!';
+
+  @override
+  String get whatNeedToRecord => 'What do you need to record?';
+
+  @override
+  String get accrueExpenseLabel => 'Accrue expense\\n(Unpaid wages)';
+
+  @override
+  String get usePrepaidAssetLabel => 'Use prepaid asset\\n(Rent/insurance)';
+
+  @override
+  String get errorLoadingAccountsShort => 'Error loading accounts';
+
+  @override
+  String get bankReconciliationTitle => 'Bank reconciliation';
+
+  @override
+  String get allCaughtUpNoTransactions =>
+      'All caught up! No transactions to reconcile.';
+
+  @override
+  String get bankMatchingTitle => 'Bank matching';
+
+  @override
+  String get pleaseEnterCurrencyDetails => 'Please enter currency details';
+
+  @override
+  String failedToPickImage(Object details) {
+    return 'Failed to pick image: $details';
+  }
+
+  @override
+  String get englishLanguage => 'English';
+
+  @override
+  String get arabicLanguage => 'Arabic';
+
+  @override
+  String get syncWarningTitle => 'Sync warning';
+
+  @override
+  String get syncWarningAcknowledge => 'I understand';
+
+  @override
+  String revisionNumber(Object number) {
+    return 'Revision $number';
+  }
+
+  @override
+  String deliveryChannelValue(Object channel) {
+    return '$channel';
+  }
+
+  @override
+  String get dateFormatYyyyMmDd => 'YYYY-MM-DD';
+
+  @override
+  String get paymentMethodsExample => 'cash, bank transfer, Jaib';
+
+  @override
+  String get localAiNotEnabled => 'Local AI is not enabled on this device.';
+
+  @override
+  String get localAiModelUnavailable => 'The local AI model is unavailable.';
+
+  @override
+  String get localAiRuntimeFailed => 'The Android local AI runtime failed.';
+
+  @override
+  String reconciledTransactionsCount(Object count) {
+    return '$count transactions';
+  }
+
+  @override
+  String get noBankAccountsCreateHint =>
+      'No bank accounts found. Create a bank or cash account first.';
+
+  @override
+  String importRowCount(Object count) {
+    return '$count rows';
+  }
+
+  @override
+  String importMappingSummary(Object columns, Object rows) {
+    return 'Found $rows rows with $columns columns.';
+  }
+
+  @override
+  String importErrorCount(Object count) {
+    return '$count errors';
+  }
+
+  @override
+  String get recordAssetUsage => 'Record asset usage';
+
+  @override
+  String get accrueUnpaidExpense => 'Accrue unpaid expense';
+
+  @override
+  String get expenseAccountWhereValueWent =>
+      'Expense account (where did the value go?)';
+
+  @override
+  String get expenseAccountWhatCost => 'Expense account (what is the cost?)';
+
+  @override
+  String get assetAccountWhatWasUsed => 'Asset account (what was used?)';
+
+  @override
+  String get liabilityAccountWhoOwed => 'Liability account (who do we owe?)';
+
+  @override
+  String get runReport => 'Run report';
+
+  @override
+  String get setParametersAndRunReport => 'Set parameters and run the report.';
+
+  @override
+  String get noDataForCriteria => 'No data found for these criteria.';
+
+  @override
+  String get selectPeriodAction => 'Select period';
+
+  @override
+  String get refreshData => 'Refresh';
+
+  @override
+  String get analysisPeriodLabel => 'Analysis period';
+
+  @override
+  String get changePeriod => 'Change';
+
+  @override
+  String get createRecord => 'Create';
+
+  @override
+  String get syncWarningMessage =>
+      'We saved your data locally, but could not confirm it with the cloud.\n\nReason: This device may be offline.\n\nYour data is safe, but other devices will not see it until you reconnect.';
+
+  @override
+  String get exchangeRateFieldLabel => 'Exchange rate';
+
+  @override
+  String get confirmAction => 'Confirm';
+
+  @override
+  String get swipeMatchSkip => 'Swipe right to match, left to skip';
+
+  @override
+  String get proposeAdjustment => 'Propose adjustment';
+
+  @override
+  String get approveAction => 'Approve';
+
+  @override
+  String get importCompleted => 'Import complete';
+
+  @override
+  String get rejectAction => 'Reject';
+
+  @override
+  String depreciationConfirmMessage(Object assetName) {
+    return 'Calculate and record depreciation for \"$assetName\"?';
+  }
+
+  @override
+  String depreciationRecordedForAsset(Object amount, Object assetName) {
+    return 'Depreciation recorded: $amount for $assetName';
+  }
+
+  @override
+  String depreciationBatchProcessed(Object count, Object total) {
+    return 'Processed $count assets. Total: $total';
+  }
+
+  @override
+  String labelValue(Object label, Object value) {
+    return '$label: $value';
+  }
+
+  @override
+  String optionalFieldLabel(Object label) {
+    return '$label (optional)';
+  }
+
+  @override
+  String get createCustomFieldAction => '+ Create custom field';
+
+  @override
+  String exchangeRateSummary(Object from, Object to) {
+    return '1 $from = $to';
+  }
+
+  @override
+  String get exchangeRateHelperText => '1 From = X To';
+
+  @override
+  String yearNumber(Object year) {
+    return 'Year $year';
+  }
+
+  @override
+  String roleStatusValue(Object role, Object status) {
+    return '$role • $status';
+  }
+
+  @override
+  String labelWithColon(Object label) {
+    return '$label:';
+  }
+
+  @override
+  String get unexpectedImportError => 'Unexpected import error';
+
+  @override
+  String importFieldRequired(Object field) {
+    return '$field is required';
+  }
+
+  @override
+  String get localAiDisabled => 'Local AI is not enabled on this device.';
+
+  @override
+  String get localAiRuntimeNotPackaged =>
+      'No Android local AI runtime is packaged.';
+
+  @override
+  String get localAiInvalidRuntimeResponse =>
+      'The local AI runtime returned an invalid response.';
+
+  @override
+  String get localAiUnsupportedLocale =>
+      'Local AI supports Arabic and English only.';
+
+  @override
+  String get localAiLocaleNotSupported =>
+      'The packaged local model does not support this language.';
+
+  @override
+  String get localAiModelLoadFailed =>
+      'The local AI model could not be loaded.';
+
+  @override
+  String get localAiInferenceFailed => 'Local AI inference failed.';
+
+  @override
+  String get localAiGenericFailure =>
+      'The local AI assistant could not complete this request.';
 }

@@ -4,15 +4,16 @@ import 'dart:async';
 import 'package:feature_sync/src/data/cloud_sync_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:core_l10n/app_localizations.dart';
 
 /// 🛡️ THE GATEKEEPER
 /// Ensures "Strict Consistency" by blocking the UI until data is confirmed in the Cloud.
 class SyncGatekeeper {
   final CloudSyncService _syncService;
-  
+
   // In Phase 6, we will inject BillingRepository here to check entitlements.
   // For now, we assume if we are running, we are Enterprise/Pro.
-  
+
   SyncGatekeeper(this._syncService);
 
   /// The Blocking Method. Call this before popping a screen after a save.
@@ -29,7 +30,9 @@ class SyncGatekeeper {
       // 2. Run the Immediate Sync with a Safety Timeout
       // If internet is fast, this takes 500ms.
       // If internet is dead, it throws TimeoutException after 20s.
-      await _syncService.runImmediateSync().timeout(const Duration(seconds: 20));
+      await _syncService.runImmediateSync().timeout(
+        const Duration(seconds: 20),
+      );
 
       // 3. Success: Close the Dialog
       if (context.mounted) {
@@ -40,7 +43,7 @@ class SyncGatekeeper {
       if (context.mounted) {
         Navigator.of(context).pop(); // Close Spinner
       }
-      
+
       // 5. Show the "Escape Hatch" Dialog
       if (context.mounted) {
         await _showFailureDialog(context, e);
@@ -49,20 +52,17 @@ class SyncGatekeeper {
   }
 
   Future<void> _showFailureDialog(BuildContext context, Object error) async {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('☁️ Sync Warning'),
-        content: Text(
-          'We saved your data locally, but could not confirm it with the Headquarters.\n\n'
-          'Reason: This device seems to be offline.\n\n'
-          'Your data is safe, but other devices won\'t see it until you reconnect.',
-        ),
+        title: Text(l10n.syncWarningTitle),
+        content: Text(l10n.syncWarningMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(), // Just close dialog
-            child: const Text('I Understand'),
+            child: Text(l10n.syncWarningAcknowledge),
           ),
         ],
       ),

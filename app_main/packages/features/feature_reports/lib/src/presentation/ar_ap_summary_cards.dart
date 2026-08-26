@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
+import 'package:core_l10n/app_localizations.dart';
 
 /// 💰 AR/AP Summary Cards Widget
 /// Shows accounts receivable and payable summaries side by side.
@@ -10,6 +11,7 @@ class ARAPSummaryCards extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final arReportAsync = ref.watch(arAgingReportProvider);
     final apReportAsync = ref.watch(apAgingReportProvider);
     final theme = Theme.of(context);
@@ -21,19 +23,19 @@ class ARAPSummaryCards extends ConsumerWidget {
         Expanded(
           child: arReportAsync.when(
             loading: () => _SummaryCard(
-              title: 'Receivables',
+              title: l10n.receivables,
               icon: Icons.arrow_downward,
               color: colorScheme.primary,
               isLoading: true,
             ),
             error: (e, _) => _SummaryCard(
-              title: 'Receivables',
+              title: l10n.receivables,
               icon: Icons.arrow_downward,
               color: colorScheme.primary,
               error: e.toString(),
             ),
             data: (report) => _SummaryCard(
-              title: 'Receivables',
+              title: l10n.receivables,
               icon: Icons.arrow_downward,
               color: colorScheme.primary,
               total: report.totalReceivables,
@@ -41,7 +43,7 @@ class ARAPSummaryCards extends ConsumerWidget {
               overdue:
                   report.days31to60 + report.days61to90 + report.over90Days,
               count: report.customerBalances.length,
-              countLabel: 'customers',
+              countLabel: l10n.customers,
             ),
           ),
         ),
@@ -50,19 +52,19 @@ class ARAPSummaryCards extends ConsumerWidget {
         Expanded(
           child: apReportAsync.when(
             loading: () => _SummaryCard(
-              title: 'Payables',
+              title: l10n.payables,
               icon: Icons.arrow_upward,
               color: colorScheme.tertiary,
               isLoading: true,
             ),
             error: (e, _) => _SummaryCard(
-              title: 'Payables',
+              title: l10n.payables,
               icon: Icons.arrow_upward,
               color: colorScheme.tertiary,
               error: e.toString(),
             ),
             data: (report) => _SummaryCard(
-              title: 'Payables',
+              title: l10n.payables,
               icon: Icons.arrow_upward,
               color: colorScheme.tertiary,
               total: report.totalPayables,
@@ -70,7 +72,7 @@ class ARAPSummaryCards extends ConsumerWidget {
               overdue:
                   report.days31to60 + report.days61to90 + report.over90Days,
               count: report.vendorBalances.length,
-              countLabel: 'vendors',
+              countLabel: l10n.vendors,
             ),
           ),
         ),

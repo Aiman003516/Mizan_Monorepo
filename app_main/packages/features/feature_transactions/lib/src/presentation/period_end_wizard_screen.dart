@@ -145,7 +145,9 @@ class _PeriodEndWizardScreenState extends ConsumerState<PeriodEndWizardScreen> {
                 );
               },
               loading: () => const CircularProgressIndicator(),
-              error: (e, s) => Text("Error loading accounts: $e"),
+              error: (e, s) => Text(
+                l10n.errorWithDetails(l10n.errorLoadingAccounts, e.toString()),
+              ),
             ),
             const SizedBox(height: 48),
 
@@ -220,23 +222,24 @@ class _PeriodEndWizardScreenState extends ConsumerState<PeriodEndWizardScreen> {
   }
 
   Future<void> _executeClose(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     // Confirmation Dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Confirm Period Close"),
-        content: const Text(
-          "Are you sure? This will lock all transactions on or before this date. "
-          "This action cannot be easily undone.",
-        ),
+        title: Text(l10n.confirmPeriodCloseTitle),
+        content: Text(l10n.confirmPeriodCloseMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text("Cancel"),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text("Confirm", style: TextStyle(color: context.appColors.error)),
+            child: Text(
+              l10n.confirmAction,
+              style: TextStyle(color: context.appColors.error),
+            ),
           ),
         ],
       ),
@@ -255,15 +258,18 @@ class _PeriodEndWizardScreenState extends ConsumerState<PeriodEndWizardScreen> {
           );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Period Closed Successfully.")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.periodClosedSuccessfully)));
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e"), backgroundColor: context.appColors.error),
+          SnackBar(
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
+            backgroundColor: context.appColors.error,
+          ),
         );
       }
     } finally {

@@ -4,6 +4,7 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
+import 'package:core_l10n/app_localizations.dart';
 
 import 'file_parser.dart';
 import 'field_mapper.dart';
@@ -26,19 +27,39 @@ class ImportResult {
   int get totalCount => successCount + errorCount;
 }
 
-/// Error during import
+/// The user-visible category of an import error.
+enum ImportErrorType { generic, unexpected, requiredField }
+
+/// Error during import.
 class ImportError {
   final int rowNumber;
   final String columnName;
   final String message;
   final dynamic value;
+  final ImportErrorType type;
+  final String? contextValue;
 
   const ImportError({
     required this.rowNumber,
     required this.columnName,
     required this.message,
     this.value,
+    this.type = ImportErrorType.generic,
+    this.contextValue,
   });
+
+  String localizedMessage(AppLocalizations l10n) {
+    return switch (type) {
+      ImportErrorType.unexpected => l10n.errorWithDetails(
+        l10n.unexpectedImportError,
+        contextValue ?? message,
+      ),
+      ImportErrorType.requiredField => l10n.importFieldRequired(
+        contextValue ?? columnName,
+      ),
+      ImportErrorType.generic => message,
+    };
+  }
 
   @override
   String toString() => 'Row $rowNumber, Column "$columnName": $message';
@@ -109,11 +130,15 @@ class ImportService {
         await _insertRow(targetEntity, mappedData);
         successCount++;
       } catch (e) {
-        errors.add(ImportError(
-          rowNumber: rowNumber,
-          columnName: '',
-          message: 'Unexpected error: $e',
-        ));
+        errors.add(
+          ImportError(
+            rowNumber: rowNumber,
+            columnName: '',
+            message: e.toString(),
+            type: ImportErrorType.unexpected,
+            contextValue: e.toString(),
+          ),
+        );
       }
     }
 
@@ -141,31 +166,41 @@ class ImportService {
 
       // Check required fields
       if (mapping.isExistingField) {
-        final fieldDefs =
-            EntityFieldDefinitions.getFieldsFor(mapping.targetEntity);
-        final fieldDef =
-            fieldDefs.where((f) => f.name == mapping.targetField).firstOrNull;
+        final fieldDefs = EntityFieldDefinitions.getFieldsFor(
+          mapping.targetEntity,
+        );
+        final fieldDef = fieldDefs
+            .where((f) => f.name == mapping.targetField)
+            .firstOrNull;
 
         if (fieldDef != null &&
             fieldDef.required &&
             (value == null || value.toString().trim().isEmpty)) {
-          errors.add(ImportError(
-            rowNumber: rowNumber,
-            columnName: mapping.sourceColumn,
-            message: '${fieldDef.label} is required',
-            value: value,
-          ));
+          errors.add(
+            ImportError(
+              rowNumber: rowNumber,
+              columnName: mapping.sourceColumn,
+              message: fieldDef.label,
+              value: value,
+              type: ImportErrorType.requiredField,
+              contextValue: fieldDef.label,
+            ),
+          );
         }
       }
 
       if (mapping.customField?.isRequired == true &&
           (value == null || value.toString().trim().isEmpty)) {
-        errors.add(ImportError(
-          rowNumber: rowNumber,
-          columnName: mapping.sourceColumn,
-          message: '${mapping.customField!.label} is required',
-          value: value,
-        ));
+        errors.add(
+          ImportError(
+            rowNumber: rowNumber,
+            columnName: mapping.sourceColumn,
+            message: mapping.customField!.label,
+            value: value,
+            type: ImportErrorType.requiredField,
+            contextValue: mapping.customField!.label,
+          ),
+        );
       }
     }
 
@@ -176,7 +211,9 @@ class ImportService {
   Future<void> _insertRow(String entity, Map<String, dynamic> data) async {
     switch (entity) {
       case 'accounts':
-        await _db.into(_db.accounts).insert(
+        await _db
+            .into(_db.accounts)
+            .insert(
               AccountsCompanion.insert(
                 name: data['name'] as String? ?? 'Imported Account',
                 type: data['type'] as String? ?? 'asset',
@@ -190,7 +227,9 @@ class ImportService {
       case 'products':
         // Need to get or create a default category
         final categoryId = await _getOrCreateDefaultCategory();
-        await _db.into(_db.products).insert(
+        await _db
+            .into(_db.products)
+            .insert(
               ProductsCompanion.insert(
                 name: data['name'] as String? ?? 'Imported Product',
                 price: data['price'] as int? ?? 0,
@@ -204,7 +243,9 @@ class ImportService {
         break;
 
       case 'categories':
-        await _db.into(_db.categories).insert(
+        await _db
+            .into(_db.categories)
+            .insert(
               CategoriesCompanion.insert(
                 name: data['name'] as String? ?? 'Imported Category',
               ),
@@ -213,22 +254,24 @@ class ImportService {
 
       default:
         throw UnsupportedError(
-            'Import to entity "$entity" is not yet supported');
+          'Import to entity "$entity" is not yet supported',
+        );
     }
   }
 
   /// Get or create a default category for product imports
   Future<String> _getOrCreateDefaultCategory() async {
-    final existing = await (_db.select(_db.categories)
-          ..where((t) => t.name.equals('Imported'))
-          ..limit(1))
-        .getSingleOrNull();
+    final existing =
+        await (_db.select(_db.categories)
+              ..where((t) => t.name.equals('Imported'))
+              ..limit(1))
+            .getSingleOrNull();
 
     if (existing != null) return existing.id;
 
-    final newCategory = await _db.into(_db.categories).insertReturning(
-          CategoriesCompanion.insert(name: 'Imported'),
-        );
+    final newCategory = await _db
+        .into(_db.categories)
+        .insertReturning(CategoriesCompanion.insert(name: 'Imported'));
     return newCategory.id;
   }
 }

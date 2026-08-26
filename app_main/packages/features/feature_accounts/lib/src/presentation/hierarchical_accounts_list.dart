@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:feature_accounts/src/presentation/accounts_list_provider.dart';
 import 'package:feature_accounts/src/presentation/account_ledger_screen.dart';
 import 'package:feature_reports/feature_reports.dart';
@@ -33,6 +34,7 @@ class _HierarchicalAccountsListState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final accountsAsync = ref.watch(accountsStreamProvider);
     final summariesAsync = ref.watch(allAccountSummariesProvider);
 
@@ -41,11 +43,15 @@ class _HierarchicalAccountsListState
         return accountsAsync.when(
           data: (accounts) => _buildHierarchicalList(accounts, summaries),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, _) => Center(child: Text('Error: $err')),
+          error: (err, _) => Center(
+            child: Text(l10n.errorWithDetails(l10n.error, err.toString())),
+          ),
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text('Error: $err')),
+      error: (err, _) => Center(
+        child: Text(l10n.errorWithDetails(l10n.error, err.toString())),
+      ),
     );
   }
 

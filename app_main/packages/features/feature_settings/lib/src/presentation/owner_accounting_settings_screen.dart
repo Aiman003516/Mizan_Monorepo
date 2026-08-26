@@ -410,7 +410,7 @@ class _OwnerAccountingSettingsScreenState
             child: TextFormField(
               controller: prefix,
               decoration: InputDecoration(
-                labelText: '$title ${l10n.documentPrefix}',
+                labelText: l10n.labelValue(title, l10n.documentPrefix),
               ),
               maxLength: 12,
               validator: (value) => value == null || value.trim().isEmpty

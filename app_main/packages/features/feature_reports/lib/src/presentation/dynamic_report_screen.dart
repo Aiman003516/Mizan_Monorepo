@@ -4,8 +4,10 @@ import 'package:feature_reports/src/data/report_models.dart';
 import 'package:feature_reports/src/data/report_templates_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+
 // For formatting utilities
 
 class DynamicReportScreen extends ConsumerStatefulWidget {
@@ -59,6 +61,7 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(widget.template.title)),
       body: Column(
@@ -80,7 +83,7 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
                   ElevatedButton.icon(
                     onPressed: _isLoading ? null : _runReport,
                     icon: const Icon(Icons.play_arrow),
-                    label: const Text("Run Report"),
+                    label: Text(l10n.runReport),
                   ),
                 ],
               ),
@@ -93,14 +96,14 @@ class _DynamicReportScreenState extends ConsumerState<DynamicReportScreen> {
                 : _error != null
                 ? Center(
                     child: Text(
-                      "Error: $_error",
+                      l10n.errorWithDetails(l10n.error, _error ?? ''),
                       style: TextStyle(color: context.appColors.error),
                     ),
                   )
                 : _results == null
-                ? const Center(child: Text("Set parameters and run report."))
+                ? Center(child: Text(l10n.setParametersAndRunReport))
                 : _results!.isEmpty
-                ? const Center(child: Text("No data found for these criteria."))
+                ? Center(child: Text(l10n.noDataForCriteria))
                 : _buildDataTable(),
           ),
         ],

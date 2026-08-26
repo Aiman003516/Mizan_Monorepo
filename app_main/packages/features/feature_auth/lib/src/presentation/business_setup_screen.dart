@@ -56,7 +56,7 @@ class _BusinessSetupScreenState extends ConsumerState<BusinessSetupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${l10n.error} $e'),
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
             backgroundColor: context.appColors.error,
           ),
         );

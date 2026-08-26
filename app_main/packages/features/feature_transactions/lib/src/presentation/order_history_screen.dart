@@ -115,18 +115,23 @@ class OrderHistoryScreen extends ConsumerWidget {
                     },
                   );
                 },
-                error: (err, stack) =>
-                    Center(child: Text('${l10n.error}: ${err.toString()}')),
+                error: (err, stack) => Center(
+                  child: Text(
+                    l10n.errorWithDetails(l10n.error, err.toString()),
+                  ),
+                ),
                 loading: () => const Center(child: CircularProgressIndicator()),
               );
             },
-            error: (err, stack) =>
-                Center(child: Text('${l10n.error}: ${err.toString()}')),
+            error: (err, stack) => Center(
+              child: Text(l10n.errorWithDetails(l10n.error, err.toString())),
+            ),
             loading: () => const Center(child: CircularProgressIndicator()),
           );
         },
-        error: (err, stack) =>
-            Center(child: Text('${l10n.error}: ${err.toString()}')),
+        error: (err, stack) => Center(
+          child: Text(l10n.errorWithDetails(l10n.error, err.toString())),
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );

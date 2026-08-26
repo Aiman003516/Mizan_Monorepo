@@ -287,8 +287,8 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  Text('$role • $readableStatus'),
-                  Text('${l10n.deliveryChannel}: $channel'),
+                  Text(l10n.roleStatusValue(role, readableStatus)),
+                  Text(l10n.labelValue(l10n.deliveryChannel, channel)),
                   if (invitation.expiresAt != null)
                     Text(
                       l10n.invitationExpiresAt(

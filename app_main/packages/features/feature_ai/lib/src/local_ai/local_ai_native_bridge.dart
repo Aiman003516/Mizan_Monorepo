@@ -146,20 +146,30 @@ class LocalAiNativeResult {
     required this.status,
     this.proposalJson,
     this.message,
+    this.code,
   });
 
   const LocalAiNativeResult.ready(String proposalJson)
     : this._(status: LocalAiNativeStatus.ready, proposalJson: proposalJson);
 
-  const LocalAiNativeResult.unavailable(String message)
-    : this._(status: LocalAiNativeStatus.unavailable, message: message);
+  const LocalAiNativeResult.unavailable(
+    String message, {
+    LocalAiDiagnosticCode? code,
+  }) : this._(
+         status: LocalAiNativeStatus.unavailable,
+         message: message,
+         code: code,
+       );
 
-  const LocalAiNativeResult.failed(String message)
-    : this._(status: LocalAiNativeStatus.failed, message: message);
+  const LocalAiNativeResult.failed(
+    String message, {
+    LocalAiDiagnosticCode? code,
+  }) : this._(status: LocalAiNativeStatus.failed, message: message, code: code);
 
   final LocalAiNativeStatus status;
   final String? proposalJson;
   final String? message;
+  final LocalAiDiagnosticCode? code;
 }
 
 abstract interface class LocalAiNativeInferenceBridge {
@@ -194,7 +204,8 @@ class MethodChannelLocalAiNativeInferenceBridge
       return _parseResult(result);
     } on MissingPluginException {
       return const LocalAiNativeResult.unavailable(
-        'No Android local AI runtime is packaged.',
+        '',
+        code: LocalAiDiagnosticCode.runtimeNotPackaged,
       );
     } on PlatformException catch (error) {
       return LocalAiNativeResult.failed(error.message ?? error.code);
@@ -214,7 +225,8 @@ class MethodChannelLocalAiNativeInferenceBridge
       return _parseResult(result);
     } on MissingPluginException {
       return const LocalAiNativeResult.unavailable(
-        'No Android local AI runtime is packaged.',
+        '',
+        code: LocalAiDiagnosticCode.runtimeNotPackaged,
       );
     } on PlatformException catch (error) {
       return LocalAiNativeResult.failed(error.message ?? error.code);
@@ -227,7 +239,8 @@ class MethodChannelLocalAiNativeInferenceBridge
   LocalAiNativeResult _parseResult(Object? value) {
     if (value is! Map) {
       return const LocalAiNativeResult.failed(
-        'Android local AI runtime returned an invalid response.',
+        '',
+        code: LocalAiDiagnosticCode.invalidRuntimeResponse,
       );
     }
     final map = Map<Object?, Object?>.from(value);
@@ -239,11 +252,13 @@ class MethodChannelLocalAiNativeInferenceBridge
     }
     if (status == 'unavailable') {
       return LocalAiNativeResult.unavailable(
-        message is String ? message : 'Local AI model is unavailable.',
+        message is String ? message : '',
+        code: message is String ? null : LocalAiDiagnosticCode.modelUnavailable,
       );
     }
     return LocalAiNativeResult.failed(
-      message is String ? message : 'Android local AI runtime failed.',
+      message is String ? message : '',
+      code: message is String ? null : LocalAiDiagnosticCode.runtimeFailed,
     );
   }
 }
@@ -268,12 +283,14 @@ class NativeTfliteLocalAiEngine implements LocalAiEngine {
   Future<LocalAiEngineResult> propose(LocalAiRequest request) async {
     if (request.locale != 'ar' && request.locale != 'en') {
       return const LocalAiEngineResult.failed(
-        'Local AI supports Arabic (ar) and English (en) only.',
+        '',
+        code: LocalAiDiagnosticCode.unsupportedLocale,
       );
     }
     if (!manifest.supportedLocales.contains(request.locale)) {
       return const LocalAiEngineResult.failed(
-        'The packaged local model does not support this locale.',
+        '',
+        code: LocalAiDiagnosticCode.localeNotInManifest,
       );
     }
 
@@ -286,7 +303,8 @@ class NativeTfliteLocalAiEngine implements LocalAiEngine {
       if (loadResult.status != LocalAiNativeStatus.ready) {
         _status = LocalAiEngineStatus.failed;
         return LocalAiEngineResult.failed(
-          loadResult.message ?? 'Local AI model failed to load.',
+          loadResult.message ?? '',
+          code: loadResult.code ?? LocalAiDiagnosticCode.modelLoadFailed,
         );
       }
       _status = LocalAiEngineStatus.ready;
@@ -304,7 +322,8 @@ class NativeTfliteLocalAiEngine implements LocalAiEngine {
         result.proposalJson == null) {
       _status = LocalAiEngineStatus.failed;
       return LocalAiEngineResult.failed(
-        result.message ?? 'Local AI inference failed.',
+        result.message ?? '',
+        code: result.code ?? LocalAiDiagnosticCode.inferenceFailed,
       );
     }
 

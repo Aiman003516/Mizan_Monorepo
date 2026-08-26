@@ -58,7 +58,9 @@ class _SetPasscodeScreenState extends ConsumerState<SetPasscodeScreen> {
       });
       messenger.showSnackBar(
         SnackBar(
-          content: Text('${l10n.failedToSavePasscode} $e'),
+          content: Text(
+            l10n.errorWithDetails(l10n.failedToSavePasscode, e.toString()),
+          ),
           backgroundColor: context.appColors.error,
         ),
       );

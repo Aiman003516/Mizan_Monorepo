@@ -12,13 +12,14 @@ class APAgingReportScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final reportAsync = ref.watch(apAgingReportProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.apAgingReport),
+        title: Text(l10n.apAgingReport),
         centerTitle: true,
         actions: [
           IconButton(
@@ -35,7 +36,7 @@ class APAgingReportScreen extends ConsumerWidget {
             children: [
               Icon(Icons.error_outline, size: 48, color: colorScheme.error),
               const SizedBox(height: 16),
-              Text('Error: $e'),
+              Text(l10n.errorWithDetails(l10n.error, e.toString())),
             ],
           ),
         ),
@@ -98,7 +99,10 @@ class APAgingReportScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        CurrencyFormatter.formatAmount(report.totalPayables, currencyCode),
+                        CurrencyFormatter.formatAmount(
+                          report.totalPayables,
+                          currencyCode,
+                        ),
                         style: theme.textTheme.headlineLarge?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -106,7 +110,9 @@ class APAgingReportScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        AppLocalizations.of(context)!.vendorsWithBalances(report.vendorBalances.length),
+                        AppLocalizations.of(
+                          context,
+                        )!.vendorsWithBalances(report.vendorBalances.length),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: Colors.white.withValues(alpha: 0.8),
                         ),
@@ -271,7 +277,10 @@ class _VendorAgingCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    CurrencyFormatter.formatAmount(balance.balance, currencyCode),
+                    CurrencyFormatter.formatAmount(
+                      balance.balance,
+                      currencyCode,
+                    ),
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: hasOverdue ? colorScheme.error : null,

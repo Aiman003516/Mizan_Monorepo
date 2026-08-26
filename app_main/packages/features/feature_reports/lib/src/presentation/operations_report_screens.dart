@@ -154,8 +154,18 @@ class StockVelocityReportScreen extends ConsumerWidget {
                         spacing: 16,
                         runSpacing: 6,
                         children: [
-                          Text('${l10n.soldQuantity}: ${product.quantitySold}'),
-                          Text('${l10n.currentStock}: ${product.currentStock}'),
+                          Text(
+                            l10n.labelValue(
+                              l10n.soldQuantity,
+                              product.quantitySold.toString(),
+                            ),
+                          ),
+                          Text(
+                            l10n.labelValue(
+                              l10n.currentStock,
+                              product.currentStock.toString(),
+                            ),
+                          ),
                           Text(
                             '${l10n.totalRevenue}: ${CurrencyFormatter.formatAmount((product.totalRevenue * 100).round(), currencyCode)}',
                             style: TextStyle(

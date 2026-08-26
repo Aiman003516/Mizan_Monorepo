@@ -14,18 +14,20 @@ import 'package:feature_transactions/src/data/transactions_repository.dart';
 
 final _currenciesStreamProvider = StreamProvider<List<Currency>>((ref) {
   final db = ref.watch(databaseProvider);
-  return (db.select(db.currencies)
-        ..orderBy([(t) => d.OrderingTerm.asc(t.code)]))
-      .watch();
+  return (db.select(
+    db.currencies,
+  )..orderBy([(t) => d.OrderingTerm.asc(t.code)])).watch();
 });
 
-final _accountNameProvider =
-    FutureProvider.autoDispose.family<String, String>((ref, accountId) async {
+final _accountNameProvider = FutureProvider.autoDispose.family<String, String>((
+  ref,
+  accountId,
+) async {
   final l10n = ref.watch(appLocalizationsProvider);
   final db = ref.watch(databaseProvider);
-  final account = await (db.select(db.accounts)
-        ..where((tbl) => tbl.id.equals(accountId)))
-      .getSingleOrNull();
+  final account = await (db.select(
+    db.accounts,
+  )..where((tbl) => tbl.id.equals(accountId))).getSingleOrNull();
   return account?.name ?? l10n.unknownAccount;
 });
 
@@ -100,14 +102,16 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
       return;
     }
     if (_selectedCurrency == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.pleaseSelectCurrency)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.pleaseSelectCurrency)));
       return;
     }
     final accountName = _nameController.text.trim();
     if (accountName.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.pleaseEnterAccountName)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.pleaseEnterAccountName)));
       return;
     }
     setState(() {
@@ -124,13 +128,15 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
       if (_selectedAccount != null && _selectedAccount!.name == accountName) {
         targetAccountId = _selectedAccount!.id;
       } else {
-        final existingAccountId =
-            await accountsRepo.getAccountIdByName(accountName);
+        final existingAccountId = await accountsRepo.getAccountIdByName(
+          accountName,
+        );
         if (existingAccountId != null) {
           targetAccountId = existingAccountId;
         } else {
           final classificationId = await accountsRepo.getClassificationIdByName(
-              widget.classificationName ?? kClassificationGeneral);
+            widget.classificationName ?? kClassificationGeneral,
+          );
 
           // FIX: initialBalance expects INT (0), not Double (0.0)
           final newAccountCompanion = AccountsCompanion.insert(
@@ -139,17 +145,20 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
             classificationId: d.Value(classificationId),
             initialBalance: 0, // Int
           );
-          final newAccount =
-              await db.into(db.accounts).insertReturning(newAccountCompanion);
+          final newAccount = await db
+              .into(db.accounts)
+              .insertReturning(newAccountCompanion);
           targetAccountId = newAccount.id;
         }
       }
 
-      final equityAccountId =
-          await accountsRepo.getAccountIdByName(kEquityAccountName);
+      final equityAccountId = await accountsRepo.getAccountIdByName(
+        kEquityAccountName,
+      );
       if (equityAccountId == null) {
-        messenger
-            .showSnackBar(SnackBar(content: Text(l10n.criticalAccountError)));
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.criticalAccountError)),
+        );
         setState(() {
           _isLoading = false;
         });
@@ -180,7 +189,9 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
         ),
       ];
 
-      await ref.read(transactionsRepositoryProvider).createTransaction(
+      await ref
+          .read(transactionsRepositoryProvider)
+          .createTransaction(
             description: description.isNotEmpty
                 ? description
                 : (_isCredit ? l10n.paymentCredit : l10n.chargeDebit),
@@ -207,14 +218,19 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
       setState(() {
         _isLoading = false;
       });
-      messenger.showSnackBar(SnackBar(content: Text('${l10n.failedToSave} $e')));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorWithDetails(l10n.failedToSave, e.toString())),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final accountNameAsync =
-        ref.watch(_accountNameProvider(widget.accountId ?? ''));
+    final accountNameAsync = ref.watch(
+      _accountNameProvider(widget.accountId ?? ''),
+    );
 
     final historyAsync = ref.watch(generalLedgerStreamProvider);
     final allAccountsAsync = ref.watch(allAccountsStreamProvider);
@@ -224,17 +240,20 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.accountId != null
-            ? accountNameAsync.when(
-                data: (name) => l10n.forAccount(name),
-                loading: () => l10n.loading,
-                error: (e, s) => l10n.error)
-            : l10n.addNewTransaction),
+        title: Text(
+          widget.accountId != null
+              ? accountNameAsync.when(
+                  data: (name) => l10n.forAccount(name),
+                  loading: () => l10n.loading,
+                  error: (e, s) => l10n.error,
+                )
+              : l10n.addNewTransaction,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: _isLoading ? null : _saveTransaction,
-          )
+          ),
         ],
       ),
       body: Column(
@@ -250,34 +269,41 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                     allAccountsAsync.when(
                       data: (accounts) {
                         return Autocomplete<Account>(
-                          fieldViewBuilder: (context, textEditingController,
-                              focusNode, onFieldSubmitted) {
-                            _nameController.text = textEditingController.text;
+                          fieldViewBuilder:
+                              (
+                                context,
+                                textEditingController,
+                                focusNode,
+                                onFieldSubmitted,
+                              ) {
+                                _nameController.text =
+                                    textEditingController.text;
 
-                            return TextFormField(
-                              controller: textEditingController,
-                              focusNode: focusNode,
-                              decoration: InputDecoration(
-                                labelText: l10n.accountName,
-                                border: const OutlineInputBorder(),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return l10n.pleaseEnterOrSelectAccount;
-                                }
-                                return null;
+                                return TextFormField(
+                                  controller: textEditingController,
+                                  focusNode: focusNode,
+                                  decoration: InputDecoration(
+                                    labelText: l10n.accountName,
+                                    border: const OutlineInputBorder(),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return l10n.pleaseEnterOrSelectAccount;
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (text) =>
+                                      _nameController.text = text,
+                                );
                               },
-                              onChanged: (text) => _nameController.text = text,
-                            );
-                          },
                           optionsBuilder: (TextEditingValue textEditingValue) {
                             if (textEditingValue.text == '') {
                               return const Iterable<Account>.empty();
                             }
                             return accounts.where((Account account) {
                               return account.name.toLowerCase().contains(
-                                    textEditingValue.text.toLowerCase(),
-                                  );
+                                textEditingValue.text.toLowerCase(),
+                              );
                             });
                           },
                           displayStringForOption: (Account option) =>
@@ -292,8 +318,12 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                       },
                       loading: () =>
                           const Center(child: CircularProgressIndicator()),
-                      error: (e, s) =>
-                          Text('${l10n.errorLoadingAccounts} $e'),
+                      error: (e, s) => Text(
+                        l10n.errorWithDetails(
+                          l10n.errorLoadingAccounts,
+                          e.toString(),
+                        ),
+                      ),
                     ),
                   if (widget.accountId != null)
                     TextFormField(
@@ -308,12 +338,16 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                   TextFormField(
                     controller: _amountController,
                     decoration: InputDecoration(
-                        labelText: l10n.amount,
-                        prefixIcon: const Icon(Icons.calculate)),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                      labelText: l10n.amount,
+                      prefixIcon: const Icon(Icons.calculate),
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d+\.?\d{0,2}'),
+                      ),
                     ],
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -333,14 +367,19 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                         controller: _rateController,
                         decoration: InputDecoration(
                           labelText: l10n.exchangeRate(
-                              _selectedCurrency ?? '', defaultCurrency),
+                            _selectedCurrency ?? '',
+                            defaultCurrency,
+                          ),
                           prefixIcon: const Icon(Icons.swap_horiz),
                           border: const OutlineInputBorder(),
                         ),
-                        keyboardType:
-                            const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*'))
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d+\.?\d*'),
+                          ),
                         ],
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -363,8 +402,9 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                           onTap: () => _selectDate(context),
                           child: InputDecorator(
                             decoration: InputDecoration(
-                                labelText: l10n.date,
-                                border: InputBorder.none),
+                              labelText: l10n.date,
+                              border: InputBorder.none,
+                            ),
                             child: Text(DateFormat.yMd().format(_selectedDate)),
                           ),
                         ),
@@ -372,8 +412,7 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                       IconButton(
                         icon: const Icon(Icons.camera_alt),
                         tooltip: l10n.addAttachment,
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                       ),
                       Expanded(
                         flex: 3,
@@ -468,17 +507,23 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                         dense: true,
                         leading: Icon(
                           isDebit ? Icons.arrow_downward : Icons.arrow_upward,
-                          color: isDebit ? context.appColors.error : context.appColors.success,
+                          color: isDebit
+                              ? context.appColors.error
+                              : context.appColors.success,
                         ),
                         title: Text(detail.transactionDescription),
-                        subtitle: Text(DateFormat.yMd()
-                            .add_jm()
-                            .format(detail.transactionDate)),
+                        subtitle: Text(
+                          DateFormat.yMd().add_jm().format(
+                            detail.transactionDate,
+                          ),
+                        ),
                         trailing: Text(
                           '${detail.entryAmount.abs().toStringAsFixed(2)} ${detail.currencyCode}',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isDebit ? context.appColors.error : context.appColors.success,
+                            color: isDebit
+                                ? context.appColors.error
+                                : context.appColors.success,
                           ),
                         ),
                         onTap: () {},
@@ -486,8 +531,14 @@ class _AddAmountScreenState extends ConsumerState<AddAmountScreen> {
                     },
                   );
                 },
-                error: (e, s) =>
-                    Center(child: Text('${l10n.errorLoadingHistory} $e')),
+                error: (e, s) => Center(
+                  child: Text(
+                    l10n.errorWithDetails(
+                      l10n.errorLoadingHistory,
+                      e.toString(),
+                    ),
+                  ),
+                ),
                 loading: () => const Center(child: CircularProgressIndicator()),
               ),
             ),

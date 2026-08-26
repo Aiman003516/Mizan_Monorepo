@@ -40,7 +40,7 @@ class ARAgingReportScreen extends ConsumerWidget {
             children: [
               Icon(Icons.error_outline, size: 48, color: colorScheme.error),
               const SizedBox(height: 16),
-              Text('Error: $e'),
+              Text(l10n.errorWithDetails(l10n.error, e.toString())),
             ],
           ),
         ),
@@ -105,7 +105,10 @@ class ARAgingReportScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        CurrencyFormatter.formatAmount(report.totalReceivables, currencyCode),
+                        CurrencyFormatter.formatAmount(
+                          report.totalReceivables,
+                          currencyCode,
+                        ),
                         style: theme.textTheme.headlineLarge?.copyWith(
                           color: context.appColors.onPrimary,
                           fontWeight: FontWeight.bold,
@@ -113,7 +116,9 @@ class ARAgingReportScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        l10n.customersWithBalances(report.customerBalances.length),
+                        l10n.customersWithBalances(
+                          report.customerBalances.length,
+                        ),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: context.appColors.onPrimary.withValues(
                             alpha: 0.8,
@@ -288,7 +293,10 @@ class _CustomerAgingCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    CurrencyFormatter.formatAmount(balance.balance, currencyCode),
+                    CurrencyFormatter.formatAmount(
+                      balance.balance,
+                      currencyCode,
+                    ),
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: hasOverdue ? colorScheme.error : null,

@@ -167,7 +167,9 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => Center(child: Text('Error: $err')),
+              error: (err, _) => Center(
+                child: Text(l10n.errorWithDetails(l10n.error, err.toString())),
+              ),
             ),
           ),
         ],
@@ -313,6 +315,7 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
   }
 
   Future<void> _runSingleDepreciation(FixedAsset asset) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final depreciationService = ref.read(depreciationServiceProvider);
       final result = await depreciationService.processDepreciation(
@@ -324,7 +327,10 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Depreciation recorded: ${_formatCurrency(result.annualDepreciation)} for ${asset.name}',
+              l10n.depreciationRecordedForAsset(
+                _formatCurrency(result.annualDepreciation),
+                asset.name,
+              ),
             ),
             backgroundColor: context.appColors.success,
           ),
@@ -334,7 +340,7 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
             backgroundColor: context.appColors.error,
           ),
         );
@@ -343,6 +349,7 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
   }
 
   Future<void> _runBatchDepreciation() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isProcessing = true;
     });
@@ -375,7 +382,10 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Processed $successCount assets. Total: ${_formatCurrency(totalDepreciation)}',
+              l10n.depreciationBatchProcessed(
+                successCount.toString(),
+                _formatCurrency(totalDepreciation),
+              ),
             ),
             backgroundColor: context.appColors.success,
           ),
@@ -385,7 +395,7 @@ class _DepreciationScreenState extends ConsumerState<DepreciationScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
             backgroundColor: context.appColors.error,
           ),
         );

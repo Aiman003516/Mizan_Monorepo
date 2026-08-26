@@ -60,8 +60,9 @@ class AccountLedgerScreen extends ConsumerWidget {
 
           // Resolve account currency — fall back to user's configured base currency.
           final baseCurrencyCode = ref.read(defaultCurrencyProvider);
-          final baseCurrencySymbol =
-              ref.read(preferencesRepositoryProvider).getCurrencySymbol();
+          final baseCurrencySymbol = ref
+              .read(preferencesRepositoryProvider)
+              .getCurrencySymbol();
 
           String accountCurrency = baseCurrencyCode;
           if (account.customAttributes != null) {
@@ -81,7 +82,12 @@ class AccountLedgerScreen extends ConsumerWidget {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 0.0),
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    right: 16.0,
+                    top: 8.0,
+                    bottom: 0.0,
+                  ),
                   child: Text(
                     '${l10n.account}: ${account.name}',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -92,7 +98,12 @@ class AccountLedgerScreen extends ConsumerWidget {
                 ),
               ),
               SliverToBoxAdapter(
-                child: _buildBalanceCard(context, l10n, totalBalance, currencySymbol),
+                child: _buildBalanceCard(
+                  context,
+                  l10n,
+                  totalBalance,
+                  currencySymbol,
+                ),
               ),
               accountDetails.isEmpty
                   ? SliverFillRemaining(
@@ -105,66 +116,65 @@ class AccountLedgerScreen extends ConsumerWidget {
                       ),
                     )
                   : SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          if (index.isOdd) return const Divider(height: 1);
-                          final detailIndex = index ~/ 2;
-                          final detail = accountDetails[detailIndex];
-                          final isDebit = detail.entryAmount > 0;
-                          return ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: isDebit
-                                  ? context.appColors.success.withValues(
-                                      alpha: 0.1,
-                                    )
-                                  : context.appColors.error.withValues(
-                                      alpha: 0.1,
-                                    ),
-                              child: Icon(
-                                isDebit
-                                    ? Icons.arrow_downward
-                                    : Icons.arrow_upward,
-                                color: isDebit
-                                    ? context.appColors.success
-                                    : context.appColors.error,
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        if (index.isOdd) return const Divider(height: 1);
+                        final detailIndex = index ~/ 2;
+                        final detail = accountDetails[detailIndex];
+                        final isDebit = detail.entryAmount > 0;
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: isDebit
+                                ? context.appColors.success.withValues(
+                                    alpha: 0.1,
+                                  )
+                                : context.appColors.error.withValues(
+                                    alpha: 0.1,
+                                  ),
+                            child: Icon(
+                              isDebit
+                                  ? Icons.arrow_downward
+                                  : Icons.arrow_upward,
+                              color: isDebit
+                                  ? context.appColors.success
+                                  : context.appColors.error,
+                            ),
+                          ),
+                          title: Text(detail.transactionDescription),
+                          subtitle: Text(
+                            DateFormat.yMd().format(detail.transactionDate),
+                          ),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                detail.entryAmount.abs().toStringAsFixed(2),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: isDebit
+                                      ? context.appColors.success
+                                      : context.appColors.error,
+                                ),
                               ),
-                            ),
-                            title: Text(detail.transactionDescription),
-                            subtitle: Text(
-                              DateFormat.yMd().format(detail.transactionDate),
-                            ),
-                            trailing: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  detail.entryAmount.abs().toStringAsFixed(2),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: isDebit
-                                        ? context.appColors.success
-                                        : context.appColors.error,
-                                  ),
+                              Text(
+                                detail.currencyCode,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: context.appColors.subtleText,
                                 ),
-                                Text(
-                                  detail.currencyCode,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: context.appColors.subtleText,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        childCount: accountDetails.length * 2 - 1,
-                      ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }, childCount: accountDetails.length * 2 - 1),
                     ),
             ],
           );
         },
-        error: (err, stack) => Center(child: Text('${l10n.error} $err')),
+        error: (err, stack) => Center(
+          child: Text(l10n.errorWithDetails(l10n.error, err.toString())),
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton.extended(

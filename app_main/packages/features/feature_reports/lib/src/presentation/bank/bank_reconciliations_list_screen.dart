@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart';
+import 'package:core_l10n/app_localizations.dart';
 
 import 'bank_reconciliation_screen.dart';
 
@@ -11,19 +12,17 @@ class BankReconciliationsListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final repo = ref.watch(bankReconciliationRepositoryProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bank Reconciliations'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(l10n.bankReconciliations), centerTitle: true),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showNewReconciliationDialog(context, ref),
         icon: const Icon(Icons.add),
-        label: const Text('New Reconciliation'),
+        label: Text(l10n.newReconciliation),
       ),
       body: StreamBuilder<List<ReconciliationSummary>>(
         stream: repo.watchAllReconciliations(),
@@ -46,14 +45,14 @@ class BankReconciliationsListScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No reconciliations yet',
+                    l10n.noReconciliationsYet,
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: colorScheme.outline,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Start reconciling your bank statements',
+                    l10n.startReconciling,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.outline,
                     ),
@@ -87,7 +86,7 @@ class BankReconciliationsListScreen extends ConsumerWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    '${summary.reconciliation.statementDate.day}/${summary.reconciliation.statementDate.month}/${summary.reconciliation.statementDate.year} • ${summary.reconciledCount} transactions',
+                    '${summary.reconciliation.statementDate.day}/${summary.reconciliation.statementDate.month}/${summary.reconciliation.statementDate.year} • ${l10n.reconciledTransactionsCount(summary.reconciledCount)}',
                   ),
                   trailing: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -129,18 +128,15 @@ class BankReconciliationsListScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final repo = ref.read(bankReconciliationRepositoryProvider);
     final accounts = await repo.getBankAccounts();
 
     if (accounts.isEmpty) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'No bank accounts found. Create a bank/cash account first.',
-            ),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.noBankAccountsCreateHint)));
       }
       return;
     }
@@ -155,16 +151,16 @@ class BankReconciliationsListScreen extends ConsumerWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('New Reconciliation'),
+          title: Text(l10n.newReconciliation),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 DropdownButtonFormField<Account>(
                   initialValue: selectedAccount,
-                  decoration: const InputDecoration(
-                    labelText: 'Bank Account',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.selectBankAccount,
+                    border: const OutlineInputBorder(),
                   ),
                   items: accounts
                       .map(
@@ -176,7 +172,7 @@ class BankReconciliationsListScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Statement Date'),
+                  title: Text(l10n.statementDate),
                   subtitle: Text(
                     '${statementDate.day}/${statementDate.month}/${statementDate.year}',
                   ),
@@ -194,9 +190,9 @@ class BankReconciliationsListScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: balanceController,
-                  decoration: const InputDecoration(
-                    labelText: 'Statement Ending Balance',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.statementEndingBalance,
+                    border: const OutlineInputBorder(),
                     prefixText: '\$ ',
                   ),
                   keyboardType: TextInputType.number,
@@ -207,7 +203,7 @@ class BankReconciliationsListScreen extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () async {
@@ -223,7 +219,7 @@ class BankReconciliationsListScreen extends ConsumerWidget {
                 );
                 if (context.mounted) Navigator.pop(context);
               },
-              child: const Text('Create'),
+              child: Text(l10n.createRecord),
             ),
           ],
         ),

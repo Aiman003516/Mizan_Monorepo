@@ -34,13 +34,17 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
       });
       if (drafts.isEmpty) {
         if (mounted)
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(l10n.noProductsInFile)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.noProductsInFile)));
       }
     } catch (e) {
       if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('${l10n.error} $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
+          ),
+        );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -48,8 +52,9 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
 
   Future<void> _confirmImport() async {
     if (_selectedDefaultCategoryId == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.pleaseSelectCategory)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.pleaseSelectCategory)));
       return;
     }
 
@@ -79,8 +84,11 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
       }
     } catch (e) {
       if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('${l10n.error} $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorWithDetails(l10n.error, e.toString())),
+          ),
+        );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -130,7 +138,8 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
                       );
                     },
                     loading: () => const LinearProgressIndicator(),
-                    error: (e, s) => Text('${l10n.error} $e'),
+                    error: (e, s) =>
+                        Text(l10n.errorWithDetails(l10n.error, e.toString())),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -184,8 +193,9 @@ class _ProductImportScreenState extends ConsumerState<ProductImportScreen> {
               width: double.infinity,
               height: 50,
               child: FilledButton(
-                onPressed:
-                    (_drafts.isEmpty || _isLoading) ? null : _confirmImport,
+                onPressed: (_drafts.isEmpty || _isLoading)
+                    ? null
+                    : _confirmImport,
                 child: _isLoading
                     ? CircularProgressIndicator(
                         color: context.appColors.onPrimary,

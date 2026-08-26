@@ -42,13 +42,13 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
           IconButton(
             icon: const Icon(Icons.date_range),
             onPressed: _selectPeriod,
-            tooltip: 'Select Period',
+            tooltip: l10n.selectPeriodAction,
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () =>
                 ref.invalidate(financialRatiosProvider(_selectedPeriod)),
-            tooltip: 'Refresh',
+            tooltip: l10n.refreshData,
           ),
         ],
       ),
@@ -94,7 +94,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Period indicator
-          _buildPeriodCard(),
+          _buildPeriodCard(l10n),
           const SizedBox(height: 24),
 
           // Liquidity Ratios
@@ -145,7 +145,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
     );
   }
 
-  Widget _buildPeriodCard() {
+  Widget _buildPeriodCard(AppLocalizations l10n) {
     final theme = Theme.of(context);
     return Card(
       child: Padding(
@@ -158,7 +158,10 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Analysis Period', style: theme.textTheme.labelMedium),
+                  Text(
+                    l10n.analysisPeriodLabel,
+                    style: theme.textTheme.labelMedium,
+                  ),
                   Text(
                     '${_formatDate(_selectedPeriod.start)} - ${_formatDate(_selectedPeriod.end)}',
                     style: theme.textTheme.titleMedium,
@@ -169,7 +172,7 @@ class _FinancialRatiosScreenState extends ConsumerState<FinancialRatiosScreen> {
             TextButton.icon(
               onPressed: _selectPeriod,
               icon: const Icon(Icons.edit),
-              label: const Text('Change'),
+              label: Text(l10n.changePeriod),
             ),
           ],
         ),

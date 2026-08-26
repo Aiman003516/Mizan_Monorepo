@@ -122,7 +122,9 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
       if (mounted) {
         messenger.showSnackBar(
           SnackBar(
-            content: Text('${l10n.returnFailed}: $e'),
+            content: Text(
+              l10n.errorWithDetails(l10n.returnFailed, e.toString()),
+            ),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -330,7 +332,9 @@ class _ReturnItemsScreenState extends ConsumerState<ReturnItemsScreen> {
             ],
           );
         },
-        error: (err, stack) => Center(child: Text('${l10n.error}: $err')),
+        error: (err, stack) => Center(
+          child: Text(l10n.errorWithDetails(l10n.error, err.toString())),
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );

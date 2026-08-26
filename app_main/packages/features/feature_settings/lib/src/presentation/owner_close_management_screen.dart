@@ -73,7 +73,7 @@ class _OwnerCloseManagementScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${l10n.error} $error'),
+            content: Text(l10n.errorWithDetails(l10n.error, error.toString())),
             backgroundColor: context.appColors.error,
           ),
         );
@@ -122,7 +122,7 @@ class _OwnerCloseManagementScreenState
               keyboardType: TextInputType.datetime,
               decoration: InputDecoration(
                 labelText: l10n.closeThroughDate,
-                hintText: 'YYYY-MM-DD',
+                hintText: l10n.dateFormatYyyyMmDd,
               ),
               validator: (value) {
                 final text = value?.trim() ?? '';

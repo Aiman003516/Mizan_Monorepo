@@ -71,7 +71,7 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to pick image: $e"),
+            content: Text(l10n.failedToPickImage(e.toString())),
             backgroundColor: context.appColors.error,
           ),
         );
@@ -119,7 +119,9 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${l10n.failedToSaveProfile} $e'),
+            content: Text(
+              l10n.errorWithDetails(l10n.failedToSaveProfile, e.toString()),
+            ),
             backgroundColor: context.appColors.error,
           ),
         );

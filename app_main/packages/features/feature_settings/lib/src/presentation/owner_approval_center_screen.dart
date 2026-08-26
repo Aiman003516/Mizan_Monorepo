@@ -86,9 +86,9 @@ class _ApprovalCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text('${l10n.requester}: ${request.requester}'),
-            Text('${l10n.approvalAmount}: $amount'),
-            Text('${l10n.approvalReason}: ${request.reason}'),
+            Text(l10n.labelValue(l10n.requester, request.requester)),
+            Text(l10n.labelValue(l10n.approvalAmount, amount)),
+            Text(l10n.labelValue(l10n.approvalReason, request.reason)),
             if (isPending) ...[
               const SizedBox(height: 12),
               Text(

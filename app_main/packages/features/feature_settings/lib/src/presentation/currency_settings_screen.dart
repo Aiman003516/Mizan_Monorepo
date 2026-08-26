@@ -105,7 +105,12 @@ class _CurrencySettingsScreenState
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('${l10n.failedToSave} $e'),
+                          content: Text(
+                            l10n.errorWithDetails(
+                              l10n.failedToSave,
+                              e.toString(),
+                            ),
+                          ),
                           backgroundColor: context.appColors.error,
                         ),
                       );
@@ -138,7 +143,7 @@ class _CurrencySettingsScreenState
               final currency = currencies[index];
               return RadioListTile<String>(
                 title: Text(currency.name),
-                subtitle: Text('${l10n.codeLabel} ${currency.code}'),
+                subtitle: Text(l10n.labelValue(l10n.codeLabel, currency.code)),
                 value: currency.code,
                 // ignore: deprecated_member_use
                 groupValue: defaultCurrencyCode,
@@ -171,8 +176,9 @@ class _CurrencySettingsScreenState
             },
           );
         },
-        error: (err, stack) =>
-            Center(child: Text('${l10n.error} ${err.toString()}')),
+        error: (err, stack) => Center(
+          child: Text(l10n.errorWithDetails(l10n.error, err.toString())),
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
       floatingActionButton: FloatingActionButton(
