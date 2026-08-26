@@ -176,6 +176,7 @@ class JournalLineInput {
     this.foreignCreditMinor = 0,
     this.taxCodeId,
     this.lineNumber,
+    this.worktags = const <String, String>{},
   });
 
   final String accountId;
@@ -187,6 +188,7 @@ class JournalLineInput {
   final int foreignCreditMinor;
   final String? taxCodeId;
   final int? lineNumber;
+  final Map<String, String> worktags;
 
   Map<String, dynamic> toJson() => {
     'account_id': accountId,
@@ -200,6 +202,7 @@ class JournalLineInput {
     'foreign_credit_minor': foreignCreditMinor,
     if (taxCodeId?.trim().isNotEmpty == true) 'tax_code_id': taxCodeId,
     if (lineNumber != null) 'line_number': lineNumber,
+    if (worktags.isNotEmpty) 'worktags': Map<String, String>.from(worktags),
   };
 }
 
@@ -428,6 +431,10 @@ class AccountingLedgerRepository {
     required String currencyCode,
     required double exchangeRate,
     required List<JournalLineInput> lines,
+    String? bookId,
+    String? baseCurrencyCode,
+    String? exchangeRateSource,
+    DateTime? exchangeRateEffectiveOn,
   }) async {
     if (lines.length < 2) {
       throw const PostgrestException(
@@ -446,17 +453,31 @@ class AccountingLedgerRepository {
         code: 'MIZAN_JOURNAL_UNBALANCED',
       );
     }
-    final result = await _supabase.rpc(
-      'create_journal_draft',
-      params: {
-        'p_entry_number': entryNumber.trim(),
-        'p_entry_date': entryDate.toIso8601String().substring(0, 10),
-        'p_description': description.trim(),
-        'p_currency_code': currencyCode.trim().toUpperCase(),
-        'p_exchange_rate': exchangeRate,
-        'p_lines': lines.map((line) => line.toJson()).toList(),
-      },
-    );
+    final params = <String, dynamic>{
+      'p_entry_number': entryNumber.trim(),
+      'p_entry_date': entryDate.toIso8601String().substring(0, 10),
+      'p_description': description.trim(),
+      'p_currency_code': currencyCode.trim().toUpperCase(),
+      'p_exchange_rate': exchangeRate,
+      'p_lines': lines.map((line) => line.toJson()).toList(),
+    };
+    final hasExtendedContract =
+        bookId != null ||
+        baseCurrencyCode != null ||
+        exchangeRateSource != null ||
+        exchangeRateEffectiveOn != null ||
+        lines.any((line) => line.worktags.isNotEmpty);
+    if (hasExtendedContract) {
+      params.addAll({
+        'p_book_id': bookId,
+        'p_base_currency_code': baseCurrencyCode?.trim().toUpperCase(),
+        'p_exchange_rate_source': exchangeRateSource?.trim(),
+        'p_exchange_rate_effective_on': exchangeRateEffectiveOn
+            ?.toIso8601String()
+            .substring(0, 10),
+      });
+    }
+    final result = await _supabase.rpc('create_journal_draft', params: params);
     if (result is! Map) {
       throw const PostgrestException(
         message: 'Journal draft creation returned no result.',

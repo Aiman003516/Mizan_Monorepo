@@ -86,6 +86,21 @@ void main() {
     expect(json['currency_code'], 'SAR');
     expect(json['line_number'], 1);
     expect(json.containsKey('tax_code_id'), isFalse);
+    expect(json.containsKey('worktags'), isFalse);
+  });
+
+  test('serializes validated worktags for an extended journal draft', () {
+    const line = JournalLineInput(
+      accountId: 'account-1',
+      debitMinor: 1000,
+      creditMinor: 0,
+      worktags: {'cost_center': 'OPS', 'project': 'P-01'},
+    );
+
+    expect(line.toJson()['worktags'], {
+      'cost_center': 'OPS',
+      'project': 'P-01',
+    });
   });
 
   test('maps server draft and trial-balance responses', () {

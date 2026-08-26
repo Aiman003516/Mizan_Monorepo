@@ -30,6 +30,7 @@ Run the files in filename order. The current sequence is:
 | 18 | `20260827220000_tax_engine_foundation.sql` | Effective-dated tax metadata, deterministic calculation, tax snapshots, RLS, and audit hooks | Added in the current upgrade; not applied |
 | 19 | `20260827230000_revenue_recognition_foundation.sql` | Tenant-scoped contracts, deterministic schedules, recognition drafts, posting synchronization, RLS, and audit hooks | Added in the current upgrade; not applied |
 | 20 | `20260827240000_ar_ap_settlement_aging.sql` | AR/AP settlement drafts, outstanding-balance guards, posting synchronization, receivables/payables aging, RLS, and audit hooks | Added in the current upgrade; not applied |
+| 21 | `20260827241000_dimensions_books_fx_repair.sql` | Table-aware dimensional triggers, leading-book seeding/backfill, and extended journal-draft book/FX/worktag contract | Added in the current upgrade; not applied |
 
 ## Preflight checklist
 
