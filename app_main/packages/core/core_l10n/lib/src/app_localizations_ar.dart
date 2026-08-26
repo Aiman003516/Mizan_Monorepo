@@ -971,6 +971,58 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trialBalanceReport => 'ميزان المراجعة';
 
   @override
+  String get trialBalanceLoadFailed => 'تعذر تحميل ميزان المراجعة.';
+
+  @override
+  String get trialBalanceServerSource => 'بيانات دفتر الأستاذ السحابية';
+
+  @override
+  String get trialBalanceLocalSource => 'بيانات هذا الجهاز المحلية';
+
+  @override
+  String get ledgerControl => 'إدارة دفتر الأستاذ';
+
+  @override
+  String get ledgerControlIntro =>
+      'راجع الفترات المحاسبية السحابية وأكواد الضرائب ودليل الحسابات. النشر والإغلاق مصرح بهما من الخادم.';
+
+  @override
+  String get ledgerLoadFailed => 'تعذر تحميل إعدادات المحاسبة.';
+
+  @override
+  String get accountingPeriods => 'الفترات المحاسبية';
+
+  @override
+  String get chartOfAccounts => 'دليل الحسابات';
+
+  @override
+  String get taxCodes => 'أكواد الضرائب';
+
+  @override
+  String get noPeriods => 'لم يتم إعداد فترات محاسبية.';
+
+  @override
+  String get noAccounts => 'لم يتم إعداد حسابات سحابية في دليل الحسابات.';
+
+  @override
+  String get noTaxCodes => 'لم يتم إعداد أكواد ضرائب نشطة.';
+
+  @override
+  String get closePeriod => 'إغلاق الفترة';
+
+  @override
+  String get periodClosed => 'تم إغلاق الفترة المحاسبية.';
+
+  @override
+  String get periodCloseFailed => 'تعذر إغلاق الفترة المحاسبية.';
+
+  @override
+  String get taxInclusive => 'شامل الضريبة';
+
+  @override
+  String get taxExclusive => 'غير شامل الضريبة';
+
+  @override
   String get addProduct => 'أضف منتج';
 
   @override

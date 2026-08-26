@@ -1940,6 +1940,108 @@ abstract class AppLocalizations {
   /// **'Trial Balance'**
   String get trialBalanceReport;
 
+  /// No description provided for @trialBalanceLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the trial balance.'**
+  String get trialBalanceLoadFailed;
+
+  /// No description provided for @trialBalanceServerSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud ledger data'**
+  String get trialBalanceServerSource;
+
+  /// No description provided for @trialBalanceLocalSource.
+  ///
+  /// In en, this message translates to:
+  /// **'This device’s local data'**
+  String get trialBalanceLocalSource;
+
+  /// No description provided for @ledgerControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Ledger Control'**
+  String get ledgerControl;
+
+  /// No description provided for @ledgerControlIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Review cloud accounting periods, tax codes, and the chart of accounts. Posting and closing are server-authorized.'**
+  String get ledgerControlIntro;
+
+  /// No description provided for @ledgerLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the accounting controls.'**
+  String get ledgerLoadFailed;
+
+  /// No description provided for @accountingPeriods.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounting periods'**
+  String get accountingPeriods;
+
+  /// No description provided for @chartOfAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart of accounts'**
+  String get chartOfAccounts;
+
+  /// No description provided for @taxCodes.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax codes'**
+  String get taxCodes;
+
+  /// No description provided for @noPeriods.
+  ///
+  /// In en, this message translates to:
+  /// **'No accounting periods are configured.'**
+  String get noPeriods;
+
+  /// No description provided for @noAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud chart-of-accounts records are configured.'**
+  String get noAccounts;
+
+  /// No description provided for @noTaxCodes.
+  ///
+  /// In en, this message translates to:
+  /// **'No active tax codes are configured.'**
+  String get noTaxCodes;
+
+  /// No description provided for @closePeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Close period'**
+  String get closePeriod;
+
+  /// No description provided for @periodClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounting period closed.'**
+  String get periodClosed;
+
+  /// No description provided for @periodCloseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not close the accounting period.'**
+  String get periodCloseFailed;
+
+  /// No description provided for @taxInclusive.
+  ///
+  /// In en, this message translates to:
+  /// **'tax inclusive'**
+  String get taxInclusive;
+
+  /// No description provided for @taxExclusive.
+  ///
+  /// In en, this message translates to:
+  /// **'tax exclusive'**
+  String get taxExclusive;
+
   /// No description provided for @addProduct.
   ///
   /// In en, this message translates to:

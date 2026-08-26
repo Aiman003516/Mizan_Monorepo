@@ -93,7 +93,13 @@ class TrialBalanceScreen extends ConsumerWidget {
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text("Error: $e")),
+        error: (e, s) => Center(
+          child: FilledButton.tonalIcon(
+            onPressed: () => ref.invalidate(trialBalanceProvider),
+            icon: const Icon(Icons.refresh),
+            label: Text(l10n.trialBalanceLoadFailed),
+          ),
+        ),
       ),
     );
   }
@@ -148,7 +154,13 @@ class TrialBalanceScreen extends ConsumerWidget {
           ...data.map(
             (line) => DataRow(
               cells: [
-                DataCell(Text(line.accountName)),
+                DataCell(
+                  Text(
+                    line.accountCode.isEmpty
+                        ? line.accountName
+                        : '${line.accountCode} — ${line.accountName}',
+                  ),
+                ),
                 DataCell(
                   Text(
                     line.debit == 0 ? '-' : l10n.currencyFormat(line.debit),

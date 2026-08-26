@@ -10,6 +10,7 @@ import 'dart:async';
 import 'package:async/async.dart';
 import 'package:drift/drift.dart' as d;
 import 'package:core_data/core_data.dart';
+import 'package:feature_auth/feature_auth.dart';
 
 /// The placeholder database provider for this feature.
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -188,10 +189,14 @@ class FixedAssetsSummary {
 
 class TrialBalanceLine {
   final String accountName;
+  final String accountCode;
+  final String accountType;
   final double debit;
   final double credit;
   TrialBalanceLine({
     required this.accountName,
+    this.accountCode = '',
+    this.accountType = '',
     required this.debit,
     required this.credit,
   });
@@ -305,16 +310,22 @@ final balanceSheetDateProvider = StateProvider<DateTime>((ref) {
 final profitAndLossProvider = StreamProvider<PnlData>((ref) {
   final service = ref.watch(reportsServiceProvider);
   final dateRange = ref.watch(pnlDateRangeProvider);
-  return service.watchProfitAndLoss(dateRange);
+  final authStatus = ref.watch(authControllerProvider).status;
+  final useCloud = authStatus == AuthStatus.authenticated_online;
+  return service.watchProfitAndLoss(dateRange, preferCloud: useCloud);
 });
 final balanceSheetProvider = StreamProvider<BalanceSheetData>((ref) {
   final service = ref.watch(reportsServiceProvider);
   final asOfDate = ref.watch(balanceSheetDateProvider);
-  return service.watchBalanceSheet(asOfDate);
+  final authStatus = ref.watch(authControllerProvider).status;
+  final useCloud = authStatus == AuthStatus.authenticated_online;
+  return service.watchBalanceSheet(asOfDate, preferCloud: useCloud);
 });
 final trialBalanceProvider = StreamProvider<List<TrialBalanceLine>>((ref) {
   final service = ref.watch(reportsServiceProvider);
-  return service.watchTrialBalance();
+  final authStatus = ref.watch(authControllerProvider).status;
+  final useCloud = authStatus == AuthStatus.authenticated_online;
+  return service.watchTrialBalance(preferCloud: useCloud);
 });
 
 class ReportsService {
@@ -789,7 +800,14 @@ class ReportsService {
     });
   }
 
-  Stream<PnlData> watchProfitAndLoss(DateTimeRange range) {
+  Stream<PnlData> watchProfitAndLoss(
+    DateTimeRange range, {
+    bool preferCloud = false,
+  }) {
+    if (preferCloud) {
+      return Stream.fromFuture(_watchCloudProfitAndLoss(range));
+    }
+
     final query =
         _db.select(_db.transactionEntries).join([
             d.innerJoin(
@@ -867,7 +885,14 @@ class ReportsService {
     });
   }
 
-  Stream<BalanceSheetData> watchBalanceSheet(DateTime asOfDate) {
+  Stream<BalanceSheetData> watchBalanceSheet(
+    DateTime asOfDate, {
+    bool preferCloud = false,
+  }) {
+    if (preferCloud) {
+      return Stream.fromFuture(_watchCloudBalanceSheet(asOfDate));
+    }
+
     final pnlRange = DateTimeRange(
       start: DateTime(asOfDate.year, 1, 1),
       end: asOfDate,
@@ -1011,7 +1036,97 @@ class ReportsService {
     });
   }
 
-  Stream<List<TrialBalanceLine>> watchTrialBalance() {
+  Future<PnlData> _watchCloudProfitAndLoss(DateTimeRange range) async {
+    final ledger = _ref.read(accountingLedgerRepositoryProvider);
+    final rows = await ledger.profitAndLoss(
+      startsOn: range.start,
+      endsOn: range.end,
+    );
+    final revenueLines = <PnlLine>[];
+    final expenseLines = <PnlLine>[];
+    var totalRevenueMinor = 0;
+    var totalExpensesMinor = 0;
+    for (final row in rows) {
+      final amount = row.balanceMinor;
+      if (row.accountType == 'revenue') {
+        revenueLines.add(
+          PnlLine(
+            accountType: row.accountType,
+            accountName: row.accountName,
+            balance: amount / 100.0,
+          ),
+        );
+        totalRevenueMinor += amount;
+      } else if (row.accountType == 'expense') {
+        expenseLines.add(
+          PnlLine(
+            accountType: row.accountType,
+            accountName: row.accountName,
+            balance: amount / 100.0,
+          ),
+        );
+        totalExpensesMinor += amount;
+      }
+    }
+    return PnlData(
+      revenueLines: revenueLines,
+      expenseLines: expenseLines,
+      totalRevenue: totalRevenueMinor / 100.0,
+      totalExpenses: totalExpensesMinor / 100.0,
+      netIncome: (totalRevenueMinor - totalExpensesMinor) / 100.0,
+    );
+  }
+
+  Future<BalanceSheetData> _watchCloudBalanceSheet(DateTime asOfDate) async {
+    final ledger = _ref.read(accountingLedgerRepositoryProvider);
+    final rows = await ledger.balanceSheet(asOfDate: asOfDate);
+    final pnl = await _watchCloudProfitAndLoss(
+      DateTimeRange(start: DateTime(asOfDate.year, 1, 1), end: asOfDate),
+    );
+    final assetLines = <BalanceSheetLine>[];
+    final liabilityLines = <BalanceSheetLine>[];
+    final equityLines = <BalanceSheetLine>[];
+    var totalAssetsMinor = 0;
+    var totalLiabilitiesMinor = 0;
+    var totalEquityMinor = 0;
+    for (final row in rows) {
+      final amount = row.balanceMinor / 100.0;
+      final line = BalanceSheetLine(
+        accountType: row.accountType,
+        accountName: row.accountName,
+        balance: amount,
+      );
+      switch (row.accountType) {
+        case 'asset':
+          assetLines.add(line);
+          totalAssetsMinor += row.balanceMinor;
+        case 'liability':
+          liabilityLines.add(line);
+          totalLiabilitiesMinor += row.balanceMinor;
+        case 'equity':
+          equityLines.add(line);
+          totalEquityMinor += row.balanceMinor;
+      }
+    }
+    totalEquityMinor += (pnl.netIncome * 100).round();
+    return BalanceSheetData(
+      assetLines: assetLines,
+      liabilityLines: liabilityLines,
+      equityLines: equityLines,
+      totalAssets: totalAssetsMinor / 100.0,
+      totalLiabilities: totalLiabilitiesMinor / 100.0,
+      totalEquity: totalEquityMinor / 100.0,
+    );
+  }
+
+  Stream<List<TrialBalanceLine>> watchTrialBalance({bool preferCloud = false}) {
+    if (preferCloud) {
+      final now = DateTime.now();
+      final start = DateTime(now.year, 1, 1);
+      final end = DateTime(now.year, 12, 31);
+      return Stream.fromFuture(_watchCloudTrialBalance(start, end));
+    }
+
     final accountsStream = _db.select(_db.accounts).watch();
     final entriesStream = _db.select(_db.transactionEntries).watch();
 
@@ -1059,5 +1174,25 @@ class ReportsService {
       lines.sort((a, b) => a.accountName.compareTo(b.accountName));
       return lines;
     });
+  }
+
+  Future<List<TrialBalanceLine>> _watchCloudTrialBalance(
+    DateTime startsOn,
+    DateTime endsOn,
+  ) async {
+    final ledger = _ref.read(accountingLedgerRepositoryProvider);
+    final rows = await ledger.trialBalance(startsOn: startsOn, endsOn: endsOn);
+    return rows
+        .map(
+          (line) => TrialBalanceLine(
+            accountName: line.accountName,
+            accountCode: line.accountCode,
+            accountType: line.accountType,
+            debit: line.debitMinor / 100.0,
+            credit: line.creditMinor / 100.0,
+          ),
+        )
+        .where((line) => line.debit != 0 || line.credit != 0)
+        .toList(growable: false);
   }
 }

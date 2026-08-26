@@ -972,6 +972,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trialBalanceReport => 'Trial Balance';
 
   @override
+  String get trialBalanceLoadFailed => 'Could not load the trial balance.';
+
+  @override
+  String get trialBalanceServerSource => 'Cloud ledger data';
+
+  @override
+  String get trialBalanceLocalSource => 'This device’s local data';
+
+  @override
+  String get ledgerControl => 'Ledger Control';
+
+  @override
+  String get ledgerControlIntro =>
+      'Review cloud accounting periods, tax codes, and the chart of accounts. Posting and closing are server-authorized.';
+
+  @override
+  String get ledgerLoadFailed => 'Could not load the accounting controls.';
+
+  @override
+  String get accountingPeriods => 'Accounting periods';
+
+  @override
+  String get chartOfAccounts => 'Chart of accounts';
+
+  @override
+  String get taxCodes => 'Tax codes';
+
+  @override
+  String get noPeriods => 'No accounting periods are configured.';
+
+  @override
+  String get noAccounts => 'No cloud chart-of-accounts records are configured.';
+
+  @override
+  String get noTaxCodes => 'No active tax codes are configured.';
+
+  @override
+  String get closePeriod => 'Close period';
+
+  @override
+  String get periodClosed => 'Accounting period closed.';
+
+  @override
+  String get periodCloseFailed => 'Could not close the accounting period.';
+
+  @override
+  String get taxInclusive => 'tax inclusive';
+
+  @override
+  String get taxExclusive => 'tax exclusive';
+
+  @override
   String get addProduct => 'Add Product';
 
   @override
