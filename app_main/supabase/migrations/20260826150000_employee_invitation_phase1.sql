@@ -267,6 +267,102 @@ begin
 end;
 $$;
 
+create or replace function public.set_staff_status(
+  p_user_id uuid,
+  p_status text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_tenant_id uuid;
+begin
+  if p_status not in ('active', 'suspended', 'removed') then
+    raise exception 'Invalid staff status';
+  end if;
+  select sm.tenant_id
+    into v_tenant_id
+    from public.staff_members sm
+   where sm.user_id = auth.uid() and sm.status = 'active'
+   limit 1;
+  if v_tenant_id is null or not public.has_tenant_permission(
+    v_tenant_id, array['manageStaff','manageSettings']
+  ) then
+    raise exception 'Staff management permission required';
+  end if;
+  if exists (
+    select 1
+      from public.staff_members sm
+      join public.roles r on r.tenant_id = sm.tenant_id and r.id = sm.role_id
+     where sm.tenant_id = v_tenant_id and sm.user_id = p_user_id
+       and r.is_system_admin
+  ) then
+    raise exception 'The owner cannot be suspended or removed';
+  end if;
+  update public.staff_members
+     set status = p_status, updated_at = timezone('utc', now())
+   where tenant_id = v_tenant_id and user_id = p_user_id;
+end;
+$$;
+
+create or replace function public.create_invitations_bulk(
+  p_role_id uuid,
+  p_recipient_emails text[],
+  p_expires_hours integer default 24
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_email text;
+  v_result jsonb;
+  v_results jsonb := '[]'::jsonb;
+  v_count integer := coalesce(array_length(p_recipient_emails, 1), 0);
+begin
+  if v_count = 0 then
+    raise exception 'At least one recipient email is required';
+  end if;
+  if v_count > 100 then
+    raise exception 'Bulk invitations are limited to 100 recipients per batch';
+  end if;
+  foreach v_email in array p_recipient_emails loop
+    begin
+      v_result := public.create_invitation(
+        p_role_id,
+        v_email,
+        null,
+        null,
+        p_expires_hours
+      );
+      v_results := v_results || jsonb_build_array(
+        jsonb_build_object(
+          'email', lower(btrim(v_email)),
+          'success', true,
+          'code', v_result -> 'code',
+          'expires_at', v_result -> 'expires_at'
+        )
+      );
+    exception when others then
+      v_results := v_results || jsonb_build_array(
+        jsonb_build_object(
+          'email', lower(btrim(v_email)),
+          'success', false,
+          'error', 'Unable to create invitation'
+        )
+      );
+    end;
+  end loop;
+  return jsonb_build_object(
+    'requested', v_count,
+    'results', v_results
+  );
+end;
+$$;
+
 create or replace function public.revoke_invitation(p_invitation_id uuid)
 returns void
 language plpgsql
@@ -287,10 +383,14 @@ end;
 $$;
 
 revoke all on function public.create_invitation(uuid,text,text,text,integer) from public, anon, authenticated;
+revoke all on function public.set_staff_status(uuid,text) from public, anon, authenticated;
 revoke all on function public.validate_invitation(text,text) from public, anon, authenticated;
 revoke all on function public.redeem_invitation(text,text,text) from public, anon, authenticated;
+revoke all on function public.create_invitations_bulk(uuid,text[],integer) from public, anon, authenticated;
 revoke all on function public.revoke_invitation(uuid) from public, anon, authenticated;
 grant execute on function public.create_invitation(uuid,text,text,text,integer) to authenticated;
+grant execute on function public.set_staff_status(uuid,text) to authenticated;
 grant execute on function public.validate_invitation(text,text) to anon, authenticated;
 grant execute on function public.redeem_invitation(text,text,text) to authenticated;
+grant execute on function public.create_invitations_bulk(uuid,text[],integer) to authenticated;
 grant execute on function public.revoke_invitation(uuid) to authenticated;

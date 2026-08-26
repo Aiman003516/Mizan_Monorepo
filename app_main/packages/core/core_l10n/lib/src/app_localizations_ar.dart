@@ -2489,6 +2489,40 @@ class AppLocalizationsAr extends AppLocalizations {
   String get budgetAnalysis => 'تحليل الميزانية';
 
   @override
+  String get addBudget => 'إضافة ميزانية';
+
+  @override
+  String get budgetName => 'اسم الميزانية';
+
+  @override
+  String get periodStartDate => 'تاريخ بداية الفترة';
+
+  @override
+  String get addLineItem => 'إضافة سطر حساب';
+
+  @override
+  String get calculate => 'حساب';
+
+  @override
+  String get deleteLabel => 'حذف';
+
+  @override
+  String get budgetLineAccount => 'حساب الميزانية';
+
+  @override
+  String get plannedAmount => 'المبلغ المخطط';
+
+  @override
+  String get budgetSaved => 'تم حفظ الميزانية';
+
+  @override
+  String get budgetDeleted => 'تم حذف الميزانية';
+
+  @override
+  String get noBudgets =>
+      'لا توجد ميزانيات بعد. أضف ميزانية لمقارنة المبالغ المخططة بحركة دفتر الأستاذ.';
+
+  @override
   String get summaryTab => 'ملخص';
 
   @override
@@ -2905,6 +2939,33 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get staffManagement => 'إدارة الموظفين';
+
+  @override
+  String get activeStaff => 'النشطون';
+
+  @override
+  String get suspendStaff => 'تعليق الوصول';
+
+  @override
+  String get reactivateStaff => 'إعادة تفعيل الوصول';
+
+  @override
+  String get revokeInvitation => 'إلغاء الدعوة';
+
+  @override
+  String get pendingStaff => 'الدعوات المعلقة';
+
+  @override
+  String get suspendedStaff => 'الموقوفون';
+
+  @override
+  String get expiredStaff => 'الدعوات المنتهية';
+
+  @override
+  String get revokedStaff => 'الدعوات الملغاة';
+
+  @override
+  String get searchStaff => 'بحث عن الموظفين';
 
   @override
   String get changeRole => 'تغيير الدور';
@@ -4169,6 +4230,53 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get inviteStaff => 'دعوة موظف';
+
+  @override
+  String get bulkInviteStaff => 'دعوة الموظفين بشكل جماعي';
+
+  @override
+  String get bulkInviteHint =>
+      'أدخل بريداً إلكترونياً في كل سطر، بحد أقصى 100 موظف';
+
+  @override
+  String bulkInviteCount(int count) {
+    return 'عدد المدعوين: $count';
+  }
+
+  @override
+  String bulkInviteCreated(int count) {
+    return 'تم إنشاء $count دعوة';
+  }
+
+  @override
+  String bulkInvitePartial(int success, int failed) {
+    return 'تم إنشاء $success وفشل $failed';
+  }
+
+  @override
+  String get bulkInviteNoEmails =>
+      'أدخل بريداً إلكترونياً صالحاً واحداً على الأقل';
+
+  @override
+  String get bulkInviteLimit => 'يمكن أن تحتوي الدفعة على 100 موظف كحد أقصى';
+
+  @override
+  String get bulkInviteResults => 'نتائج الدعوات';
+
+  @override
+  String get invitationSetupRequired =>
+      'إعداد الدعوات غير مكتمل. طبّق أحدث ترحيل لدعوات Supabase ثم حاول مرة أخرى.';
+
+  @override
+  String get invitationAlreadyPending =>
+      'توجد دعوة نشطة لهذا البريد الإلكتروني بالفعل.';
+
+  @override
+  String get invitationPermissionDenied => 'ليس لديك صلاحية لدعوة الموظفين.';
+
+  @override
+  String get invitationNetworkError =>
+      'تعذر الوصول إلى خدمة الدعوات. تحقق من الاتصال وحاول مرة أخرى.';
 
   @override
   String get stepSelectRole => '1. اختر دوراً';

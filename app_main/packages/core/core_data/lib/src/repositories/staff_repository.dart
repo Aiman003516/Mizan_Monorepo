@@ -1,7 +1,60 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/rbac_models.dart';
+
+class StaffInvitation {
+  const StaffInvitation({
+    required this.id,
+    required this.email,
+    required this.roleId,
+    required this.status,
+    required this.expiresAt,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String email;
+  final String roleId;
+  final String status;
+  final DateTime? expiresAt;
+  final DateTime? createdAt;
+
+  bool get isExpired =>
+      expiresAt != null && expiresAt!.isBefore(DateTime.now());
+
+  factory StaffInvitation.fromJson(Map<String, dynamic> json) {
+    return StaffInvitation(
+      id: json['id'] as String? ?? '',
+      email: (json['recipient_email'] ?? json['email'] ?? '') as String,
+      roleId: json['role_id'] as String? ?? '',
+      status: json['status'] as String? ?? 'pending',
+      expiresAt: DateTime.tryParse(json['expires_at'] as String? ?? ''),
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? ''),
+    );
+  }
+}
+
+class BulkInvitationResult {
+  const BulkInvitationResult({
+    required this.email,
+    required this.success,
+    this.code,
+  });
+
+  final String email;
+  final bool success;
+  final String? code;
+
+  factory BulkInvitationResult.fromJson(Map<String, dynamic> json) {
+    return BulkInvitationResult(
+      email: json['email'] as String? ?? '',
+      success: json['success'] == true,
+      code: json['code'] as String?,
+    );
+  }
+}
 
 final staffRepositoryProvider = Provider<StaffRepository>((ref) {
   return StaffRepository(Supabase.instance.client);
@@ -13,6 +66,11 @@ final staffStreamProvider = StreamProvider.autoDispose<List<StaffMember>>((
   final repository = ref.watch(staffRepositoryProvider);
   return repository.watchCurrentTenantStaff();
 });
+
+final invitationsStreamProvider =
+    StreamProvider.autoDispose<List<StaffInvitation>>((ref) {
+      return ref.watch(staffRepositoryProvider).watchInvitations();
+    });
 
 class StaffRepository {
   final SupabaseClient _supabase;
@@ -44,8 +102,7 @@ class StaffRepository {
           in _supabase
               .from('staff_members')
               .stream(primaryKey: ['id'])
-              .eq('tenant_id', tenantId)
-              .eq('status', 'active')) {
+              .eq('tenant_id', tenantId)) {
         try {
           yield await _fetchStaff(tenantId);
         } catch (_) {
@@ -54,6 +111,47 @@ class StaffRepository {
       }
     } catch (_) {
       // Nonfatal when Realtime is unavailable or not configured.
+    }
+  }
+
+  Stream<List<StaffInvitation>> watchInvitations() async* {
+    final tenantId = await _getTenantId();
+    Future<List<StaffInvitation>> fetch() async {
+      final rows = await _supabase
+          .from('invites')
+          .select(
+            'id,recipient_email,email,role_id,status,expires_at,created_at',
+          )
+          .eq('tenant_id', tenantId)
+          .order('created_at', ascending: false);
+      return (rows as List)
+          .map(
+            (row) =>
+                StaffInvitation.fromJson(Map<String, dynamic>.from(row as Map)),
+          )
+          .toList(growable: false);
+    }
+
+    try {
+      yield await fetch();
+    } catch (_) {
+      yield const <StaffInvitation>[];
+      return;
+    }
+    try {
+      await for (final _
+          in _supabase
+              .from('invites')
+              .stream(primaryKey: ['id'])
+              .eq('tenant_id', tenantId)) {
+        try {
+          yield await fetch();
+        } catch (_) {
+          // Preserve the last successful invitation snapshot.
+        }
+      }
+    } catch (_) {
+      // Realtime is optional; the REST snapshot remains usable.
     }
   }
 
@@ -70,8 +168,7 @@ class StaffRepository {
           in _supabase
               .from('staff_members')
               .stream(primaryKey: ['id'])
-              .eq('tenant_id', tenantId)
-              .eq('status', 'active')) {
+              .eq('tenant_id', tenantId)) {
         try {
           yield await _fetchStaff(tenantId);
         } catch (_) {
@@ -90,7 +187,6 @@ class StaffRepository {
           'id,user_id,role_id,status,created_at,user_profiles(email,display_name)',
         )
         .eq('tenant_id', tenantId)
-        .eq('status', 'active')
         .order('created_at');
     return (rows as List)
         .map(
@@ -131,14 +227,22 @@ class StaffRepository {
         .eq('status', 'active');
   }
 
+  Future<void> setStaffStatus(String uid, String status) async {
+    await _supabase.rpc(
+      'set_staff_status',
+      params: {'p_user_id': uid, 'p_status': status},
+    );
+  }
+
   Future<void> removeStaffMember(String uid) async {
-    final tenantId = await _getTenantId();
-    await _supabase
-        .from('staff_members')
-        .update({'status': 'removed'})
-        .eq('user_id', uid)
-        .eq('tenant_id', tenantId)
-        .eq('status', 'active');
+    await setStaffStatus(uid, 'removed');
+  }
+
+  Future<void> revokeInvitation(String invitationId) async {
+    await _supabase.rpc(
+      'revoke_invitation',
+      params: {'p_invitation_id': invitationId},
+    );
   }
 
   Future<String> createInvite(String roleId, {String? recipientEmail}) async {
@@ -226,6 +330,44 @@ class StaffRepository {
       message: 'Invite redemption returned no role.',
       code: 'MIZAN_INVITE_INVALID_RESPONSE',
     );
+  }
+
+  Future<List<BulkInvitationResult>> createInvitationsBulk({
+    required String roleId,
+    required List<String> emails,
+  }) async {
+    final normalizedEmails = emails
+        .map((email) => email.trim().toLowerCase())
+        .where((email) => email.isNotEmpty)
+        .toSet()
+        .toList();
+    if (normalizedEmails.isEmpty || normalizedEmails.length > 100) {
+      throw const PostgrestException(
+        message: 'Bulk invitations require between 1 and 100 recipients.',
+        code: 'MIZAN_INVITE_BATCH_SIZE',
+      );
+    }
+    final result = await _supabase.rpc(
+      'create_invitations_bulk',
+      params: {
+        'p_role_id': roleId,
+        'p_recipient_emails': normalizedEmails,
+        'p_idempotency_key': const Uuid().v4(),
+      },
+    );
+    if (result is! Map || result['results'] is! List) {
+      throw const PostgrestException(
+        message: 'Bulk invitation creation returned no results.',
+        code: 'MIZAN_INVITE_INVALID_RESPONSE',
+      );
+    }
+    return (result['results'] as List)
+        .whereType<Map>()
+        .map(
+          (row) =>
+              BulkInvitationResult.fromJson(Map<String, dynamic>.from(row)),
+        )
+        .toList();
   }
 
   Future<Map<String, dynamic>?> validateInviteCode(String code) async {

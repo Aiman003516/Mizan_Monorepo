@@ -1,84 +1,33 @@
-// FILE: packages/features/feature_reports/lib/src/presentation/budget_screen.dart
-// Purpose: Budget creation and variance analysis dashboard
-// Reference: Accounting Principles 13e (Weygandt), Chapters 23-24
-
-import 'package:flutter/material.dart';
-import 'package:core_ui/core_ui.dart';
-import 'package:core_l10n/app_localizations.dart';
-import 'package:flutter/services.dart';
 import 'package:core_data/core_data.dart';
+import 'package:core_l10n/app_localizations.dart';
+import 'package:feature_accounts/feature_accounts.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_ui/shared_ui.dart';
 
-/// Budget Screen - Create budgets and analyze variances
-class BudgetScreen extends StatefulWidget {
+import '../data/budget_repository.dart';
+
+class BudgetScreen extends ConsumerStatefulWidget {
   const BudgetScreen({super.key});
 
   @override
-  State<BudgetScreen> createState() => _BudgetScreenState();
+  ConsumerState<BudgetScreen> createState() => _BudgetScreenState();
 }
 
-class _BudgetScreenState extends State<BudgetScreen>
+class _BudgetScreenState extends ConsumerState<BudgetScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  // Mock data for demonstration (in production, this comes from database)
-  final List<_MockBudgetLine> _budgetLines = [
-    _MockBudgetLine(
-      accountName: 'Sales Revenue',
-      accountType: 'revenue',
-      budgetedAmount: 50000000, // $500,000
-      actualAmount: 55000000, // $550,000
-    ),
-    _MockBudgetLine(
-      accountName: 'Service Revenue',
-      accountType: 'revenue',
-      budgetedAmount: 15000000, // $150,000
-      actualAmount: 14000000, // $140,000
-    ),
-    _MockBudgetLine(
-      accountName: 'Cost of Goods Sold',
-      accountType: 'expense',
-      budgetedAmount: 30000000, // $300,000
-      actualAmount: 28500000, // $285,000
-    ),
-    _MockBudgetLine(
-      accountName: 'Salaries Expense',
-      accountType: 'expense',
-      budgetedAmount: 12000000, // $120,000
-      actualAmount: 12500000, // $125,000
-    ),
-    _MockBudgetLine(
-      accountName: 'Rent Expense',
-      accountType: 'expense',
-      budgetedAmount: 3600000, // $36,000
-      actualAmount: 3600000, // $36,000
-    ),
-    _MockBudgetLine(
-      accountName: 'Utilities Expense',
-      accountType: 'expense',
-      budgetedAmount: 1200000, // $12,000
-      actualAmount: 1400000, // $14,000
-    ),
-    _MockBudgetLine(
-      accountName: 'Marketing Expense',
-      accountType: 'expense',
-      budgetedAmount: 5000000, // $50,000
-      actualAmount: 4200000, // $42,000
-    ),
-  ];
-
-  // Flexible budget inputs
-  final _fixedCostController = TextEditingController(text: '100000');
-  final _variableRateController = TextEditingController(text: '50');
-  final _plannedActivityController = TextEditingController(text: '2000');
-  final _actualActivityController = TextEditingController(text: '2200');
-  final _actualCostController = TextEditingController(text: '230000');
+  late final TabController _tabController;
+  final _fixedCostController = TextEditingController();
+  final _variableRateController = TextEditingController();
+  final _plannedActivityController = TextEditingController();
+  final _actualActivityController = TextEditingController();
+  final _actualCostController = TextEditingController();
   FlexibleBudgetResult? _flexibleBudgetResult;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _calculateFlexibleBudget();
   }
 
   @override
@@ -93,12 +42,17 @@ class _BudgetScreenState extends State<BudgetScreen>
   }
 
   void _calculateFlexibleBudget() {
-    final fixedCost = _dollarsToCents(_fixedCostController.text);
-    final variableRate = _dollarsToCents(_variableRateController.text);
+    final fixedCost = CurrencyFormatter.doubleToCents(
+      double.tryParse(_fixedCostController.text) ?? 0,
+    );
+    final variableRate = CurrencyFormatter.doubleToCents(
+      double.tryParse(_variableRateController.text) ?? 0,
+    );
     final plannedActivity = int.tryParse(_plannedActivityController.text) ?? 0;
     final actualActivity = int.tryParse(_actualActivityController.text) ?? 0;
-    final actualCost = _dollarsToCents(_actualCostController.text);
-
+    final actualCost = CurrencyFormatter.doubleToCents(
+      double.tryParse(_actualCostController.text) ?? 0,
+    );
     setState(() {
       _flexibleBudgetResult = BudgetingService.calculateFlexibleBudget(
         fixedPortion: fixedCost,
@@ -110,26 +64,53 @@ class _BudgetScreenState extends State<BudgetScreen>
     });
   }
 
-  int _dollarsToCents(String text) =>
-      ((double.tryParse(text) ?? 0) * 100).round();
+  String _formatCurrency(int cents, String currencyCode) {
+    return CurrencyFormatter.formatAmount(cents, currencyCode);
+  }
 
-  String _formatCurrency(int cents) {
-    final dollars = cents / 100;
-    final sign = dollars < 0 ? '-' : '';
-    final abs = dollars.abs();
-    if (abs >= 1000000) {
-      return '$sign\$${(abs / 1000000).toStringAsFixed(2)}M';
-    } else if (abs >= 1000) {
-      return '$sign\$${(abs / 1000).toStringAsFixed(1)}K';
-    }
-    return '$sign\$${abs.toStringAsFixed(2)}';
+  Future<void> _addBudget() async {
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (_) => const _BudgetEditorDialog(),
+    );
+    if (saved != true || !mounted) return;
+    ref.invalidate(budgetSummariesProvider);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context)!.budgetSaved)),
+    );
+  }
+
+  Future<void> _deleteBudget(BudgetReportSummary summary) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.deleteLabel),
+        content: Text(summary.budget.name),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.deleteLabel),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await ref.read(budgetRepositoryProvider).deleteBudget(summary.budget.id);
+    ref.invalidate(budgetSummariesProvider);
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.budgetDeleted)));
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.budgetAnalysis),
@@ -142,711 +123,653 @@ class _BudgetScreenState extends State<BudgetScreen>
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _addBudget,
+        icon: const Icon(Icons.add),
+        label: Text(l10n.addBudget),
+      ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildSummaryTab(theme),
-          _buildVariancesTab(theme),
-          _buildFlexibleBudgetTab(theme),
+          _buildSummaryTab(),
+          _buildVariancesTab(),
+          _buildFlexibleBudgetTab(),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryTab(ThemeData theme) {
+  Widget _buildSummaryTab() {
     final l10n = AppLocalizations.of(context)!;
-    // Calculate totals
-    int totalBudgetedRevenue = 0;
-    int totalActualRevenue = 0;
-    int totalBudgetedExpenses = 0;
-    int totalActualExpenses = 0;
-
-    for (final line in _budgetLines) {
-      if (line.accountType == 'revenue') {
-        totalBudgetedRevenue += line.budgetedAmount;
-        totalActualRevenue += line.actualAmount;
-      } else {
-        totalBudgetedExpenses += line.budgetedAmount;
-        totalActualExpenses += line.actualAmount;
-      }
-    }
-
-    final budgetedNetIncome = totalBudgetedRevenue - totalBudgetedExpenses;
-    final actualNetIncome = totalActualRevenue - totalActualExpenses;
-    final netIncomeVariance = actualNetIncome - budgetedNetIncome;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          // Header Cards
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryCard(
-                  theme,
-                  title: l10n.budgetedNetIncome,
-                  value: _formatCurrency(budgetedNetIncome),
-                  icon: Icons.flag,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildSummaryCard(
-                  theme,
-                  title: l10n.actualNetIncome,
-                  value: _formatCurrency(actualNetIncome),
-                  icon: Icons.check_circle,
-                  color: netIncomeVariance >= 0
-                      ? context.appColors.success
-                      : context.appColors.error,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _buildSummaryCard(
-            theme,
-            title: l10n.netIncomeVariance,
-            value:
-                '${netIncomeVariance >= 0 ? '+' : ''}${_formatCurrency(netIncomeVariance)}',
-            subtitle: netIncomeVariance >= 0
-                ? '${l10n.favorableLabel} ✓'
-                : l10n.unfavorableLabel,
-            icon: netIncomeVariance >= 0
-                ? Icons.trending_up
-                : Icons.trending_down,
-            color: netIncomeVariance >= 0
-                ? context.appColors.success
-                : context.appColors.error,
-          ),
-          const SizedBox(height: 24),
-
-          // Revenue Summary
-          _buildCategoryCard(
-            theme,
-            title: l10n.revenueLabel,
-            budgeted: totalBudgetedRevenue,
-            actual: totalActualRevenue,
-            isRevenue: true,
-          ),
-          const SizedBox(height: 12),
-
-          // Expenses Summary
-          _buildCategoryCard(
-            theme,
-            title: l10n.expensesLabel,
-            budgeted: totalBudgetedExpenses,
-            actual: totalActualExpenses,
-            isRevenue: false,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVariancesTab(ThemeData theme) {
-    final l10n = AppLocalizations.of(context)!;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.budgetVsActual, style: theme.textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(
-            l10n.greenFavorable,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Revenue Section
-          Text(
-            l10n.revenueLabel.toUpperCase(),
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ..._budgetLines
-              .where((l) => l.accountType == 'revenue')
-              .map((line) => _buildVarianceRow(theme, line)),
-
-          const SizedBox(height: 24),
-
-          // Expenses Section
-          Text(
-            l10n.expensesLabel.toUpperCase(),
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: context.appColors.warning,
-            ),
-          ),
-          const SizedBox(height: 8),
-          ..._budgetLines
-              .where((l) => l.accountType == 'expense')
-              .map((line) => _buildVarianceRow(theme, line)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFlexibleBudgetTab(ThemeData theme) {
-    final l10n = AppLocalizations.of(context)!;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.flexibleBudgetAnalysis, style: theme.textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(
-            l10n.separateVariances,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Input Card
-          Card(
+    final currencyCode = ref.watch(defaultCurrencyProvider);
+    final budgetsAsync = ref.watch(budgetSummariesProvider);
+    return budgetsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => Center(child: Text(l10n.errorLoadingData)),
+      data: (summaries) {
+        if (summaries.isEmpty) {
+          return Center(
             child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.costStructure, style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _fixedCostController,
-                          decoration: InputDecoration(
-                            labelText: l10n.fixedCosts,
-                            prefixText: '\$ ',
-                            border: OutlineInputBorder(),
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          onChanged: (_) => _calculateFlexibleBudget(),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextField(
-                          controller: _variableRateController,
-                          decoration: InputDecoration(
-                            labelText: l10n.variableRateUnit,
-                            prefixText: '\$ ',
-                            border: OutlineInputBorder(),
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          onChanged: (_) => _calculateFlexibleBudget(),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _plannedActivityController,
-                          decoration: InputDecoration(
-                            labelText: l10n.plannedActivity,
-                            suffixText: l10n.unitsLowercase,
-                            border: OutlineInputBorder(),
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          onChanged: (_) => _calculateFlexibleBudget(),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextField(
-                          controller: _actualActivityController,
-                          decoration: InputDecoration(
-                            labelText: l10n.actualActivity,
-                            suffixText: l10n.unitsLowercase,
-                            border: OutlineInputBorder(),
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          onChanged: (_) => _calculateFlexibleBudget(),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _actualCostController,
-                    decoration: InputDecoration(
-                      labelText: l10n.actualTotalCost,
-                      prefixText: '\$ ',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    onChanged: (_) => _calculateFlexibleBudget(),
-                  ),
-                ],
-              ),
+              padding: const EdgeInsets.all(24),
+              child: Text(l10n.noBudgets, textAlign: TextAlign.center),
             ),
-          ),
-          const SizedBox(height: 24),
-
-          // Results
-          if (_flexibleBudgetResult != null) ...[
-            // Budget Comparison
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Text(
-                      l10n.budgetComparison,
-                      style: theme.textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildComparisonRow(
-                      l10n.staticBudget,
-                      _formatCurrency(_flexibleBudgetResult!.staticBudget),
-                      theme.colorScheme.primary,
-                    ),
-                    _buildComparisonRow(
-                      l10n.flexibleBudgetResult,
-                      _formatCurrency(_flexibleBudgetResult!.flexibleBudget),
-                      context.appColors.secondary,
-                    ),
-                    _buildComparisonRow(
-                      l10n.actualCost,
-                      _formatCurrency(_flexibleBudgetResult!.actualAmount),
-                      context.appColors.warning,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Variance Analysis
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Text(
-                      l10n.varianceAnalysis,
-                      style: theme.textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildVarianceAnalysisRow(
-                      l10n.volumeVariance,
-                      _flexibleBudgetResult!.volumeVariance,
-                      l10n.dueToActivityLevel,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildVarianceAnalysisRow(
-                      l10n.spendingVariance,
-                      _flexibleBudgetResult!.spendingVariance,
-                      l10n.dueToEfficiency,
-                    ),
-                    const Divider(height: 24),
-                    _buildVarianceAnalysisRow(
-                      l10n.totalVariance,
-                      _flexibleBudgetResult!.totalVariance,
-                      l10n.actualMinusStatic,
-                      isTotal: true,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Formula Card
-            Card(
-              color: theme.colorScheme.tertiaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.functions,
-                          color: theme.colorScheme.onTertiaryContainer,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          l10n.costStructure,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onTertiaryContainer,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      l10n.varianceFormulas,
-                      style: TextStyle(
-                        color: theme.colorScheme.onTertiaryContainer,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+          itemCount: summaries.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          itemBuilder: (context, index) {
+            final summary = summaries[index];
+            return _buildBudgetCard(summary, currencyCode);
+          },
+        );
+      },
     );
   }
 
-  // Helper Widgets
-
-  Widget _buildSummaryCard(
-    ThemeData theme, {
-    required String title,
-    required String value,
-    String? subtitle,
-    required IconData icon,
-    required Color color,
-  }) {
+  Widget _buildBudgetCard(BudgetReportSummary summary, String currencyCode) {
+    final l10n = AppLocalizations.of(context)!;
+    final budget = summary.budget;
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
+      clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(icon, color: color, size: 20),
-                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    title,
-                    style: theme.textTheme.bodyMedium,
-                    overflow: TextOverflow.ellipsis,
+                    budget.name,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'delete') _deleteBudget(summary);
+                  },
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(l10n.deleteLabel),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 12),
             Text(
-              value,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+              '${MaterialLocalizations.of(context).formatMediumDate(budget.startDate)} – '
+              '${MaterialLocalizations.of(context).formatMediumDate(budget.endDate)}',
+              style: Theme.of(context).textTheme.bodySmall,
             ),
-            if (subtitle != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: theme.textTheme.bodySmall?.copyWith(color: color),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _Metric(
+                  label: l10n.budgetedNetIncome,
+                  value: _formatCurrency(
+                    summary.budgetedNetIncome,
+                    currencyCode,
+                  ),
+                  color: colorScheme.primary,
+                ),
+                _Metric(
+                  label: l10n.actualNetIncome,
+                  value: _formatCurrency(summary.actualNetIncome, currencyCode),
+                  color: colorScheme.tertiary,
+                ),
+                _Metric(
+                  label: l10n.netIncomeVariance,
+                  value: _formatCurrency(
+                    summary.netIncomeVariance,
+                    currencyCode,
+                  ),
+                  color: summary.netIncomeVariance >= 0
+                      ? colorScheme.tertiary
+                      : colorScheme.error,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _SummaryRow(
+              label: l10n.revenueLabel,
+              budgeted: _formatCurrency(summary.budgetedRevenue, currencyCode),
+              actual: _formatCurrency(summary.actualRevenue, currencyCode),
+            ),
+            _SummaryRow(
+              label: l10n.expensesLabel,
+              budgeted: _formatCurrency(summary.budgetedExpenses, currencyCode),
+              actual: _formatCurrency(summary.actualExpenses, currencyCode),
+            ),
+            if (summary.lines.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(l10n.noTransactionEntries),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVariancesTab() {
+    final l10n = AppLocalizations.of(context)!;
+    final currencyCode = ref.watch(defaultCurrencyProvider);
+    final budgetsAsync = ref.watch(budgetSummariesProvider);
+    return budgetsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => Center(child: Text(l10n.errorLoadingData)),
+      data: (summaries) {
+        if (summaries.isEmpty) return Center(child: Text(l10n.noBudgets));
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+          children: [
+            Text(
+              l10n.budgetVsActual,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(l10n.greenFavorable),
+            const SizedBox(height: 16),
+            for (final summary in summaries) ...[
+              Text(
+                summary.budget.name,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              if (summary.lines.isEmpty) Text(l10n.noTransactionEntries),
+              for (final line in summary.lines)
+                Card(
+                  child: ListTile(
+                    title: Text(line.account.name),
+                    subtitle: Text(
+                      '${l10n.budgetedLabel}: ${_formatCurrency(line.line.budgetedAmount, currencyCode)}\n'
+                      '${l10n.actualLabel}: ${_formatCurrency(line.actualAmount, currencyCode)}',
+                    ),
+                    trailing: Text(
+                      '${line.variance >= 0 ? '+' : ''}${_formatCurrency(line.variance, currencyCode)}',
+                      style: TextStyle(
+                        color: line.isFavorable
+                            ? Theme.of(context).colorScheme.tertiary
+                            : Theme.of(context).colorScheme.error,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 16),
             ],
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildCategoryCard(
-    ThemeData theme, {
-    required String title,
-    required int budgeted,
-    required int actual,
-    required bool isRevenue,
-  }) {
+  Widget _buildFlexibleBudgetTab() {
     final l10n = AppLocalizations.of(context)!;
-    final variance = actual - budgeted;
-    final isFavorable = isRevenue ? variance > 0 : variance < 0;
-    final color = isFavorable
-        ? context.appColors.success
-        : context.appColors.error;
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: theme.textTheme.titleMedium),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.budgetedLabel,
-                        style: theme.textTheme.bodySmall,
-                      ),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: AlignmentDirectional.centerStart,
-                        child: Text(
-                          '\u200E${_formatCurrency(budgeted)}',
-                          style: theme.textTheme.titleMedium,
-                          textDirection: TextDirection.ltr,
-                          maxLines: 1,
-                          softWrap: false,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(l10n.actualLabel, style: theme.textTheme.bodySmall),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: AlignmentDirectional.centerStart,
-                        child: Text(
-                          '\u200E${_formatCurrency(actual)}',
-                          style: theme.textTheme.titleMedium,
-                          textDirection: TextDirection.ltr,
-                          maxLines: 1,
-                          softWrap: false,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.varianceLabel,
-                        style: theme.textTheme.bodySmall,
-                      ),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: AlignmentDirectional.centerStart,
-                        child: Text(
-                          '\u200E${variance >= 0 ? '+' : ''}${_formatCurrency(variance)}',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: color,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textDirection: TextDirection.ltr,
-                          maxLines: 1,
-                          softWrap: false,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+    final currencyCode = ref.watch(defaultCurrencyProvider);
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+      children: [
+        Text(
+          l10n.flexibleBudgetAnalysis,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
-      ),
-    );
-  }
-
-  Widget _buildVarianceRow(ThemeData theme, _MockBudgetLine line) {
-    final variance = BudgetingService.calculateVariance(
-      accountId: '',
-      accountName: line.accountName,
-      accountType: line.accountType,
-      budgetedAmount: line.budgetedAmount,
-      actualAmount: line.actualAmount,
-    );
-
-    final color = variance.isFavorable
-        ? context.appColors.success
-        : context.appColors.error;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Text(
-                line.accountName,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Expanded(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: AlignmentDirectional.centerEnd,
-                child: Text(
-                  '\u200E${_formatCurrency(line.budgetedAmount)}',
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.ltr,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-              ),
-            ),
-            Expanded(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: AlignmentDirectional.centerEnd,
-                child: Text(
-                  '\u200E${_formatCurrency(line.actualAmount)}',
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.ltr,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-              ),
-            ),
-            Expanded(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: AlignmentDirectional.centerEnd,
-                child: Text(
-                  '\u200E${variance.variance >= 0 ? '+' : ''}${_formatCurrency(variance.variance)}',
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.ltr,
-                  style: TextStyle(color: color, fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 40,
-              child: Icon(
-                variance.isFavorable
-                    ? Icons.check_circle_outline
-                    : Icons.warning_outlined,
-                color: color,
-                size: 20,
-              ),
-            ),
-          ],
+        const SizedBox(height: 8),
+        Text(l10n.flexibleBudgetResult),
+        const SizedBox(height: 16),
+        _amountField(_fixedCostController, l10n.fixedCosts),
+        _amountField(_variableRateController, l10n.variableRateUnit),
+        _numberField(_plannedActivityController, l10n.plannedActivity),
+        _numberField(_actualActivityController, l10n.actualActivity),
+        _amountField(_actualCostController, l10n.actualCost),
+        const SizedBox(height: 8),
+        FilledButton.icon(
+          onPressed: _calculateFlexibleBudget,
+          icon: const Icon(Icons.calculate_outlined),
+          label: Text(l10n.calculate),
         ),
-      ),
-    );
-  }
-
-  Widget _buildComparisonRow(String label, String value, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: color,
-              fontSize: 16,
+        if (_flexibleBudgetResult != null) ...[
+          const SizedBox(height: 16),
+          _ResultRow(
+            l10n.staticBudget,
+            _formatCurrency(_flexibleBudgetResult!.staticBudget, currencyCode),
+          ),
+          _ResultRow(
+            l10n.flexibleBudgetResult,
+            _formatCurrency(
+              _flexibleBudgetResult!.flexibleBudget,
+              currencyCode,
             ),
           ),
+          _ResultRow(
+            l10n.actualTotalCost,
+            _formatCurrency(_flexibleBudgetResult!.actualAmount, currencyCode),
+          ),
+          _ResultRow(
+            l10n.volumeVariance,
+            _formatCurrency(
+              _flexibleBudgetResult!.volumeVariance,
+              currencyCode,
+            ),
+          ),
+          _ResultRow(
+            l10n.spendingVariance,
+            _formatCurrency(
+              _flexibleBudgetResult!.spendingVariance,
+              currencyCode,
+            ),
+          ),
+          _ResultRow(
+            l10n.totalVariance,
+            _formatCurrency(_flexibleBudgetResult!.totalVariance, currencyCode),
+          ),
         ],
+      ],
+    );
+  }
+
+  Widget _amountField(TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: controller,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
       ),
     );
   }
 
-  Widget _buildVarianceAnalysisRow(
-    String label,
-    int amount,
-    String description, {
-    bool isTotal = false,
-  }) {
-    final l10n = AppLocalizations.of(context)!;
-    final isFavorable = amount < 0; // For costs, negative = good
-    final color = amount == 0
-        ? context.appColors.subtleText
-        : isFavorable
-        ? context.appColors.success
-        : context.appColors.error;
+  Widget _numberField(TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextField(
+        controller: controller,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+}
 
-    return Row(
-      children: [
-        Expanded(
+class _Metric extends StatelessWidget {
+  const _Metric({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 150, maxWidth: 260),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(label),
+              const SizedBox(height: 4),
               Text(
-                label,
-                style: TextStyle(
-                  fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
-                  fontSize: isTotal ? 16 : 14,
-                ),
-              ),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: context.appColors.primary,
-                ),
+                value,
+                style: TextStyle(fontWeight: FontWeight.bold, color: color),
               ),
             ],
           ),
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${amount >= 0 ? '+' : ''}${_formatCurrency(amount)}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: color,
-                fontSize: isTotal ? 18 : 14,
-              ),
+      ),
+    );
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  const _SummaryRow({
+    required this.label,
+    required this.budgeted,
+    required this.actual,
+  });
+  final String label;
+  final String budgeted;
+  final String actual;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(child: Text(label)),
+          Text(budgeted, textDirection: TextDirection.ltr),
+          const SizedBox(width: 12),
+          Text(actual, textDirection: TextDirection.ltr),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResultRow extends StatelessWidget {
+  const _ResultRow(this.label, this.value);
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(label),
+      trailing: Text(value, textDirection: TextDirection.ltr),
+    );
+  }
+}
+
+class _BudgetEditorDialog extends ConsumerStatefulWidget {
+  const _BudgetEditorDialog();
+
+  @override
+  ConsumerState<_BudgetEditorDialog> createState() =>
+      _BudgetEditorDialogState();
+}
+
+class _DraftLine {
+  _DraftLine();
+  Account? account;
+  final amountController = TextEditingController();
+
+  void dispose() => amountController.dispose();
+}
+
+class _BudgetEditorDialogState extends ConsumerState<_BudgetEditorDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  late DateTime _startDate;
+  late DateTime _endDate;
+  final _lines = <_DraftLine>[];
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _startDate = DateTime(now.year, now.month, 1);
+    _endDate = DateTime(now.year, now.month + 1, 0);
+    _lines.add(_DraftLine());
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    for (final line in _lines) {
+      line.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _pickDate({required bool start}) async {
+    final selected = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      initialDate: start ? _startDate : _endDate,
+    );
+    if (selected == null) return;
+    setState(() {
+      if (start) {
+        _startDate = selected;
+      } else {
+        _endDate = selected;
+      }
+    });
+  }
+
+  Future<void> _save() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
+    final drafts = <BudgetLineDraft>[];
+    for (final line in _lines) {
+      final amount = double.tryParse(line.amountController.text.trim());
+      if (line.account == null || amount == null || amount < 0) {
+        setState(() => _error = AppLocalizations.of(context)!.invalidAmount);
+        return;
+      }
+      drafts.add(
+        BudgetLineDraft(
+          accountId: line.account!.id,
+          budgetedAmount: CurrencyFormatter.doubleToCents(amount),
+        ),
+      );
+    }
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await ref
+          .read(budgetRepositoryProvider)
+          .createBudget(
+            name: _nameController.text,
+            periodType: 'custom',
+            startDate: _startDate,
+            endDate: _endDate,
+            status: 'draft',
+            budgetType: 'static',
+            lines: drafts,
+          );
+      if (mounted) Navigator.pop(context, true);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _error = AppLocalizations.of(context)!.errorLoadingData);
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final accountsAsync = ref.watch(accountsStreamProvider);
+    return AlertDialog(
+      title: Text(l10n.addBudget),
+      content: SizedBox(
+        width: 520,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(labelText: l10n.budgetName),
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? l10n.nameIsRequired
+                      : null,
+                ),
+                const SizedBox(height: 12),
+                _DateButton(
+                  label: l10n.periodStartDate,
+                  date: _startDate,
+                  onPressed: () => _pickDate(start: true),
+                ),
+                _DateButton(
+                  label: l10n.periodEndDate,
+                  date: _endDate,
+                  onPressed: () => _pickDate(start: false),
+                ),
+                const SizedBox(height: 8),
+                accountsAsync.when(
+                  loading: () => const LinearProgressIndicator(),
+                  error: (_, __) => Text(l10n.errorLoadingAccounts),
+                  data: (accounts) {
+                    final usable = accounts
+                        .where(
+                          (account) =>
+                              (account.type.toLowerCase() == 'revenue' ||
+                                  account.type.toLowerCase() == 'expense') &&
+                              !account.isHeader,
+                        )
+                        .toList();
+                    return Column(
+                      children: [
+                        for (final line in _lines)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: DropdownButtonFormField<Account>(
+                                    initialValue: usable.contains(line.account)
+                                        ? line.account
+                                        : null,
+                                    decoration: InputDecoration(
+                                      labelText: l10n.budgetLineAccount,
+                                      border: const OutlineInputBorder(),
+                                    ),
+                                    items: usable
+                                        .map(
+                                          (account) => DropdownMenuItem(
+                                            value: account,
+                                            child: Text(
+                                              account.name,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (value) =>
+                                        setState(() => line.account = value),
+                                    validator: (value) => value == null
+                                        ? l10n.requiredField
+                                        : null,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 125,
+                                  child: TextFormField(
+                                    controller: line.amountController,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                    decoration: InputDecoration(
+                                      labelText: l10n.plannedAmount,
+                                      border: const OutlineInputBorder(),
+                                    ),
+                                    validator: (value) {
+                                      final amount = double.tryParse(
+                                        value ?? '',
+                                      );
+                                      return amount == null || amount < 0
+                                          ? l10n.invalidAmount
+                                          : null;
+                                    },
+                                  ),
+                                ),
+                                if (_lines.length > 1)
+                                  IconButton(
+                                    onPressed: () => setState(() {
+                                      line.dispose();
+                                      _lines.remove(line);
+                                    }),
+                                    icon: const Icon(
+                                      Icons.remove_circle_outline,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: TextButton.icon(
+                            onPressed: usable.isEmpty
+                                ? null
+                                : () =>
+                                      setState(() => _lines.add(_DraftLine())),
+                            icon: const Icon(Icons.add),
+                            label: Text(l10n.addLineItem),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                if (_error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      _error!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            Text(
-              amount == 0
-                  ? l10n.onTarget
-                  : isFavorable
-                  ? l10n.favorableLabel
-                  : l10n.unfavorableLabel,
-              style: TextStyle(fontSize: 11, color: color),
-            ),
-          ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _save,
+          child: _saving
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.save),
         ),
       ],
     );
   }
 }
 
-// Mock data class for demonstration
-class _MockBudgetLine {
-  final String accountName;
-  final String accountType;
-  final int budgetedAmount;
-  final int actualAmount;
-
-  const _MockBudgetLine({
-    required this.accountName,
-    required this.accountType,
-    required this.budgetedAmount,
-    required this.actualAmount,
+class _DateButton extends StatelessWidget {
+  const _DateButton({
+    required this.label,
+    required this.date,
+    required this.onPressed,
   });
+  final String label;
+  final DateTime date;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(label),
+      subtitle: Text(MaterialLocalizations.of(context).formatMediumDate(date)),
+      trailing: const Icon(Icons.calendar_today_outlined),
+      onTap: onPressed,
+    );
+  }
 }

@@ -1123,6 +1123,17 @@
   },
   "pleaseSelectDefaultCategory": "Please select a Default Category",
   "budgetAnalysis": "Budget Analysis",
+  "addBudget": "Add budget",
+  "budgetName": "Budget name",
+  "periodStartDate": "Period start date",
+  "addLineItem": "Add account line",
+  "calculate": "Calculate",
+  "deleteLabel": "Delete",
+  "budgetLineAccount": "Budget account",
+  "plannedAmount": "Planned amount",
+  "budgetSaved": "Budget saved",
+  "budgetDeleted": "Budget deleted",
+  "noBudgets": "No budgets yet. Add a budget to compare planned amounts with ledger activity.",
   "summaryTab": "Summary",
   "variancesTab": "Variances",
   "flexibleBudgetTab": "Flexible Budget",
@@ -1262,6 +1273,15 @@
   "bookBalanceLabel": "Book Balance:",
   "entryReconciled": "Entry reconciled",
   "staffManagement": "Staff Management",
+  "activeStaff": "Active",
+  "suspendStaff": "Suspend access",
+  "reactivateStaff": "Reactivate access",
+  "revokeInvitation": "Revoke invitation",
+  "pendingStaff": "Pending invitations",
+  "suspendedStaff": "Suspended",
+  "expiredStaff": "Expired invitations",
+  "revokedStaff": "Revoked invitations",
+  "searchStaff": "Search employees",
   "changeRole": "Change Role",
   "removeAccess": "Remove Access",
   "roleSaved": "Role saved successfully!",
@@ -1916,6 +1936,18 @@
   },
   "removeStaffWarning": "They will lose access to this business immediately.",
   "inviteStaff": "Invite Staff",
+  "bulkInviteStaff": "Bulk invite employees",
+  "bulkInviteHint": "Enter one email per line, up to 100 employees",
+  "bulkInviteCount": "Recipients: {count}",
+  "bulkInviteCreated": "Created {count} invitations",
+  "bulkInvitePartial": "{success} created, {failed} failed",
+  "bulkInviteNoEmails": "Enter at least one valid email address",
+  "bulkInviteLimit": "A batch can contain no more than 100 employees",
+  "bulkInviteResults": "Invitation results",
+  "invitationSetupRequired": "Invitation setup is incomplete. Apply the latest Supabase invitation migration and try again.",
+  "invitationAlreadyPending": "An active invitation already exists for this email.",
+  "invitationPermissionDenied": "You do not have permission to invite employees.",
+  "invitationNetworkError": "Could not reach the invitation service. Check your connection and try again.",
   "stepSelectRole": "1. Select a Role",
   "chooseRoleHint": "Choose Role (e.g. Cashier)",
   "errorLoadingRoles": "Error loading roles: {error}",
@@ -1933,6 +1965,30 @@
   "copyInviteCode": "Copy invite code",
   "inviteCodeCopied": "Invite code copied",
   "inviteShareText": "You are invited to join my business on Mizan!\n\n1. Download or open the app\n2. Tap Sign In / Create Account\n3. Tap Join Organization and enter code: {code}\n\nDo not forward this invitation. It is valid for 24 hours.",
+  "@bulkInviteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@bulkInviteCreated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@bulkInvitePartial": {
+    "placeholders": {
+      "success": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
   "@inviteShareText": {
     "placeholders": {
       "code": {

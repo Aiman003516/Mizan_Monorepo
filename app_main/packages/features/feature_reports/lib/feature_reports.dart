@@ -1,6 +1,7 @@
 // Data
 export 'src/data/report_models.dart';
 export 'src/data/reports_service.dart';
+export 'src/data/budget_repository.dart';
 export 'src/data/export_service.dart';
 
 // Providers
@@ -22,8 +23,6 @@ export 'src/data/report_templates_repository.dart';
 export 'src/presentation/report_marketplace_screen.dart';
 export 'src/presentation/reports_hub_screen.dart';
 export 'src/presentation/operations_report_screens.dart';
-
-
 
 // Phase D: Enhanced Reports
 export 'src/presentation/cash_flow_screen.dart';

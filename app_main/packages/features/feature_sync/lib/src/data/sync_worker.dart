@@ -10,7 +10,14 @@ void callbackDispatcher() {
       await SyncService.performSilentBackup();
       return true;
     } catch (e) {
-      print("Background task failed: $e");
+      if (SyncService.isNonRetryableSilentBackupError(e)) {
+        print(
+          "Background backup skipped: Google Drive setup or authorization "
+          "is required; no automatic retry will be scheduled.",
+        );
+        return true;
+      }
+      print("Background task failed temporarily: $e");
       return false;
     }
   });

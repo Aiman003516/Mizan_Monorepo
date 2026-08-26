@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:core_l10n/app_localizations.dart';
@@ -44,14 +46,44 @@ class _InviteStaffScreenState extends ConsumerState<InviteStaffScreen> {
       setState(() {
         _generatedCode = code;
       });
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(l10n.errorLoadingData)));
+      ).showSnackBar(SnackBar(content: Text(_inviteErrorMessage(error, l10n))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  String _inviteErrorMessage(Object error, AppLocalizations l10n) {
+    final message = error.toString().toLowerCase();
+    if (message.contains('42883') ||
+        message.contains('create_invitation') &&
+            (message.contains('function') ||
+                message.contains('does not exist')) ||
+        message.contains('mizan_invite_setup')) {
+      return l10n.invitationSetupRequired;
+    }
+    if (message.contains('42501') ||
+        message.contains('permission') ||
+        message.contains('not authorized') ||
+        message.contains('forbidden')) {
+      return l10n.invitationPermissionDenied;
+    }
+    if (message.contains('already') ||
+        message.contains('pending') ||
+        message.contains('duplicate') ||
+        message.contains('unique constraint')) {
+      return l10n.invitationAlreadyPending;
+    }
+    if (error is SocketException ||
+        message.contains('timeout') ||
+        message.contains('failed host lookup') ||
+        message.contains('network')) {
+      return l10n.invitationNetworkError;
+    }
+    return l10n.errorLoadingData;
   }
 
   void _shareInvite() {

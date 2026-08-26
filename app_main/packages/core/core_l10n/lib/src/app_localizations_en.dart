@@ -2499,6 +2499,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get budgetAnalysis => 'Budget Analysis';
 
   @override
+  String get addBudget => 'Add budget';
+
+  @override
+  String get budgetName => 'Budget name';
+
+  @override
+  String get periodStartDate => 'Period start date';
+
+  @override
+  String get addLineItem => 'Add account line';
+
+  @override
+  String get calculate => 'Calculate';
+
+  @override
+  String get deleteLabel => 'Delete';
+
+  @override
+  String get budgetLineAccount => 'Budget account';
+
+  @override
+  String get plannedAmount => 'Planned amount';
+
+  @override
+  String get budgetSaved => 'Budget saved';
+
+  @override
+  String get budgetDeleted => 'Budget deleted';
+
+  @override
+  String get noBudgets =>
+      'No budgets yet. Add a budget to compare planned amounts with ledger activity.';
+
+  @override
   String get summaryTab => 'Summary';
 
   @override
@@ -2915,6 +2949,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get staffManagement => 'Staff Management';
+
+  @override
+  String get activeStaff => 'Active';
+
+  @override
+  String get suspendStaff => 'Suspend access';
+
+  @override
+  String get reactivateStaff => 'Reactivate access';
+
+  @override
+  String get revokeInvitation => 'Revoke invitation';
+
+  @override
+  String get pendingStaff => 'Pending invitations';
+
+  @override
+  String get suspendedStaff => 'Suspended';
+
+  @override
+  String get expiredStaff => 'Expired invitations';
+
+  @override
+  String get revokedStaff => 'Revoked invitations';
+
+  @override
+  String get searchStaff => 'Search employees';
 
   @override
   String get changeRole => 'Change Role';
@@ -4170,6 +4231,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get inviteStaff => 'Invite Staff';
+
+  @override
+  String get bulkInviteStaff => 'Bulk invite employees';
+
+  @override
+  String get bulkInviteHint => 'Enter one email per line, up to 100 employees';
+
+  @override
+  String bulkInviteCount(int count) {
+    return 'Recipients: $count';
+  }
+
+  @override
+  String bulkInviteCreated(int count) {
+    return 'Created $count invitations';
+  }
+
+  @override
+  String bulkInvitePartial(int success, int failed) {
+    return '$success created, $failed failed';
+  }
+
+  @override
+  String get bulkInviteNoEmails => 'Enter at least one valid email address';
+
+  @override
+  String get bulkInviteLimit =>
+      'A batch can contain no more than 100 employees';
+
+  @override
+  String get bulkInviteResults => 'Invitation results';
+
+  @override
+  String get invitationSetupRequired =>
+      'Invitation setup is incomplete. Apply the latest Supabase invitation migration and try again.';
+
+  @override
+  String get invitationAlreadyPending =>
+      'An active invitation already exists for this email.';
+
+  @override
+  String get invitationPermissionDenied =>
+      'You do not have permission to invite employees.';
+
+  @override
+  String get invitationNetworkError =>
+      'Could not reach the invitation service. Check your connection and try again.';
 
   @override
   String get stepSelectRole => '1. Select a Role';

@@ -47,6 +47,9 @@ Future<void> main() async {
         networkType:
             NetworkType.connected, // Only run when internet is available
       ),
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
+      backoffPolicy: BackoffPolicy.exponential,
+      backoffPolicyDelay: const Duration(minutes: 15),
     );
   }
 

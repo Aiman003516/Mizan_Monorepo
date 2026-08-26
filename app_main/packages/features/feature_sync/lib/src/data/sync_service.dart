@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:core_database/core_database.dart';
 import 'package:feature_auth/feature_auth.dart';
@@ -14,13 +15,13 @@ final syncServiceProvider = Provider<SyncService>((ref) {
 });
 
 // ⚡ FIX: Split the states so Backup and Restore don't confuse each other
-enum SyncStatus { 
-  idle, 
-  backupInProgress, 
-  restoreInProgress, 
-  backupSuccess, 
-  restoreSuccess, 
-  error 
+enum SyncStatus {
+  idle,
+  backupInProgress,
+  restoreInProgress,
+  backupSuccess,
+  restoreSuccess,
+  error,
 }
 
 final syncStatusProvider = StateProvider<SyncStatus>((ref) => SyncStatus.idle);
@@ -31,6 +32,38 @@ class SyncService {
 
   static const String _dbFileName = 'mizan.db';
   static const String _backupFileName = 'mizan_backup.db';
+  static const String silentBackupSetupRequiredKey =
+      'mizan.silent_backup_setup_required';
+  static const String silentBackupSetupErrorKey =
+      'mizan.silent_backup_setup_error';
+
+  /// Configuration/authentication failures should not cause an hourly retry
+  /// loop. Network and server failures remain retryable by WorkManager.
+  static bool isNonRetryableSilentBackupError(Object error) {
+    final message = error.toString().toLowerCase();
+    final isForbidden =
+        message.contains('403') ||
+        message.contains('forbidden') ||
+        message.contains('permission denied');
+    final driveConfigurationFailure =
+        message.contains('drive api has not been used') ||
+        message.contains('drive api') && message.contains('disabled') ||
+        message.contains('access not configured') ||
+        message.contains('api has not been enabled');
+    return message.contains('silent auth failed') ||
+        (isForbidden && driveConfigurationFailure);
+  }
+
+  static Future<void> _markSilentBackupSetupRequired(Object error) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(silentBackupSetupRequiredKey, true);
+    await prefs.setString(
+      silentBackupSetupErrorKey,
+      isNonRetryableSilentBackupError(error)
+          ? 'Google Drive setup or authorization is required.'
+          : 'Google Drive backup is unavailable.',
+    );
+  }
 
   Future<drive.DriveApi> _getDriveApi() async {
     final authRepo = _ref.read(authRepositoryProvider);
@@ -48,15 +81,16 @@ class SyncService {
     if (kIsWeb) return;
     // ⚡ SET SPECIFIC STATE
     _ref.read(syncStatusProvider.notifier).state = SyncStatus.backupInProgress;
-    
+
     final db = _ref.read(appDatabaseProvider);
-    
+
     // Reset state after a delay or on error, but we handle success explicitly
     File? backupFile;
 
     try {
-      final driveApi = await _getDriveApi(); // Moved inside try to catch auth errors
-      
+      final driveApi =
+          await _getDriveApi(); // Moved inside try to catch auth errors
+
       final tempDir = await getTemporaryDirectory();
       final backupPath = p.join(tempDir.path, _backupFileName);
       backupFile = File(backupPath);
@@ -76,26 +110,21 @@ class SyncService {
       );
 
       final fileToUpload = drive.File()..name = _backupFileName;
-      final media = drive.Media(backupFile.openRead(), await backupFile.length());
+      final media = drive.Media(
+        backupFile.openRead(),
+        await backupFile.length(),
+      );
 
       if (response.files != null && response.files!.isNotEmpty) {
         final fileId = response.files!.first.id!;
-        await driveApi.files.update(
-          fileToUpload,
-          fileId,
-          uploadMedia: media,
-        );
+        await driveApi.files.update(fileToUpload, fileId, uploadMedia: media);
       } else {
         fileToUpload.parents = ['appDataFolder'];
-        await driveApi.files.create(
-          fileToUpload,
-          uploadMedia: media,
-        );
+        await driveApi.files.create(fileToUpload, uploadMedia: media);
       }
 
       // ⚡ SPECIFIC SUCCESS
       _ref.read(syncStatusProvider.notifier).state = SyncStatus.backupSuccess;
-
     } catch (e) {
       print("Backup Error: $e");
       _ref.read(syncStatusProvider.notifier).state = SyncStatus.error;
@@ -108,7 +137,7 @@ class SyncService {
       } catch (e) {
         print('Error cleaning up: $e');
       }
-      
+
       // Auto-reset state after 2 seconds so the success message disappears/resets
       Future.delayed(const Duration(seconds: 2), () {
         if (_ref.read(syncStatusProvider) == SyncStatus.backupSuccess) {
@@ -145,7 +174,10 @@ class SyncService {
       );
 
       final fileToUpload = drive.File()..name = _backupFileName;
-      final media = drive.Media(backupFile.openRead(), await backupFile.length());
+      final media = drive.Media(
+        backupFile.openRead(),
+        await backupFile.length(),
+      );
 
       if (response.files != null && response.files!.isNotEmpty) {
         final fileId = response.files!.first.id!;
@@ -154,8 +186,19 @@ class SyncService {
         fileToUpload.parents = ['appDataFolder'];
         await driveApi.files.create(fileToUpload, uploadMedia: media);
       }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(silentBackupSetupRequiredKey);
+      await prefs.remove(silentBackupSetupErrorKey);
       print("✅ Silent Background Backup Succeeded!");
     } catch (e) {
+      if (isNonRetryableSilentBackupError(e)) {
+        await _markSilentBackupSetupRequired(e);
+        print(
+          "⚠️ Silent Background Backup needs Google Drive setup; "
+          "automatic retry suppressed.",
+        );
+        return;
+      }
       print("❌ Silent Background Backup Failed: $e");
       rethrow;
     } finally {
@@ -172,9 +215,9 @@ class SyncService {
     if (kIsWeb) return;
     // ⚡ SET SPECIFIC STATE
     _ref.read(syncStatusProvider.notifier).state = SyncStatus.restoreInProgress;
-    
+
     final db = _ref.read(appDatabaseProvider);
-    
+
     File? dbFile;
 
     try {
@@ -196,10 +239,12 @@ class SyncService {
       // For Restore, we must close the DB
       await db.close();
 
-      final media = await driveApi.files.get(
-        fileId,
-        downloadOptions: drive.DownloadOptions.fullMedia,
-      ) as drive.Media;
+      final media =
+          await driveApi.files.get(
+                fileId,
+                downloadOptions: drive.DownloadOptions.fullMedia,
+              )
+              as drive.Media;
 
       final fileSink = dbFile.openWrite(mode: FileMode.write);
       await media.stream.pipe(fileSink);
@@ -207,7 +252,6 @@ class SyncService {
 
       // ⚡ SPECIFIC SUCCESS
       _ref.read(syncStatusProvider.notifier).state = SyncStatus.restoreSuccess;
-
     } catch (e) {
       print("Restore Error: $e");
       _ref.read(syncStatusProvider.notifier).state = SyncStatus.error;
@@ -216,7 +260,7 @@ class SyncService {
       // Resurrection
       // ignore: unused_result
       _ref.refresh(appDatabaseProvider);
-      
+
       // Auto-reset state
       Future.delayed(const Duration(seconds: 2), () {
         if (_ref.read(syncStatusProvider) == SyncStatus.restoreSuccess) {

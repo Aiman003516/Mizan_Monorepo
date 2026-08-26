@@ -1180,6 +1180,17 @@
   },
   "pleaseSelectDefaultCategory": "يرجى اختيار فئة افتراضية",
   "budgetAnalysis": "تحليل الميزانية",
+  "addBudget": "إضافة ميزانية",
+  "budgetName": "اسم الميزانية",
+  "periodStartDate": "تاريخ بداية الفترة",
+  "addLineItem": "إضافة سطر حساب",
+  "calculate": "حساب",
+  "deleteLabel": "حذف",
+  "budgetLineAccount": "حساب الميزانية",
+  "plannedAmount": "المبلغ المخطط",
+  "budgetSaved": "تم حفظ الميزانية",
+  "budgetDeleted": "تم حذف الميزانية",
+  "noBudgets": "لا توجد ميزانيات بعد. أضف ميزانية لمقارنة المبالغ المخططة بحركة دفتر الأستاذ.",
   "summaryTab": "ملخص",
   "variancesTab": "الانحرافات",
   "flexibleBudgetTab": "الميزانية المرنة",
@@ -1314,6 +1325,15 @@
   "bookBalanceLabel": "الرصيد الدفتري:",
   "entryReconciled": "تمت تسوية القيد",
   "staffManagement": "إدارة الموظفين",
+  "activeStaff": "النشطون",
+  "suspendStaff": "تعليق الوصول",
+  "reactivateStaff": "إعادة تفعيل الوصول",
+  "revokeInvitation": "إلغاء الدعوة",
+  "pendingStaff": "الدعوات المعلقة",
+  "suspendedStaff": "الموقوفون",
+  "expiredStaff": "الدعوات المنتهية",
+  "revokedStaff": "الدعوات الملغاة",
+  "searchStaff": "بحث عن الموظفين",
   "changeRole": "تغيير الدور",
   "removeAccess": "إزالة الوصول",
   "roleSaved": "تم حفظ الدور بنجاح!",
@@ -2101,6 +2121,18 @@
   },
   "removeStaffWarning": "سيفقد هذا الشخص الوصول إلى هذا النشاط التجاري فوراً.",
   "inviteStaff": "دعوة موظف",
+  "bulkInviteStaff": "دعوة الموظفين بشكل جماعي",
+  "bulkInviteHint": "أدخل بريداً إلكترونياً في كل سطر، بحد أقصى 100 موظف",
+  "bulkInviteCount": "عدد المدعوين: {count}",
+  "bulkInviteCreated": "تم إنشاء {count} دعوة",
+  "bulkInvitePartial": "تم إنشاء {success} وفشل {failed}",
+  "bulkInviteNoEmails": "أدخل بريداً إلكترونياً صالحاً واحداً على الأقل",
+  "bulkInviteLimit": "يمكن أن تحتوي الدفعة على 100 موظف كحد أقصى",
+  "bulkInviteResults": "نتائج الدعوات",
+  "invitationSetupRequired": "إعداد الدعوات غير مكتمل. طبّق أحدث ترحيل لدعوات Supabase ثم حاول مرة أخرى.",
+  "invitationAlreadyPending": "توجد دعوة نشطة لهذا البريد الإلكتروني بالفعل.",
+  "invitationPermissionDenied": "ليس لديك صلاحية لدعوة الموظفين.",
+  "invitationNetworkError": "تعذر الوصول إلى خدمة الدعوات. تحقق من الاتصال وحاول مرة أخرى.",
   "stepSelectRole": "1. اختر دوراً",
   "chooseRoleHint": "اختر الدور (مثال: أمين الصندوق)",
   "errorLoadingRoles": "خطأ في تحميل الأدوار: {error}",
@@ -2118,6 +2150,30 @@
   "copyInviteCode": "نسخ رمز الدعوة",
   "inviteCodeCopied": "تم نسخ رمز الدعوة",
   "inviteShareText": "تمت دعوتك للانضمام إلى نشاطي التجاري على ميزان!\n\n1. نزّل التطبيق أو افتحه\n2. اضغط على تسجيل الدخول / إنشاء حساب\n3. اضغط على الانضمام إلى منظمة وأدخل الرمز: {code}\n\nلا تشارك هذه الدعوة مع الآخرين. الرمز صالح لمدة 24 ساعة.",
+  "@bulkInviteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@bulkInviteCreated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@bulkInvitePartial": {
+    "placeholders": {
+      "success": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
   "@inviteShareText": {
     "placeholders": {
       "code": {

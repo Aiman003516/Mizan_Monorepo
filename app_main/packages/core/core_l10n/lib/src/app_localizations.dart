@@ -4784,6 +4784,72 @@ abstract class AppLocalizations {
   /// **'Budget Analysis'**
   String get budgetAnalysis;
 
+  /// No description provided for @addBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Add budget'**
+  String get addBudget;
+
+  /// No description provided for @budgetName.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget name'**
+  String get budgetName;
+
+  /// No description provided for @periodStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Period start date'**
+  String get periodStartDate;
+
+  /// No description provided for @addLineItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add account line'**
+  String get addLineItem;
+
+  /// No description provided for @calculate.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate'**
+  String get calculate;
+
+  /// No description provided for @deleteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteLabel;
+
+  /// No description provided for @budgetLineAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget account'**
+  String get budgetLineAccount;
+
+  /// No description provided for @plannedAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned amount'**
+  String get plannedAmount;
+
+  /// No description provided for @budgetSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget saved'**
+  String get budgetSaved;
+
+  /// No description provided for @budgetDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget deleted'**
+  String get budgetDeleted;
+
+  /// No description provided for @noBudgets.
+  ///
+  /// In en, this message translates to:
+  /// **'No budgets yet. Add a budget to compare planned amounts with ledger activity.'**
+  String get noBudgets;
+
   /// No description provided for @summaryTab.
   ///
   /// In en, this message translates to:
@@ -5617,6 +5683,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Staff Management'**
   String get staffManagement;
+
+  /// No description provided for @activeStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get activeStaff;
+
+  /// No description provided for @suspendStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend access'**
+  String get suspendStaff;
+
+  /// No description provided for @reactivateStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate access'**
+  String get reactivateStaff;
+
+  /// No description provided for @revokeInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke invitation'**
+  String get revokeInvitation;
+
+  /// No description provided for @pendingStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending invitations'**
+  String get pendingStaff;
+
+  /// No description provided for @suspendedStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspended'**
+  String get suspendedStaff;
+
+  /// No description provided for @expiredStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired invitations'**
+  String get expiredStaff;
+
+  /// No description provided for @revokedStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Revoked invitations'**
+  String get revokedStaff;
+
+  /// No description provided for @searchStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Search employees'**
+  String get searchStaff;
 
   /// No description provided for @changeRole.
   ///
@@ -7915,6 +8035,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invite Staff'**
   String get inviteStaff;
+
+  /// No description provided for @bulkInviteStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Bulk invite employees'**
+  String get bulkInviteStaff;
+
+  /// No description provided for @bulkInviteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter one email per line, up to 100 employees'**
+  String get bulkInviteHint;
+
+  /// No description provided for @bulkInviteCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipients: {count}'**
+  String bulkInviteCount(int count);
+
+  /// No description provided for @bulkInviteCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created {count} invitations'**
+  String bulkInviteCreated(int count);
+
+  /// No description provided for @bulkInvitePartial.
+  ///
+  /// In en, this message translates to:
+  /// **'{success} created, {failed} failed'**
+  String bulkInvitePartial(int success, int failed);
+
+  /// No description provided for @bulkInviteNoEmails.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least one valid email address'**
+  String get bulkInviteNoEmails;
+
+  /// No description provided for @bulkInviteLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'A batch can contain no more than 100 employees'**
+  String get bulkInviteLimit;
+
+  /// No description provided for @bulkInviteResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation results'**
+  String get bulkInviteResults;
+
+  /// No description provided for @invitationSetupRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation setup is incomplete. Apply the latest Supabase invitation migration and try again.'**
+  String get invitationSetupRequired;
+
+  /// No description provided for @invitationAlreadyPending.
+  ///
+  /// In en, this message translates to:
+  /// **'An active invitation already exists for this email.'**
+  String get invitationAlreadyPending;
+
+  /// No description provided for @invitationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to invite employees.'**
+  String get invitationPermissionDenied;
+
+  /// No description provided for @invitationNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the invitation service. Check your connection and try again.'**
+  String get invitationNetworkError;
 
   /// No description provided for @stepSelectRole.
   ///
