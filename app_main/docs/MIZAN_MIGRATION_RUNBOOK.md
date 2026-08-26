@@ -32,6 +32,7 @@ Run the files in filename order. The current sequence is:
 | 20 | `20260827240000_ar_ap_settlement_aging.sql` | AR/AP settlement drafts, outstanding-balance guards, posting synchronization, receivables/payables aging, RLS, and audit hooks | Added in the current upgrade; not applied |
 | 21 | `20260827241000_dimensions_books_fx_repair.sql` | Table-aware dimensional triggers, leading-book seeding/backfill, and extended journal-draft book/FX/worktag contract | Added in the current upgrade; not applied |
 | 22 | `20260827250000_inventory_pos_accounting_bridge.sql` | Server inventory balances, receipt/sale drafts, weighted-average costing, posting-time stock guards, RLS, and audit hooks | Added in the current upgrade; not applied |
+| 23 | `20260827260000_crm_360_health_cpq.sql` | Customer 360 metrics, deterministic advisory health scores, interaction recording, draft-only quote/CPQ contracts, RLS, and audit hooks | Added in the current upgrade; not applied |
 
 ## Preflight checklist
 
