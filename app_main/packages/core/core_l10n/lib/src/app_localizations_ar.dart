@@ -4817,4 +4817,48 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get crmSectionTitle => 'إدارة العملاء والموردين';
+
+  @override
+  String get aiAssistantTitle => 'مساعد ميزان الذكي';
+
+  @override
+  String get aiAssistantIntro =>
+      'اسأل عن بياناتك المالية وبيانات إدارة العملاء. الإصدار الأول للقراءة فقط ولا ينشئ السجلات أو يعدّلها.';
+
+  @override
+  String get aiAssistantGuestMode =>
+      'اربط حساباً موثقاً ومستأجراً لاستخدام المساعد الذكي مع البيانات السحابية. تبقى بيانات الضيف على هذا الجهاز.';
+
+  @override
+  String get aiAssistantConnectAccount => 'ربط الحساب';
+
+  @override
+  String get aiAssistantReadOnly => 'مساعدة للقراءة فقط';
+
+  @override
+  String get aiAssistantInputHint =>
+      'اسأل عن التقارير أو العملاء أو الموردين أو الفواتير أو الموظفين…';
+
+  @override
+  String get aiAssistantSend => 'إرسال';
+
+  @override
+  String get aiAssistantThinking => 'ميزان يحلل…';
+
+  @override
+  String get aiAssistantError => 'تعذر على المساعد الذكي إكمال الطلب.';
+
+  @override
+  String get aiAssistantNoData => 'لم يتم العثور على بيانات مستأجر مطابقة.';
+
+  @override
+  String get aiAssistantMutationBlocked =>
+      'يمكن لهذا الإصدار تحليل البيانات، لكنه لا يستطيع تعديل السجلات أو إرسال الرسائل.';
+
+  @override
+  String get aiAssistantSignInRequired =>
+      'سجّل الدخول لاستخدام المساعدة الذكية المرتبطة بالمستأجر.';
+
+  @override
+  String get aiAssistantRetry => 'إعادة المحاولة';
 }

@@ -9121,6 +9121,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Customer & Vendor Management'**
   String get crmSectionTitle;
+
+  /// No description provided for @aiAssistantTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mizan AI Copilot'**
+  String get aiAssistantTitle;
+
+  /// No description provided for @aiAssistantIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about your tenant’s financial and CRM data. The first release is read-only and does not post or modify records.'**
+  String get aiAssistantIntro;
+
+  /// No description provided for @aiAssistantGuestMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect an authenticated tenant account to use the AI Copilot with cloud data. Guest data stays on this device.'**
+  String get aiAssistantGuestMode;
+
+  /// No description provided for @aiAssistantConnectAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect account'**
+  String get aiAssistantConnectAccount;
+
+  /// No description provided for @aiAssistantReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only assistance'**
+  String get aiAssistantReadOnly;
+
+  /// No description provided for @aiAssistantInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about reports, customers, vendors, invoices, or staff…'**
+  String get aiAssistantInputHint;
+
+  /// No description provided for @aiAssistantSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get aiAssistantSend;
+
+  /// No description provided for @aiAssistantThinking.
+  ///
+  /// In en, this message translates to:
+  /// **'Mizan is analyzing…'**
+  String get aiAssistantThinking;
+
+  /// No description provided for @aiAssistantError.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI assistant could not complete this request.'**
+  String get aiAssistantError;
+
+  /// No description provided for @aiAssistantNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching tenant data was found.'**
+  String get aiAssistantNoData;
+
+  /// No description provided for @aiAssistantMutationBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This pilot can analyze data but cannot modify records or send messages.'**
+  String get aiAssistantMutationBlocked;
+
+  /// No description provided for @aiAssistantSignInRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to use tenant-aware AI assistance.'**
+  String get aiAssistantSignInRequired;
+
+  /// No description provided for @aiAssistantRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get aiAssistantRetry;
 }
 
 class _AppLocalizationsDelegate

@@ -35,6 +35,8 @@ dependencies:
     path: ../packages/features/feature_accounts
   feature_auth:
     path: ../packages/features/feature_auth
+  feature_ai:
+    path: ../packages/features/feature_ai
   feature_dashboard:
     path: ../packages/features/feature_dashboard
   feature_products:

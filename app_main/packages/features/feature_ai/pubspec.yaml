@@ -1,0 +1,22 @@
+name: feature_ai
+resolution: workspace
+description: Secure tenant-aware Mizan AI Copilot UI and gateway client.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  supabase_flutter: ^2.17.2
+  core_data:
+    path: ../../core/core_data
+  core_l10n:
+    path: ../../core/core_l10n
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0

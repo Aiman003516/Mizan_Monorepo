@@ -6,6 +6,8 @@ The migration in `migrations/20260825123000_cloud_source_of_truth.sql` creates c
 
 The connected Supabase Data API accepts authenticated REST queries, but the current session key does not have DDL privileges and no direct Postgres connection is available in the build environment. Apply the migration once in the Supabase SQL Editor or with the Supabase CLI using the project’s database credentials. Apply the complete file as one migration; do not copy individual policy fragments out of order. If an earlier run stopped with `ERROR: 42703: column "status" does not exist`, pull the latest repository version and rerun the complete file: the compatibility block now adds legacy `staff_members.status` and invite lifecycle columns before creating their indexes and policies. The migration also uses JSONB for role permissions, matching the existing `roles.permissions` column.
 
+After applying it, apply `migrations/20260827100000_ai_agent_phase1.sql` for the read-only Copilot conversation and audit schema. Apply `migrations/20260827110000_ai_action_requests_phase2.sql` only when the draft-action endpoint is being enabled; it stores confirmation-gated previews and does not execute business mutations. Deploy `functions/mizan-ai-agent` after the Phase 1 AI migration, and deploy `functions/mizan-ai-action` only when the action-draft workflow is ready. Keep the SQL migrations and function deployments in this order.
+
 After applying it, run the SQL in `tests/cloud_source_of_truth.sql` with the project’s database test runner. The supplied schema export shows the legacy tables are currently empty, so no data conversion is expected for the first successful run; retain a database backup before applying to a populated project. The Data API probe should then return HTTP 200 for `currencies`, `custom_fields`, `customers`, `vendors`, `invoices`, `invoice_items`, `bills`, `bill_items`, and `audit_logs`.
 
 ## Realtime and client configuration
@@ -19,6 +21,17 @@ Existing local Drift data should be exported and staged before importing into th
 ## Offline behavior
 
 Online CRM and document writes target Supabase first. Temporary network failures can materialize a tenant-scoped Drift row and an outbox entry. The synchronization engine replays pending outbox entries in bounded batches, while the existing Google Drive service backs up the complete SQLite file through `VACUUM INTO`; this includes cache tables and pending outbox entries. Authorization failures, validation errors, and RLS denials are not treated as offline successes.
+
+## AI Copilot deployment
+
+The read-only Mizan AI Copilot requires migration `20260827100000_ai_agent_phase1.sql` and the Edge Function at `functions/mizan-ai-agent`. Deploy the function only after the migration is applied. Configure `OPENAI_API_KEY` and optional `MIZAN_AI_MODEL`/`MIZAN_AI_BASE_URL` as Supabase Function secrets; never place provider credentials in Flutter or Git. The function derives the tenant from the authenticated `staff_members` membership, uses the user-scoped client for RLS-protected reads, exposes only bounded read-only tools, and records minimal tenant/user-scoped conversation and audit events. Guest mode must remain local and must not call this function.
+
+```bash
+supabase functions deploy mizan-ai-agent --project-ref eawkctancunjpatujzpu
+supabase secrets set --project-ref eawkctancunjpatujzpu OPENAI_API_KEY=... MIZAN_AI_MODEL=gpt-5-mini MIZAN_AI_BASE_URL=https://api.openai.com/v1
+```
+
+Before enabling the feature for users, test an owner, an ordinary member, a guest, and a user from a second tenant. Confirm read-only answers, permission-safe failures, provider-unavailable handling, no cross-tenant data, no secrets in logs, and audit events for request/tool/response/error outcomes. Mutation and scheduled-agent phases require separate review and migrations.
 
 ## Production checks
 

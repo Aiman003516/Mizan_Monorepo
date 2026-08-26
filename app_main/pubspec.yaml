@@ -12,6 +12,7 @@ workspace:
   - packages/core/core_ui
   - packages/features/feature_accounts
   - packages/features/feature_auth
+  - packages/features/feature_ai
   - packages/features/feature_contacts
   - packages/features/feature_dashboard
   - packages/features/feature_data_import

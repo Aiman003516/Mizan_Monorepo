@@ -4817,4 +4817,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get crmSectionTitle => 'Customer & Vendor Management';
+
+  @override
+  String get aiAssistantTitle => 'Mizan AI Copilot';
+
+  @override
+  String get aiAssistantIntro =>
+      'Ask about your tenant’s financial and CRM data. The first release is read-only and does not post or modify records.';
+
+  @override
+  String get aiAssistantGuestMode =>
+      'Connect an authenticated tenant account to use the AI Copilot with cloud data. Guest data stays on this device.';
+
+  @override
+  String get aiAssistantConnectAccount => 'Connect account';
+
+  @override
+  String get aiAssistantReadOnly => 'Read-only assistance';
+
+  @override
+  String get aiAssistantInputHint =>
+      'Ask about reports, customers, vendors, invoices, or staff…';
+
+  @override
+  String get aiAssistantSend => 'Send';
+
+  @override
+  String get aiAssistantThinking => 'Mizan is analyzing…';
+
+  @override
+  String get aiAssistantError =>
+      'The AI assistant could not complete this request.';
+
+  @override
+  String get aiAssistantNoData => 'No matching tenant data was found.';
+
+  @override
+  String get aiAssistantMutationBlocked =>
+      'This pilot can analyze data but cannot modify records or send messages.';
+
+  @override
+  String get aiAssistantSignInRequired =>
+      'Sign in to use tenant-aware AI assistance.';
+
+  @override
+  String get aiAssistantRetry => 'Try again';
 }

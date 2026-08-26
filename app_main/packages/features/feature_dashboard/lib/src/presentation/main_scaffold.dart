@@ -9,6 +9,7 @@ import 'package:core_data/core_data.dart';
 import 'package:core_database/core_database.dart' as c;
 
 import 'package:feature_accounts/feature_accounts.dart';
+import 'package:feature_ai/feature_ai.dart';
 import 'package:feature_auth/feature_auth.dart';
 import 'package:feature_products/feature_products.dart';
 import 'package:feature_reports/feature_reports.dart';
@@ -384,6 +385,27 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               onTap: () {
                 Navigator.pop(context);
                 ref.read(mainNavProvider.notifier).state = MainPage.dashboard;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.auto_awesome),
+              title: Text(l10n.aiAssistantTitle),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AiAssistantScreen(
+                      onConnectAccount: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                LoginScreen(onJoinOrganization: () {}),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
               },
             ),
             ListTile(

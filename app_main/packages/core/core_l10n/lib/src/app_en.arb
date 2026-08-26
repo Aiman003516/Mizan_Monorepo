@@ -2224,5 +2224,18 @@
   "increasesPayable": "Increases the amount owed to this supplier",
   "decreasesPayable": "Decreases the amount owed to this supplier",
   "supplierAdjustmentFailed": "Could not update the supplier balance",
-  "crmSectionTitle": "Customer & Vendor Management"
+  "crmSectionTitle": "Customer & Vendor Management",
+  "aiAssistantTitle": "Mizan AI Copilot",
+  "aiAssistantIntro": "Ask about your tenant’s financial and CRM data. The first release is read-only and does not post or modify records.",
+  "aiAssistantGuestMode": "Connect an authenticated tenant account to use the AI Copilot with cloud data. Guest data stays on this device.",
+  "aiAssistantConnectAccount": "Connect account",
+  "aiAssistantReadOnly": "Read-only assistance",
+  "aiAssistantInputHint": "Ask about reports, customers, vendors, invoices, or staff…",
+  "aiAssistantSend": "Send",
+  "aiAssistantThinking": "Mizan is analyzing…",
+  "aiAssistantError": "The AI assistant could not complete this request.",
+  "aiAssistantNoData": "No matching tenant data was found.",
+  "aiAssistantMutationBlocked": "This pilot can analyze data but cannot modify records or send messages.",
+  "aiAssistantSignInRequired": "Sign in to use tenant-aware AI assistance.",
+  "aiAssistantRetry": "Try again"
 }
