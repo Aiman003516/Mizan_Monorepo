@@ -45,6 +45,12 @@ The Phase 4 rollout must test, in order, a CRM edit, a draft-invoice edit, a dra
 
 Application source-code editing remains outside the accounting Copilot. If a developer assistant is introduced later, it must be a separate local-only patch generator with no production database credentials and no automatic file application.
 
+## CRM persistence repair migration
+
+Apply `migrations/20260827291000_repair_crm_balance_consistency.sql` after the existing CRM, invoice, bill, and settlement migrations. It installs tenant-scoped invoice/bill balance-delta triggers without overwriting opening balances or separately posted adjustments. Then apply `migrations/20260827292000_crm_edit_rpc_wrappers.sql`; it grants authenticated clients access only to tenant-derived `update_customer` and `update_vendor` wrappers while keeping the AI-only `*_for_tenant` helpers revoked from direct clients. Run `tests/crm_persistence_consistency.sql` in a disposable or project test database after both migrations. Do not apply either migration to production without an approved backup, migration-state check, and rollback plan.
+
+The Flutter cloud edit implementation depends on the wrapper migration. If the wrapper functions are absent, the app must not be switched to an authenticated cloud build that uses the repaired customer/vendor edit path.
+
 ## Production checks
 
 Before release, verify email-confirmation behavior, session refresh, tenant bootstrap, invite validation/redemption, RLS isolation with two test users from different tenants, system-admin immutability, role permission enforcement, atomic invoice/bill creation, duplicate currency/custom-field constraints, pagination behavior, offline creation and replay, and Google Drive backup/restore on a physical Android device. Confirm that the SQL migration is applied before enabling the cloud-mode build flag.

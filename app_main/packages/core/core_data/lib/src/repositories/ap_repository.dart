@@ -486,6 +486,10 @@ class APRepository {
 
   /// Update bill status
   Future<void> updateBillStatus(String billId, String status) async {
+    if (_useCloud) {
+      await _cloudRepository.updateBillStatus(billId, status);
+      return;
+    }
     await (_db.update(_db.bills)..where((t) => t.id.equals(billId))).write(
       BillsCompanion(status: Value(status)),
     );

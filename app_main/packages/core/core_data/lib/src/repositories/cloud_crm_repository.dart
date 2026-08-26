@@ -62,13 +62,35 @@ class CloudCrmRepository {
         final payload = _queue.decodePayload(entry);
         final table = _supabase.from(entry.entityTable);
         if (entry.operation == 'delete') {
-          await table
+          final deleted = await table
               .update({
                 'is_deleted': true,
                 'updated_at': DateTime.now().toUtc().toIso8601String(),
               })
               .eq('id', entry.recordId)
-              .eq('tenant_id', tenantId);
+              .eq('tenant_id', tenantId)
+              .select('id')
+              .maybeSingle();
+          if (deleted == null) {
+            throw StateError(
+              'Queued delete affected no ${entry.entityTable} row.',
+            );
+          }
+        } else if (entry.operation == 'update') {
+          final updatePayload = Map<String, dynamic>.from(payload)
+            ..remove('id')
+            ..remove('tenant_id');
+          final updated = await table
+              .update(updatePayload)
+              .eq('id', entry.recordId)
+              .eq('tenant_id', tenantId)
+              .select('id')
+              .maybeSingle();
+          if (updated == null) {
+            throw StateError(
+              'Queued update affected no ${entry.entityTable} row.',
+            );
+          }
         } else {
           await table.upsert(payload, onConflict: 'id');
         }
@@ -229,11 +251,13 @@ class CloudCrmRepository {
         yield customers;
       }
     } catch (_) {
-      yield await (_db.select(_db.customers)
+      // Keep the UI reactive while the remote stream is unavailable. A one-shot
+      // query would leave the screen stale after a local write or retry.
+      yield* (_db.select(_db.customers)
             ..where((table) => table.tenantId.equals(tenantId))
             ..where((table) => table.isDeleted.equals(false))
             ..orderBy([(table) => drift.OrderingTerm.asc(table.name)]))
-          .get();
+          .watch();
     }
   }
 
@@ -302,16 +326,31 @@ class CloudCrmRepository {
 
   Future<void> updateCustomer(String id, Map<String, dynamic> values) async {
     final tenantId = await currentTenantId();
+    final local =
+        await (_db.select(_db.customers)
+              ..where((row) => row.id.equals(id))
+              ..where((row) => row.tenantId.equals(tenantId)))
+            .getSingleOrNull();
+    if (local == null) {
+      throw StateError('Customer is not available in the current tenant.');
+    }
     final now = DateTime.now().toUtc();
-    final updatedValues = {...values, 'updated_at': now.toIso8601String()};
+    final payload = Map<String, dynamic>.from(values);
     try {
-      final response = await _supabase
-          .from('customers')
-          .update(updatedValues)
-          .eq('id', id)
-          .eq('tenant_id', tenantId)
-          .select()
-          .single();
+      final response = await _supabase.rpc(
+        'update_customer',
+        params: {
+          'p_customer_id': id,
+          'p_expected_updated_at': local.lastUpdated.toUtc().toIso8601String(),
+          'p_patch': payload,
+        },
+      );
+      if (response is! Map) {
+        throw const PostgrestException(
+          message: 'Customer update returned no committed record.',
+          code: 'MIZAN_INVALID_UPDATE_RESPONSE',
+        );
+      }
       await _db
           .into(_db.customers)
           .insertOnConflictUpdate(
@@ -319,46 +358,47 @@ class CloudCrmRepository {
           );
     } catch (error) {
       if (!_isRetryable(error)) rethrow;
-      final local =
-          await (_db.select(_db.customers)
-                ..where((row) => row.id.equals(id))
-                ..where((row) => row.tenantId.equals(tenantId)))
-              .getSingleOrNull();
-      if (local == null) rethrow;
-      await (_db.update(
-        _db.customers,
-      )..where((row) => row.id.equals(id))).write(
-        CustomersCompanion(
-          name: values.containsKey('name')
-              ? Value(values['name'] as String)
-              : const Value.absent(),
-          email: values.containsKey('email')
-              ? Value(values['email'] as String?)
-              : const Value.absent(),
-          phone: values.containsKey('phone')
-              ? Value(values['phone'] as String?)
-              : const Value.absent(),
-          address: values.containsKey('address')
-              ? Value(values['address'] as String?)
-              : const Value.absent(),
-          taxId: values.containsKey('tax_id')
-              ? Value(values['tax_id'] as String?)
-              : const Value.absent(),
-          creditLimit: values.containsKey('credit_limit')
-              ? Value(values['credit_limit'] as int)
-              : const Value.absent(),
-          notes: values.containsKey('notes')
-              ? Value(values['notes'] as String?)
-              : const Value.absent(),
-          lastUpdated: Value(now),
+      final updatedLocal = local.copyWith(
+        name: values.containsKey('name')
+            ? values['name'] as String
+            : local.name,
+        email: Value(
+          values.containsKey('email')
+              ? values['email'] as String?
+              : local.email,
         ),
+        phone: Value(
+          values.containsKey('phone')
+              ? values['phone'] as String?
+              : local.phone,
+        ),
+        address: Value(
+          values.containsKey('address')
+              ? values['address'] as String?
+              : local.address,
+        ),
+        taxId: Value(
+          values.containsKey('tax_id')
+              ? values['tax_id'] as String?
+              : local.taxId,
+        ),
+        creditLimit: values.containsKey('credit_limit')
+            ? values['credit_limit'] as int
+            : local.creditLimit,
+        notes: Value(
+          values.containsKey('notes')
+              ? values['notes'] as String?
+              : local.notes,
+        ),
+        lastUpdated: now,
       );
+      await _db.into(_db.customers).insertOnConflictUpdate(updatedLocal);
       await _queue.enqueue(
         tenantId: tenantId,
         tableName: 'customers',
         recordId: id,
         operation: 'update',
-        payload: {'id': id, 'tenant_id': tenantId, ...updatedValues},
+        payload: {'id': id, 'tenant_id': tenantId, ...payload},
       );
     }
   }
@@ -394,12 +434,12 @@ class CloudCrmRepository {
         yield invoices;
       }
     } catch (_) {
-      yield await (_db.select(_db.invoices)
+      yield* (_db.select(_db.invoices)
             ..where((table) => table.tenantId.equals(tenantId))
             ..where((table) => table.customerId.equals(customerId))
             ..where((table) => table.isDeleted.equals(false))
             ..orderBy([(table) => drift.OrderingTerm.desc(table.invoiceDate)]))
-          .get();
+          .watch();
     }
   }
 
@@ -512,6 +552,50 @@ class CloudCrmRepository {
             ..where((table) => table.isDeleted.equals(false))
             ..orderBy([(table) => drift.OrderingTerm.desc(table.invoiceDate)]))
           .get();
+    }
+  }
+
+  Future<void> updateInvoiceStatus(String invoiceId, String status) async {
+    final tenantId = await currentTenantId();
+    final now = DateTime.now().toUtc();
+    final payload = <String, dynamic>{
+      'status': status,
+      'updated_at': now.toIso8601String(),
+    };
+    try {
+      final row = await _supabase
+          .from('invoices')
+          .update(payload)
+          .eq('id', invoiceId)
+          .eq('tenant_id', tenantId)
+          .select()
+          .single();
+      await _db
+          .into(_db.invoices)
+          .insertOnConflictUpdate(
+            _invoiceFromMap(Map<String, dynamic>.from(row)),
+          );
+    } catch (error) {
+      if (!_isRetryable(error)) rethrow;
+      final local =
+          await (_db.select(_db.invoices)
+                ..where((row) => row.id.equals(invoiceId))
+                ..where((row) => row.tenantId.equals(tenantId)))
+              .getSingleOrNull();
+      if (local == null) rethrow;
+      await (_db.update(_db.invoices)
+            ..where((row) => row.id.equals(invoiceId))
+            ..where((row) => row.tenantId.equals(tenantId)))
+          .write(
+            InvoicesCompanion(status: Value(status), lastUpdated: Value(now)),
+          );
+      await _queue.enqueue(
+        tenantId: tenantId,
+        tableName: 'invoices',
+        recordId: invoiceId,
+        operation: 'update',
+        payload: {'id': invoiceId, 'tenant_id': tenantId, ...payload},
+      );
     }
   }
 
@@ -635,12 +719,12 @@ class CloudCrmRepository {
         yield bills;
       }
     } catch (_) {
-      yield await (_db.select(_db.bills)
+      yield* (_db.select(_db.bills)
             ..where((table) => table.tenantId.equals(tenantId))
             ..where((table) => table.vendorId.equals(vendorId))
             ..where((table) => table.isDeleted.equals(false))
             ..orderBy([(table) => drift.OrderingTerm.desc(table.billDate)]))
-          .get();
+          .watch();
     }
   }
 
@@ -661,11 +745,11 @@ class CloudCrmRepository {
         yield vendors;
       }
     } catch (_) {
-      yield await (_db.select(_db.vendors)
+      yield* (_db.select(_db.vendors)
             ..where((table) => table.tenantId.equals(tenantId))
             ..where((table) => table.isDeleted.equals(false))
             ..orderBy([(table) => drift.OrderingTerm.asc(table.name)]))
-          .get();
+          .watch();
     }
   }
 
@@ -801,19 +885,125 @@ class CloudCrmRepository {
 
   Future<void> updateVendor(String id, Map<String, dynamic> values) async {
     final tenantId = await currentTenantId();
-    final row = await _supabase
-        .from('vendors')
-        .update({
-          ...values,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('id', id)
-        .eq('tenant_id', tenantId)
-        .select()
-        .single();
-    await _db
-        .into(_db.vendors)
-        .insertOnConflictUpdate(_vendorFromMap(Map<String, dynamic>.from(row)));
+    final local =
+        await (_db.select(_db.vendors)
+              ..where((row) => row.id.equals(id))
+              ..where((row) => row.tenantId.equals(tenantId)))
+            .getSingleOrNull();
+    if (local == null) {
+      throw StateError('Vendor is not available in the current tenant.');
+    }
+    final now = DateTime.now().toUtc();
+    final payload = Map<String, dynamic>.from(values);
+    try {
+      final response = await _supabase.rpc(
+        'update_vendor',
+        params: {
+          'p_vendor_id': id,
+          'p_expected_updated_at': local.lastUpdated.toUtc().toIso8601String(),
+          'p_patch': payload,
+        },
+      );
+      if (response is! Map) {
+        throw const PostgrestException(
+          message: 'Vendor update returned no committed record.',
+          code: 'MIZAN_INVALID_UPDATE_RESPONSE',
+        );
+      }
+      await _db
+          .into(_db.vendors)
+          .insertOnConflictUpdate(
+            _vendorFromMap(Map<String, dynamic>.from(response)),
+          );
+    } catch (error) {
+      if (!_isRetryable(error)) rethrow;
+      final updatedLocal = local.copyWith(
+        name: values.containsKey('name')
+            ? values['name'] as String
+            : local.name,
+        email: Value(
+          values.containsKey('email')
+              ? values['email'] as String?
+              : local.email,
+        ),
+        phone: Value(
+          values.containsKey('phone')
+              ? values['phone'] as String?
+              : local.phone,
+        ),
+        address: Value(
+          values.containsKey('address')
+              ? values['address'] as String?
+              : local.address,
+        ),
+        taxId: Value(
+          values.containsKey('tax_id')
+              ? values['tax_id'] as String?
+              : local.taxId,
+        ),
+        paymentTerms: Value(
+          values.containsKey('payment_terms')
+              ? values['payment_terms'] as String?
+              : local.paymentTerms,
+        ),
+        notes: Value(
+          values.containsKey('notes')
+              ? values['notes'] as String?
+              : local.notes,
+        ),
+        lastUpdated: now,
+      );
+      await _db.into(_db.vendors).insertOnConflictUpdate(updatedLocal);
+      await _queue.enqueue(
+        tenantId: tenantId,
+        tableName: 'vendors',
+        recordId: id,
+        operation: 'update',
+        payload: {'id': id, 'tenant_id': tenantId, ...payload},
+      );
+    }
+  }
+
+  Future<void> updateBillStatus(String billId, String status) async {
+    final tenantId = await currentTenantId();
+    final now = DateTime.now().toUtc();
+    final payload = <String, dynamic>{
+      'status': status,
+      'updated_at': now.toIso8601String(),
+    };
+    try {
+      final row = await _supabase
+          .from('bills')
+          .update(payload)
+          .eq('id', billId)
+          .eq('tenant_id', tenantId)
+          .select()
+          .single();
+      await _db
+          .into(_db.bills)
+          .insertOnConflictUpdate(_billFromMap(Map<String, dynamic>.from(row)));
+    } catch (error) {
+      if (!_isRetryable(error)) rethrow;
+      final local =
+          await (_db.select(_db.bills)
+                ..where((row) => row.id.equals(billId))
+                ..where((row) => row.tenantId.equals(tenantId)))
+              .getSingleOrNull();
+      if (local == null) rethrow;
+      await (_db.update(_db.bills)
+            ..where((row) => row.id.equals(billId))
+            ..where((row) => row.tenantId.equals(tenantId)))
+          .write(
+            BillsCompanion(status: Value(status), lastUpdated: Value(now)),
+          );
+      await _queue.enqueue(
+        tenantId: tenantId,
+        tableName: 'bills',
+        recordId: billId,
+        operation: 'update',
+        payload: {'id': billId, 'tenant_id': tenantId, ...payload},
+      );
+    }
   }
 
   Future<Vendor?> getVendor(String id) async {

@@ -20,17 +20,37 @@ class SyncQueueService {
     required Map<String, dynamic> payload,
   }) async {
     final now = DateTime.now().toUtc();
+    final queueId = '${tableName}_$recordId';
+    final existing = await (_db.select(
+      _db.syncQueueEntries,
+    )..where((entry) => entry.id.equals(queueId))).getSingleOrNull();
+
+    // A locally created row may be edited several times before connectivity
+    // returns. Coalesce those mutations into one complete insert payload so a
+    // later partial update cannot make the remote upsert drop required fields.
+    final shouldPreserveInsert =
+        existing?.operation == 'insert' && operation == 'update';
+    final mergedPayload = shouldPreserveInsert
+        ? <String, dynamic>{
+            ...decodePayload(existing!),
+            ...payload,
+            'id': recordId,
+            'tenant_id': tenantId,
+          }
+        : payload;
+    final storedOperation = shouldPreserveInsert ? 'insert' : operation;
+
     await _db
         .into(_db.syncQueueEntries)
         .insert(
           SyncQueueEntriesCompanion.insert(
-            id: Value('${tableName}_$recordId'),
+            id: Value(queueId),
             tenantId: Value(tenantId),
             entityTable: tableName,
             recordId: recordId,
-            operation: operation,
-            payloadJson: jsonEncode(payload),
-            queuedAt: Value(now),
+            operation: storedOperation,
+            payloadJson: jsonEncode(mergedPayload),
+            queuedAt: Value(existing?.queuedAt ?? now),
             lastUpdated: Value(now),
             status: const Value('pending'),
           ),

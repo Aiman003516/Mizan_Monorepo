@@ -67,9 +67,17 @@ final cloudDataModeStateProvider = StreamProvider<CloudDataMode>((ref) async* {
   }
 });
 
-/// Cloud persistence is opt-in and tenant-scoped. Guests and users whose
-/// membership is still resolving continue using local Drift storage.
+/// Cloud persistence is opt-in and tenant-scoped. Genuine guests use local
+/// Drift storage; an authenticated session stays on the cloud path while its
+/// tenant membership is resolving so writes cannot silently become unscoped.
 final cloudDataModeProvider = Provider<bool>((ref) {
-  return ref.watch(cloudDataModeStateProvider).valueOrNull ==
-      CloudDataMode.authenticatedTenant;
+  final mode = ref.watch(cloudDataModeStateProvider).valueOrNull;
+  final session = ref.watch(supabaseSessionProvider).valueOrNull;
+
+  // Once a Supabase session exists, keep repositories on the cloud path while
+  // tenant membership is resolving. Falling back to guest-local at this point
+  // can write an authenticated user's edit into an unscoped cache that will
+  // never be uploaded to the tenant later.
+  return mode == CloudDataMode.authenticatedTenant ||
+      (session != null && mode == CloudDataMode.resolvingTenant);
 });

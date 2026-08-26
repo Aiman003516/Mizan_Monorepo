@@ -37,4 +37,27 @@ void main() {
       expect(detail.invoice.totalAmount, 2500);
     },
   );
+
+  test('guest customer and vendor edits update the watched rows', () async {
+    final db = AppDatabase.connect(NativeDatabase.memory());
+    addTearDown(db.close);
+    final ar = ARRepository(db, cloudMode: false);
+    final ap = APRepository(db, cloudMode: false);
+
+    final customer = await ar.createCustomer(name: 'Customer Before');
+    await ar.updateCustomer(
+      customer.id,
+      CustomersCompanion(name: const Value('Customer After')),
+    );
+    final vendor = await ap.createVendor(name: 'Vendor Before');
+    await ap.updateVendor(
+      vendor.id,
+      VendorsCompanion(name: const Value('Vendor After')),
+    );
+
+    final customers = await ar.watchAllCustomers().first;
+    final vendors = await ap.watchAllVendors().first;
+    expect(customers.single.name, 'Customer After');
+    expect(vendors.single.name, 'Vendor After');
+  });
 }

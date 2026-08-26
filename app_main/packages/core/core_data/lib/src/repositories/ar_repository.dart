@@ -504,6 +504,10 @@ class ARRepository {
 
   /// Update invoice status
   Future<void> updateInvoiceStatus(String invoiceId, String status) async {
+    if (_useCloud) {
+      await _cloudRepository.updateInvoiceStatus(invoiceId, status);
+      return;
+    }
     await (_db.update(_db.invoices)..where((t) => t.id.equals(invoiceId)))
         .write(InvoicesCompanion(status: Value(status)));
   }
