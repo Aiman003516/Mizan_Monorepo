@@ -1005,7 +1005,7 @@
   "soldQuantity": "Sold quantity",
   "reorderPoint": "Reorder point",
   "salesTaxCollected": "Sales tax collected",
-  "purchaseTaxPaid": "Purchase tax paid",
+  "purchaseTaxPaid": "Purchase tax",
   "netTaxDue": "Net tax due",
   "reportInvoicesCount": "{count} invoices",
   "reportBillsCount": "{count} bills",

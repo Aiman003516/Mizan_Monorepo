@@ -1062,7 +1062,7 @@
   "soldQuantity": "الكمية المباعة",
   "reorderPoint": "نقطة إعادة الطلب",
   "salesTaxCollected": "ضريبة المبيعات المحصلة",
-  "purchaseTaxPaid": "ضريبة المشتريات المدفوعة",
+  "purchaseTaxPaid": "ضريبة المشتريات",
   "netTaxDue": "صافي الضريبة المستحقة",
   "reportInvoicesCount": "{count} فواتير",
   "reportBillsCount": "{count} فواتير مشتريات",

@@ -2326,7 +2326,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get salesTaxCollected => 'Sales tax collected';
 
   @override
-  String get purchaseTaxPaid => 'Purchase tax paid';
+  String get purchaseTaxPaid => 'Purchase tax';
 
   @override
   String get netTaxDue => 'Net tax due';

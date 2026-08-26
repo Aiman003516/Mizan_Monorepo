@@ -2318,7 +2318,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get salesTaxCollected => 'ضريبة المبيعات المحصلة';
 
   @override
-  String get purchaseTaxPaid => 'ضريبة المشتريات المدفوعة';
+  String get purchaseTaxPaid => 'ضريبة المشتريات';
 
   @override
   String get netTaxDue => 'صافي الضريبة المستحقة';

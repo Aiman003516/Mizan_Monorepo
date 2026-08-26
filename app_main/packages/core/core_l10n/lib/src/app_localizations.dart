@@ -4493,7 +4493,7 @@ abstract class AppLocalizations {
   /// No description provided for @purchaseTaxPaid.
   ///
   /// In en, this message translates to:
-  /// **'Purchase tax paid'**
+  /// **'Purchase tax'**
   String get purchaseTaxPaid;
 
   /// No description provided for @netTaxDue.
