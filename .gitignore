@@ -5,3 +5,8 @@
 build/
 skills-lock.json
 *.iml
+
+# Local environment files and provider secrets
+.env
+.env.*
+!.env.example
