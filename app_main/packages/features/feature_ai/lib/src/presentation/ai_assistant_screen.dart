@@ -388,12 +388,16 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
             conversationId: _conversationId,
           );
       if (!mounted) return;
+      final proposal = response.actionProposal;
       setState(() {
         _conversationId = response.conversationId;
         _messages.add(
           AiChatMessage(role: 'assistant', content: response.message),
         );
       });
+      if (proposal != null && proposal.requiresConfirmation) {
+        await _createActionDraft(proposal.actionType, proposal.payload);
+      }
     } catch (error) {
       if (!mounted) return;
       final message = error is AiGuestModeException

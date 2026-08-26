@@ -17,6 +17,48 @@ void main() {
     expect(response.readOnly, isTrue);
   });
 
+  test('parses a structured action proposal from an AI response', () {
+    final response = AiAgentResponse.fromData({
+      'conversation_id': 'conversation-2',
+      'request_id': 'request-2',
+      'message': 'I prepared a customer draft for your review.',
+      'read_only': true,
+      'action_proposal': {
+        'action_type': 'customer_draft',
+        'payload': {'name': 'Acme'},
+        'requires_confirmation': true,
+      },
+    });
+
+    expect(response.actionProposal, isNotNull);
+    expect(response.actionProposal!.actionType, 'customer_draft');
+    expect(response.actionProposal!.payload['name'], 'Acme');
+    expect(response.actionProposal!.requiresConfirmation, isTrue);
+  });
+
+  test('rejects a malformed action proposal', () {
+    expect(
+      () => AiAgentResponse.fromData({
+        'conversation_id': 'conversation-3',
+        'request_id': 'request-3',
+        'message': 'Draft',
+        'read_only': true,
+        'action_proposal': {
+          'action_type': 'customer_draft',
+          'payload': {'name': 'Acme'},
+          'requires_confirmation': false,
+        },
+      }),
+      throwsA(
+        isA<AiAgentException>().having(
+          (error) => error.code,
+          'code',
+          'MIZAN_AI_INVALID_PROPOSAL',
+        ),
+      ),
+    );
+  });
+
   test('rejects a response without a message or identifiers', () {
     expect(
       () => AiAgentResponse.fromData(const {}),

@@ -34,6 +34,7 @@ class AiAgentResponse {
     required this.requestId,
     required this.message,
     required this.readOnly,
+    this.actionProposal,
     this.model,
   });
 
@@ -50,12 +51,17 @@ class AiAgentResponse {
         'The AI assistant returned an invalid response.',
       );
     }
+    final rawProposal = data['action_proposal'];
+    final actionProposal = rawProposal is Map
+        ? AiActionProposal.fromJson(Map<String, dynamic>.from(rawProposal))
+        : null;
     return AiAgentResponse(
       conversationId: conversationId,
       requestId: requestId,
       message: message,
       model: data['model'] is String ? data['model'] as String : null,
       readOnly: data['read_only'] == true,
+      actionProposal: actionProposal,
     );
   }
 
@@ -64,6 +70,37 @@ class AiAgentResponse {
   final String message;
   final String? model;
   final bool readOnly;
+  final AiActionProposal? actionProposal;
+}
+
+class AiActionProposal {
+  const AiActionProposal({
+    required this.actionType,
+    required this.payload,
+    required this.requiresConfirmation,
+  });
+
+  factory AiActionProposal.fromJson(Map<String, dynamic> json) {
+    final actionType = json['action_type'];
+    final payload = json['payload'];
+    if (actionType is! String ||
+        payload is! Map ||
+        json['requires_confirmation'] != true) {
+      throw const AiAgentException(
+        'MIZAN_AI_INVALID_PROPOSAL',
+        'The AI assistant returned an invalid action proposal.',
+      );
+    }
+    return AiActionProposal(
+      actionType: actionType,
+      payload: Map<String, dynamic>.from(payload),
+      requiresConfirmation: true,
+    );
+  }
+
+  final String actionType;
+  final Map<String, dynamic> payload;
+  final bool requiresConfirmation;
 }
 
 class AiAgentRepository {

@@ -24,14 +24,14 @@ Online CRM and document writes target Supabase first. Temporary network failures
 
 ## AI Copilot deployment
 
-The read-only Mizan AI Copilot requires migration `20260827100000_ai_agent_phase1.sql` and the Edge Function at `functions/mizan-ai-agent`. Deploy the function only after the migration is applied. Configure `OPENAI_API_KEY` and optional `MIZAN_AI_MODEL`/`MIZAN_AI_BASE_URL` as Supabase Function secrets; never place provider credentials in Flutter or Git. The function derives the tenant from the authenticated `staff_members` membership, uses the user-scoped client for RLS-protected reads, exposes only bounded read-only tools, and records minimal tenant/user-scoped conversation and audit events. Guest mode must remain local and must not call this function.
+The Mizan AI Copilot requires migration `20260827100000_ai_agent_phase1.sql` and the Edge Function at `functions/mizan-ai-agent`. Deploy the function only after the migration is applied. For the attached OpenRouter workflow, configure `OPENROUTER_API_KEY`, `MIZAN_AI_BASE_URL=https://openrouter.ai/api/v1`, and optional `MIZAN_AI_MODELS`/`MIZAN_AI_MODEL` as Supabase Function secrets; never place provider credentials in Flutter or Git. The function discovers the configured model IDs from OpenRouter’s `/models` endpoint, retains only models advertising tool support, and uses the reference fallback list if discovery is unavailable. It derives the tenant from the authenticated `staff_members` membership, uses the user-scoped client for RLS-protected reads, exposes only bounded tools, prepares proposals without mutations, and records minimal tenant/user-scoped conversation and audit events. Guest mode must remain local and must not call this function.
 
 ```bash
 supabase functions deploy mizan-ai-agent --project-ref eawkctancunjpatujzpu
-supabase secrets set --project-ref eawkctancunjpatujzpu OPENAI_API_KEY=... MIZAN_AI_MODEL=gpt-5-mini MIZAN_AI_BASE_URL=https://api.openai.com/v1
+supabase secrets set --project-ref eawkctancunjpatujzpu OPENROUTER_API_KEY=... MIZAN_AI_BASE_URL=https://openrouter.ai/api/v1 MIZAN_AI_MODELS=...
 ```
 
-Before enabling the feature for users, test an owner, an ordinary member, a guest, and a user from a second tenant. Confirm read-only answers, permission-safe failures, provider-unavailable handling, no cross-tenant data, no secrets in logs, and audit events for request/tool/response/error outcomes. Mutation and scheduled-agent phases require separate review and migrations.
+Before enabling the feature for users, test an owner, an ordinary member, a guest, and a user from a second tenant. Confirm read-only answers, structured draft proposals only for explicit create requests, permission-safe failures, provider-unavailable handling, no cross-tenant data, no secrets in logs, and audit events for request/tool/response/error outcomes. After the user reviews a proposal, confirm that the Flutter client calls `mizan-ai-action`, receives a one-time confirmation token, and displays the committed or safely failed result. Mutation and scheduled-agent phases require separate review and migrations.
 
 ## Production checks
 
