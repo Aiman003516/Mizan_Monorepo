@@ -1736,6 +1736,54 @@ abstract class AppLocalizations {
   /// **'Backup & Restore'**
   String get backupAndRestore;
 
+  /// No description provided for @syncHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync health'**
+  String get syncHealth;
+
+  /// Number of pending cloud synchronization events
+  ///
+  /// In en, this message translates to:
+  /// **'Pending: {count}'**
+  String syncPending(int count);
+
+  /// Number of cloud synchronization events being processed
+  ///
+  /// In en, this message translates to:
+  /// **'Processing: {count}'**
+  String syncProcessing(int count);
+
+  /// Number of failed cloud synchronization events
+  ///
+  /// In en, this message translates to:
+  /// **'Failed: {count}'**
+  String syncFailed(int count);
+
+  /// Number of open synchronization conflicts
+  ///
+  /// In en, this message translates to:
+  /// **'Conflicts: {count}'**
+  String syncConflicts(int count);
+
+  /// No description provided for @syncUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync is up to date.'**
+  String get syncUpToDate;
+
+  /// No description provided for @syncRequiresAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync requires attention.'**
+  String get syncRequiresAttention;
+
+  /// No description provided for @syncCloudUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync status is available after sign-in.'**
+  String get syncCloudUnavailable;
+
   /// No description provided for @upgradeToMizanPro.
   ///
   /// In en, this message translates to:

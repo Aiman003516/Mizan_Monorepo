@@ -83,6 +83,7 @@ export 'src/models/procurement_models.dart';
 export 'src/repositories/procurement_repository.dart';
 export 'src/validation/procurement_validation.dart';
 export 'src/repositories/inventory_pos_repository.dart';
+export 'src/models/sync_health_models.dart';
 export 'src/repositories/event_outbox_repository.dart';
 export 'src/repositories/document_intake_repository.dart';
 export 'src/repositories/extension_registry_repository.dart';

@@ -149,3 +149,7 @@ Run `tests/20260828070000_purchase_bill_match_gate.sql` in staging and verify th
 Migration `migrations/20260828080000_purchase_bill_exception_workflow.sql` adds auditable match-variance exception requests. A blocked bill can request a reasoned `bill` approval; the approval synchronization trigger records the decision, and `assert_purchase_bill_posting_eligibility(uuid)` accepts either a fully matched bill or an approved exception. This migration does not post bills, approve requests automatically, bypass maker-checker controls, or alter the original match evidence.
 
 Run `tests/20260828080000_purchase_bill_exception_workflow.sql` in staging after the match-gate migration. Exercise blocked and matched bills, duplicate exception retries, pending-exception rejection, self-approval rejection, approved-exception eligibility, rejected-exception blocking, tenant/branch isolation, and anonymous execution denial. Production application requires explicit approval and a recorded staging result.
+
+## Sync-health snapshot
+
+Migration `migrations/20260828090000_sync_health_snapshot.sql` adds `get_sync_health_snapshot()`, an authenticated tenant-scoped aggregate RPC for dashboard status. It reports event counts and open conflict counts without returning event payloads. Run `tests/20260828090000_sync_health_snapshot.sql` in staging, verify tenant isolation, failed-event and conflict counts, and anonymous execution denial. This does not prove realtime delivery or worker deployment, and production application still requires explicit approval.

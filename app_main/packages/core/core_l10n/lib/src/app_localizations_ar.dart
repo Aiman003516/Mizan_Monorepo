@@ -867,6 +867,39 @@ class AppLocalizationsAr extends AppLocalizations {
   String get backupAndRestore => 'النسخ الاحتياطي والاستعادة';
 
   @override
+  String get syncHealth => 'حالة المزامنة السحابية';
+
+  @override
+  String syncPending(int count) {
+    return 'قيد الانتظار: $count';
+  }
+
+  @override
+  String syncProcessing(int count) {
+    return 'قيد المعالجة: $count';
+  }
+
+  @override
+  String syncFailed(int count) {
+    return 'فشل: $count';
+  }
+
+  @override
+  String syncConflicts(int count) {
+    return 'التعارضات: $count';
+  }
+
+  @override
+  String get syncUpToDate => 'المزامنة السحابية محدثة.';
+
+  @override
+  String get syncRequiresAttention => 'المزامنة السحابية تتطلب الانتباه.';
+
+  @override
+  String get syncCloudUnavailable =>
+      'تتوفر حالة المزامنة السحابية بعد تسجيل الدخول.';
+
+  @override
   String get upgradeToMizanPro => 'الترقية إلى ميزان برو';
 
   @override

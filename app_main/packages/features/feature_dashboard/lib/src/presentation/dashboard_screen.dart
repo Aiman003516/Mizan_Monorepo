@@ -95,6 +95,7 @@ class DashboardScreen extends ConsumerWidget {
     final totalExpenses = ref.watch(totalExpensesProvider);
     final totalReceivable = ref.watch(totalReceivableProvider);
     final totalPayable = ref.watch(totalPayableProvider);
+    final syncHealth = ref.watch(syncHealthSnapshotProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -290,6 +291,8 @@ class DashboardScreen extends ConsumerWidget {
           ),
 
           const SizedBox(height: 24),
+          _buildSyncHealthCard(context, syncHealth),
+          const SizedBox(height: 16),
           const Divider(),
           const SizedBox(height: 16),
 
@@ -365,6 +368,84 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildSyncHealthCard(
+    BuildContext context,
+    AsyncValue<SyncHealthSnapshot> syncHealth,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: syncHealth.when(
+          loading: () => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                l10n.syncHealth,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 12),
+              const LinearProgressIndicator(),
+            ],
+          ),
+          error: (_, __) => Row(
+            children: [
+              Icon(Icons.cloud_off_outlined, color: colors.outline),
+              const SizedBox(width: 12),
+              Expanded(child: Text(l10n.syncCloudUnavailable)),
+            ],
+          ),
+          data: (snapshot) {
+            final statusColor = snapshot.needsAttention
+                ? colors.error
+                : colors.primary;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.cloud_sync_outlined, color: statusColor),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        snapshot.needsAttention
+                            ? l10n.syncRequiresAttention
+                            : l10n.syncUpToDate,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    _SyncMetric(
+                      label: l10n.syncPending(snapshot.serverPendingCount),
+                    ),
+                    _SyncMetric(
+                      label: l10n.syncProcessing(
+                        snapshot.serverProcessingCount,
+                      ),
+                    ),
+                    _SyncMetric(
+                      label: l10n.syncFailed(snapshot.serverFailedCount),
+                    ),
+                    _SyncMetric(
+                      label: l10n.syncConflicts(snapshot.openConflictCount),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _buildSummaryCard({
     required BuildContext context,
     required String title,
@@ -404,6 +485,21 @@ class DashboardScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SyncMetric extends StatelessWidget {
+  const _SyncMetric({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      avatar: const Icon(Icons.circle, size: 8),
+      label: Text(label),
+      visualDensity: VisualDensity.compact,
     );
   }
 }

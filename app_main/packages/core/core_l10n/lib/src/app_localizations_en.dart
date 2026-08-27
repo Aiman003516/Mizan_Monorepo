@@ -868,6 +868,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupAndRestore => 'Backup & Restore';
 
   @override
+  String get syncHealth => 'Cloud sync health';
+
+  @override
+  String syncPending(int count) {
+    return 'Pending: $count';
+  }
+
+  @override
+  String syncProcessing(int count) {
+    return 'Processing: $count';
+  }
+
+  @override
+  String syncFailed(int count) {
+    return 'Failed: $count';
+  }
+
+  @override
+  String syncConflicts(int count) {
+    return 'Conflicts: $count';
+  }
+
+  @override
+  String get syncUpToDate => 'Cloud sync is up to date.';
+
+  @override
+  String get syncRequiresAttention => 'Cloud sync requires attention.';
+
+  @override
+  String get syncCloudUnavailable =>
+      'Cloud sync status is available after sign-in.';
+
+  @override
   String get upgradeToMizanPro => 'Upgrade to Mizan Pro';
 
   @override

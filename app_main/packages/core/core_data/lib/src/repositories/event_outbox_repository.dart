@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../models/sync_health_models.dart';
 import '../tenant_context.dart';
 
 final eventOutboxRepositoryProvider = Provider<EventOutboxRepository>(
@@ -9,6 +10,10 @@ final eventOutboxRepositoryProvider = Provider<EventOutboxRepository>(
     ref.watch(tenantContextProvider),
   ),
 );
+
+final syncHealthSnapshotProvider = FutureProvider<SyncHealthSnapshot>((ref) {
+  return ref.watch(eventOutboxRepositoryProvider).healthSnapshot();
+});
 
 class ErpOutboxEvent {
   const ErpOutboxEvent({
@@ -135,6 +140,30 @@ class EventOutboxRepository {
       );
     }
     return response;
+  }
+
+  Future<SyncHealthSnapshot> healthSnapshot() async {
+    await _tenantId();
+    final response = await _supabase.rpc('get_sync_health_snapshot');
+    if (response is! Map) {
+      throw const PostgrestException(
+        message: 'Sync health returned no result.',
+        code: 'MIZAN_SYNC_HEALTH_INVALID_RESPONSE',
+      );
+    }
+    final json = Map<String, dynamic>.from(response);
+    return SyncHealthSnapshot(
+      serverPendingCount: (json['server_pending_count'] as num?)?.toInt() ?? 0,
+      serverProcessingCount:
+          (json['server_processing_count'] as num?)?.toInt() ?? 0,
+      serverFailedCount: (json['server_failed_count'] as num?)?.toInt() ?? 0,
+      openConflictCount: (json['open_conflict_count'] as num?)?.toInt() ?? 0,
+      serverSucceededCount:
+          (json['server_succeeded_count'] as num?)?.toInt() ?? 0,
+      observedAt:
+          DateTime.tryParse(json['observed_at']?.toString() ?? '') ??
+          DateTime.now().toUtc(),
+    );
   }
 
   Future<List<ErpOutboxEvent>> claim({
