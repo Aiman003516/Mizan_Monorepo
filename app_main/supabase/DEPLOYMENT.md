@@ -161,3 +161,17 @@ Migration `migrations/20260828100000_inventory_reservations.sql` adds idempotent
 ## Governed purchase-bill posting
 
 Migration `migrations/20260828120000_governed_purchase_bill_posting.sql` adds `post_purchase_bill(uuid, uuid, uuid, text, date)`. It derives tenant scope from the session, checks branch access and accounting permissions, calls the exception-aware match eligibility gate, creates a source-linked journal, and posts it through the existing governed journal command. A retry returns the existing posted linkage. In staging, verify fully matched bills, approved exceptions, blocked bills, locked periods, invalid account types, branch isolation, concurrent retry behavior, and audit/source links. No production SQL is applied automatically; production use requires explicit approval and a recorded staging result.
+
+## Warehouse transfers
+
+Migration `migrations/20260828130000_warehouse_transfers.sql` adds tenant-scoped `warehouse_transfers` and `warehouse_transfer_lines`, plus the atomic `post_warehouse_transfer(text, text, text, text, text, jsonb, text)` command. The command locks source inventory rows, rejects insufficient physical stock, writes source and destination movements in one transaction, and supports idempotent retry by key. In staging, verify source decrement and destination increment, insufficient-source rollback, duplicate-key replay, source/destination tenant and branch authorization, anonymous denial, currency and product validation, and interaction with active reservations. This is an immediate stock movement, not an in-transit or receiving workflow; production use requires explicit approval and a recorded staging result.
+
+## Accounting source drill-down
+
+Migration `migrations/20260828140000_accounting_source_drilldown.sql` adds the tenant-safe read RPC `accounting_source_drilldown(text, uuid)` for posted source documents. In staging, verify that it returns only posted source-linked journal lines and account details for the current tenant, rejects or hides another tenant’s source, respects the report permission, excludes drafts, and does not expose event payloads or permit writes. Production use requires explicit approval and a recorded staging result.
+
+## CRM quote approval and interaction history
+
+Migration `migrations/20260828150000_crm_quote_approval_history.sql` extends the approval vocabulary with `quote`, adds `submit_crm_quote_for_approval(uuid, text)`, adds tenant-safe `list_crm_interactions(text, uuid)`, and synchronizes approved/rejected quote requests to `sent -> accepted/rejected`. In staging, verify that quote submission requires CRM/quote permission and tenant membership, maker-checker self-approval is rejected, existing invoice/bill/procurement approval types still work, duplicate submissions do not create unintended duplicate requests, approved and rejected decisions transition only the intended quote, and interaction history is tenant-isolated. Production use requires explicit approval and a recorded staging result.
+
+No production SQL is applied automatically; production use requires explicit approval and a recorded staging result.
