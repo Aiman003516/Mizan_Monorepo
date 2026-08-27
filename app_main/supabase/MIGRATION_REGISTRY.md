@@ -44,6 +44,7 @@ This registry is the canonical human-readable dependency map for the additive Su
 | `20260828080000_purchase_bill_exception_workflow.sql` | Procurement / Accounting / Governance | Auditable match-variance exception requests with maker-checker approval and exception-aware eligibility | Purchase-bill match gate, approval enforcement, bills, branches, tenant permissions |
 | `20260828090000_sync_health_snapshot.sql` | Sync / Governance | Tenant-scoped aggregate synchronization health status without event payload exposure | Transactional outbox events, sync conflicts, tenant membership |
 | `20260828100000_inventory_reservations.sql` | Inventory / POS | Tenant-scoped idempotent stock reservations and controlled release commands | Inventory balances, inventory bridge, tenant permissions |
+| `20260828110000_inventory_reservation_expiry.sql` | Inventory / POS / Governance | Manual tenant-scoped expiry of stale reservations without autonomous background execution | Inventory reservations, tenant permissions |
 
 ## Required migration header
 
