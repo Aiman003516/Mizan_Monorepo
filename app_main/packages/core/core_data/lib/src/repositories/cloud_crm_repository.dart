@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
+import '../models/balance_adjustment.dart';
 import '../services/sync_queue_service.dart';
 import '../tenant_context.dart';
 import 'ar_repository.dart';
@@ -111,6 +112,175 @@ class CloudCrmRepository {
         return _cachedTenantId!;
       }
       rethrow;
+    }
+  }
+
+  Future<void> postBalanceAdjustment(BalanceAdjustmentInput input) async {
+    final tenantId = await currentTenantId();
+    if (input.partyId.isEmpty || input.amountMinor <= 0) {
+      throw ArgumentError('A valid party and positive adjustment are required');
+    }
+    if (input.reason.trim().length < 3) {
+      throw ArgumentError('A reason of at least three characters is required');
+    }
+    if (input.currencyCode != input.currencyCode.toUpperCase()) {
+      throw ArgumentError('The adjustment currency must be uppercase');
+    }
+    final idempotencyKey =
+        'manual-adjustment:${input.partyType.wireName}:${input.partyId}:${input.effectiveDate.toIso8601String()}:${input.amountMinor}:${input.direction.wireName}:${input.reference ?? ''}';
+    final response = await _supabase.rpc(
+      'post_manual_balance_adjustment',
+      params: {
+        'p_party_type': input.partyType.wireName,
+        'p_party_id': input.partyId,
+        'p_amount_minor': input.amountMinor,
+        'p_direction': input.direction.wireName,
+        'p_currency_code': input.currencyCode,
+        'p_reason': input.reason.trim(),
+        'p_reference': input.reference,
+        'p_effective_date': input.effectiveDate
+            .toIso8601String()
+            .split('T')
+            .first,
+        'p_debit_account_id': input.debitAccountId,
+        'p_credit_account_id': input.creditAccountId,
+        'p_idempotency_key': idempotencyKey,
+      },
+    );
+    if (response is! Map) {
+      throw const PostgrestException(
+        message: 'The balance adjustment was not committed.',
+        code: 'MIZAN_BALANCE_ADJUSTMENT_INVALID_RESPONSE',
+      );
+    }
+    final row = Map<String, dynamic>.from(response);
+    final adjustmentId = row['adjustment_id']?.toString();
+    final journalEntryId = row['journal_entry_id']?.toString();
+    final newBalance = _int(row['new_balance']);
+    if (adjustmentId == null || journalEntryId == null) {
+      throw const PostgrestException(
+        message: 'The balance adjustment response is incomplete.',
+        code: 'MIZAN_BALANCE_ADJUSTMENT_INCOMPLETE_RESPONSE',
+      );
+    }
+    final effectiveDate = _date(row['effective_date']);
+    await _db.transaction(() async {
+      if (input.partyType == BalancePartyType.customer) {
+        final local =
+            await (_db.select(_db.customers)
+                  ..where((item) => item.id.equals(input.partyId))
+                  ..where((item) => item.tenantId.equals(tenantId)))
+                .getSingleOrNull();
+        if (local != null) {
+          await (_db.update(_db.customers)
+                ..where((item) => item.id.equals(input.partyId))
+                ..where((item) => item.tenantId.equals(tenantId)))
+              .write(
+                CustomersCompanion(
+                  balance: Value(newBalance),
+                  lastUpdated: Value(DateTime.now().toUtc()),
+                ),
+              );
+        }
+      } else {
+        final local =
+            await (_db.select(_db.vendors)
+                  ..where((item) => item.id.equals(input.partyId))
+                  ..where((item) => item.tenantId.equals(tenantId)))
+                .getSingleOrNull();
+        if (local != null) {
+          await (_db.update(_db.vendors)
+                ..where((item) => item.id.equals(input.partyId))
+                ..where((item) => item.tenantId.equals(tenantId)))
+              .write(
+                VendorsCompanion(
+                  balance: Value(newBalance),
+                  lastUpdated: Value(DateTime.now().toUtc()),
+                ),
+              );
+        }
+      }
+      await _db
+          .into(_db.balanceAdjustments)
+          .insertOnConflictUpdate(
+            BalanceAdjustmentsCompanion.insert(
+              id: Value(adjustmentId),
+              partyType: input.partyType.wireName,
+              partyId: input.partyId,
+              amount: _int(row['amount_minor']),
+              direction:
+                  row['direction']?.toString() ?? input.direction.wireName,
+              currencyCode: Value(
+                row['currency_code']?.toString() ?? input.currencyCode,
+              ),
+              reason: row['reason']?.toString() ?? input.reason.trim(),
+              reference: Value(row['reference']?.toString()),
+              transactionId: Value(journalEntryId),
+              status: Value(row['status']?.toString() ?? 'posted'),
+              effectiveDate: effectiveDate,
+            ),
+          );
+    });
+  }
+
+  BalanceAdjustment _balanceAdjustmentFromMap(Map<String, dynamic> row) {
+    return BalanceAdjustment(
+      id: row['id'] as String,
+      createdAt: _date(row['created_at']),
+      lastUpdated: _date(row['updated_at'] ?? row['created_at']),
+      tenantId: row['tenant_id'] as String?,
+      isDeleted: row['is_deleted'] == true,
+      partyType: row['party_type'] as String,
+      partyId: row['party_id'] as String,
+      amount: _int(row['amount_minor']),
+      direction: row['direction'] as String,
+      currencyCode: row['currency_code'] as String,
+      reason: row['reason'] as String,
+      reference: row['reference'] as String?,
+      transactionId: row['journal_entry_id'] as String?,
+      status: row['status'] as String,
+      effectiveDate: _date(row['effective_date']),
+      createdByUserId: row['created_by'] as String?,
+    );
+  }
+
+  Stream<List<BalanceAdjustment>> watchBalanceAdjustments({
+    required String partyType,
+    required String partyId,
+  }) async* {
+    final tenantId = await currentTenantId();
+    final remote = _supabase
+        .from('balance_adjustments')
+        .stream(primaryKey: ['id'])
+        .eq('tenant_id', tenantId)
+        .eq('party_type', partyType)
+        .eq('party_id', partyId)
+        .order('effective_date', ascending: false);
+    try {
+      await for (final rows in remote) {
+        final adjustments = rows
+            .map(
+              (row) =>
+                  _balanceAdjustmentFromMap(Map<String, dynamic>.from(row)),
+            )
+            .toList(growable: false);
+        await _db.transaction(() async {
+          for (final adjustment in adjustments) {
+            await _db
+                .into(_db.balanceAdjustments)
+                .insertOnConflictUpdate(adjustment);
+          }
+        });
+        yield adjustments;
+      }
+    } catch (_) {
+      yield* (_db.select(_db.balanceAdjustments)
+            ..where((row) => row.tenantId.equals(tenantId))
+            ..where((row) => row.partyType.equals(partyType))
+            ..where((row) => row.partyId.equals(partyId))
+            ..where((row) => row.isDeleted.equals(false))
+            ..orderBy([(row) => drift.OrderingTerm.desc(row.effectiveDate)]))
+          .watch();
     }
   }
 

@@ -9530,6 +9530,114 @@ abstract class AppLocalizations {
   /// **'Could not update the supplier balance'**
   String get supplierAdjustmentFailed;
 
+  /// No description provided for @adjustmentReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get adjustmentReason;
+
+  /// No description provided for @adjustmentReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain why this balance is being adjusted'**
+  String get adjustmentReasonHint;
+
+  /// No description provided for @adjustmentReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a reason of at least 3 characters.'**
+  String get adjustmentReasonRequired;
+
+  /// No description provided for @adjustmentReferenceOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference (optional)'**
+  String get adjustmentReferenceOptional;
+
+  /// No description provided for @effectiveDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Effective date'**
+  String get effectiveDate;
+
+  /// No description provided for @reviewAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Review adjustment'**
+  String get reviewAdjustment;
+
+  /// No description provided for @confirmAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm adjustment'**
+  String get confirmAdjustment;
+
+  /// No description provided for @reviewBalanceAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply {amount} to {name}? The resulting balance will be {newBalance}. This creates a posted journal entry.'**
+  String reviewBalanceAdjustment(String amount, String name, String newBalance);
+
+  /// No description provided for @resultingBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Resulting balance'**
+  String get resultingBalance;
+
+  /// No description provided for @balanceAdjustmentPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'This adjustment will be recorded in the register and linked to a journal entry.'**
+  String get balanceAdjustmentPreview;
+
+  /// No description provided for @balanceAdjustmentCannotBeNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'The resulting balance cannot be negative.'**
+  String get balanceAdjustmentCannotBeNegative;
+
+  /// No description provided for @balanceAdjustmentFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The balance adjustment could not be posted.'**
+  String get balanceAdjustmentFailed;
+
+  /// No description provided for @balanceAdjustmentHistoryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load balance adjustment history.'**
+  String get balanceAdjustmentHistoryFailed;
+
+  /// No description provided for @adjustmentHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustment history'**
+  String get adjustmentHistory;
+
+  /// No description provided for @noBalanceAdjustments.
+  ///
+  /// In en, this message translates to:
+  /// **'No manual balance adjustments have been posted.'**
+  String get noBalanceAdjustments;
+
+  /// No description provided for @adjustmentIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase'**
+  String get adjustmentIncrease;
+
+  /// No description provided for @adjustmentDecrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease'**
+  String get adjustmentDecrease;
+
+  /// No description provided for @posted.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted'**
+  String get posted;
+
   /// No description provided for @crmSectionTitle.
   ///
   /// In en, this message translates to:

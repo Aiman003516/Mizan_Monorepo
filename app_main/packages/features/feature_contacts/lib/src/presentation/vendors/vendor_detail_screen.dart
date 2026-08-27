@@ -8,6 +8,7 @@ import 'package:shared_ui/shared_ui.dart';
 import 'vendor_form_screen.dart';
 import 'bill_form_screen.dart';
 import 'vendor_quick_adjustment_dialog.dart';
+import '../widgets/balance_adjustment_history_section.dart';
 
 /// 📋 Vendor Detail Screen
 class VendorDetailScreen extends ConsumerWidget {
@@ -17,6 +18,7 @@ class VendorDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final billsAsync = ref.watch(vendorBillsProvider(vendorId));
+    final adjustmentsAsync = ref.watch(vendorAdjustmentsProvider(vendorId));
     final vendorsAsync = ref.watch(vendorsStreamProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -55,12 +57,17 @@ class VendorDetailScreen extends ConsumerWidget {
           currencyCode: currencyCode,
           outstandingBalanceLabel: l10n.outstandingBalance,
           quickAdjustmentLabel: l10n.quickLedgerAdjustment,
+          balanceHistorySection: BalanceAdjustmentHistorySection(
+            adjustments: adjustmentsAsync,
+            currencyCode: currencyCode,
+          ),
           onQuickAdjustment: () async {
             final updated = await showDialog<bool>(
               context: context,
               builder: (_) => VendorQuickAdjustmentDialog(
                 vendorId: vendor.id,
                 vendorName: vendor.name,
+                currentBalance: vendor.balance,
               ),
             );
             if (updated == true) {

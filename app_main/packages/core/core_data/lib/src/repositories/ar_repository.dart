@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:uuid/uuid.dart';
 
 import 'cloud_crm_repository.dart';
+import '../models/balance_adjustment.dart';
 import '../providers/cloud_data_mode_provider.dart';
 
 const _uuid = Uuid();
@@ -26,6 +27,12 @@ final customersStreamProvider = StreamProvider.autoDispose<List<Customer>>((
 final customerInvoicesProvider = StreamProvider.autoDispose
     .family<List<Invoice>, String>((ref, customerId) {
       return ref.watch(arRepositoryProvider).watchCustomerInvoices(customerId);
+    });
+final customerAdjustmentsProvider = StreamProvider.autoDispose
+    .family<List<BalanceAdjustment>, String>((ref, customerId) {
+      return ref
+          .watch(arRepositoryProvider)
+          .watchCustomerAdjustments(customerId);
     });
 
 final invoiceWithItemsProvider = FutureProvider.autoDispose
@@ -217,6 +224,19 @@ class ARRepository {
                 amount: -openingBalance,
               ),
             );
+        await _db
+            .into(_db.balanceAdjustments)
+            .insert(
+              BalanceAdjustmentsCompanion.insert(
+                partyType: 'customer',
+                partyId: customerUuid,
+                amount: openingBalance.abs(),
+                direction: openingBalance > 0 ? 'increase' : 'decrease',
+                reason: 'Opening balance',
+                transactionId: Value(txnUuid),
+                effectiveDate: DateTime.now().toUtc(),
+              ),
+            );
       }
 
       // Use the pre-generated UUID — no need to re-query by rowid
@@ -247,113 +267,191 @@ class ARRepository {
     )..where((t) => t.id.equals(id))).write(companion);
   }
 
-  /// Update customer balance
+  /// Update customer balance from invoice outstanding plus posted adjustments.
   Future<void> updateCustomerBalance(String customerId) async {
-    // Calculate total outstanding from unpaid invoices
     final invoices =
         await (_db.select(_db.invoices)
               ..where((t) => t.customerId.equals(customerId))
               ..where((t) => t.status.isNotIn(['void', 'paid'])))
             .get();
+    final adjustments =
+        await (_db.select(_db.balanceAdjustments)
+              ..where((row) => row.partyType.equals('customer'))
+              ..where((row) => row.partyId.equals(customerId))
+              ..where((row) => row.status.equals('posted'))
+              ..where((row) => row.isDeleted.equals(false)))
+            .get();
+    final invoiceOutstanding = invoices.fold<int>(
+      0,
+      (sum, invoice) => sum + invoice.totalAmount - invoice.amountPaid,
+    );
+    final manualBalance = adjustments.fold<int>(
+      0,
+      (sum, adjustment) =>
+          sum +
+          (adjustment.direction == 'increase'
+              ? adjustment.amount
+              : -adjustment.amount),
+    );
+    await (_db.update(
+      _db.customers,
+    )..where((t) => t.id.equals(customerId))).write(
+      CustomersCompanion(balance: Value(invoiceOutstanding + manualBalance)),
+    );
+  }
 
-    int totalOutstanding = 0;
-    for (final inv in invoices) {
-      totalOutstanding += inv.totalAmount - inv.amountPaid;
+  Stream<List<BalanceAdjustment>> watchCustomerAdjustments(String customerId) {
+    if (_useCloud) {
+      return _cloudRepository.watchBalanceAdjustments(
+        partyType: 'customer',
+        partyId: customerId,
+      );
     }
-
-    await (_db.update(_db.customers)..where((t) => t.id.equals(customerId)))
-        .write(CustomersCompanion(balance: Value(totalOutstanding)));
+    return (_db.select(_db.balanceAdjustments)
+          ..where((row) => row.partyType.equals('customer'))
+          ..where((row) => row.partyId.equals(customerId))
+          ..where((row) => row.isDeleted.equals(false))
+          ..orderBy([(row) => OrderingTerm.desc(row.effectiveDate)]))
+        .watch();
   }
 
   // ==================== INVOICES ====================
 
-  /// Record Quick Ledger Adjustment
+  /// Records a manual customer balance adjustment as an atomic journal posting.
+  ///
+  /// A charge increases receivables and credits revenue; a receipt decreases
+  /// receivables and debits cash. The adjustment register, journal, and cached
+  /// balance are committed together. Cloud mode delegates to the server RPC.
   Future<void> recordQuickAdjustment({
     required String customerId,
     required int amount,
     required bool isCharge,
     String? notes,
+    String? reference,
+    DateTime? effectiveDate,
+    String? debitAccountId,
+    String? creditAccountId,
+    String currencyCode = 'USD',
   }) async {
+    if (amount <= 0) throw ArgumentError.value(amount, 'amount');
+    final reason = notes?.trim() ?? '';
+    if (reason.isEmpty) {
+      throw ArgumentError.value(notes, 'notes', 'A reason is required');
+    }
+    final selectedDate = effectiveDate ?? DateTime.now();
+    final date = DateTime.utc(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
+    if (_useCloud) {
+      await _cloudRepository.postBalanceAdjustment(
+        BalanceAdjustmentInput(
+          partyType: BalancePartyType.customer,
+          partyId: customerId,
+          amountMinor: amount,
+          direction: isCharge
+              ? BalanceAdjustmentDirection.increase
+              : BalanceAdjustmentDirection.decrease,
+          currencyCode: currencyCode,
+          reason: reason,
+          reference: reference?.trim().isEmpty == true
+              ? null
+              : reference?.trim(),
+          effectiveDate: date,
+          debitAccountId: debitAccountId,
+          creditAccountId: creditAccountId,
+        ),
+      );
+      return;
+    }
+
     await _db.transaction(() async {
       final customer = await getCustomer(customerId);
-      if (customer == null) return;
-
-      final accountsList = await _db.select(_db.accounts).get();
-      final arAccount =
-          accountsList.firstWhereOrNull(
-            (a) =>
-                a.name == 'Accounts Receivable' ||
-                a.name.contains('Receivable'),
-          ) ??
-          accountsList.firstWhereOrNull((a) => a.type == 'asset');
-      final cashAccount =
-          accountsList.firstWhereOrNull(
-            (a) => a.name == 'Cash' || a.name.contains('Cash'),
-          ) ??
-          accountsList.firstWhereOrNull((a) => a.type == 'asset');
-
-      if (arAccount == null || cashAccount == null) {
-        throw Exception(
-          'Required system accounts (Accounts Receivable or Cash) are missing from the database.',
+      if (customer == null) {
+        throw StateError('Customer not found');
+      }
+      final accounts = await _db.select(_db.accounts).get();
+      final arAccount = debitAccountId == null && creditAccountId == null
+          ? accounts.firstWhereOrNull(
+              (a) =>
+                  a.name == 'Accounts Receivable' ||
+                  a.name.contains('Receivable'),
+            )
+          : accounts.firstWhereOrNull((a) => a.id == debitAccountId) ??
+                accounts.firstWhereOrNull((a) => a.id == creditAccountId);
+      final cashAccount = accounts.firstWhereOrNull(
+        (a) => a.name == 'Cash' || a.name.contains('Cash'),
+      );
+      final revenueAccount = accounts.firstWhereOrNull(
+        (a) => a.type == 'revenue',
+      );
+      final debitAccount = debitAccountId == null
+          ? (isCharge ? arAccount : cashAccount)
+          : accounts.firstWhereOrNull((a) => a.id == debitAccountId);
+      final creditAccount = creditAccountId == null
+          ? (isCharge ? revenueAccount : arAccount)
+          : accounts.firstWhereOrNull((a) => a.id == creditAccountId);
+      if (debitAccount == null || creditAccount == null) {
+        throw StateError(
+          'Receivable, cash, and revenue accounts must be configured before adjusting a customer balance',
         );
       }
-
-      // Pre-generate transaction UUID for FK references
-      final txnUuid = _uuid.v4();
-      final txnCompanion = TransactionsCompanion.insert(
-        id: Value(txnUuid),
-        transactionDate: DateTime.now(),
-        description:
-            notes ??
-            (isCharge
-                ? 'Quick Charge for ${customer.name}'
-                : 'Payment Received from ${customer.name}'),
-      );
-      await _db.into(_db.transactions).insert(txnCompanion);
-
-      if (isCharge) {
-        // Customer owes us more: Debit AR (positive), Credit Cash (negative)
-        await _db
-            .into(_db.transactionEntries)
-            .insert(
-              TransactionEntriesCompanion.insert(
-                transactionId: txnUuid, // ✅ UUID string, not int rowid
-                accountId: arAccount.id,
-                amount: amount,
-              ),
-            );
-        await _db
-            .into(_db.transactionEntries)
-            .insert(
-              TransactionEntriesCompanion.insert(
-                transactionId: txnUuid, // ✅ UUID string, not int rowid
-                accountId: cashAccount.id,
-                amount: -amount,
-              ),
-            );
-      } else {
-        // Customer pays us: Debit Cash (positive), Credit AR (negative)
-        await _db
-            .into(_db.transactionEntries)
-            .insert(
-              TransactionEntriesCompanion.insert(
-                transactionId: txnUuid, // ✅ UUID string, not int rowid
-                accountId: cashAccount.id,
-                amount: amount,
-              ),
-            );
-        await _db
-            .into(_db.transactionEntries)
-            .insert(
-              TransactionEntriesCompanion.insert(
-                transactionId: txnUuid, // ✅ UUID string, not int rowid
-                accountId: arAccount.id,
-                amount: -amount,
-              ),
-            );
+      if (debitAccount.id == creditAccount.id) {
+        throw StateError('Adjustment debit and credit accounts must differ');
+      }
+      final newBalance = customer.balance + (isCharge ? amount : -amount);
+      if (newBalance < 0) {
+        throw StateError('A customer balance cannot become negative');
       }
 
-      final newBalance = customer.balance + (isCharge ? amount : -amount);
+      final transactionId = _uuid.v4();
+      await _db
+          .into(_db.transactions)
+          .insert(
+            TransactionsCompanion.insert(
+              id: Value(transactionId),
+              transactionDate: date,
+              description: reason,
+              currencyCode: Value(currencyCode),
+              isAdjustment: const Value(true),
+            ),
+          );
+      await _db
+          .into(_db.transactionEntries)
+          .insert(
+            TransactionEntriesCompanion.insert(
+              transactionId: transactionId,
+              accountId: debitAccount.id,
+              amount: amount,
+            ),
+          );
+      await _db
+          .into(_db.transactionEntries)
+          .insert(
+            TransactionEntriesCompanion.insert(
+              transactionId: transactionId,
+              accountId: creditAccount.id,
+              amount: -amount,
+            ),
+          );
+      await _db
+          .into(_db.balanceAdjustments)
+          .insert(
+            BalanceAdjustmentsCompanion.insert(
+              partyType: 'customer',
+              partyId: customerId,
+              amount: amount,
+              direction: isCharge ? 'increase' : 'decrease',
+              currencyCode: Value(currencyCode),
+              reason: reason,
+              reference: Value(
+                reference?.trim().isEmpty == true ? null : reference?.trim(),
+              ),
+              transactionId: Value(transactionId),
+              effectiveDate: date,
+            ),
+          );
       await (_db.update(_db.customers)..where((t) => t.id.equals(customerId)))
           .write(CustomersCompanion(balance: Value(newBalance)));
     });

@@ -618,6 +618,25 @@ class Customers extends MizanTable {
   BoolColumn get isOnHold => boolean().withDefault(const Constant(false))();
 }
 
+@DataClassName('BalanceAdjustment')
+class BalanceAdjustments extends MizanTable {
+  TextColumn get partyType => text()();
+  TextColumn get partyId => text()();
+  IntColumn get amount => integer()();
+  TextColumn get direction => text()();
+  TextColumn get currencyCode => text().withDefault(const Constant('USD'))();
+  TextColumn get reason => text()();
+  TextColumn get reference => text().nullable()();
+  TextColumn get transactionId => text().nullable().references(
+    Transactions,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  TextColumn get status => text().withDefault(const Constant('posted'))();
+  DateTimeColumn get effectiveDate => dateTime()();
+  TextColumn get createdByUserId => text().nullable()();
+}
+
 @DataClassName('Currency')
 class Currencies extends MizanTable {
   TextColumn get code => text().unique()();
@@ -704,6 +723,7 @@ class OrderItems extends MizanTable {
     Comments,
     UserRoles,
     SyncQueueEntries,
+    BalanceAdjustments,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -712,9 +732,9 @@ class AppDatabase extends _$AppDatabase {
   /// 🧪 Constructor for Testing
   AppDatabase.connect(QueryExecutor connection) : super(connection);
 
-  // ⭐️ BUMPED VERSION: 31 -> 32 (Offline outbox)
+  // ⭐️ BUMPED VERSION: 32 -> 33 (Balance adjustment register)
   @override
-  int get schemaVersion => 32;
+  int get schemaVersion => 33;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -867,6 +887,10 @@ class AppDatabase extends _$AppDatabase {
       // Offline mutation queue (Version 32)
       if (from < 32) {
         await m.createTable(syncQueueEntries);
+      }
+      // Manual customer/supplier balance adjustment register (Version 33)
+      if (from < 33) {
+        await m.createTable(balanceAdjustments);
       }
     },
     beforeOpen: (details) async {

@@ -5035,6 +5035,73 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not update the supplier balance';
 
   @override
+  String get adjustmentReason => 'Reason';
+
+  @override
+  String get adjustmentReasonHint =>
+      'Explain why this balance is being adjusted';
+
+  @override
+  String get adjustmentReasonRequired =>
+      'Enter a reason of at least 3 characters.';
+
+  @override
+  String get adjustmentReferenceOptional => 'Reference (optional)';
+
+  @override
+  String get effectiveDate => 'Effective date';
+
+  @override
+  String get reviewAdjustment => 'Review adjustment';
+
+  @override
+  String get confirmAdjustment => 'Confirm adjustment';
+
+  @override
+  String reviewBalanceAdjustment(
+    String amount,
+    String name,
+    String newBalance,
+  ) {
+    return 'Apply $amount to $name? The resulting balance will be $newBalance. This creates a posted journal entry.';
+  }
+
+  @override
+  String get resultingBalance => 'Resulting balance';
+
+  @override
+  String get balanceAdjustmentPreview =>
+      'This adjustment will be recorded in the register and linked to a journal entry.';
+
+  @override
+  String get balanceAdjustmentCannotBeNegative =>
+      'The resulting balance cannot be negative.';
+
+  @override
+  String get balanceAdjustmentFailed =>
+      'The balance adjustment could not be posted.';
+
+  @override
+  String get balanceAdjustmentHistoryFailed =>
+      'Could not load balance adjustment history.';
+
+  @override
+  String get adjustmentHistory => 'Adjustment history';
+
+  @override
+  String get noBalanceAdjustments =>
+      'No manual balance adjustments have been posted.';
+
+  @override
+  String get adjustmentIncrease => 'Increase';
+
+  @override
+  String get adjustmentDecrease => 'Decrease';
+
+  @override
+  String get posted => 'Posted';
+
+  @override
   String get crmSectionTitle => 'Customer & Vendor Management';
 
   @override

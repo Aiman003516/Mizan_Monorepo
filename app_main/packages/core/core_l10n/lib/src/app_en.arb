@@ -2295,6 +2295,37 @@
   "increasesPayable": "Increases the amount owed to this supplier",
   "decreasesPayable": "Decreases the amount owed to this supplier",
   "supplierAdjustmentFailed": "Could not update the supplier balance",
+  "adjustmentReason": "Reason",
+  "adjustmentReasonHint": "Explain why this balance is being adjusted",
+  "adjustmentReasonRequired": "Enter a reason of at least 3 characters.",
+  "adjustmentReferenceOptional": "Reference (optional)",
+  "effectiveDate": "Effective date",
+  "reviewAdjustment": "Review adjustment",
+  "confirmAdjustment": "Confirm adjustment",
+  "reviewBalanceAdjustment": "Apply {amount} to {name}? The resulting balance will be {newBalance}. This creates a posted journal entry.",
+  "resultingBalance": "Resulting balance",
+  "balanceAdjustmentPreview": "This adjustment will be recorded in the register and linked to a journal entry.",
+  "balanceAdjustmentCannotBeNegative": "The resulting balance cannot be negative.",
+  "balanceAdjustmentFailed": "The balance adjustment could not be posted.",
+  "balanceAdjustmentHistoryFailed": "Could not load balance adjustment history.",
+  "adjustmentHistory": "Adjustment history",
+  "noBalanceAdjustments": "No manual balance adjustments have been posted.",
+  "adjustmentIncrease": "Increase",
+  "adjustmentDecrease": "Decrease",
+  "posted": "Posted",
+  "@reviewBalanceAdjustment": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "newBalance": {
+        "type": "String"
+      }
+    }
+  },
   "crmSectionTitle": "Customer & Vendor Management",
   "crmPipeline": "Sales Pipeline",
   "crmPipelineIntro": "Track leads, opportunities, next actions, and stage progress in one place.",

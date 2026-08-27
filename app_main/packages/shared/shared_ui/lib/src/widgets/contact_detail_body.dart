@@ -21,6 +21,7 @@ class ContactDetailBody extends StatelessWidget {
   final String currencyCode;
   final String outstandingBalanceLabel;
   final String? quickAdjustmentLabel;
+  final Widget? balanceHistorySection;
 
   final VoidCallback onEdit;
   final VoidCallback onNewDocument;
@@ -56,6 +57,7 @@ class ContactDetailBody extends StatelessWidget {
     required this.currencyCode,
     required this.outstandingBalanceLabel,
     this.quickAdjustmentLabel,
+    this.balanceHistorySection,
     required this.onEdit,
     required this.onNewDocument,
     this.onQuickAdjustment,
@@ -228,6 +230,8 @@ class ContactDetailBody extends StatelessWidget {
                 ],
               ),
             ),
+
+            if (balanceHistorySection != null) balanceHistorySection!,
 
             // Documents Section
             Padding(

@@ -2143,6 +2143,37 @@
   "increasesPayable": "يزيد المبلغ المستحق لهذا المورد",
   "decreasesPayable": "يخفض المبلغ المستحق لهذا المورد",
   "supplierAdjustmentFailed": "تعذر تحديث رصيد المورد",
+  "adjustmentReason": "السبب",
+  "adjustmentReasonHint": "اشرح سبب تعديل هذا الرصيد",
+  "adjustmentReasonRequired": "أدخل سبباً لا يقل عن 3 أحرف.",
+  "adjustmentReferenceOptional": "المرجع (اختياري)",
+  "effectiveDate": "تاريخ السريان",
+  "reviewAdjustment": "مراجعة التعديل",
+  "confirmAdjustment": "تأكيد التعديل",
+  "reviewBalanceAdjustment": "هل تريد تطبيق {amount} على {name}؟ سيصبح الرصيد {newBalance}. سيتم إنشاء قيد يومية مرحّل.",
+  "resultingBalance": "الرصيد الناتج",
+  "balanceAdjustmentPreview": "سيُسجّل هذا التعديل في سجل التعديلات ويرتبط بقيد يومية.",
+  "balanceAdjustmentCannotBeNegative": "لا يمكن أن يكون الرصيد الناتج سالباً.",
+  "balanceAdjustmentFailed": "تعذر ترحيل تعديل الرصيد.",
+  "balanceAdjustmentHistoryFailed": "تعذر تحميل سجل تعديلات الرصيد.",
+  "adjustmentHistory": "سجل التعديلات",
+  "noBalanceAdjustments": "لم يتم ترحيل أي تعديلات يدوية على الرصيد.",
+  "adjustmentIncrease": "زيادة",
+  "adjustmentDecrease": "انخفاض",
+  "posted": "مرحّل",
+  "@reviewBalanceAdjustment": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "newBalance": {
+        "type": "String"
+      }
+    }
+  },
   "closeBooks": "إقفال الدفاتر",
   "currentLockDate": "تاريخ القفل الحالي",
   "booksAreOpen": "الدفاتر مفتوحة",

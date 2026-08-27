@@ -8,6 +8,7 @@ import 'package:shared_ui/shared_ui.dart';
 import 'customer_form_screen.dart';
 import 'invoice_form_screen.dart';
 import 'widgets/quick_adjustment_dialog.dart';
+import '../widgets/balance_adjustment_history_section.dart';
 
 /// 📋 Customer Detail Screen
 /// Shows customer info, invoices, and balance history.
@@ -19,6 +20,7 @@ class CustomerDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final invoicesAsync = ref.watch(customerInvoicesProvider(customerId));
+    final adjustmentsAsync = ref.watch(customerAdjustmentsProvider(customerId));
     final customersAsync = ref.watch(customersStreamProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -60,6 +62,10 @@ class CustomerDetailScreen extends ConsumerWidget {
           currencyCode: currencyCode,
           outstandingBalanceLabel: l10n.outstandingBalance,
           quickAdjustmentLabel: l10n.quickLedgerAdjustment,
+          balanceHistorySection: BalanceAdjustmentHistorySection(
+            adjustments: adjustmentsAsync,
+            currencyCode: currencyCode,
+          ),
           onEdit: () async {
             final updated = await Navigator.of(context).push<bool>(
               MaterialPageRoute(
@@ -89,6 +95,7 @@ class CustomerDetailScreen extends ConsumerWidget {
               builder: (context) => QuickAdjustmentDialog(
                 customerId: customer.id,
                 customerName: customer.name,
+                currentBalance: customer.balance,
               ),
             );
             if (updated == true) {

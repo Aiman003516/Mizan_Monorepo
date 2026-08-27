@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:uuid/uuid.dart';
 
 import 'cloud_crm_repository.dart';
+import '../models/balance_adjustment.dart';
 import '../providers/cloud_data_mode_provider.dart';
 
 const _uuid = Uuid();
@@ -24,6 +25,10 @@ final vendorsStreamProvider = StreamProvider.autoDispose<List<Vendor>>((ref) {
 final vendorBillsProvider = StreamProvider.autoDispose
     .family<List<Bill>, String>((ref, vendorId) {
       return ref.watch(apRepositoryProvider).watchVendorBills(vendorId);
+    });
+final vendorAdjustmentsProvider = StreamProvider.autoDispose
+    .family<List<BalanceAdjustment>, String>((ref, vendorId) {
+      return ref.watch(apRepositoryProvider).watchVendorAdjustments(vendorId);
     });
 
 final apAgingReportProvider = FutureProvider.autoDispose<APAgingReport>((ref) {
@@ -207,6 +212,19 @@ class APRepository {
                 amount: openingBalance,
               ),
             );
+        await _db
+            .into(_db.balanceAdjustments)
+            .insert(
+              BalanceAdjustmentsCompanion.insert(
+                partyType: 'vendor',
+                partyId: vendorUuid,
+                amount: openingBalance.abs(),
+                direction: openingBalance > 0 ? 'increase' : 'decrease',
+                reason: 'Opening balance',
+                transactionId: Value(txnUuid),
+                effectiveDate: DateTime.now().toUtc(),
+              ),
+            );
       }
 
       // Use the pre-generated UUID — no need to re-query by rowid
@@ -237,82 +255,122 @@ class APRepository {
     )..where((t) => t.id.equals(id))).write(companion);
   }
 
-  /// Update vendor balance
+  /// Update supplier balance from bill outstanding plus posted adjustments.
   Future<void> updateVendorBalance(String vendorId) async {
     final bills =
         await (_db.select(_db.bills)
               ..where((t) => t.vendorId.equals(vendorId))
-              ..where((t) => t.status.isNotIn(['paid'])))
+              ..where((t) => t.status.isNotIn(['paid', 'void'])))
             .get();
-
-    int totalOutstanding = 0;
-    for (final bill in bills) {
-      totalOutstanding += bill.totalAmount - bill.amountPaid;
-    }
-
+    final adjustments =
+        await (_db.select(_db.balanceAdjustments)
+              ..where((row) => row.partyType.equals('vendor'))
+              ..where((row) => row.partyId.equals(vendorId))
+              ..where((row) => row.status.equals('posted'))
+              ..where((row) => row.isDeleted.equals(false)))
+            .get();
+    final billOutstanding = bills.fold<int>(
+      0,
+      (sum, bill) => sum + bill.totalAmount - bill.amountPaid,
+    );
+    final manualBalance = adjustments.fold<int>(
+      0,
+      (sum, adjustment) =>
+          sum +
+          (adjustment.direction == 'increase'
+              ? adjustment.amount
+              : -adjustment.amount),
+    );
     await (_db.update(_db.vendors)..where((t) => t.id.equals(vendorId))).write(
-      VendorsCompanion(balance: Value(totalOutstanding)),
+      VendorsCompanion(balance: Value(billOutstanding + manualBalance)),
     );
   }
 
-  /// Records a manual supplier balance adjustment in the local ledger.
+  /// Records a manual supplier balance adjustment as an atomic journal posting.
   ///
-  /// A positive adjustment increases the amount owed to the supplier and is
-  /// posted as debit Expense/Equity + credit Accounts Payable. A negative
-  /// adjustment reduces the payable and is posted as debit Accounts Payable +
-  /// credit Cash. The vendor balance and its journal transaction are written
-  /// atomically.
-  ///
-  /// The current cloud schema does not expose a tenant-scoped journal-posting
-  /// RPC, so authenticated cloud mode is rejected rather than silently writing
-  /// to the local cache. This matches the existing AR limitation and keeps
-  /// cloud source-of-truth integrity explicit until that RPC is added.
+  /// An increase debits expense and credits payables; a decrease debits
+  /// payables and credits cash. The register, journal, and cached balance are
+  /// committed together. Cloud mode delegates to the server RPC.
   Future<void> recordQuickAdjustment({
     required String vendorId,
     required int amount,
     required bool increasePayable,
     String? notes,
+    String? reference,
+    DateTime? effectiveDate,
+    String? debitAccountId,
+    String? creditAccountId,
+    String currencyCode = 'USD',
   }) async {
-    if (amount <= 0) {
-      throw ArgumentError.value(amount, 'amount');
+    if (amount <= 0) throw ArgumentError.value(amount, 'amount');
+    final reason = notes?.trim() ?? '';
+    if (reason.isEmpty) {
+      throw ArgumentError.value(notes, 'notes', 'A reason is required');
     }
+    final selectedDate = effectiveDate ?? DateTime.now();
+    final date = DateTime.utc(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
     if (_useCloud) {
-      throw StateError('Cloud supplier journal adjustment is not available');
+      await _cloudRepository.postBalanceAdjustment(
+        BalanceAdjustmentInput(
+          partyType: BalancePartyType.vendor,
+          partyId: vendorId,
+          amountMinor: amount,
+          direction: increasePayable
+              ? BalanceAdjustmentDirection.increase
+              : BalanceAdjustmentDirection.decrease,
+          currencyCode: currencyCode,
+          reason: reason,
+          reference: reference?.trim().isEmpty == true
+              ? null
+              : reference?.trim(),
+          effectiveDate: date,
+          debitAccountId: debitAccountId,
+          creditAccountId: creditAccountId,
+        ),
+      );
+      return;
     }
 
     await _db.transaction(() async {
       final vendor = await getVendor(vendorId);
-      if (vendor == null) return;
-
-      final accountsList = await _db.select(_db.accounts).get();
-      final apAccount =
-          accountsList.firstWhereOrNull(
-            (account) =>
-                account.name == 'Accounts Payable' ||
-                account.name.contains('Payable'),
-          ) ??
-          accountsList.firstWhereOrNull(
-            (account) => account.type == 'liability',
-          );
-      final offsetAccount = increasePayable
-          ? accountsList.firstWhereOrNull(
-                  (account) => account.type == 'expense',
-                ) ??
-                accountsList.firstWhereOrNull(
-                  (account) => account.type == 'equity',
-                )
-          : accountsList.firstWhereOrNull(
-                  (account) =>
-                      account.name == 'Cash' || account.name.contains('Cash'),
-                ) ??
-                accountsList.firstWhereOrNull(
-                  (account) => account.type == 'asset',
-                );
-
-      if (apAccount == null || offsetAccount == null) {
+      if (vendor == null) throw StateError('Supplier not found');
+      final accounts = await _db.select(_db.accounts).get();
+      final apAccount = accounts.firstWhereOrNull(
+        (account) =>
+            account.name == 'Accounts Payable' ||
+            account.name.contains('Payable'),
+      );
+      final expenseAccount = accounts.firstWhereOrNull(
+        (account) => account.type == 'expense',
+      );
+      final cashAccount = accounts.firstWhereOrNull(
+        (account) => account.name == 'Cash' || account.name.contains('Cash'),
+      );
+      final debitAccount = debitAccountId == null
+          ? (increasePayable ? expenseAccount : apAccount)
+          : accounts.firstWhereOrNull(
+              (account) => account.id == debitAccountId,
+            );
+      final creditAccount = creditAccountId == null
+          ? (increasePayable ? apAccount : cashAccount)
+          : accounts.firstWhereOrNull(
+              (account) => account.id == creditAccountId,
+            );
+      if (debitAccount == null || creditAccount == null) {
         throw StateError(
-          'Required Accounts Payable and offset accounts are missing from the database',
+          'Payable, expense, and cash accounts must be configured before adjusting a supplier balance',
         );
+      }
+      if (debitAccount.id == creditAccount.id) {
+        throw StateError('Adjustment debit and credit accounts must differ');
+      }
+      final newBalance = vendor.balance + (increasePayable ? amount : -amount);
+      if (newBalance < 0) {
+        throw StateError('A supplier balance cannot become negative');
       }
 
       final transactionId = _uuid.v4();
@@ -321,21 +379,18 @@ class APRepository {
           .insert(
             TransactionsCompanion.insert(
               id: Value(transactionId),
-              transactionDate: DateTime.now(),
-              description: notes?.trim().isNotEmpty == true
-                  ? notes!.trim()
-                  : 'Supplier Balance Adjustment for ${vendor.name}',
+              transactionDate: date,
+              description: reason,
+              currencyCode: Value(currencyCode),
+              isAdjustment: const Value(true),
             ),
           );
-
-      final debitAccountId = increasePayable ? offsetAccount.id : apAccount.id;
-      final creditAccountId = increasePayable ? apAccount.id : offsetAccount.id;
       await _db
           .into(_db.transactionEntries)
           .insert(
             TransactionEntriesCompanion.insert(
               transactionId: transactionId,
-              accountId: debitAccountId,
+              accountId: debitAccount.id,
               amount: amount,
             ),
           );
@@ -344,19 +399,45 @@ class APRepository {
           .insert(
             TransactionEntriesCompanion.insert(
               transactionId: transactionId,
-              accountId: creditAccountId,
+              accountId: creditAccount.id,
               amount: -amount,
             ),
           );
-
-      await (_db.update(
-        _db.vendors,
-      )..where((row) => row.id.equals(vendorId))).write(
-        VendorsCompanion(
-          balance: Value(vendor.balance + (increasePayable ? amount : -amount)),
-        ),
-      );
+      await _db
+          .into(_db.balanceAdjustments)
+          .insert(
+            BalanceAdjustmentsCompanion.insert(
+              partyType: 'vendor',
+              partyId: vendorId,
+              amount: amount,
+              direction: increasePayable ? 'increase' : 'decrease',
+              currencyCode: Value(currencyCode),
+              reason: reason,
+              reference: Value(
+                reference?.trim().isEmpty == true ? null : reference?.trim(),
+              ),
+              transactionId: Value(transactionId),
+              effectiveDate: date,
+            ),
+          );
+      await (_db.update(_db.vendors)..where((row) => row.id.equals(vendorId)))
+          .write(VendorsCompanion(balance: Value(newBalance)));
     });
+  }
+
+  Stream<List<BalanceAdjustment>> watchVendorAdjustments(String vendorId) {
+    if (_useCloud) {
+      return _cloudRepository.watchBalanceAdjustments(
+        partyType: 'vendor',
+        partyId: vendorId,
+      );
+    }
+    return (_db.select(_db.balanceAdjustments)
+          ..where((row) => row.partyType.equals('vendor'))
+          ..where((row) => row.partyId.equals(vendorId))
+          ..where((row) => row.isDeleted.equals(false))
+          ..orderBy([(row) => OrderingTerm.desc(row.effectiveDate)]))
+        .watch();
   }
 
   // ==================== BILLS ====================

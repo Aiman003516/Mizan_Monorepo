@@ -1,22 +1,22 @@
 import 'package:core_data/core_data.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:drift/native.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test(
-    'supplier quick adjustment updates AP balance and writes balanced entries',
+    'customer adjustment uses revenue for charges and records history',
     () async {
       final db = AppDatabase.connect(NativeDatabase.memory());
       addTearDown(db.close);
-      final repository = APRepository(db, cloudMode: false);
+      final repository = ARRepository(db, cloudMode: false);
 
       await db
           .into(db.accounts)
           .insert(
             AccountsCompanion.insert(
-              id: const Value('ap-account'),
-              name: 'Accounts Payable',
-              type: 'liability',
+              id: const Value('ar-account'),
+              name: 'Accounts Receivable',
+              type: 'asset',
               initialBalance: 0,
             ),
           );
@@ -24,9 +24,9 @@ void main() {
           .into(db.accounts)
           .insert(
             AccountsCompanion.insert(
-              id: const Value('expense-account'),
-              name: 'Supplier Adjustments',
-              type: 'expense',
+              id: const Value('revenue-account'),
+              name: 'Service Revenue',
+              type: 'revenue',
               initialBalance: 0,
             ),
           );
@@ -41,25 +41,23 @@ void main() {
             ),
           );
 
-      final vendor = await repository.createVendor(name: 'Local Supplier');
-
+      final customer = await repository.createCustomer(name: 'Local Customer');
       await repository.recordQuickAdjustment(
-        vendorId: vendor.id,
-        amount: 1500,
-        increasePayable: true,
-        notes: 'Additional supplier charge',
+        customerId: customer.id,
+        amount: 1250,
+        isCharge: true,
+        notes: 'Unbilled service correction',
       );
       await repository.recordQuickAdjustment(
-        vendorId: vendor.id,
-        amount: 500,
-        increasePayable: false,
-        notes: 'Supplier payment correction',
+        customerId: customer.id,
+        amount: 250,
+        isCharge: false,
+        notes: 'Receipt correction',
       );
 
-      final updatedVendor = await repository.getVendor(vendor.id);
-      expect(updatedVendor?.balance, 1000);
+      expect((await repository.getCustomer(customer.id))?.balance, 1000);
       final adjustments = await repository
-          .watchVendorAdjustments(vendor.id)
+          .watchCustomerAdjustments(customer.id)
           .first;
       expect(adjustments, hasLength(2));
       expect(
@@ -70,21 +68,15 @@ void main() {
       final entries = await db.select(db.transactionEntries).get();
       expect(entries, hasLength(4));
       expect(entries.fold<int>(0, (sum, entry) => sum + entry.amount), 0);
+      expect(entries.where((entry) => entry.amount == -1250), hasLength(1));
+      expect(entries.where((entry) => entry.amount == 250), hasLength(1));
 
-      final apAccountId = (await db.select(db.accounts).get())
-          .firstWhere((account) => account.name == 'Accounts Payable')
-          .id;
-      final payableEntries = entries
-          .where((entry) => entry.accountId == apAccountId)
-          .map((entry) => entry.amount)
-          .toList();
-      expect(payableEntries, containsAll(<int>[-1500, 500]));
       expect(
         () => repository.recordQuickAdjustment(
-          vendorId: vendor.id,
+          customerId: customer.id,
           amount: 1001,
-          increasePayable: false,
-          notes: 'Too much payment',
+          isCharge: false,
+          notes: 'Too much receipt',
         ),
         throwsA(isA<StateError>()),
       );

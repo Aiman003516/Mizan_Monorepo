@@ -5030,6 +5030,69 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supplierAdjustmentFailed => 'تعذر تحديث رصيد المورد';
 
   @override
+  String get adjustmentReason => 'السبب';
+
+  @override
+  String get adjustmentReasonHint => 'اشرح سبب تعديل هذا الرصيد';
+
+  @override
+  String get adjustmentReasonRequired => 'أدخل سبباً لا يقل عن 3 أحرف.';
+
+  @override
+  String get adjustmentReferenceOptional => 'المرجع (اختياري)';
+
+  @override
+  String get effectiveDate => 'تاريخ السريان';
+
+  @override
+  String get reviewAdjustment => 'مراجعة التعديل';
+
+  @override
+  String get confirmAdjustment => 'تأكيد التعديل';
+
+  @override
+  String reviewBalanceAdjustment(
+    String amount,
+    String name,
+    String newBalance,
+  ) {
+    return 'هل تريد تطبيق $amount على $name؟ سيصبح الرصيد $newBalance. سيتم إنشاء قيد يومية مرحّل.';
+  }
+
+  @override
+  String get resultingBalance => 'الرصيد الناتج';
+
+  @override
+  String get balanceAdjustmentPreview =>
+      'سيُسجّل هذا التعديل في سجل التعديلات ويرتبط بقيد يومية.';
+
+  @override
+  String get balanceAdjustmentCannotBeNegative =>
+      'لا يمكن أن يكون الرصيد الناتج سالباً.';
+
+  @override
+  String get balanceAdjustmentFailed => 'تعذر ترحيل تعديل الرصيد.';
+
+  @override
+  String get balanceAdjustmentHistoryFailed => 'تعذر تحميل سجل تعديلات الرصيد.';
+
+  @override
+  String get adjustmentHistory => 'سجل التعديلات';
+
+  @override
+  String get noBalanceAdjustments =>
+      'لم يتم ترحيل أي تعديلات يدوية على الرصيد.';
+
+  @override
+  String get adjustmentIncrease => 'زيادة';
+
+  @override
+  String get adjustmentDecrease => 'انخفاض';
+
+  @override
+  String get posted => 'مرحّل';
+
+  @override
   String get crmSectionTitle => 'إدارة العملاء والموردين';
 
   @override

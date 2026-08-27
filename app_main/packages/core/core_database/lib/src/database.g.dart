@@ -28433,6 +28433,922 @@ class SyncQueueEntriesCompanion extends UpdateCompanion<SyncQueueEntry> {
   }
 }
 
+class $BalanceAdjustmentsTable extends BalanceAdjustments
+    with TableInfo<$BalanceAdjustmentsTable, BalanceAdjustment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BalanceAdjustmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: () => _uuid.v4(),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  static const VerificationMeta _lastUpdatedMeta = const VerificationMeta(
+    'lastUpdated',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastUpdated = GeneratedColumn<DateTime>(
+    'last_updated',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    clientDefault: () => DateTime.now(),
+  );
+  static const VerificationMeta _tenantIdMeta = const VerificationMeta(
+    'tenantId',
+  );
+  @override
+  late final GeneratedColumn<String> tenantId = GeneratedColumn<String>(
+    'tenant_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _partyTypeMeta = const VerificationMeta(
+    'partyType',
+  );
+  @override
+  late final GeneratedColumn<String> partyType = GeneratedColumn<String>(
+    'party_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _partyIdMeta = const VerificationMeta(
+    'partyId',
+  );
+  @override
+  late final GeneratedColumn<String> partyId = GeneratedColumn<String>(
+    'party_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<int> amount = GeneratedColumn<int>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _directionMeta = const VerificationMeta(
+    'direction',
+  );
+  @override
+  late final GeneratedColumn<String> direction = GeneratedColumn<String>(
+    'direction',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
+    'currencyCode',
+  );
+  @override
+  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
+    'currency_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('USD'),
+  );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  @override
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _referenceMeta = const VerificationMeta(
+    'reference',
+  );
+  @override
+  late final GeneratedColumn<String> reference = GeneratedColumn<String>(
+    'reference',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _transactionIdMeta = const VerificationMeta(
+    'transactionId',
+  );
+  @override
+  late final GeneratedColumn<String> transactionId = GeneratedColumn<String>(
+    'transaction_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('posted'),
+  );
+  static const VerificationMeta _effectiveDateMeta = const VerificationMeta(
+    'effectiveDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> effectiveDate =
+      GeneratedColumn<DateTime>(
+        'effective_date',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _createdByUserIdMeta = const VerificationMeta(
+    'createdByUserId',
+  );
+  @override
+  late final GeneratedColumn<String> createdByUserId = GeneratedColumn<String>(
+    'created_by_user_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    lastUpdated,
+    tenantId,
+    isDeleted,
+    partyType,
+    partyId,
+    amount,
+    direction,
+    currencyCode,
+    reason,
+    reference,
+    transactionId,
+    status,
+    effectiveDate,
+    createdByUserId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'balance_adjustments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BalanceAdjustment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('last_updated')) {
+      context.handle(
+        _lastUpdatedMeta,
+        lastUpdated.isAcceptableOrUnknown(
+          data['last_updated']!,
+          _lastUpdatedMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tenant_id')) {
+      context.handle(
+        _tenantIdMeta,
+        tenantId.isAcceptableOrUnknown(data['tenant_id']!, _tenantIdMeta),
+      );
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
+    if (data.containsKey('party_type')) {
+      context.handle(
+        _partyTypeMeta,
+        partyType.isAcceptableOrUnknown(data['party_type']!, _partyTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_partyTypeMeta);
+    }
+    if (data.containsKey('party_id')) {
+      context.handle(
+        _partyIdMeta,
+        partyId.isAcceptableOrUnknown(data['party_id']!, _partyIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_partyIdMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('direction')) {
+      context.handle(
+        _directionMeta,
+        direction.isAcceptableOrUnknown(data['direction']!, _directionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_directionMeta);
+    }
+    if (data.containsKey('currency_code')) {
+      context.handle(
+        _currencyCodeMeta,
+        currencyCode.isAcceptableOrUnknown(
+          data['currency_code']!,
+          _currencyCodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reasonMeta);
+    }
+    if (data.containsKey('reference')) {
+      context.handle(
+        _referenceMeta,
+        reference.isAcceptableOrUnknown(data['reference']!, _referenceMeta),
+      );
+    }
+    if (data.containsKey('transaction_id')) {
+      context.handle(
+        _transactionIdMeta,
+        transactionId.isAcceptableOrUnknown(
+          data['transaction_id']!,
+          _transactionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('effective_date')) {
+      context.handle(
+        _effectiveDateMeta,
+        effectiveDate.isAcceptableOrUnknown(
+          data['effective_date']!,
+          _effectiveDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_effectiveDateMeta);
+    }
+    if (data.containsKey('created_by_user_id')) {
+      context.handle(
+        _createdByUserIdMeta,
+        createdByUserId.isAcceptableOrUnknown(
+          data['created_by_user_id']!,
+          _createdByUserIdMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BalanceAdjustment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BalanceAdjustment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      lastUpdated: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_updated'],
+      )!,
+      tenantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tenant_id'],
+      ),
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
+      partyType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}party_type'],
+      )!,
+      partyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}party_id'],
+      )!,
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount'],
+      )!,
+      direction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}direction'],
+      )!,
+      currencyCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency_code'],
+      )!,
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      )!,
+      reference: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reference'],
+      ),
+      transactionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transaction_id'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      effectiveDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}effective_date'],
+      )!,
+      createdByUserId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_by_user_id'],
+      ),
+    );
+  }
+
+  @override
+  $BalanceAdjustmentsTable createAlias(String alias) {
+    return $BalanceAdjustmentsTable(attachedDatabase, alias);
+  }
+}
+
+class BalanceAdjustment extends DataClass
+    implements Insertable<BalanceAdjustment> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime lastUpdated;
+  final String? tenantId;
+  final bool isDeleted;
+  final String partyType;
+  final String partyId;
+  final int amount;
+  final String direction;
+  final String currencyCode;
+  final String reason;
+  final String? reference;
+  final String? transactionId;
+  final String status;
+  final DateTime effectiveDate;
+  final String? createdByUserId;
+  const BalanceAdjustment({
+    required this.id,
+    required this.createdAt,
+    required this.lastUpdated,
+    this.tenantId,
+    required this.isDeleted,
+    required this.partyType,
+    required this.partyId,
+    required this.amount,
+    required this.direction,
+    required this.currencyCode,
+    required this.reason,
+    this.reference,
+    this.transactionId,
+    required this.status,
+    required this.effectiveDate,
+    this.createdByUserId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['last_updated'] = Variable<DateTime>(lastUpdated);
+    if (!nullToAbsent || tenantId != null) {
+      map['tenant_id'] = Variable<String>(tenantId);
+    }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['party_type'] = Variable<String>(partyType);
+    map['party_id'] = Variable<String>(partyId);
+    map['amount'] = Variable<int>(amount);
+    map['direction'] = Variable<String>(direction);
+    map['currency_code'] = Variable<String>(currencyCode);
+    map['reason'] = Variable<String>(reason);
+    if (!nullToAbsent || reference != null) {
+      map['reference'] = Variable<String>(reference);
+    }
+    if (!nullToAbsent || transactionId != null) {
+      map['transaction_id'] = Variable<String>(transactionId);
+    }
+    map['status'] = Variable<String>(status);
+    map['effective_date'] = Variable<DateTime>(effectiveDate);
+    if (!nullToAbsent || createdByUserId != null) {
+      map['created_by_user_id'] = Variable<String>(createdByUserId);
+    }
+    return map;
+  }
+
+  BalanceAdjustmentsCompanion toCompanion(bool nullToAbsent) {
+    return BalanceAdjustmentsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      lastUpdated: Value(lastUpdated),
+      tenantId: tenantId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tenantId),
+      isDeleted: Value(isDeleted),
+      partyType: Value(partyType),
+      partyId: Value(partyId),
+      amount: Value(amount),
+      direction: Value(direction),
+      currencyCode: Value(currencyCode),
+      reason: Value(reason),
+      reference: reference == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reference),
+      transactionId: transactionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(transactionId),
+      status: Value(status),
+      effectiveDate: Value(effectiveDate),
+      createdByUserId: createdByUserId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdByUserId),
+    );
+  }
+
+  factory BalanceAdjustment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BalanceAdjustment(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      lastUpdated: serializer.fromJson<DateTime>(json['lastUpdated']),
+      tenantId: serializer.fromJson<String?>(json['tenantId']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      partyType: serializer.fromJson<String>(json['partyType']),
+      partyId: serializer.fromJson<String>(json['partyId']),
+      amount: serializer.fromJson<int>(json['amount']),
+      direction: serializer.fromJson<String>(json['direction']),
+      currencyCode: serializer.fromJson<String>(json['currencyCode']),
+      reason: serializer.fromJson<String>(json['reason']),
+      reference: serializer.fromJson<String?>(json['reference']),
+      transactionId: serializer.fromJson<String?>(json['transactionId']),
+      status: serializer.fromJson<String>(json['status']),
+      effectiveDate: serializer.fromJson<DateTime>(json['effectiveDate']),
+      createdByUserId: serializer.fromJson<String?>(json['createdByUserId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'lastUpdated': serializer.toJson<DateTime>(lastUpdated),
+      'tenantId': serializer.toJson<String?>(tenantId),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'partyType': serializer.toJson<String>(partyType),
+      'partyId': serializer.toJson<String>(partyId),
+      'amount': serializer.toJson<int>(amount),
+      'direction': serializer.toJson<String>(direction),
+      'currencyCode': serializer.toJson<String>(currencyCode),
+      'reason': serializer.toJson<String>(reason),
+      'reference': serializer.toJson<String?>(reference),
+      'transactionId': serializer.toJson<String?>(transactionId),
+      'status': serializer.toJson<String>(status),
+      'effectiveDate': serializer.toJson<DateTime>(effectiveDate),
+      'createdByUserId': serializer.toJson<String?>(createdByUserId),
+    };
+  }
+
+  BalanceAdjustment copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? lastUpdated,
+    Value<String?> tenantId = const Value.absent(),
+    bool? isDeleted,
+    String? partyType,
+    String? partyId,
+    int? amount,
+    String? direction,
+    String? currencyCode,
+    String? reason,
+    Value<String?> reference = const Value.absent(),
+    Value<String?> transactionId = const Value.absent(),
+    String? status,
+    DateTime? effectiveDate,
+    Value<String?> createdByUserId = const Value.absent(),
+  }) => BalanceAdjustment(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    lastUpdated: lastUpdated ?? this.lastUpdated,
+    tenantId: tenantId.present ? tenantId.value : this.tenantId,
+    isDeleted: isDeleted ?? this.isDeleted,
+    partyType: partyType ?? this.partyType,
+    partyId: partyId ?? this.partyId,
+    amount: amount ?? this.amount,
+    direction: direction ?? this.direction,
+    currencyCode: currencyCode ?? this.currencyCode,
+    reason: reason ?? this.reason,
+    reference: reference.present ? reference.value : this.reference,
+    transactionId: transactionId.present
+        ? transactionId.value
+        : this.transactionId,
+    status: status ?? this.status,
+    effectiveDate: effectiveDate ?? this.effectiveDate,
+    createdByUserId: createdByUserId.present
+        ? createdByUserId.value
+        : this.createdByUserId,
+  );
+  BalanceAdjustment copyWithCompanion(BalanceAdjustmentsCompanion data) {
+    return BalanceAdjustment(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      lastUpdated: data.lastUpdated.present
+          ? data.lastUpdated.value
+          : this.lastUpdated,
+      tenantId: data.tenantId.present ? data.tenantId.value : this.tenantId,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      partyType: data.partyType.present ? data.partyType.value : this.partyType,
+      partyId: data.partyId.present ? data.partyId.value : this.partyId,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      direction: data.direction.present ? data.direction.value : this.direction,
+      currencyCode: data.currencyCode.present
+          ? data.currencyCode.value
+          : this.currencyCode,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      reference: data.reference.present ? data.reference.value : this.reference,
+      transactionId: data.transactionId.present
+          ? data.transactionId.value
+          : this.transactionId,
+      status: data.status.present ? data.status.value : this.status,
+      effectiveDate: data.effectiveDate.present
+          ? data.effectiveDate.value
+          : this.effectiveDate,
+      createdByUserId: data.createdByUserId.present
+          ? data.createdByUserId.value
+          : this.createdByUserId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BalanceAdjustment(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastUpdated: $lastUpdated, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('partyType: $partyType, ')
+          ..write('partyId: $partyId, ')
+          ..write('amount: $amount, ')
+          ..write('direction: $direction, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('reason: $reason, ')
+          ..write('reference: $reference, ')
+          ..write('transactionId: $transactionId, ')
+          ..write('status: $status, ')
+          ..write('effectiveDate: $effectiveDate, ')
+          ..write('createdByUserId: $createdByUserId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    lastUpdated,
+    tenantId,
+    isDeleted,
+    partyType,
+    partyId,
+    amount,
+    direction,
+    currencyCode,
+    reason,
+    reference,
+    transactionId,
+    status,
+    effectiveDate,
+    createdByUserId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BalanceAdjustment &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.lastUpdated == this.lastUpdated &&
+          other.tenantId == this.tenantId &&
+          other.isDeleted == this.isDeleted &&
+          other.partyType == this.partyType &&
+          other.partyId == this.partyId &&
+          other.amount == this.amount &&
+          other.direction == this.direction &&
+          other.currencyCode == this.currencyCode &&
+          other.reason == this.reason &&
+          other.reference == this.reference &&
+          other.transactionId == this.transactionId &&
+          other.status == this.status &&
+          other.effectiveDate == this.effectiveDate &&
+          other.createdByUserId == this.createdByUserId);
+}
+
+class BalanceAdjustmentsCompanion extends UpdateCompanion<BalanceAdjustment> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> lastUpdated;
+  final Value<String?> tenantId;
+  final Value<bool> isDeleted;
+  final Value<String> partyType;
+  final Value<String> partyId;
+  final Value<int> amount;
+  final Value<String> direction;
+  final Value<String> currencyCode;
+  final Value<String> reason;
+  final Value<String?> reference;
+  final Value<String?> transactionId;
+  final Value<String> status;
+  final Value<DateTime> effectiveDate;
+  final Value<String?> createdByUserId;
+  final Value<int> rowid;
+  const BalanceAdjustmentsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.lastUpdated = const Value.absent(),
+    this.tenantId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.partyType = const Value.absent(),
+    this.partyId = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.direction = const Value.absent(),
+    this.currencyCode = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.reference = const Value.absent(),
+    this.transactionId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.effectiveDate = const Value.absent(),
+    this.createdByUserId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BalanceAdjustmentsCompanion.insert({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.lastUpdated = const Value.absent(),
+    this.tenantId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    required String partyType,
+    required String partyId,
+    required int amount,
+    required String direction,
+    this.currencyCode = const Value.absent(),
+    required String reason,
+    this.reference = const Value.absent(),
+    this.transactionId = const Value.absent(),
+    this.status = const Value.absent(),
+    required DateTime effectiveDate,
+    this.createdByUserId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : partyType = Value(partyType),
+       partyId = Value(partyId),
+       amount = Value(amount),
+       direction = Value(direction),
+       reason = Value(reason),
+       effectiveDate = Value(effectiveDate);
+  static Insertable<BalanceAdjustment> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? lastUpdated,
+    Expression<String>? tenantId,
+    Expression<bool>? isDeleted,
+    Expression<String>? partyType,
+    Expression<String>? partyId,
+    Expression<int>? amount,
+    Expression<String>? direction,
+    Expression<String>? currencyCode,
+    Expression<String>? reason,
+    Expression<String>? reference,
+    Expression<String>? transactionId,
+    Expression<String>? status,
+    Expression<DateTime>? effectiveDate,
+    Expression<String>? createdByUserId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (lastUpdated != null) 'last_updated': lastUpdated,
+      if (tenantId != null) 'tenant_id': tenantId,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (partyType != null) 'party_type': partyType,
+      if (partyId != null) 'party_id': partyId,
+      if (amount != null) 'amount': amount,
+      if (direction != null) 'direction': direction,
+      if (currencyCode != null) 'currency_code': currencyCode,
+      if (reason != null) 'reason': reason,
+      if (reference != null) 'reference': reference,
+      if (transactionId != null) 'transaction_id': transactionId,
+      if (status != null) 'status': status,
+      if (effectiveDate != null) 'effective_date': effectiveDate,
+      if (createdByUserId != null) 'created_by_user_id': createdByUserId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BalanceAdjustmentsCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? lastUpdated,
+    Value<String?>? tenantId,
+    Value<bool>? isDeleted,
+    Value<String>? partyType,
+    Value<String>? partyId,
+    Value<int>? amount,
+    Value<String>? direction,
+    Value<String>? currencyCode,
+    Value<String>? reason,
+    Value<String?>? reference,
+    Value<String?>? transactionId,
+    Value<String>? status,
+    Value<DateTime>? effectiveDate,
+    Value<String?>? createdByUserId,
+    Value<int>? rowid,
+  }) {
+    return BalanceAdjustmentsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
+      tenantId: tenantId ?? this.tenantId,
+      isDeleted: isDeleted ?? this.isDeleted,
+      partyType: partyType ?? this.partyType,
+      partyId: partyId ?? this.partyId,
+      amount: amount ?? this.amount,
+      direction: direction ?? this.direction,
+      currencyCode: currencyCode ?? this.currencyCode,
+      reason: reason ?? this.reason,
+      reference: reference ?? this.reference,
+      transactionId: transactionId ?? this.transactionId,
+      status: status ?? this.status,
+      effectiveDate: effectiveDate ?? this.effectiveDate,
+      createdByUserId: createdByUserId ?? this.createdByUserId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (lastUpdated.present) {
+      map['last_updated'] = Variable<DateTime>(lastUpdated.value);
+    }
+    if (tenantId.present) {
+      map['tenant_id'] = Variable<String>(tenantId.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (partyType.present) {
+      map['party_type'] = Variable<String>(partyType.value);
+    }
+    if (partyId.present) {
+      map['party_id'] = Variable<String>(partyId.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<int>(amount.value);
+    }
+    if (direction.present) {
+      map['direction'] = Variable<String>(direction.value);
+    }
+    if (currencyCode.present) {
+      map['currency_code'] = Variable<String>(currencyCode.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (reference.present) {
+      map['reference'] = Variable<String>(reference.value);
+    }
+    if (transactionId.present) {
+      map['transaction_id'] = Variable<String>(transactionId.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (effectiveDate.present) {
+      map['effective_date'] = Variable<DateTime>(effectiveDate.value);
+    }
+    if (createdByUserId.present) {
+      map['created_by_user_id'] = Variable<String>(createdByUserId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BalanceAdjustmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('lastUpdated: $lastUpdated, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('partyType: $partyType, ')
+          ..write('partyId: $partyId, ')
+          ..write('amount: $amount, ')
+          ..write('direction: $direction, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('reason: $reason, ')
+          ..write('reference: $reference, ')
+          ..write('transactionId: $transactionId, ')
+          ..write('status: $status, ')
+          ..write('effectiveDate: $effectiveDate, ')
+          ..write('createdByUserId: $createdByUserId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -28497,6 +29413,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SyncQueueEntriesTable syncQueueEntries = $SyncQueueEntriesTable(
     this,
   );
+  late final $BalanceAdjustmentsTable balanceAdjustments =
+      $BalanceAdjustmentsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -28544,6 +29462,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     comments,
     userRoles,
     syncQueueEntries,
+    balanceAdjustments,
   ];
 }
 
@@ -42245,6 +43164,438 @@ typedef $$SyncQueueEntriesTableProcessedTableManager =
       SyncQueueEntry,
       PrefetchHooks Function()
     >;
+typedef $$BalanceAdjustmentsTableCreateCompanionBuilder =
+    BalanceAdjustmentsCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> lastUpdated,
+      Value<String?> tenantId,
+      Value<bool> isDeleted,
+      required String partyType,
+      required String partyId,
+      required int amount,
+      required String direction,
+      Value<String> currencyCode,
+      required String reason,
+      Value<String?> reference,
+      Value<String?> transactionId,
+      Value<String> status,
+      required DateTime effectiveDate,
+      Value<String?> createdByUserId,
+      Value<int> rowid,
+    });
+typedef $$BalanceAdjustmentsTableUpdateCompanionBuilder =
+    BalanceAdjustmentsCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> lastUpdated,
+      Value<String?> tenantId,
+      Value<bool> isDeleted,
+      Value<String> partyType,
+      Value<String> partyId,
+      Value<int> amount,
+      Value<String> direction,
+      Value<String> currencyCode,
+      Value<String> reason,
+      Value<String?> reference,
+      Value<String?> transactionId,
+      Value<String> status,
+      Value<DateTime> effectiveDate,
+      Value<String?> createdByUserId,
+      Value<int> rowid,
+    });
+
+class $$BalanceAdjustmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $BalanceAdjustmentsTable> {
+  $$BalanceAdjustmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastUpdated => $composableBuilder(
+    column: $table.lastUpdated,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get partyType => $composableBuilder(
+    column: $table.partyType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get partyId => $composableBuilder(
+    column: $table.partyId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reference => $composableBuilder(
+    column: $table.reference,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get transactionId => $composableBuilder(
+    column: $table.transactionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get effectiveDate => $composableBuilder(
+    column: $table.effectiveDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdByUserId => $composableBuilder(
+    column: $table.createdByUserId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BalanceAdjustmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BalanceAdjustmentsTable> {
+  $$BalanceAdjustmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastUpdated => $composableBuilder(
+    column: $table.lastUpdated,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tenantId => $composableBuilder(
+    column: $table.tenantId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get partyType => $composableBuilder(
+    column: $table.partyType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get partyId => $composableBuilder(
+    column: $table.partyId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reference => $composableBuilder(
+    column: $table.reference,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transactionId => $composableBuilder(
+    column: $table.transactionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get effectiveDate => $composableBuilder(
+    column: $table.effectiveDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdByUserId => $composableBuilder(
+    column: $table.createdByUserId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BalanceAdjustmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BalanceAdjustmentsTable> {
+  $$BalanceAdjustmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastUpdated => $composableBuilder(
+    column: $table.lastUpdated,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get tenantId =>
+      $composableBuilder(column: $table.tenantId, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
+
+  GeneratedColumn<String> get partyType =>
+      $composableBuilder(column: $table.partyType, builder: (column) => column);
+
+  GeneratedColumn<String> get partyId =>
+      $composableBuilder(column: $table.partyId, builder: (column) => column);
+
+  GeneratedColumn<int> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get direction =>
+      $composableBuilder(column: $table.direction, builder: (column) => column);
+
+  GeneratedColumn<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<String> get reference =>
+      $composableBuilder(column: $table.reference, builder: (column) => column);
+
+  GeneratedColumn<String> get transactionId => $composableBuilder(
+    column: $table.transactionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get effectiveDate => $composableBuilder(
+    column: $table.effectiveDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get createdByUserId => $composableBuilder(
+    column: $table.createdByUserId,
+    builder: (column) => column,
+  );
+}
+
+class $$BalanceAdjustmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BalanceAdjustmentsTable,
+          BalanceAdjustment,
+          $$BalanceAdjustmentsTableFilterComposer,
+          $$BalanceAdjustmentsTableOrderingComposer,
+          $$BalanceAdjustmentsTableAnnotationComposer,
+          $$BalanceAdjustmentsTableCreateCompanionBuilder,
+          $$BalanceAdjustmentsTableUpdateCompanionBuilder,
+          (
+            BalanceAdjustment,
+            BaseReferences<
+              _$AppDatabase,
+              $BalanceAdjustmentsTable,
+              BalanceAdjustment
+            >,
+          ),
+          BalanceAdjustment,
+          PrefetchHooks Function()
+        > {
+  $$BalanceAdjustmentsTableTableManager(
+    _$AppDatabase db,
+    $BalanceAdjustmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BalanceAdjustmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BalanceAdjustmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BalanceAdjustmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> lastUpdated = const Value.absent(),
+                Value<String?> tenantId = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                Value<String> partyType = const Value.absent(),
+                Value<String> partyId = const Value.absent(),
+                Value<int> amount = const Value.absent(),
+                Value<String> direction = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
+                Value<String> reason = const Value.absent(),
+                Value<String?> reference = const Value.absent(),
+                Value<String?> transactionId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> effectiveDate = const Value.absent(),
+                Value<String?> createdByUserId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BalanceAdjustmentsCompanion(
+                id: id,
+                createdAt: createdAt,
+                lastUpdated: lastUpdated,
+                tenantId: tenantId,
+                isDeleted: isDeleted,
+                partyType: partyType,
+                partyId: partyId,
+                amount: amount,
+                direction: direction,
+                currencyCode: currencyCode,
+                reason: reason,
+                reference: reference,
+                transactionId: transactionId,
+                status: status,
+                effectiveDate: effectiveDate,
+                createdByUserId: createdByUserId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> lastUpdated = const Value.absent(),
+                Value<String?> tenantId = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+                required String partyType,
+                required String partyId,
+                required int amount,
+                required String direction,
+                Value<String> currencyCode = const Value.absent(),
+                required String reason,
+                Value<String?> reference = const Value.absent(),
+                Value<String?> transactionId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                required DateTime effectiveDate,
+                Value<String?> createdByUserId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BalanceAdjustmentsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                lastUpdated: lastUpdated,
+                tenantId: tenantId,
+                isDeleted: isDeleted,
+                partyType: partyType,
+                partyId: partyId,
+                amount: amount,
+                direction: direction,
+                currencyCode: currencyCode,
+                reason: reason,
+                reference: reference,
+                transactionId: transactionId,
+                status: status,
+                effectiveDate: effectiveDate,
+                createdByUserId: createdByUserId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BalanceAdjustmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BalanceAdjustmentsTable,
+      BalanceAdjustment,
+      $$BalanceAdjustmentsTableFilterComposer,
+      $$BalanceAdjustmentsTableOrderingComposer,
+      $$BalanceAdjustmentsTableAnnotationComposer,
+      $$BalanceAdjustmentsTableCreateCompanionBuilder,
+      $$BalanceAdjustmentsTableUpdateCompanionBuilder,
+      (
+        BalanceAdjustment,
+        BaseReferences<
+          _$AppDatabase,
+          $BalanceAdjustmentsTable,
+          BalanceAdjustment
+        >,
+      ),
+      BalanceAdjustment,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -42342,4 +43693,6 @@ class $AppDatabaseManager {
       $$UserRolesTableTableManager(_db, _db.userRoles);
   $$SyncQueueEntriesTableTableManager get syncQueueEntries =>
       $$SyncQueueEntriesTableTableManager(_db, _db.syncQueueEntries);
+  $$BalanceAdjustmentsTableTableManager get balanceAdjustments =>
+      $$BalanceAdjustmentsTableTableManager(_db, _db.balanceAdjustments);
 }
