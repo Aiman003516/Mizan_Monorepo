@@ -46,6 +46,8 @@ dependencies:
     path: ../feature_transactions
   feature_contacts:
     path: ../feature_contacts
+  feature_procurement:
+    path: ../feature_procurement
   flutter_speed_dial: ^7.0.0
   fl_chart: ^0.66.2
 

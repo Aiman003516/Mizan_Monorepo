@@ -51,6 +51,8 @@ dependencies:
     path: ../packages/features/feature_transactions
   feature_contacts:
     path: ../packages/features/feature_contacts
+  feature_procurement:
+    path: ../packages/features/feature_procurement
   core_ui:
     path: ../packages/core/core_ui
   local_auth: ^2.3.0

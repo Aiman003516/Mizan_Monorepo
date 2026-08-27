@@ -17,6 +17,7 @@ workspace:
   - packages/features/feature_dashboard
   - packages/features/feature_data_import
   - packages/features/feature_products
+  - packages/features/feature_procurement
   - packages/features/feature_reports
   - packages/features/feature_settings
   - packages/features/feature_sync

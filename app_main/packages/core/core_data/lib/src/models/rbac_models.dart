@@ -75,6 +75,9 @@ enum AppPermission {
   manageSettings, // Change currency, tax, company info
   manageBranches, // Manage branch records and staff branch assignments
   approveRequests, // Decide governed approval requests
+  manageProcurement,
+  approveProcurement,
+  receiveInventory,
   manageCrm,
   manageCustomers,
   manageVendors,

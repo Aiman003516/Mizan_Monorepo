@@ -123,3 +123,11 @@ Run `tests/20260828030000_close_preflight.sql` in staging after the accounting, 
 Migration `migrations/20260828040000_settlement_idempotency.sql` adds a tenant-scoped idempotency key to `ar_ap_settlements` and the `public.create_settlement_draft_idempotent(...)` RPC. The RPC serializes retries with a transaction advisory lock, returns the existing draft for a repeated key, and delegates new drafts to the canonical settlement command.
 
 Run `tests/20260828040000_settlement_idempotency.sql` in staging and verify that repeated client retries return the same settlement identifier and journal draft rather than creating duplicate financial effects. No production grant or migration application is implied by this repository change.
+
+## Procure-to-pay foundation
+
+Migration `migrations/20260828050000_procurement_foundation.sql` adds purchase requisitions, purchase orders and lines, purchase receipt/return evidence, vendor-bill and bill-line linkage, procurement approval request types, and the `purchase_bill_three_way_match(uuid)` read RPC. Requisition and purchase-order submission creates immutable approval requests. Receipt and return quantities are checked against ordered and posted quantities. Three-way matching reports line-level ordered, received, returned, available, and billed quantities plus unit-price variance and a blocking reason.
+
+Procurement workflow tables are tenant/branch scoped, protected by RLS, readable only to authenticated tenant members, and mutated through security-definer RPCs with permission checks and audit triggers. The first receipt/return posting commands record procurement evidence and update purchase-order lifecycle state; they do not claim to replace the existing inventory accounting bridge until a dedicated adapter is implemented and verified.
+
+Run `tests/20260828050000_procurement_foundation.sql` in a disposable/staging database after all listed prerequisites. Verify approval state synchronization, duplicate-document rejection, tenant isolation, branch isolation, quantity-overrun rejection, return-over-receipt rejection, vendor mismatch blocking, currency mismatch blocking, and bill-over-receipt blocking. No production SQL is applied automatically.

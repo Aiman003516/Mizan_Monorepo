@@ -16,6 +16,7 @@ import 'package:feature_reports/feature_reports.dart';
 import 'package:feature_settings/feature_settings.dart';
 import 'package:feature_contacts/feature_contacts.dart';
 import 'package:feature_transactions/feature_transactions.dart';
+import 'package:feature_procurement/feature_procurement.dart';
 import 'package:feature_sync/feature_sync.dart';
 import 'package:feature_dashboard/src/presentation/main_nav_provider.dart';
 import 'package:feature_dashboard/src/presentation/dashboard_providers.dart';
@@ -139,6 +140,8 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         return Text(l10n.vendorsAp);
       case MainPage.crmPipeline:
         return Text(l10n.crmPipeline);
+      case MainPage.procurement:
+        return Text(l10n.procurement);
     }
   }
 
@@ -460,6 +463,15 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               },
             ),
 
+            ListTile(
+              leading: const Icon(Icons.shopping_cart_checkout),
+              title: Text(l10n.procurement),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state = MainPage.procurement;
+              },
+            ),
+
             const Divider(),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -646,6 +658,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         MainPage.customers => const CustomersTableScreen(),
         MainPage.vendors => const VendorsTableScreen(),
         MainPage.crmPipeline => const CrmPipelineScreen(),
+        MainPage.procurement => const ProcurementHubScreen(),
       },
     );
 

@@ -1,0 +1,25 @@
+name: feature_procurement
+resolution: workspace
+description: Modular procure-to-pay workflows for Mizan.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.2
+  flutter: ">=3.3.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  core_data:
+    path: ../../core/core_data
+  core_l10n:
+    path: ../../core/core_l10n
+  shared_ui:
+    path: ../../shared/shared_ui
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0

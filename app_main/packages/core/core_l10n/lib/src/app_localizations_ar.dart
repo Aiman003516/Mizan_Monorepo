@@ -858,7 +858,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noLineItemsSaved => 'لم يتم حفظ أصناف لهذا الطلب.';
 
   @override
-  String get fieldRequired => 'الحقل مطلوب';
+  String get fieldRequired => 'هذا الحقل مطلوب.';
 
   @override
   String get selectPaymentMethod => 'اختر طريقة الدفع';
@@ -1094,6 +1094,206 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get closePreflightLeadingBook => 'الدفتر الرئيسي النشط';
+
+  @override
+  String get procurement => 'المشتريات';
+
+  @override
+  String get procurementHub => 'دورة الشراء إلى الدفع';
+
+  @override
+  String get purchaseRequisition => 'طلب شراء';
+
+  @override
+  String get createRequisition => 'إنشاء طلب شراء';
+
+  @override
+  String get requisitionNumber => 'رقم طلب الشراء';
+
+  @override
+  String get purpose => 'الغرض';
+
+  @override
+  String get neededBy => 'مطلوب بحلول';
+
+  @override
+  String get estimatedUnitPrice => 'سعر الوحدة التقديري';
+
+  @override
+  String get requisitionCreated => 'تم إنشاء طلب الشراء.';
+
+  @override
+  String get requisitionSubmitted => 'تم إرسال طلب الشراء للموافقة.';
+
+  @override
+  String get submitForApproval => 'إرسال للموافقة';
+
+  @override
+  String get requisitionCreateFailed => 'تعذر إنشاء طلب الشراء.';
+
+  @override
+  String get requisitionSubmitFailed => 'تعذر إرسال طلب الشراء.';
+
+  @override
+  String get purchaseOrder => 'أمر شراء';
+
+  @override
+  String get createPurchaseOrder => 'إنشاء أمر شراء';
+
+  @override
+  String get purchaseOrderNumber => 'رقم أمر الشراء';
+
+  @override
+  String get vendorId => 'معرّف المورد';
+
+  @override
+  String get requisitionIdOptional => 'معرّف طلب الشراء (اختياري)';
+
+  @override
+  String get orderDate => 'تاريخ الطلب';
+
+  @override
+  String get expectedDateOptional => 'التاريخ المتوقع (اختياري)';
+
+  @override
+  String get purchaseOrderCreated => 'تم إنشاء أمر الشراء.';
+
+  @override
+  String get purchaseOrderCreateFailed => 'تعذر إنشاء أمر الشراء.';
+
+  @override
+  String get purchaseOrderSubmitFailed => 'تعذر إرسال أمر الشراء.';
+
+  @override
+  String get receipt => 'إيصال الاستلام';
+
+  @override
+  String get createReceipt => 'إنشاء إيصال استلام';
+
+  @override
+  String get receiptNumber => 'رقم إيصال الاستلام';
+
+  @override
+  String get purchaseOrderId => 'معرّف أمر الشراء';
+
+  @override
+  String get purchaseOrderLineId => 'معرّف سطر أمر الشراء';
+
+  @override
+  String get warehouseId => 'معرّف المستودع';
+
+  @override
+  String get receiptCreated => 'تم إنشاء مسودة إيصال الاستلام.';
+
+  @override
+  String get receiptIdOptional => 'معرّف إيصال الاستلام (اختياري)';
+
+  @override
+  String get receiptCreateFailed => 'تعذر إنشاء مسودة إيصال الاستلام.';
+
+  @override
+  String get receiptPostFailed => 'تعذر ترحيل إيصال الاستلام.';
+
+  @override
+  String get postReceipt => 'ترحيل إيصال الاستلام';
+
+  @override
+  String get returnTitle => 'مرتجع';
+
+  @override
+  String get createReturn => 'إنشاء مرتجع';
+
+  @override
+  String get returnNumber => 'رقم المرتجع';
+
+  @override
+  String get returnReason => 'سبب المرتجع';
+
+  @override
+  String get returnCreated => 'تم إنشاء مسودة المرتجع.';
+
+  @override
+  String get returnCreateFailed => 'تعذر إنشاء مسودة المرتجع.';
+
+  @override
+  String get returnPostFailed => 'تعذر ترحيل المرتجع.';
+
+  @override
+  String get postReturn => 'ترحيل المرتجع';
+
+  @override
+  String get workflowComingSoon =>
+      'تتوفر عمليات أوامر الشراء والاستلام والمرتجعات عبر عقد الخادم؛ وتعرض هذه الشاشة إجراءات المسودات والترحيل الآمنة.';
+
+  @override
+  String get procurementOperations => 'عمليات المشتريات';
+
+  @override
+  String get procurementOperationsHint =>
+      'أنشئ أوامر الشراء وسجل أدلة الاستلام ورحّل المرتجعات عبر أوامر موثوقة من الخادم.';
+
+  @override
+  String get openProcurementOperations => 'فتح عمليات المشتريات';
+
+  @override
+  String get invalidIdentifier => 'أدخل معرّفاً صالحاً.';
+
+  @override
+  String get procurementActionCompleted => 'اكتملت عملية المشتريات.';
+
+  @override
+  String get threeWayMatching => 'المطابقة الثلاثية';
+
+  @override
+  String get matchVendorBill => 'مطابقة فاتورة المورد';
+
+  @override
+  String get billId => 'معرّف فاتورة المورد';
+
+  @override
+  String get runMatch => 'تشغيل المطابقة';
+
+  @override
+  String get matchPassed => 'مطابق';
+
+  @override
+  String get matchBlocked => 'محظور';
+
+  @override
+  String get matchEvidence => 'أدلة المطابقة';
+
+  @override
+  String get orderedQuantity => 'الكمية المطلوبة';
+
+  @override
+  String get receivedQuantity => 'الكمية المستلمة';
+
+  @override
+  String get returnedQuantity => 'الكمية المرتجعة';
+
+  @override
+  String get availableQuantity => 'الكمية المتاحة';
+
+  @override
+  String get billedQuantity => 'الكمية المفوترة';
+
+  @override
+  String get priceVariance => 'انحراف السعر';
+
+  @override
+  String get blockingReason => 'سبب الحظر';
+
+  @override
+  String get matchLoadFailed => 'تعذر تحميل المطابقة الثلاثية.';
+
+  @override
+  String get matchNoLines => 'لم يتم إرجاع بنود للفاتورة للمطابقة.';
+
+  @override
+  String get positiveQuantityRequired => 'أدخل كمية موجبة.';
+
+  @override
+  String get nonNegativeAmountRequired => 'أدخل مبلغاً غير سالب.';
 
   @override
   String get periodClosed => 'تم إغلاق الفترة المحاسبية.';
@@ -3902,9 +4102,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get varianceBreakdown => 'تحليل الانحرافات';
 
   @override
-  String get priceVariance => 'انحراف السعر';
-
-  @override
   String get priceVarianceFormula =>
       '(السعر الفعلي - المعياري) × الكمية الفعلية';
 
@@ -4358,6 +4555,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get permApproveRequests => 'الموافقة على الطلبات';
+
+  @override
+  String get permManageProcurement => 'إدارة المشتريات';
+
+  @override
+  String get permApproveProcurement => 'الموافقة على المشتريات';
+
+  @override
+  String get permReceiveInventory => 'استلام المخزون';
 
   @override
   String get permManageCrm => 'إدارة إدارة علاقات العملاء';

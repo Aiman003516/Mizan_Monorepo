@@ -686,7 +686,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noProductsInCategory => 'No products in this category';
 
   @override
-  String get quantity => 'Qty';
+  String get quantity => 'Quantity';
 
   @override
   String get clear => 'Clear';
@@ -859,7 +859,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noLineItemsSaved => 'No line items were saved for this order.';
 
   @override
-  String get fieldRequired => 'field Required';
+  String get fieldRequired => 'This field is required.';
 
   @override
   String get selectPaymentMethod => 'select Payment Method';
@@ -1097,6 +1097,211 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get closePreflightLeadingBook => 'Active leading book';
+
+  @override
+  String get procurement => 'Procurement';
+
+  @override
+  String get procurementHub => 'Procure-to-pay';
+
+  @override
+  String get purchaseRequisition => 'Purchase requisition';
+
+  @override
+  String get createRequisition => 'Create requisition';
+
+  @override
+  String get requisitionNumber => 'Requisition number';
+
+  @override
+  String get purpose => 'Purpose';
+
+  @override
+  String get neededBy => 'Needed by';
+
+  @override
+  String get estimatedUnitPrice => 'Estimated unit price';
+
+  @override
+  String get requisitionCreated => 'Purchase requisition created.';
+
+  @override
+  String get requisitionSubmitted =>
+      'Purchase requisition submitted for approval.';
+
+  @override
+  String get submitForApproval => 'Submit for approval';
+
+  @override
+  String get requisitionCreateFailed =>
+      'Could not create the purchase requisition.';
+
+  @override
+  String get requisitionSubmitFailed =>
+      'Could not submit the purchase requisition.';
+
+  @override
+  String get purchaseOrder => 'Purchase order';
+
+  @override
+  String get createPurchaseOrder => 'Create purchase order';
+
+  @override
+  String get purchaseOrderNumber => 'Purchase order number';
+
+  @override
+  String get vendorId => 'Vendor ID';
+
+  @override
+  String get requisitionIdOptional => 'Requisition ID (optional)';
+
+  @override
+  String get orderDate => 'Order date';
+
+  @override
+  String get expectedDateOptional => 'Expected date (optional)';
+
+  @override
+  String get purchaseOrderCreated => 'Purchase order created.';
+
+  @override
+  String get purchaseOrderCreateFailed =>
+      'Could not create the purchase order.';
+
+  @override
+  String get purchaseOrderSubmitFailed =>
+      'Could not submit the purchase order.';
+
+  @override
+  String get receipt => 'Receipt';
+
+  @override
+  String get createReceipt => 'Create receipt';
+
+  @override
+  String get receiptNumber => 'Receipt number';
+
+  @override
+  String get purchaseOrderId => 'Purchase order ID';
+
+  @override
+  String get purchaseOrderLineId => 'Purchase-order line ID';
+
+  @override
+  String get warehouseId => 'Warehouse ID';
+
+  @override
+  String get receiptCreated => 'Receipt draft created.';
+
+  @override
+  String get receiptIdOptional => 'Receipt ID (optional)';
+
+  @override
+  String get receiptCreateFailed => 'Could not create the receipt draft.';
+
+  @override
+  String get receiptPostFailed => 'Could not post the receipt.';
+
+  @override
+  String get postReceipt => 'Post receipt';
+
+  @override
+  String get returnTitle => 'Return';
+
+  @override
+  String get createReturn => 'Create return';
+
+  @override
+  String get returnNumber => 'Return number';
+
+  @override
+  String get returnReason => 'Return reason';
+
+  @override
+  String get returnCreated => 'Return draft created.';
+
+  @override
+  String get returnCreateFailed => 'Could not create the return draft.';
+
+  @override
+  String get returnPostFailed => 'Could not post the return.';
+
+  @override
+  String get postReturn => 'Post return';
+
+  @override
+  String get workflowComingSoon =>
+      'PO, receipt, and return workflows are available through the server contract; this screen exposes the safe draft and posting actions.';
+
+  @override
+  String get procurementOperations => 'Procurement operations';
+
+  @override
+  String get procurementOperationsHint =>
+      'Create and submit purchase orders, record receiving evidence, and post returns through server-authoritative commands.';
+
+  @override
+  String get openProcurementOperations => 'Open procurement operations';
+
+  @override
+  String get invalidIdentifier => 'Enter a valid identifier.';
+
+  @override
+  String get procurementActionCompleted => 'Procurement action completed.';
+
+  @override
+  String get threeWayMatching => 'Three-way matching';
+
+  @override
+  String get matchVendorBill => 'Match vendor bill';
+
+  @override
+  String get billId => 'Vendor bill ID';
+
+  @override
+  String get runMatch => 'Run matching';
+
+  @override
+  String get matchPassed => 'Matched';
+
+  @override
+  String get matchBlocked => 'Blocked';
+
+  @override
+  String get matchEvidence => 'Matching evidence';
+
+  @override
+  String get orderedQuantity => 'Ordered quantity';
+
+  @override
+  String get receivedQuantity => 'Received quantity';
+
+  @override
+  String get returnedQuantity => 'Returned quantity';
+
+  @override
+  String get availableQuantity => 'Available quantity';
+
+  @override
+  String get billedQuantity => 'Billed quantity';
+
+  @override
+  String get priceVariance => 'Price Variance';
+
+  @override
+  String get blockingReason => 'Blocking reason';
+
+  @override
+  String get matchLoadFailed => 'The three-way match could not be loaded.';
+
+  @override
+  String get matchNoLines => 'No bill lines were returned for matching.';
+
+  @override
+  String get positiveQuantityRequired => 'Enter a positive quantity.';
+
+  @override
+  String get nonNegativeAmountRequired => 'Enter a non-negative amount.';
 
   @override
   String get periodClosed => 'Accounting period closed.';
@@ -3916,9 +4121,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get varianceBreakdown => 'Variance Breakdown';
 
   @override
-  String get priceVariance => 'Price Variance';
-
-  @override
   String get priceVarianceFormula => '(AP - SP) × AQ';
 
   @override
@@ -4366,6 +4568,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get permApproveRequests => 'Approve Requests';
+
+  @override
+  String get permManageProcurement => 'Manage Procurement';
+
+  @override
+  String get permApproveProcurement => 'Approve Procurement';
+
+  @override
+  String get permReceiveInventory => 'Receive Inventory';
 
   @override
   String get permManageCrm => 'Manage CRM';

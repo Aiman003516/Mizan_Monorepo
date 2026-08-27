@@ -38,6 +38,7 @@ This registry is the canonical human-readable dependency map for the additive Su
 | `20260828020000_party_statements.sql` | AR/AP / Reporting | Tenant-safe customer/vendor statements with opening, activity, and running balance | AR/AP settlement and balance-adjustment workflows |
 | `20260828030000_close_preflight.sql` | Accounting / Governance | Tenant-scoped month-end close readiness checks | Accounting periods, approvals, settlements, document anomalies, accounting books |
 | `20260828040000_settlement_idempotency.sql` | AR/AP / Sync | Retry-safe settlement draft creation with tenant-scoped idempotency | AR/AP settlement, ledger drafts, tenant permissions |
+| `20260828050000_procurement_foundation.sql` | Procurement / Accounting / Inventory | Purchase requisitions, approval-aware purchase orders, receipt/return evidence, vendor-bill links, and three-way matching | Approvals, branches, vendors, bills, bill lines, inventory bridge, tenant permissions |
 
 ## Required migration header
 

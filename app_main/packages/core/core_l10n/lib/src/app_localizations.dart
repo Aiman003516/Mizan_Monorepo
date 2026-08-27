@@ -1397,7 +1397,7 @@ abstract class AppLocalizations {
   /// No description provided for @quantity.
   ///
   /// In en, this message translates to:
-  /// **'Qty'**
+  /// **'Quantity'**
   String get quantity;
 
   /// No description provided for @clear.
@@ -1721,7 +1721,7 @@ abstract class AppLocalizations {
   /// No description provided for @fieldRequired.
   ///
   /// In en, this message translates to:
-  /// **'field Required'**
+  /// **'This field is required.'**
   String get fieldRequired;
 
   /// No description provided for @selectPaymentMethod.
@@ -2185,6 +2185,402 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Active leading book'**
   String get closePreflightLeadingBook;
+
+  /// No description provided for @procurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Procurement'**
+  String get procurement;
+
+  /// No description provided for @procurementHub.
+  ///
+  /// In en, this message translates to:
+  /// **'Procure-to-pay'**
+  String get procurementHub;
+
+  /// No description provided for @purchaseRequisition.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase requisition'**
+  String get purchaseRequisition;
+
+  /// No description provided for @createRequisition.
+  ///
+  /// In en, this message translates to:
+  /// **'Create requisition'**
+  String get createRequisition;
+
+  /// No description provided for @requisitionNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Requisition number'**
+  String get requisitionNumber;
+
+  /// No description provided for @purpose.
+  ///
+  /// In en, this message translates to:
+  /// **'Purpose'**
+  String get purpose;
+
+  /// No description provided for @neededBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed by'**
+  String get neededBy;
+
+  /// No description provided for @estimatedUnitPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated unit price'**
+  String get estimatedUnitPrice;
+
+  /// No description provided for @requisitionCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase requisition created.'**
+  String get requisitionCreated;
+
+  /// No description provided for @requisitionSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase requisition submitted for approval.'**
+  String get requisitionSubmitted;
+
+  /// No description provided for @submitForApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit for approval'**
+  String get submitForApproval;
+
+  /// No description provided for @requisitionCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the purchase requisition.'**
+  String get requisitionCreateFailed;
+
+  /// No description provided for @requisitionSubmitFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not submit the purchase requisition.'**
+  String get requisitionSubmitFailed;
+
+  /// No description provided for @purchaseOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase order'**
+  String get purchaseOrder;
+
+  /// No description provided for @createPurchaseOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Create purchase order'**
+  String get createPurchaseOrder;
+
+  /// No description provided for @purchaseOrderNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase order number'**
+  String get purchaseOrderNumber;
+
+  /// No description provided for @vendorId.
+  ///
+  /// In en, this message translates to:
+  /// **'Vendor ID'**
+  String get vendorId;
+
+  /// No description provided for @requisitionIdOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Requisition ID (optional)'**
+  String get requisitionIdOptional;
+
+  /// No description provided for @orderDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Order date'**
+  String get orderDate;
+
+  /// No description provided for @expectedDateOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected date (optional)'**
+  String get expectedDateOptional;
+
+  /// No description provided for @purchaseOrderCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase order created.'**
+  String get purchaseOrderCreated;
+
+  /// No description provided for @purchaseOrderCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the purchase order.'**
+  String get purchaseOrderCreateFailed;
+
+  /// No description provided for @purchaseOrderSubmitFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not submit the purchase order.'**
+  String get purchaseOrderSubmitFailed;
+
+  /// No description provided for @receipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get receipt;
+
+  /// No description provided for @createReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Create receipt'**
+  String get createReceipt;
+
+  /// No description provided for @receiptNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt number'**
+  String get receiptNumber;
+
+  /// No description provided for @purchaseOrderId.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase order ID'**
+  String get purchaseOrderId;
+
+  /// No description provided for @purchaseOrderLineId.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase-order line ID'**
+  String get purchaseOrderLineId;
+
+  /// No description provided for @warehouseId.
+  ///
+  /// In en, this message translates to:
+  /// **'Warehouse ID'**
+  String get warehouseId;
+
+  /// No description provided for @receiptCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt draft created.'**
+  String get receiptCreated;
+
+  /// No description provided for @receiptIdOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt ID (optional)'**
+  String get receiptIdOptional;
+
+  /// No description provided for @receiptCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the receipt draft.'**
+  String get receiptCreateFailed;
+
+  /// No description provided for @receiptPostFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not post the receipt.'**
+  String get receiptPostFailed;
+
+  /// No description provided for @postReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Post receipt'**
+  String get postReceipt;
+
+  /// No description provided for @returnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Return'**
+  String get returnTitle;
+
+  /// No description provided for @createReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Create return'**
+  String get createReturn;
+
+  /// No description provided for @returnNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Return number'**
+  String get returnNumber;
+
+  /// No description provided for @returnReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Return reason'**
+  String get returnReason;
+
+  /// No description provided for @returnCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Return draft created.'**
+  String get returnCreated;
+
+  /// No description provided for @returnCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the return draft.'**
+  String get returnCreateFailed;
+
+  /// No description provided for @returnPostFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not post the return.'**
+  String get returnPostFailed;
+
+  /// No description provided for @postReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Post return'**
+  String get postReturn;
+
+  /// No description provided for @workflowComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'PO, receipt, and return workflows are available through the server contract; this screen exposes the safe draft and posting actions.'**
+  String get workflowComingSoon;
+
+  /// No description provided for @procurementOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Procurement operations'**
+  String get procurementOperations;
+
+  /// No description provided for @procurementOperationsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create and submit purchase orders, record receiving evidence, and post returns through server-authoritative commands.'**
+  String get procurementOperationsHint;
+
+  /// No description provided for @openProcurementOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Open procurement operations'**
+  String get openProcurementOperations;
+
+  /// No description provided for @invalidIdentifier.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid identifier.'**
+  String get invalidIdentifier;
+
+  /// No description provided for @procurementActionCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Procurement action completed.'**
+  String get procurementActionCompleted;
+
+  /// No description provided for @threeWayMatching.
+  ///
+  /// In en, this message translates to:
+  /// **'Three-way matching'**
+  String get threeWayMatching;
+
+  /// No description provided for @matchVendorBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Match vendor bill'**
+  String get matchVendorBill;
+
+  /// No description provided for @billId.
+  ///
+  /// In en, this message translates to:
+  /// **'Vendor bill ID'**
+  String get billId;
+
+  /// No description provided for @runMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Run matching'**
+  String get runMatch;
+
+  /// No description provided for @matchPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'Matched'**
+  String get matchPassed;
+
+  /// No description provided for @matchBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get matchBlocked;
+
+  /// No description provided for @matchEvidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Matching evidence'**
+  String get matchEvidence;
+
+  /// No description provided for @orderedQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Ordered quantity'**
+  String get orderedQuantity;
+
+  /// No description provided for @receivedQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Received quantity'**
+  String get receivedQuantity;
+
+  /// No description provided for @returnedQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Returned quantity'**
+  String get returnedQuantity;
+
+  /// No description provided for @availableQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Available quantity'**
+  String get availableQuantity;
+
+  /// No description provided for @billedQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed quantity'**
+  String get billedQuantity;
+
+  /// No description provided for @priceVariance.
+  ///
+  /// In en, this message translates to:
+  /// **'Price Variance'**
+  String get priceVariance;
+
+  /// No description provided for @blockingReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocking reason'**
+  String get blockingReason;
+
+  /// No description provided for @matchLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The three-way match could not be loaded.'**
+  String get matchLoadFailed;
+
+  /// No description provided for @matchNoLines.
+  ///
+  /// In en, this message translates to:
+  /// **'No bill lines were returned for matching.'**
+  String get matchNoLines;
+
+  /// No description provided for @positiveQuantityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a positive quantity.'**
+  String get positiveQuantityRequired;
+
+  /// No description provided for @nonNegativeAmountRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a non-negative amount.'**
+  String get nonNegativeAmountRequired;
 
   /// No description provided for @periodClosed.
   ///
@@ -7484,12 +7880,6 @@ abstract class AppLocalizations {
   /// **'Variance Breakdown'**
   String get varianceBreakdown;
 
-  /// No description provided for @priceVariance.
-  ///
-  /// In en, this message translates to:
-  /// **'Price Variance'**
-  String get priceVariance;
-
   /// No description provided for @priceVarianceFormula.
   ///
   /// In en, this message translates to:
@@ -8299,6 +8689,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Approve Requests'**
   String get permApproveRequests;
+
+  /// No description provided for @permManageProcurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Procurement'**
+  String get permManageProcurement;
+
+  /// No description provided for @permApproveProcurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve Procurement'**
+  String get permApproveProcurement;
+
+  /// No description provided for @permReceiveInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive Inventory'**
+  String get permReceiveInventory;
 
   /// No description provided for @permManageCrm.
   ///
