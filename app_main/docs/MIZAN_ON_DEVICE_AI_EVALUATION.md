@@ -42,9 +42,9 @@ The local assistant must satisfy these invariants:
 | 1 | Navigation and explanation proposal types; allowlisted shell adapter; deterministic Arabic/English intent handling | Implement |
 | 2 | Local knowledge base with bounded retrieval and no tenant-data leakage | Implement |
 | 3 | Orchestrator routing rules with rule-first behavior and explicit engine provenance | Implement |
-| 4 | Model manifest/catalog and packaged-runtime readiness contract; no unreviewed runtime or network download | Implement |
+| 4 | Model manifest/catalog, exact Qwen3 GGUF artifact, checksum verification, and packaged-runtime readiness contract | Implement |
 | 5 | Local assistant UI for guest/offline guidance, navigation cards, and explanation cards; cloud draft flow unchanged | Implement where the existing screen allows safely |
-| 6 | Real GGUF/llama.cpp runtime, signed distribution, device benchmarks, and Android/iOS packaging | Deferred pending runtime review and device evidence |
+| 6 | Real GGUF/llama.cpp inference, signed distribution, device benchmarks, and Android/iOS packaging | Asset boundary implemented; inference remains deferred pending runtime review and device evidence |
 | 7 | Fine-tuning, synthetic-data expansion, voice, and model-specific optimization | Deferred until the base local path has measured evaluation results |
 
 ## Acceptance gates for a future real model
@@ -65,7 +65,7 @@ A native runtime may be enabled only after a reviewed model artifact and pinned 
 
 [1]: local-ai-tflite-bridge.md "Mizan Android Local AI Bridge and Model Packaging"
 [2]: ../packages/features/feature_ai/lib/src/local_ai/local_ai_engine.dart "Mizan LocalAiEngine contract"
-[3]: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct "Qwen2.5-0.5B-Instruct model card"
-[4]: https://huggingface.co/lmstudio-community/Qwen2.5-0.5B-Instruct-GGUF "Qwen2.5-0.5B-Instruct GGUF distribution"
+[3]: https://huggingface.co/Qwen/Qwen3-0.6B "Qwen3-0.6B model card"
+[4]: https://huggingface.co/bartowski/Qwen_Qwen3-0.6B-GGUF "Qwen3-0.6B GGUF distribution"
 [5]: https://github.com/netdur/llama_cpp_dart "llama_cpp_dart repository and current mobile API"
 [6]: https://github.com/ggml-org/llama.cpp/blob/master/grammars/README.md "llama.cpp GBNF guide and limitations"

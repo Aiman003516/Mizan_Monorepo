@@ -19,6 +19,8 @@ class LocalAiModelManifest {
     required this.minimumAppVersion,
     required this.task,
     required this.quantization,
+    this.schemaVersion = 'mizan.local-ai.model/v1',
+    this.runtime = 'tflite',
   });
 
   final String modelId;
@@ -30,19 +32,27 @@ class LocalAiModelManifest {
   final String minimumAppVersion;
   final String task;
   final String quantization;
+  final String schemaVersion;
+  final String runtime;
 
-  Map<String, Object?> toJson() => {
-    'schema_version': 'mizan.local-ai.model/v1',
-    'model_id': modelId,
-    'model_version': modelVersion,
-    'artifact_name': artifactName,
-    'sha256': sha256,
-    'tokenizer_version': tokenizerVersion,
-    'supported_locales': supportedLocales,
-    'minimum_app_version': minimumAppVersion,
-    'task': task,
-    'quantization': quantization,
-  };
+  Map<String, Object?> toJson() {
+    final json = <String, Object?>{
+      'schema_version': schemaVersion,
+      'model_id': modelId,
+      'model_version': modelVersion,
+      'artifact_name': artifactName,
+      'sha256': sha256,
+      'tokenizer_version': tokenizerVersion,
+      'supported_locales': supportedLocales,
+      'minimum_app_version': minimumAppVersion,
+      'task': task,
+      'quantization': quantization,
+    };
+    if (schemaVersion == 'mizan.local-ai.model/v2') {
+      json['runtime'] = runtime;
+    }
+    return json;
+  }
 
   String encode() => jsonEncode(toJson());
 
@@ -51,7 +61,7 @@ class LocalAiModelManifest {
       throw const FormatException('Invalid local AI model manifest');
     }
     final json = Map<String, Object?>.from(value);
-    const keys = {
+    const requiredKeys = {
       'schema_version',
       'model_id',
       'model_version',
@@ -63,8 +73,12 @@ class LocalAiModelManifest {
       'task',
       'quantization',
     };
-    if (json.keys.length != keys.length ||
-        !json.keys.toSet().containsAll(keys)) {
+    const optionalKeys = {'runtime'};
+    final actualKeys = json.keys.toSet();
+    if (!actualKeys.containsAll(requiredKeys) ||
+        actualKeys.any(
+          (key) => !requiredKeys.contains(key) && !optionalKeys.contains(key),
+        )) {
       throw const FormatException('Local AI model manifest keys are invalid');
     }
 
@@ -89,6 +103,10 @@ class LocalAiModelManifest {
       ),
       task: _requiredText(json['task'], 'task'),
       quantization: _requiredText(json['quantization'], 'quantization'),
+      schemaVersion: _requiredText(json['schema_version'], 'schema_version'),
+      runtime: json['runtime'] is String
+          ? _requiredText(json['runtime'], 'runtime')
+          : 'tflite',
     );
     _validateManifest(manifest, json['schema_version']);
     return manifest;
@@ -105,12 +123,23 @@ class LocalAiModelManifest {
     LocalAiModelManifest manifest,
     Object? schemaVersion,
   ) {
-    if (schemaVersion != 'mizan.local-ai.model/v1') {
+    if (schemaVersion != 'mizan.local-ai.model/v1' &&
+        schemaVersion != 'mizan.local-ai.model/v2') {
       throw const FormatException(
         'Unsupported local AI model manifest version',
       );
     }
-    if (!RegExp(r'^[a-zA-Z0-9._-]+\.tflite$').hasMatch(manifest.artifactName)) {
+    final isTflite = manifest.runtime == 'tflite';
+    final isGguf = manifest.runtime == 'llama_cpp';
+    if ((isTflite &&
+            !RegExp(
+              r'^[a-zA-Z0-9._-]+\.tflite$',
+            ).hasMatch(manifest.artifactName)) ||
+        (isGguf &&
+            !RegExp(
+              r'^[a-zA-Z0-9._-]+\.gguf$',
+            ).hasMatch(manifest.artifactName)) ||
+        (!isTflite && !isGguf)) {
       throw const FormatException('Model artifact name is unsafe');
     }
     if (!RegExp(
@@ -128,13 +157,19 @@ class LocalAiModelManifest {
     if (manifest.task != 'proposal_extraction') {
       throw const FormatException('Unsupported local AI model task');
     }
-    if (!const {
-      'float32',
-      'float16',
-      'dynamic_range_int8',
-      'int8',
-    }.contains(manifest.quantization)) {
+    final validQuantization = isTflite
+        ? const {
+            'float32',
+            'float16',
+            'dynamic_range_int8',
+            'int8',
+          }.contains(manifest.quantization)
+        : isGguf && manifest.quantization == 'q4_k_m';
+    if (!validQuantization) {
       throw const FormatException('Unsupported local AI quantization');
+    }
+    if (isGguf && schemaVersion != 'mizan.local-ai.model/v2') {
+      throw const FormatException('GGUF manifests require model schema v2');
     }
   }
 }
@@ -266,21 +301,35 @@ class MethodChannelLocalAiNativeInferenceBridge
 /// Adapter that keeps native inference proposal-only and validates its output
 /// before it can reach any presentation or application layer.
 class NativeTfliteLocalAiEngine implements LocalAiEngine {
-  NativeTfliteLocalAiEngine({required this.bridge, required this.manifest});
+  NativeTfliteLocalAiEngine({required this.bridge, required this.manifest})
+    : runtime = 'tflite';
+
+  NativeTfliteLocalAiEngine._forRuntime({
+    required this.bridge,
+    required this.manifest,
+    required this.runtime,
+  });
 
   final LocalAiNativeInferenceBridge bridge;
   final LocalAiModelManifest manifest;
+  final String runtime;
   LocalAiEngineStatus _status = LocalAiEngineStatus.unavailable;
 
   @override
   String get engineId =>
-      'native-tflite-${manifest.modelId}-${manifest.modelVersion}';
+      'native-$runtime-${manifest.modelId}-${manifest.modelVersion}';
 
   @override
   LocalAiEngineStatus get status => _status;
 
   @override
   Future<LocalAiEngineResult> propose(LocalAiRequest request) async {
+    if (manifest.runtime != runtime) {
+      return const LocalAiEngineResult.failed(
+        '',
+        code: LocalAiDiagnosticCode.modelLoadFailed,
+      );
+    }
     if (request.locale != 'ar' && request.locale != 'en') {
       return const LocalAiEngineResult.failed(
         '',
@@ -343,4 +392,12 @@ class NativeTfliteLocalAiEngine implements LocalAiEngine {
     await bridge.unloadModel();
     _status = LocalAiEngineStatus.unavailable;
   }
+}
+
+/// GGUF adapter boundary for the future llama.cpp Android implementation.
+/// The channel and proposal validation remain shared with the TFLite path;
+/// the default provider still keeps this runtime disabled until packaged.
+class NativeGgufLocalAiEngine extends NativeTfliteLocalAiEngine {
+  NativeGgufLocalAiEngine({required super.bridge, required super.manifest})
+    : super._forRuntime(runtime: 'llama_cpp');
 }

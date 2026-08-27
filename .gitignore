@@ -10,3 +10,7 @@ skills-lock.json
 .env
 .env.*
 !.env.example
+
+# Large local AI model artifacts (downloaded and verified by preparation script)
+.local_ai_model_cache/
+app_main/apps/assets/local_ai/*.gguf

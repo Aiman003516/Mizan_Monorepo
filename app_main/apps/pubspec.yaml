@@ -99,6 +99,7 @@ flutter:
     - assets/images/
     - assets/fonts/
     - assets/audio/
+    - assets/local_ai/
 
   fonts:
     - family: Amiri

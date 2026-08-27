@@ -175,6 +175,18 @@ void main() {
       expect(decoded.supportedLocales, ['ar', 'en']);
     });
 
+    test('accepts the pinned Qwen3 GGUF manifest', () {
+      final decoded = LocalAiModelManifest.fromJson(
+        qwen3MizanLocalModel.toJson(),
+      );
+
+      expect(decoded.schemaVersion, 'mizan.local-ai.model/v2');
+      expect(decoded.runtime, 'llama_cpp');
+      expect(decoded.artifactName, 'Qwen_Qwen3-0.6B-Q4_K_M.gguf');
+      expect(decoded.quantization, 'q4_k_m');
+      expect(decoded.sha256.length, 64);
+    });
+
     test('rejects unsafe artifact names and invalid checksums', () {
       expect(
         () => LocalAiModelManifest.fromJson({

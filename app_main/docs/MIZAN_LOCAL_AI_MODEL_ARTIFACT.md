@@ -1,0 +1,52 @@
+# Mizan Local AI Model Artifact
+
+## Selected artifact
+
+Mizan’s first local-model pilot is pinned to the following artifact:
+
+| Field | Value |
+|---|---|
+| Base model | `Qwen/Qwen3-0.6B` |
+| Quantized artifact | `Qwen_Qwen3-0.6B-Q4_K_M.gguf` |
+| Artifact repository | `bartowski/Qwen_Qwen3-0.6B-GGUF` |
+| Immutable revision | `60b85c0e3d8fe0f6474f406922a26d12aca4550d` |
+| Runtime target | llama.cpp-compatible Android bridge |
+| Quantization | Q4_K_M |
+| Downloaded size | 484,220,320 bytes |
+| SHA-256 | `9acfc1e001311f34b4252001b626f2e466d592a42065f66571bff3790d4e1b14` |
+| Local languages | Arabic and English |
+| Task | Proposal extraction only |
+
+The original Qwen3 model is published under Apache 2.0. The GGUF file is a community conversion and must be retained with its source and checksum metadata. The app must not silently replace it with a floating `main` revision.
+
+## Preparation
+
+From the repository root, run:
+
+```bash
+./scripts/prepare_qwen3_local_model.sh
+```
+
+The script downloads the artifact into the ignored `.local_ai_model_cache/` directory, verifies the exact SHA-256 checksum, and copies it to:
+
+```text
+app_main/apps/assets/local_ai/Qwen_Qwen3-0.6B-Q4_K_M.gguf
+```
+
+The model binary is intentionally not committed to GitHub. The Flutter application now declares `assets/local_ai/`, so a prepared local build can package the file once the native runtime is implemented and enabled.
+
+## Safety boundary
+
+The pinned artifact is not yet enabled in the default provider. Until the Android llama.cpp bridge is implemented and tested, Mizan continues using the deterministic local engine and rule-based fallback. The future native adapter must return only proposal JSON, and the Dart validator must reject malformed, unknown, unsafe, or semantically invalid proposals.
+
+The local model must not receive Supabase credentials, direct database handles, tenant records, journal data, authentication tokens, or arbitrary tool definitions. Local inference cannot post journals, edit records, delete records, send messages, or modify application files. Authenticated accounting actions remain server-authoritative and confirmation-gated.
+
+## Release gates
+
+Before enabling this artifact in a release build, verify the native runtime on a Samsung Note9 and representative Android API levels. Record cold and warm load time, generation latency, peak memory, storage usage, CPU temperature, battery impact, crash recovery, Arabic and English proposal validity, malformed-output rejection, unsafe-request refusal, and network-capture evidence showing that local-only prompts do not leave the device.
+
+## Sources
+
+1. [Qwen/Qwen3-0.6B model card](https://huggingface.co/Qwen/Qwen3-0.6B)
+2. [bartowski Qwen3-0.6B GGUF repository](https://huggingface.co/bartowski/Qwen_Qwen3-0.6B-GGUF)
+3. [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
