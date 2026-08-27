@@ -1273,6 +1273,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get runMatch => 'تشغيل المطابقة';
 
   @override
+  String get checkBillEligibility => 'التحقق من أهلية الفاتورة';
+
+  @override
+  String get billEligibleForPosting =>
+      'اجتازت الفاتورة بوابة المطابقة على الخادم وهي مؤهلة لأمر ترحيل مستقبلي.';
+
+  @override
+  String get billMatchGateFailed =>
+      'الفاتورة غير مؤهلة للترحيل؛ راجع أدلة الحظر.';
+
+  @override
   String get matchPassed => 'مطابق';
 
   @override

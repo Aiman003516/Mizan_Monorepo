@@ -15,6 +15,7 @@ class _ThreeWayMatchScreenState extends ConsumerState<ThreeWayMatchScreen> {
   final _formKey = GlobalKey<FormState>();
   final _billIdController = TextEditingController();
   AsyncValue<List<ThreeWayMatchResult>>? _result;
+  AsyncValue<Map<String, dynamic>>? _gateResult;
 
   @override
   void dispose() {
@@ -24,7 +25,10 @@ class _ThreeWayMatchScreenState extends ConsumerState<ThreeWayMatchScreen> {
 
   Future<void> _runMatch() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _result = const AsyncLoading());
+    setState(() {
+      _result = const AsyncLoading();
+      _gateResult = null;
+    });
     try {
       final rows = await ref
           .read(procurementRepositoryProvider)
@@ -32,6 +36,19 @@ class _ThreeWayMatchScreenState extends ConsumerState<ThreeWayMatchScreen> {
       if (mounted) setState(() => _result = AsyncData(rows));
     } catch (error, stackTrace) {
       if (mounted) setState(() => _result = AsyncError(error, stackTrace));
+    }
+  }
+
+  Future<void> _assertMatch() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _gateResult = const AsyncLoading());
+    try {
+      final response = await ref
+          .read(procurementRepositoryProvider)
+          .assertPurchaseBillMatch(_billIdController.text.trim());
+      if (mounted) setState(() => _gateResult = AsyncData(response));
+    } catch (error, stackTrace) {
+      if (mounted) setState(() => _gateResult = AsyncError(error, stackTrace));
     }
   }
 
@@ -68,6 +85,26 @@ class _ThreeWayMatchScreenState extends ConsumerState<ThreeWayMatchScreen> {
             ),
           ),
           const SizedBox(height: 20),
+          if (result is AsyncData<List<ThreeWayMatchResult>> &&
+              result.value.isNotEmpty) ...[
+            OutlinedButton.icon(
+              onPressed: _gateResult is AsyncLoading ? null : _assertMatch,
+              icon: const Icon(Icons.verified_outlined),
+              label: Text(l10n.checkBillEligibility),
+            ),
+            if (_gateResult is AsyncLoading)
+              const Padding(
+                padding: EdgeInsets.all(12),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_gateResult is AsyncData<Map<String, dynamic>>)
+              _Message(
+                icon: Icons.check_circle_outline,
+                text: l10n.billEligibleForPosting,
+              )
+            else if (_gateResult is AsyncError)
+              _Message(icon: Icons.block, text: l10n.billMatchGateFailed),
+          ],
           if (result is AsyncLoading)
             const Center(child: CircularProgressIndicator())
           else if (result is AsyncError)

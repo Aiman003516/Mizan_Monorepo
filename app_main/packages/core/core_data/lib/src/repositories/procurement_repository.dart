@@ -263,6 +263,18 @@ class ProcurementRepository {
     );
   }
 
+  Future<Map<String, dynamic>> assertPurchaseBillMatch(String billId) async {
+    await _requireTenant();
+    ProcurementValidation.id(billId, 'billId');
+    return _requireMap(
+      await _supabase.rpc(
+        'assert_purchase_bill_match',
+        params: {'p_bill_id': billId},
+      ),
+      'MIZAN_PURCHASE_BILL_MATCH_GATE_INVALID_RESPONSE',
+    );
+  }
+
   Future<List<ThreeWayMatchResult>> matchBill(String billId) async {
     await _requireTenant();
     ProcurementValidation.id(billId, 'billId');

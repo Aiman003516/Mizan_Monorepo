@@ -1282,6 +1282,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get runMatch => 'Run matching';
 
   @override
+  String get checkBillEligibility => 'Check bill eligibility';
+
+  @override
+  String get billEligibleForPosting =>
+      'Bill passed the server-side match gate and is eligible for a future posting command.';
+
+  @override
+  String get billMatchGateFailed =>
+      'Bill is not eligible for posting; review the blocking evidence.';
+
+  @override
   String get matchPassed => 'Matched';
 
   @override

@@ -2534,6 +2534,24 @@ abstract class AppLocalizations {
   /// **'Run matching'**
   String get runMatch;
 
+  /// No description provided for @checkBillEligibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Check bill eligibility'**
+  String get checkBillEligibility;
+
+  /// No description provided for @billEligibleForPosting.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill passed the server-side match gate and is eligible for a future posting command.'**
+  String get billEligibleForPosting;
+
+  /// No description provided for @billMatchGateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill is not eligible for posting; review the blocking evidence.'**
+  String get billMatchGateFailed;
+
   /// No description provided for @matchPassed.
   ///
   /// In en, this message translates to:
