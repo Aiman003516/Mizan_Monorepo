@@ -92,7 +92,14 @@ abstract final class LocalAiNavigationCatalog {
       englishLabel: 'Customers',
       arabicLabel: 'العملاء',
       englishKeywords: ['customers', 'customer', 'clients', 'client'],
-      arabicKeywords: ['العملاء', 'العميل', 'الزبائن', 'الزبون'],
+      arabicKeywords: [
+        'العملاء',
+        'العميل',
+        'عملاء',
+        'عميل',
+        'الزبائن',
+        'الزبون',
+      ],
     ),
     LocalAiNavigationTarget(
       id: 'vendors',

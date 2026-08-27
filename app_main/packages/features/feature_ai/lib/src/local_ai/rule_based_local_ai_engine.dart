@@ -296,8 +296,29 @@ class RuleBasedLocalAiEngine implements LocalAiEngine {
   }
 
   LocalAiNavigationTarget? _detectNavigation(String text, String locale) {
+    final target = LocalAiNavigationCatalog.resolve(text, locale);
+    if (target == null) return null;
+
+    // A user may enter the destination label directly, especially in Arabic
+    // where a short phrase such as "مسار المبيعات" is a natural command.
+    if (_isBareNavigationLabel(text, target, locale)) return target;
     if (!_isNavigationRequest(text)) return null;
-    return LocalAiNavigationCatalog.resolve(text, locale);
+    return target;
+  }
+
+  bool _isBareNavigationLabel(
+    String text,
+    LocalAiNavigationTarget target,
+    String locale,
+  ) {
+    final normalized = text
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim()
+        .toLowerCase();
+    final keywords = locale == 'ar'
+        ? target.arabicKeywords
+        : target.englishKeywords;
+    return keywords.any((keyword) => normalized == keyword.toLowerCase());
   }
 
   LocalAiProposal _navigation(
@@ -334,6 +355,14 @@ class RuleBasedLocalAiEngine implements LocalAiEngine {
       'اعرض',
       'كيف أضيف',
       'كيف اضيف',
+      'كيف أقوم',
+      'كيف اقوم',
+      'كيفية إضافة',
+      'كيفية اضافه',
+      'طريقة إضافة',
+      'طريقة اضافه',
+      'ساعدني في إضافة',
+      'ساعدني بإضافة',
       'أين',
       'اين',
     ]);
@@ -412,6 +441,13 @@ class RuleBasedLocalAiEngine implements LocalAiEngine {
       'ما هي',
       'كيف يعمل',
       'لماذا',
+      'ماذا تستطيع',
+      'ماذا يمكنك',
+      'ما الذي تستطيع',
+      'ما الذي يمكنك',
+      'كيف تساعد',
+      'كيف تساعدني',
+      'ماذا تفعل',
     ]);
   }
 

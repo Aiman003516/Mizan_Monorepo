@@ -1861,6 +1861,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get role => 'Role';
 
   @override
+  String get customRole => 'Custom role';
+
+  @override
+  String get managerRole => 'Manager';
+
+  @override
+  String get accountantRole => 'Accountant';
+
+  @override
+  String get cashierRole => 'Cashier';
+
+  @override
+  String get staffRole => 'Staff';
+
+  @override
+  String get viewerRole => 'Viewer';
+
+  @override
   String get customers => 'Customers';
 
   @override
@@ -5513,6 +5531,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get crmPipelineIntro =>
       'Track leads, opportunities, next actions, and stage progress in one place.';
+
+  @override
+  String get crmPipelineSignInRequired =>
+      'Sign in to view your cloud sales pipeline.';
+
+  @override
+  String get crmPipelineSignInHint =>
+      'Your local records remain available offline. Sign in to load CRM pipeline data and sync changes.';
 
   @override
   String get crmPipelineLoadFailed => 'Could not load the CRM pipeline.';

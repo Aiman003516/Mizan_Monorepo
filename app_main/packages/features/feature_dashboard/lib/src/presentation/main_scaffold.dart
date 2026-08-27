@@ -114,6 +114,13 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     });
   }
 
+  bool _childOwnsAppBar(MainPage page) {
+    return switch (page) {
+      MainPage.dashboard || MainPage.crmPipeline => false,
+      _ => true,
+    };
+  }
+
   Widget _buildAppBarTitle(MainPage currentPage, BuildContext context) {
     if (_isSearching) {
       return TextField(
@@ -391,7 +398,9 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
             _scaffoldKey.currentState?.openDrawer();
           },
         ),
-        title: _buildAppBarTitle(currentPage, context),
+        title: _childOwnsAppBar(currentPage)
+            ? const SizedBox.shrink()
+            : _buildAppBarTitle(currentPage, context),
         actions: _buildAppBarActions(currentPage, authStatus, isSyncing),
         bottom: isDashboard
             ? TabBar(
@@ -690,7 +699,15 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         MainPage.reportTrialBalance => const TrialBalanceScreen(),
         MainPage.customers => const CustomersTableScreen(),
         MainPage.vendors => const VendorsTableScreen(),
-        MainPage.crmPipeline => const CrmPipelineScreen(),
+        MainPage.crmPipeline => CrmPipelineScreen(
+          onSignIn: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => LoginScreen(onJoinOrganization: () {}),
+              ),
+            );
+          },
+        ),
         MainPage.crm360 => const Crm360Screen(),
         MainPage.procurement => const ProcurementHubScreen(),
       },

@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CrmPipelineScreen extends ConsumerStatefulWidget {
-  const CrmPipelineScreen({super.key});
+  const CrmPipelineScreen({super.key, this.onSignIn});
+
+  final VoidCallback? onSignIn;
 
   @override
   ConsumerState<CrmPipelineScreen> createState() => _CrmPipelineScreenState();
@@ -25,6 +27,12 @@ class _CrmPipelineScreenState extends ConsumerState<CrmPipelineScreen> {
   Future<({List<CrmPipelineStage> stages, List<CrmOpportunity> opportunities})>
   _load() async {
     final repository = ref.read(crmPipelineRepositoryProvider);
+    if (!repository.hasAuthenticatedUser) {
+      return (
+        stages: const <CrmPipelineStage>[],
+        opportunities: const <CrmOpportunity>[],
+      );
+    }
     final stages = await repository.listStages();
     final opportunities = await repository.listOpportunities();
     return (stages: stages, opportunities: opportunities);
@@ -121,6 +129,46 @@ class _CrmPipelineScreenState extends ConsumerState<CrmPipelineScreen> {
     }
   }
 
+  Widget _buildGuestState(AppLocalizations l10n) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Card(
+          margin: const EdgeInsets.all(24),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.cloud_off_outlined,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.crmPipelineSignInRequired,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(l10n.crmPipelineSignInHint, textAlign: TextAlign.center),
+                if (widget.onSignIn != null) ...[
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    onPressed: widget.onSignIn,
+                    icon: const Icon(Icons.login),
+                    label: Text(l10n.signIn),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   String _statusLabel(AppLocalizations l10n, String status) {
     return switch (status) {
       'won' => l10n.crmWon,
@@ -138,6 +186,10 @@ class _CrmPipelineScreenState extends ConsumerState<CrmPipelineScreen> {
     >(
       future: _loadFuture,
       builder: (context, snapshot) {
+        final repository = ref.read(crmPipelineRepositoryProvider);
+        if (!repository.hasAuthenticatedUser) {
+          return _buildGuestState(l10n);
+        }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }

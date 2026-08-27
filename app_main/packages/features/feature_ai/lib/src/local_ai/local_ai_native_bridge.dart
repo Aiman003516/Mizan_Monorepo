@@ -380,11 +380,17 @@ class NativeTfliteLocalAiEngine implements LocalAiEngine {
       final proposal = LocalAiProposal.decode(result.proposalJson!);
       final validation = LocalAiProposalValidator.validate(proposal);
       if (!validation.isValid) {
-        return LocalAiEngineResult.failed(validation.errors.join('; '));
+        return LocalAiEngineResult.failed(
+          validation.errors.join('; '),
+          code: LocalAiDiagnosticCode.inferenceFailed,
+        );
       }
       return LocalAiEngineResult.ready(proposal);
     } on FormatException catch (error) {
-      return LocalAiEngineResult.failed(error.message);
+      return LocalAiEngineResult.failed(
+        error.message,
+        code: LocalAiDiagnosticCode.inferenceFailed,
+      );
     }
   }
 

@@ -1848,7 +1848,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get businessCloudActivated => 'تم تفعيل سحابة النشاط التجاري!';
 
   @override
-  String get role => 'الصلاحية';
+  String get role => 'الدور';
+
+  @override
+  String get customRole => 'دور مخصص';
+
+  @override
+  String get managerRole => 'المدير';
+
+  @override
+  String get accountantRole => 'المحاسب';
+
+  @override
+  String get cashierRole => 'الكاشير';
+
+  @override
+  String get staffRole => 'الموظف';
+
+  @override
+  String get viewerRole => 'مشاهد';
 
   @override
   String get customers => 'العملاء';
@@ -5493,6 +5511,14 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get crmPipelineIntro =>
       'تابع العملاء المحتملين والفرص والإجراءات التالية وتقدم المراحل في مكان واحد.';
+
+  @override
+  String get crmPipelineSignInRequired =>
+      'سجّل الدخول لعرض مسار مبيعاتك السحابي.';
+
+  @override
+  String get crmPipelineSignInHint =>
+      'تبقى سجلاتك المحلية متاحة دون اتصال. سجّل الدخول لتحميل بيانات مسار CRM ومزامنة التغييرات.';
 
   @override
   String get crmPipelineLoadFailed => 'تعذر تحميل مسار CRM.';

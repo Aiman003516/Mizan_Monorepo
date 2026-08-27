@@ -39,6 +39,11 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
     final l10n = AppLocalizations.of(context)!;
     final staffAsync = ref.watch(staffStreamProvider);
     final invitationsAsync = ref.watch(invitationsStreamProvider);
+    final roleNames = {
+      for (final role
+          in ref.watch(rolesStreamProvider).valueOrNull ?? const <AppRole>[])
+        role.id: role.name,
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -109,9 +114,9 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildStaffTab(staffAsync, 'active'),
+                _buildStaffTab(staffAsync, roleNames, 'active'),
                 _buildInvitationTab(invitationsAsync, 'pending'),
-                _buildStaffTab(staffAsync, 'suspended'),
+                _buildStaffTab(staffAsync, roleNames, 'suspended'),
                 _buildInvitationTab(invitationsAsync, 'expired'),
                 _buildInvitationTab(invitationsAsync, 'revoked'),
               ],
@@ -124,6 +129,7 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
 
   Widget _buildStaffTab(
     AsyncValue<List<StaffMember>> staffAsync,
+    Map<String, String> roleNames,
     String status,
   ) {
     final l10n = AppLocalizations.of(context)!;
@@ -135,7 +141,8 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
           final matchesStatus = member.status.toLowerCase() == status;
           if (!matchesStatus) return false;
           if (_search.isEmpty) return true;
-          return '${member.displayName} ${member.email} ${member.roleId}'
+          final roleLabel = _roleLabel(member, roleNames, l10n);
+          return '${member.displayName} ${member.email} $roleLabel'
               .toLowerCase()
               .contains(_search);
         }).toList();
@@ -146,14 +153,36 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
           padding: const EdgeInsets.only(bottom: 24),
           itemCount: filtered.length,
           separatorBuilder: (_, __) => const Divider(height: 1),
-          itemBuilder: (context, index) => _buildStaffTile(filtered[index]),
+          itemBuilder: (context, index) =>
+              _buildStaffTile(filtered[index], roleNames),
         );
       },
     );
   }
 
-  Widget _buildStaffTile(StaffMember member) {
+  String _roleLabel(
+    StaffMember member,
+    Map<String, String> roleNames,
+    AppLocalizations l10n,
+  ) {
+    final configuredName = roleNames[member.roleId.trim()];
+    if (configuredName != null && configuredName.trim().isNotEmpty) {
+      return configuredName.trim();
+    }
+    return switch (member.roleId.trim().toLowerCase()) {
+      'owner' => l10n.ownerRole,
+      'manager' => l10n.managerRole,
+      'accountant' => l10n.accountantRole,
+      'cashier' => l10n.cashierRole,
+      'staff' => l10n.staffRole,
+      'viewer' => l10n.viewerRole,
+      _ => l10n.customRole,
+    };
+  }
+
+  Widget _buildStaffTile(StaffMember member, Map<String, String> roleNames) {
     final l10n = AppLocalizations.of(context)!;
+    final roleLabel = _roleLabel(member, roleNames, l10n);
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: member.isOwner
@@ -170,7 +199,7 @@ class _StaffListScreenState extends ConsumerState<StaffListScreen>
       subtitle: Text(
         member.isOwner
             ? l10n.ownerRole
-            : l10n.staffRoleAndEmail(member.roleId, member.email),
+            : l10n.staffRoleAndEmail(roleLabel, member.email),
       ),
       trailing: member.isOwner
           ? Icon(Icons.star, color: context.appColors.warning)

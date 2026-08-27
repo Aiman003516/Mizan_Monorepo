@@ -3602,6 +3602,42 @@ abstract class AppLocalizations {
   /// **'Role'**
   String get role;
 
+  /// No description provided for @customRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom role'**
+  String get customRole;
+
+  /// No description provided for @managerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Manager'**
+  String get managerRole;
+
+  /// No description provided for @accountantRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Accountant'**
+  String get accountantRole;
+
+  /// No description provided for @cashierRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Cashier'**
+  String get cashierRole;
+
+  /// No description provided for @staffRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get staffRole;
+
+  /// No description provided for @viewerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewer'**
+  String get viewerRole;
+
   /// No description provided for @customers.
   ///
   /// In en, this message translates to:
@@ -10405,6 +10441,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Track leads, opportunities, next actions, and stage progress in one place.'**
   String get crmPipelineIntro;
+
+  /// No description provided for @crmPipelineSignInRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to view your cloud sales pipeline.'**
+  String get crmPipelineSignInRequired;
+
+  /// No description provided for @crmPipelineSignInHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your local records remain available offline. Sign in to load CRM pipeline data and sync changes.'**
+  String get crmPipelineSignInHint;
 
   /// No description provided for @crmPipelineLoadFailed.
   ///

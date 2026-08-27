@@ -574,6 +574,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
           });
         } else {
           setState(() {
+            _localFallbackWarning = l10n.aiLocalFallbackWarning;
             _messages.add(
               AiChatMessage(
                 role: 'assistant',
@@ -585,6 +586,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
       } catch (_) {
         if (mounted) {
           setState(() {
+            _localFallbackWarning = l10n.aiLocalFallbackWarning;
             _messages.add(
               AiChatMessage(
                 role: 'assistant',

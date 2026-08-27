@@ -176,6 +176,8 @@ class CrmPipelineRepository {
   final SupabaseClient _supabase;
   final TenantContext _tenantContext;
 
+  bool get hasAuthenticatedUser => _supabase.auth.currentUser != null;
+
   Future<String> _tenantId() => _tenantContext.currentTenantId();
 
   Future<List<CrmPipelineStage>> listStages() async {

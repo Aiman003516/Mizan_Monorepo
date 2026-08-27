@@ -15,6 +15,26 @@ constexpr int32_t kMaxPromptChars = 7000;
 constexpr int32_t kMaxInputTokens = 1536;
 constexpr int32_t kMaxGeneratedTokens = 384;
 
+// Constrain the output to the versioned Mizan proposal shape. Dart remains the
+// authoritative semantic validator for fields, entities, routes, and actions.
+constexpr char kProposalGrammar[] = R"GBNF(
+root ::= "{" ws "\"schema_version\"" ws ":" ws "\"mizan.local-ai.proposal/v1\"" ws "," ws "\"intent\"" ws ":" ws intent ws "," ws "\"action_type\"" ws ":" ws action-type ws "," ws "\"fields\"" ws ":" ws object ws "," ws "\"entities\"" ws ":" ws array ws "," ws "\"missing_fields\"" ws ":" ws string-array ws "," ws "\"confidence\"" ws ":" ws number ws "," ws "\"requires_confirmation\"" ws ":" ws boolean ws "," ws "\"locale\"" ws ":" ws locale ws "," ws "\"source\"" ws ":" ws "\"local\"" ws "," ws "\"route\"" ws ":" ws route-value ws "}"
+intent ::= "\"explain\"" | "\"navigate\"" | "\"propose_mutation\"" | "\"request_missing_information\"" | "\"unsupported\""
+action-type ::= "\"none\"" | "\"navigate\"" | "\"open_screen\"" | "\"search_entity\"" | "\"customer_update\"" | "\"vendor_update\"" | "\"invoice_update\"" | "\"bill_update\"" | "\"balance_adjustment\"" | "\"journal_entry_post\"" | "\"customer_archive\"" | "\"vendor_archive\"" | "\"invoice_void\"" | "\"bill_void\""
+locale ::= "\"ar\"" | "\"en\""
+route-value ::= string | "null"
+string-array ::= "[" ws (string (ws "," ws string)*)? ws "]"
+object ::= "{" ws (string ws ":" ws value (ws "," ws string ws ":" ws value)*)? ws "}"
+array ::= "[" ws (value (ws "," ws value)*)? ws "]"
+value ::= object | array | string | number | boolean | "null"
+string ::= "\"" char* "\"" ws
+char ::= [^"\\\x7F\x00-\x1F] | [\\] escape
+escape ::= ["\\/bfnrt] | "u" [0-9a-fA-F]{4}
+number ::= "-"? ("0" | [1-9] [0-9]*) ("." [0-9]+)? ([eE] [-+]? [0-9]+)? ws
+boolean ::= "true" | "false"
+ws ::= [ \t\n\r]*
+)GBNF";
+
 class LocalAiRuntime {
  public:
   static LocalAiRuntime& Instance() {
@@ -71,8 +91,14 @@ class LocalAiRuntime {
         "customer_archive|vendor_archive|invoice_void|bill_void\","
         "\"fields\":{},\"entities\":[],\"missing_fields\":[],"
         "\"confidence\":0.0,\"requires_confirmation\":false,"
-        "\"locale\":\"en or ar\",\"source\":\"local\"}. "
-        "Never execute an action. Never invent record IDs. Locale: " + locale +
+        "\"locale\":\"ar or en\",\"source\":\"local\",\"route\":null}. "
+        "Use explain for capability or workflow questions, navigate for a page request, "
+        "request_missing_information when required details are absent, and propose_mutation "
+        "only for a reviewable draft. Allowed routes include customers, vendors, crmPipeline, "
+        "crm360, procurement, pos, reportsHub, manageAccounts, manageProducts, "
+        "manageCategories, orderHistory, settings, reportProfitAndLoss, reportBalanceSheet, "
+        "and reportTrialBalance. Never execute an action. Never invent record IDs. Locale: " +
+        locale +
         ". User request: /no_think " + text + "<|im_end|>\n"
         "<|im_start|>assistant\n";
 
@@ -141,10 +167,11 @@ class LocalAiRuntime {
     llama_sampler_free(sampler);
     const size_t first_brace = output.find('{');
     const size_t last_brace = output.rfind('}');
-    if (first_brace == std::string::npos || last_brace <= first_brace) {
+    if (first_brace != 0 || last_brace != output.size() - 1 ||
+        last_brace <= first_brace) {
       return {};
     }
-    return output.substr(first_brace, last_brace - first_brace + 1);
+    return output;
   }
 
   void UnloadModel() {

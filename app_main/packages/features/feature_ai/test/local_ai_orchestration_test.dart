@@ -40,6 +40,40 @@ void main() {
       expect(result.proposal?.route, 'vendors');
       expect(result.proposal?.requiresConfirmation, isFalse);
     });
+
+    test(
+      'resolves Arabic customer guidance phrased as how-to navigation',
+      () async {
+        final result = await engine.propose(
+          const LocalAiRequest(text: 'كيف اقوم بإضافة عميل؟', locale: 'ar'),
+        );
+
+        expect(result.isReady, isTrue);
+        expect(result.proposal?.intent, LocalAiIntent.navigate);
+        expect(result.proposal?.route, 'customers');
+      },
+    );
+
+    test('resolves a bare Arabic sales-path label', () async {
+      final result = await engine.propose(
+        const LocalAiRequest(text: 'مسار المبيعات', locale: 'ar'),
+      );
+
+      expect(result.isReady, isTrue);
+      expect(result.proposal?.intent, LocalAiIntent.navigate);
+      expect(result.proposal?.route, 'crmPipeline');
+      expect(result.usedSafeFallback, isFalse);
+    });
+
+    test('answers an Arabic capability question locally', () async {
+      final result = await engine.propose(
+        const LocalAiRequest(text: 'ماذا تستطيع أن تفعل؟', locale: 'ar'),
+      );
+
+      expect(result.isReady, isTrue);
+      expect(result.proposal?.intent, LocalAiIntent.explain);
+      expect(result.proposal?.requiresConfirmation, isFalse);
+    });
   });
 
   group('local knowledge base', () {
