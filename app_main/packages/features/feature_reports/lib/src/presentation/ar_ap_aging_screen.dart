@@ -3,6 +3,8 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'party_statement_screen.dart';
+
 final _receivablesAgingProvider =
     FutureProvider.autoDispose<List<ArApAgingEntry>>(
       (ref) => ref.read(arApSettlementRepositoryProvider).receivablesAging(),
@@ -93,6 +95,14 @@ class _AgingList extends ConsumerWidget {
                 itemBuilder: (context, index) => _AgingCard(
                   entry: items[index],
                   onSettle: () => _openSettlement(context, ref, items[index]),
+                  onViewStatement: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => PartyStatementScreen(
+                        partyType: receivable ? 'customer' : 'vendor',
+                        partyId: items[index].partyId,
+                      ),
+                    ),
+                  ),
                 ),
               ),
       ),
@@ -124,10 +134,15 @@ class _AgingList extends ConsumerWidget {
 }
 
 class _AgingCard extends StatelessWidget {
-  const _AgingCard({required this.entry, required this.onSettle});
+  const _AgingCard({
+    required this.entry,
+    required this.onSettle,
+    required this.onViewStatement,
+  });
 
   final ArApAgingEntry entry;
   final VoidCallback onSettle;
+  final VoidCallback onViewStatement;
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +174,8 @@ class _AgingCard extends StatelessWidget {
           '${entry.dueDate.toLocal().toString().split(' ').first} · $bucket',
         ),
         trailing: SizedBox(
-          width: 150,
+          width: 190,
+
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -170,12 +186,21 @@ class _AgingCard extends StatelessWidget {
                   '${entry.daysOverdue} ${l10n.daysOverdue}',
                   style: TextStyle(color: color, fontSize: 12),
                 ),
-              Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: TextButton(
-                  onPressed: onSettle,
-                  child: Text(l10n.createSettlementDraft),
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: TextButton(
+                      onPressed: onSettle,
+                      child: Text(l10n.createSettlementDraft),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: onViewStatement,
+                    tooltip: l10n.statement,
+                    icon: const Icon(Icons.receipt_long),
+                  ),
+                ],
               ),
             ],
           ),

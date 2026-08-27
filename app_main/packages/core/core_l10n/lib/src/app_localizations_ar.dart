@@ -4925,6 +4925,31 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statement => 'كشف حساب';
 
   @override
+  String get partyStatement => 'كشف حساب الطرف';
+
+  @override
+  String get statementNoEntries =>
+      'لا توجد قيود كشف حساب لجهة الاتصال المحددة.';
+
+  @override
+  String get statementLoadFailed => 'تعذر تحميل كشف الحساب.';
+
+  @override
+  String get statementRunningBalance => 'الرصيد الجاري';
+
+  @override
+  String get statementInvoice => 'فاتورة مبيعات';
+
+  @override
+  String get statementBill => 'فاتورة مشتريات';
+
+  @override
+  String get statementSettlement => 'تسوية';
+
+  @override
+  String get statementBalanceAdjustment => 'تعديل الرصيد';
+
+  @override
   String get edit => 'تعديل';
 
   @override

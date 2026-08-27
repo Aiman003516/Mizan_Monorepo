@@ -9326,6 +9326,54 @@ abstract class AppLocalizations {
   /// **'Statement'**
   String get statement;
 
+  /// No description provided for @partyStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Statement'**
+  String get partyStatement;
+
+  /// No description provided for @statementNoEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'No statement entries for the selected contact.'**
+  String get statementNoEntries;
+
+  /// No description provided for @statementLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The account statement could not be loaded.'**
+  String get statementLoadFailed;
+
+  /// No description provided for @statementRunningBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Running balance'**
+  String get statementRunningBalance;
+
+  /// No description provided for @statementInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice'**
+  String get statementInvoice;
+
+  /// No description provided for @statementBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill'**
+  String get statementBill;
+
+  /// No description provided for @statementSettlement.
+  ///
+  /// In en, this message translates to:
+  /// **'Settlement'**
+  String get statementSettlement;
+
+  /// No description provided for @statementBalanceAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance adjustment'**
+  String get statementBalanceAdjustment;
+
   /// No description provided for @edit.
   ///
   /// In en, this message translates to:

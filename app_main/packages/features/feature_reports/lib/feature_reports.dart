@@ -18,6 +18,7 @@ export 'src/presentation/trial_balance_screen.dart';
 export 'src/presentation/ledger_control_screen.dart';
 export 'src/presentation/revenue_recognition_screen.dart';
 export 'src/presentation/ar_ap_aging_screen.dart';
+export 'src/presentation/party_statement_screen.dart';
 export 'src/data/analytics_repository.dart';
 export 'src/data/inventory_repository.dart';
 export 'src/presentation/analytics_dashboard_screen.dart';

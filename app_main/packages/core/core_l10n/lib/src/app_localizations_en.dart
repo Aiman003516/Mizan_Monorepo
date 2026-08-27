@@ -4928,6 +4928,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statement => 'Statement';
 
   @override
+  String get partyStatement => 'Account Statement';
+
+  @override
+  String get statementNoEntries =>
+      'No statement entries for the selected contact.';
+
+  @override
+  String get statementLoadFailed =>
+      'The account statement could not be loaded.';
+
+  @override
+  String get statementRunningBalance => 'Running balance';
+
+  @override
+  String get statementInvoice => 'Invoice';
+
+  @override
+  String get statementBill => 'Bill';
+
+  @override
+  String get statementSettlement => 'Settlement';
+
+  @override
+  String get statementBalanceAdjustment => 'Balance adjustment';
+
+  @override
   String get edit => 'Edit';
 
   @override
