@@ -31,10 +31,10 @@
 
 ## 2. Latest pushed commits
 
-The latest synchronized GitHub `main` commit before the unverified native-runtime work is:
+The latest synchronized GitHub `main` commit containing the Windows llama.cpp runtime integration is:
 
 ```text
-054621c docs: report scale and Windows verification
+8e463e6 feat: add Windows llama.cpp local AI runtime
 ```
 
 The preceding relevant commits include:
@@ -219,7 +219,7 @@ exiting with code 0
 
 The model asset can be packaged into the Windows Flutter bundle. The safe deterministic assistant and fallback path are available independently of native inference.
 
-The Windows llama.cpp integration work currently exists as an experimental working-tree change in the sandbox: it adds a pinned `llama.cpp` CMake dependency, a Windows `com.mizan/local_ai` method channel, a CPU-only Qwen3 loading path, model-path resolution from the Flutter asset bundle, strict pinned-manifest checking, proposal-only inference, and Dart-side proposal validation. **These native Windows runtime changes are not yet included in the latest pushed commit `054621c`; do not expect a fresh pull of that commit to contain the completed runtime until a later verified commit is published.**
+The Windows llama.cpp integration is included in pushed commit `8e463e6`. It adds a pinned `llama.cpp` CMake dependency, a Windows `com.mizan/local_ai` method channel, a CPU-only Qwen3 loading path, model-path resolution from the Flutter asset bundle, SHA-256 verification, strict pinned-manifest checking, proposal-only inference, and Dart-side proposal validation. The Windows build fetches and compiles the pinned llama.cpp source during CMake configuration.
 
 Before treating native Windows model inference as production-ready, the following must pass on the user’s Windows machine:
 
