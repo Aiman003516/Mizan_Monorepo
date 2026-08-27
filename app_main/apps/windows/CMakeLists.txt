@@ -49,6 +49,29 @@ endfunction()
 set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
 add_subdirectory(${FLUTTER_MANAGED_DIR})
 
+# Pinned CPU-only llama.cpp library for the local Qwen3 GGUF assistant.
+# The model remains a Flutter asset; this fetch builds only the inference library.
+include(FetchContent)
+set(LLAMA_STANDALONE OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_COMMON OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_SERVER OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_APP OFF CACHE BOOL "" FORCE)
+set(LLAMA_BUILD_MTMD OFF CACHE BOOL "" FORCE)
+set(LLAMA_OPENSSL OFF CACHE BOOL "" FORCE)
+set(GGML_OPENMP OFF CACHE BOOL "" FORCE)
+set(GGML_NATIVE OFF CACHE BOOL "" FORCE)
+set(GGML_CPU_REPACK OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(
+  llama_cpp
+  GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
+  GIT_TAG 47c786924ad1ab7e91da2cdc72fcdb563780c2bd
+  GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(llama_cpp)
+
 # Application build; see runner/CMakeLists.txt.
 add_subdirectory("runner")
 
