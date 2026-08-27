@@ -153,3 +153,7 @@ Run `tests/20260828080000_purchase_bill_exception_workflow.sql` in staging after
 ## Sync-health snapshot
 
 Migration `migrations/20260828090000_sync_health_snapshot.sql` adds `get_sync_health_snapshot()`, an authenticated tenant-scoped aggregate RPC for dashboard status. It reports event counts and open conflict counts without returning event payloads. Run `tests/20260828090000_sync_health_snapshot.sql` in staging, verify tenant isolation, failed-event and conflict counts, and anonymous execution denial. This does not prove realtime delivery or worker deployment, and production application still requires explicit approval.
+
+## Inventory reservations
+
+Migration `migrations/20260828100000_inventory_reservations.sql` adds idempotent reserve/release commands layered over authoritative inventory balances. In staging, verify concurrent reservations cannot oversubscribe a balance, retrying the same key returns the original reservation, expired reservations do not reduce availability, only active reservations can be released, and tenant/permission/RLS/anonymous-denial checks hold. Reservation commands do not post stock or journals. Production application requires explicit approval and a recorded staging result.

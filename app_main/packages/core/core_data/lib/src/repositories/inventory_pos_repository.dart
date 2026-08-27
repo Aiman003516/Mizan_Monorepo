@@ -63,6 +63,63 @@ class InventoryPosRepository {
         .toList(growable: false);
   }
 
+  Future<Map<String, dynamic>> reserveInventory({
+    required String productId,
+    String warehouseId = 'default',
+    required double quantity,
+    required String currencyCode,
+    required String referenceType,
+    String? referenceId,
+    DateTime? expiresAt,
+    required String idempotencyKey,
+  }) async {
+    await _tenantId();
+    _validateQuantity(quantity);
+    if (productId.trim().isEmpty ||
+        currencyCode.trim().length < 3 ||
+        referenceType.trim().isEmpty ||
+        idempotencyKey.trim().length < 8) {
+      throw const PostgrestException(
+        message: 'Inventory reservation data is invalid.',
+        code: 'MIZAN_INVENTORY_RESERVATION_INVALID_INPUT',
+      );
+    }
+    final response = await _supabase.rpc(
+      'reserve_inventory',
+      params: {
+        'p_warehouse_id': warehouseId.trim(),
+        'p_product_id': productId.trim(),
+        'p_quantity': quantity,
+        'p_currency_code': currencyCode.trim().toUpperCase(),
+        'p_reference_type': referenceType.trim(),
+        'p_reference_id': referenceId,
+        'p_expires_at': expiresAt?.toUtc().toIso8601String(),
+        'p_idempotency_key': idempotencyKey.trim(),
+      },
+    );
+    return _requireMap(
+      response,
+      'MIZAN_INVENTORY_RESERVATION_INVALID_RESPONSE',
+    );
+  }
+
+  Future<Map<String, dynamic>> releaseInventoryReservation(
+    String reservationId,
+  ) async {
+    await _tenantId();
+    if (reservationId.trim().isEmpty) {
+      throw const PostgrestException(
+        message: 'Reservation identifier is required.',
+        code: 'MIZAN_INVENTORY_RESERVATION_ID_REQUIRED',
+      );
+    }
+    final response = await _supabase.rpc(
+      'release_inventory_reservation',
+      params: {'p_reservation_id': reservationId.trim()},
+    );
+    return _requireMap(response, 'MIZAN_INVENTORY_RELEASE_INVALID_RESPONSE');
+  }
+
   Future<Map<String, dynamic>> createReceiptDraft({
     required String productId,
     String warehouseId = 'default',
