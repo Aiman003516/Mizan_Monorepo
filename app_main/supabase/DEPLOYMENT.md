@@ -175,3 +175,12 @@ Migration `migrations/20260828140000_accounting_source_drilldown.sql` adds the t
 Migration `migrations/20260828150000_crm_quote_approval_history.sql` extends the approval vocabulary with `quote`, adds `submit_crm_quote_for_approval(uuid, text)`, adds tenant-safe `list_crm_interactions(text, uuid)`, and synchronizes approved/rejected quote requests to `sent -> accepted/rejected`. In staging, verify that quote submission requires CRM/quote permission and tenant membership, maker-checker self-approval is rejected, existing invoice/bill/procurement approval types still work, duplicate submissions do not create unintended duplicate requests, approved and rejected decisions transition only the intended quote, and interaction history is tenant-isolated. Production use requires explicit approval and a recorded staging result.
 
 No production SQL is applied automatically; production use requires explicit approval and a recorded staging result.
+
+
+## Bounded list pagination and scale verification
+
+Migration `20260829100000_bounded_tenant_list_pages.sql` adds tenant-scoped keyset page RPCs for customers, vendors, invoices, and bills. The RPCs enforce a page limit of 1–100, require a complete `(updated_at, id)` cursor when paging, use the authenticated current tenant, and are granted only to `authenticated`. They are `security invoker`, so database RLS remains authoritative.
+
+Before any target deployment, verify in disposable or staging only that representative tenant-leading indexes are used with `EXPLAIN (ANALYZE, BUFFERS)`, that first and subsequent pages have no duplicates or skips under concurrent inserts/updates, that a non-member cannot read another tenant, and that limits outside 1–100 are rejected. Do not claim million-record or one-second performance from static SQL or unit tests. Record p50/p95/p99 latency, rows returned, query plans, database CPU, I/O, and connection utilization under a documented workload.
+
+The existing tenant-wide realtime streams remain compatibility paths and are not a large-tenant synchronization strategy. Screens should migrate to bounded pages and delta synchronization before a tenant is expected to hold very large record counts. Production SQL application remains explicitly approval-gated.

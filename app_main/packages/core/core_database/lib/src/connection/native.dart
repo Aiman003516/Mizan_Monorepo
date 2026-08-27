@@ -17,6 +17,15 @@ QueryExecutor openConnection() {
     final cachebase = (await getTemporaryDirectory()).path;
     sqlite3.tempDirectory = cachebase;
 
-    return NativeDatabase.createInBackground(file);
+    return NativeDatabase.createInBackground(
+      file,
+      setup: (database) {
+        database.execute('PRAGMA foreign_keys = ON');
+        database.execute('PRAGMA journal_mode = WAL');
+        database.execute('PRAGMA synchronous = NORMAL');
+        database.execute('PRAGMA busy_timeout = 5000');
+        database.execute('PRAGMA cache_size = -32768');
+      },
+    );
   });
 }

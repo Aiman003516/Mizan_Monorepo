@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/balance_adjustment.dart';
+import '../models/cloud_page.dart';
 import '../services/sync_queue_service.dart';
 import '../tenant_context.dart';
 import 'ar_repository.dart';
@@ -441,6 +442,95 @@ class CloudCrmRepository {
         await _db.into(_db.customers).insertOnConflictUpdate(customer);
       }
     });
+  }
+
+  Future<CloudPage<Customer>> listCustomersPage({
+    CloudPageCursor? after,
+    int pageSize = CloudPageLimits.defaultSize,
+  }) async {
+    final limit = CloudPageLimits.validate(pageSize);
+    final params = <String, Object?>{'p_limit': limit};
+    if (after != null) params.addAll(after.toRpcParams());
+    final response = await _supabase.rpc('list_customers_page', params: params);
+    final rows = List<Map<String, dynamic>>.from(
+      (response as List).map((row) => Map<String, dynamic>.from(row as Map)),
+    );
+    final items = rows.map(_customerFromMap).toList(growable: false);
+    await _cacheCustomers(items);
+    return CloudPage(
+      items: items,
+      pageSize: limit,
+      nextCursor: _nextCursor(rows, limit),
+    );
+  }
+
+  Future<CloudPage<Vendor>> listVendorsPage({
+    CloudPageCursor? after,
+    int pageSize = CloudPageLimits.defaultSize,
+  }) async {
+    final limit = CloudPageLimits.validate(pageSize);
+    final params = <String, Object?>{'p_limit': limit};
+    if (after != null) params.addAll(after.toRpcParams());
+    final response = await _supabase.rpc('list_vendors_page', params: params);
+    final rows = List<Map<String, dynamic>>.from(
+      (response as List).map((row) => Map<String, dynamic>.from(row as Map)),
+    );
+    final items = rows.map(_vendorFromMap).toList(growable: false);
+    await _cacheVendors(items);
+    return CloudPage(
+      items: items,
+      pageSize: limit,
+      nextCursor: _nextCursor(rows, limit),
+    );
+  }
+
+  Future<CloudPage<Invoice>> listInvoicesPage({
+    CloudPageCursor? after,
+    int pageSize = CloudPageLimits.defaultSize,
+  }) async {
+    final limit = CloudPageLimits.validate(pageSize);
+    final params = <String, Object?>{'p_limit': limit};
+    if (after != null) params.addAll(after.toRpcParams());
+    final response = await _supabase.rpc('list_invoices_page', params: params);
+    final rows = List<Map<String, dynamic>>.from(
+      (response as List).map((row) => Map<String, dynamic>.from(row as Map)),
+    );
+    final items = rows.map(_invoiceFromMap).toList(growable: false);
+    await _cacheInvoices(items);
+    return CloudPage(
+      items: items,
+      pageSize: limit,
+      nextCursor: _nextCursor(rows, limit),
+    );
+  }
+
+  Future<CloudPage<Bill>> listBillsPage({
+    CloudPageCursor? after,
+    int pageSize = CloudPageLimits.defaultSize,
+  }) async {
+    final limit = CloudPageLimits.validate(pageSize);
+    final params = <String, Object?>{'p_limit': limit};
+    if (after != null) params.addAll(after.toRpcParams());
+    final response = await _supabase.rpc('list_bills_page', params: params);
+    final rows = List<Map<String, dynamic>>.from(
+      (response as List).map((row) => Map<String, dynamic>.from(row as Map)),
+    );
+    final items = rows.map(_billFromMap).toList(growable: false);
+    await _cacheBills(items);
+    return CloudPage(
+      items: items,
+      pageSize: limit,
+      nextCursor: _nextCursor(rows, limit),
+    );
+  }
+
+  CloudPageCursor? _nextCursor(List<Map<String, dynamic>> rows, int pageSize) {
+    if (rows.length < pageSize || rows.isEmpty) return null;
+    final last = rows.last;
+    return CloudPageCursor(
+      updatedAt: _date(last['updated_at']),
+      id: last['id'] as String,
+    );
   }
 
   Future<Customer> createCustomer({

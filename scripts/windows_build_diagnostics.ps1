@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = 'Continue'
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $repoRoot = Split-Path -Parent $scriptRoot
-$appRoot = Join-Path $repoRoot 'app_main'
+$appRoot = Join-Path $repoRoot 'app_main/apps'
 $reportRoot = Join-Path $repoRoot 'windows-build-diagnostics'
 New-Item -ItemType Directory -Force -Path $reportRoot | Out-Null
 $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'

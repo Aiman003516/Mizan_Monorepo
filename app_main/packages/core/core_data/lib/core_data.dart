@@ -20,6 +20,7 @@ export 'src/models/custom_field_model.dart';
 export 'src/models/money_value.dart';
 export 'src/models/erp_domain_contracts.dart';
 export 'src/models/balance_adjustment.dart';
+export 'src/models/cloud_page.dart';
 export 'src/services/ghost_money_service.dart';
 // Phase 2: Account Templates & Core Engine
 export 'src/account_templates.dart';

@@ -49,6 +49,7 @@ This registry is the canonical human-readable dependency map for the additive Su
 | `20260828130000_warehouse_transfers.sql` | Inventory / Warehouse | Atomic tenant-scoped warehouse transfer posting with source guards, destination balance creation, idempotency, RLS, and audit | Inventory reservations, inventory balances, tenant permissions |
 | `20260828140000_accounting_source_drilldown.sql` | Accounting / Reporting | Read-only tenant-safe drill-down from posted source documents to journal lines and accounts | Accounting ledger, chart of accounts, report permissions |
 | `20260828150000_crm_quote_approval_history.sql` | CRM / CPQ | Quote approval submission, maker-checker status synchronization, and tenant-safe interaction history | CRM 360/CPQ foundation, approvals, customers, opportunities |
+| `20260829100000_bounded_tenant_list_pages.sql` | Platform Performance | Tenant-scoped keyset pagination RPCs for high-cardinality customer, vendor, invoice, and bill lists | CRM quote approval/history, platform tenant context, core customer/vendor/invoice/bill schema |
 
 ## Required migration header
 
