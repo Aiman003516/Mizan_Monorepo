@@ -96,6 +96,50 @@ class ApprovalRepository {
     return ApprovalRequest.fromJson(Map<String, dynamic>.from(response));
   }
 
+  Future<ApprovalRequest> createBalanceAdjustmentRequest({
+    required String partyType,
+    required String partyId,
+    required int amountMinor,
+    required String direction,
+    required String currencyCode,
+    required String reason,
+    String? reference,
+    required DateTime effectiveDate,
+    String? branchId,
+  }) {
+    if (partyType != 'customer' && partyType != 'vendor') {
+      throw ArgumentError.value(partyType, 'partyType');
+    }
+    if (direction != 'increase' && direction != 'decrease') {
+      throw ArgumentError.value(direction, 'direction');
+    }
+    final normalizedReason = reason.trim();
+    final normalizedReference = reference?.trim() ?? '';
+    final date = effectiveDate.toIso8601String().substring(0, 10);
+    final normalizedCurrency = currencyCode.trim().toUpperCase();
+    final key =
+        'balance-adjustment:$partyType:$partyId:$amountMinor:$direction:$normalizedCurrency:$date:$normalizedReference';
+    return createRequest(
+      requestType: ApprovalRequestType.balanceAdjustment,
+      targetId: partyId,
+      amountMinor: amountMinor,
+      currencyCode: normalizedCurrency,
+      reason: normalizedReason,
+      branchId: branchId,
+      idempotencyKey: key,
+      payload: {
+        'party_type': partyType,
+        'party_id': partyId,
+        'amount_minor': amountMinor,
+        'direction': direction,
+        'currency_code': normalizedCurrency,
+        'reason': normalizedReason,
+        'reference': normalizedReference.isEmpty ? null : normalizedReference,
+        'effective_date': date,
+      },
+    );
+  }
+
   Future<ApprovalRequest> decideRequest({
     required String requestId,
     required ApprovalStatus decision,
