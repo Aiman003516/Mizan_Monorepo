@@ -22,6 +22,7 @@
 | Android runner | `app_main/apps/android` |
 | Local model asset | `app_main/apps/assets/local_ai/Qwen_Qwen3-0.6B-Q4_K_M.gguf` |
 | Model preparation scripts | `scripts/prepare_qwen3_local_model.sh` and `scripts/prepare_qwen3_local_model.ps1` |
+| Windows llama.cpp preparation | `scripts/prepare_llama_cpp_windows.ps1` |
 | Windows diagnostics | `scripts/windows_build_diagnostics.ps1` |
 | Windows build wrapper | `scripts/build_windows.ps1` |
 | Scale plan | `app_main/docs/MIZAN_SCALE_AND_WINDOWS_PLAN.md` |
@@ -32,6 +33,12 @@
 ## 2. Latest pushed commits
 
 The latest synchronized GitHub `main` commit containing the Windows llama.cpp runtime integration is:
+
+```text
+c944a58 docs: update Windows runtime reference
+```
+
+The runtime implementation was introduced by:
 
 ```text
 8e463e6 feat: add Windows llama.cpp local AI runtime
@@ -101,7 +108,10 @@ Run these commands from the repository root:
 cd D:\mizan_monorepo
 Set-ExecutionPolicy -Scope Process Bypass
 .\scripts\prepare_qwen3_local_model.ps1
+.\scripts\prepare_llama_cpp_windows.ps1
 ```
+
+The second script downloads the pinned llama.cpp source archive once, verifies its SHA-256, and extracts it to the ignored `.local_llama_cpp_cache\` directory. The Flutter Windows build then uses this local source and does not perform a build-time Git clone.
 
 The script downloads the model into the ignored cache and copies it to:
 
@@ -125,7 +135,7 @@ Length: 484220320
 SHA256: 9acfc1e001311f34b4252001b626f2e466d592a42065f66571bff3790d4e1b14
 ```
 
-The model must not be renamed. If the download is interrupted, rerun the preparation script. Git pull does not download the model; Git and model preparation are separate operations.
+The model must not be renamed. If the download is interrupted, rerun the preparation script. Git pull does not download the model or llama.cpp; repository synchronization and local runtime preparation are separate operations. If the llama.cpp archive download is interrupted, rerun `prepare_llama_cpp_windows.ps1`; it verifies the archive before extraction.
 
 ## 6. Windows environment diagnostics
 
@@ -219,12 +229,12 @@ exiting with code 0
 
 The model asset can be packaged into the Windows Flutter bundle. The safe deterministic assistant and fallback path are available independently of native inference.
 
-The Windows llama.cpp integration is included in pushed commit `8e463e6`. It adds a pinned `llama.cpp` CMake dependency, a Windows `com.mizan/local_ai` method channel, a CPU-only Qwen3 loading path, model-path resolution from the Flutter asset bundle, SHA-256 verification, strict pinned-manifest checking, proposal-only inference, and Dart-side proposal validation. The Windows build fetches and compiles the pinned llama.cpp source during CMake configuration.
+The Windows llama.cpp integration is included in pushed commit `8e463e6` and hardened in `c944a58`. It adds a Windows `com.mizan/local_ai` method channel, a CPU-only Qwen3 loading path, model-path resolution from the Flutter asset bundle, SHA-256 verification, strict pinned-manifest checking, proposal-only inference, and Dart-side proposal validation. The Windows build uses a predownloaded and checksum-verified local llama.cpp source to avoid fragile build-time Git cloning.
 
 Before treating native Windows model inference as production-ready, the following must pass on the user’s Windows machine:
 
 ```text
-CMake fetch of the pinned llama.cpp revision
+Local preparation of the pinned llama.cpp source archive
 Compilation of the llama.cpp library and Windows runner
 Successful loading of the exact GGUF asset
 Successful inference returning valid Mizan proposal JSON
@@ -360,10 +370,26 @@ No honest claim can be made that one million users or every operation in one or 
 
 ## 14. Windows debugging commands
 
-Capture a detailed build log:
+Prepare the Windows native dependency before building:
+
+```powershell
+cd D:\mizan_monorepo
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\prepare_llama_cpp_windows.ps1
+```
+
+For a fresh CMake configuration after changing the native dependency workflow:
 
 ```powershell
 cd D:\mizan_monorepo\app_main\apps
+flutter clean
+Remove-Item -Recurse -Force .\build\windows -ErrorAction SilentlyContinue
+flutter pub get
+```
+
+Capture a detailed build log:
+
+```powershell
 flutter build windows --debug -v 2>&1 | Tee-Object D:\mizan_monorepo\windows-build.log
 ```
 
@@ -407,7 +433,7 @@ If `git pull` reports local changes, preserve the message and do not use `git re
 |---|---|---|
 | `flutter` not recognized | Flutter is not on PATH | Add `C:\flutter\bin` to PATH or use the full Flutter path. |
 | `flutter pub get` fails | Registry, cache, proxy, or dependency issue | Preserve the diagnostics report and inspect the first package/network error. |
-| CMake cannot configure | CMake, generator, source fetch, or native dependency problem | Inspect the first CMake error, not only the final Flutter line. |
+| CMake cannot configure | CMake, generator, or missing local llama.cpp source | Run `prepare_llama_cpp_windows.ps1`; remove `apps\build\windows` after changing the source workflow and retry. |
 | MSBuild or `cl.exe` error | Visual Studio C++ workload, Windows SDK, or native source problem | Run from a Visual Studio Developer PowerShell and capture the first compiler error. |
 | Build succeeds but model does not answer | Asset packaging does not guarantee runtime inference | Inspect the local-AI channel/runtime status and fallback warning. |
 | Model checksum mismatch | Incomplete, altered, or wrong artifact | Delete the cache/asset and rerun the pinned preparation script. |

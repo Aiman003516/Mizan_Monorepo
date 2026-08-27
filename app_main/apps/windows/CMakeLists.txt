@@ -50,8 +50,19 @@ set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
 add_subdirectory(${FLUTTER_MANAGED_DIR})
 
 # Pinned CPU-only llama.cpp library for the local Qwen3 GGUF assistant.
-# The model remains a Flutter asset; this fetch builds only the inference library.
-include(FetchContent)
+# The model remains a Flutter asset. The source is prepared separately by
+# scripts/prepare_llama_cpp_windows.ps1 so Flutter builds do not perform a
+# fragile GitHub clone during CMake configuration.
+set(MIZAN_LLAMA_CPP_REVISION "47c786924ad1ab7e91da2cdc72fcdb563780c2bd")
+set(MIZAN_LLAMA_CPP_SOURCE_DIR
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../../.local_llama_cpp_cache/llama.cpp-${MIZAN_LLAMA_CPP_REVISION}"
+  CACHE PATH "Prepared local llama.cpp source directory")
+if(NOT EXISTS "${MIZAN_LLAMA_CPP_SOURCE_DIR}/CMakeLists.txt")
+  message(FATAL_ERROR
+    "Mizan requires the prepared llama.cpp source at '${MIZAN_LLAMA_CPP_SOURCE_DIR}'. "
+    "Run scripts\\prepare_llama_cpp_windows.ps1 from the repository root, then retry the Windows build.")
+endif()
+
 set(LLAMA_STANDALONE OFF CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_COMMON OFF CACHE BOOL "" FORCE)
 set(LLAMA_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
@@ -64,13 +75,7 @@ set(LLAMA_OPENSSL OFF CACHE BOOL "" FORCE)
 set(GGML_OPENMP OFF CACHE BOOL "" FORCE)
 set(GGML_NATIVE OFF CACHE BOOL "" FORCE)
 set(GGML_CPU_REPACK OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(
-  llama_cpp
-  GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
-  GIT_TAG 47c786924ad1ab7e91da2cdc72fcdb563780c2bd
-  GIT_SHALLOW TRUE
-)
-FetchContent_MakeAvailable(llama_cpp)
+add_subdirectory("${MIZAN_LLAMA_CPP_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/mizan-llama-cpp" EXCLUDE_FROM_ALL)
 
 # Application build; see runner/CMakeLists.txt.
 add_subdirectory("runner")
