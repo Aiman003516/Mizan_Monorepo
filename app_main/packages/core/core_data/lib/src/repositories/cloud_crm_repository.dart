@@ -129,8 +129,12 @@ class CloudCrmRepository {
     final idempotencyKey =
         'manual-adjustment:${input.partyType.wireName}:${input.partyId}:${input.effectiveDate.toIso8601String()}:${input.amountMinor}:${input.direction.wireName}:${input.reference ?? ''}';
     final response = await _supabase.rpc(
-      'post_manual_balance_adjustment',
+      input.approvalRequestId == null
+          ? 'post_manual_balance_adjustment'
+          : 'post_manual_balance_adjustment_with_approval',
       params: {
+        if (input.approvalRequestId != null)
+          'p_approval_request_id': input.approvalRequestId,
         'p_party_type': input.partyType.wireName,
         'p_party_id': input.partyId,
         'p_amount_minor': input.amountMinor,

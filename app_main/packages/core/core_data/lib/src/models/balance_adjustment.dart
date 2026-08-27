@@ -11,6 +11,7 @@ class BalanceAdjustmentInput {
     required this.currencyCode,
     required this.reason,
     this.reference,
+    this.approvalRequestId,
     required this.effectiveDate,
     this.debitAccountId,
     this.creditAccountId,
@@ -23,6 +24,7 @@ class BalanceAdjustmentInput {
   final String currencyCode;
   final String reason;
   final String? reference;
+  final String? approvalRequestId;
   final DateTime effectiveDate;
   final String? debitAccountId;
   final String? creditAccountId;

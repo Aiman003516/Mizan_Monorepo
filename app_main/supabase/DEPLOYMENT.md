@@ -99,3 +99,9 @@ Apply `migrations/20260828000000_approval_enforcement_phase3.sql` only after `20
 Run `tests/20260828000000_approval_enforcement_phase3.sql` in a disposable or staging database with the canonical migrations applied. Verify that a requester can create a pending request, cannot decide their own request, an authorized approver can decide only within the permitted tenant/branch scope, a second decision is rejected, request facts cannot be edited, and event rows cannot be updated or deleted. Verify the `approval_requests` and `approval_request_events` grants and policies before enabling any UI action gate.
 
 The current migration provides the governed approval contract and decision audit trail. Individual accounting or CRM commands must call an approval-aware server RPC before they are considered approval-enforced; do not treat a client-side threshold or `SharedPreferences` flag as authorization. No production SQL should be applied without an approved backup, migration-state check, staging verification, and explicit user approval.
+
+## Approval-aware balance adjustment gate
+
+Migration `migrations/20260828010000_approval_balance_adjustment_gate.sql` adds the first approval-consuming accounting command. It requires an approved `balance_adjustment` request whose target, amount, currency, and reason exactly match the requested posting, atomically marks the request consumed, delegates to the canonical double-entry balance-adjustment RPC, and records one append-only execution row. Replaying or changing the approved request is rejected.
+
+This migration is an additive contract for the next client workflow. Do not revoke the legacy posting grant or enable this gate in production until the Flutter balance-adjustment flow creates, displays, and submits the approval request identifier through the new RPC. Run `tests/20260828010000_approval_balance_adjustment_gate.sql` in staging first; production SQL still requires explicit approval.

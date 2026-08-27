@@ -34,6 +34,7 @@ This registry is the canonical human-readable dependency map for the additive Su
 | `20260827292000_crm_edit_rpc_wrappers.sql` | CRM / Security | Authenticated tenant-derived CRM edit wrappers | CRM foundation, platform permissions |
 | `20260827293000_manual_balance_adjustment_workflow.sql` | AR/AP / Ledger | Atomic manual adjustment register and posting RPC | Ledger, CRM, periods, permissions, audit |
 | `20260828000000_approval_enforcement_phase3.sql` | Governance / Security | Branch-aware approval requests, immutable decision events, and server decision RPCs | Manual balance adjustment workflow, platform branches, tenant permissions |
+| `20260828010000_approval_balance_adjustment_gate.sql` | Governance / AR | One-time approved balance-adjustment execution and execution audit | Approval enforcement Phase 3, manual balance adjustment workflow |
 
 ## Required migration header
 
