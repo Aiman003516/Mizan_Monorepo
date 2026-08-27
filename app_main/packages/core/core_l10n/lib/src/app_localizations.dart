@@ -2123,8 +2123,68 @@ abstract class AppLocalizations {
   /// No description provided for @closePeriod.
   ///
   /// In en, this message translates to:
-  /// **'Close period'**
+  /// **'Close Period'**
   String get closePeriod;
+
+  /// No description provided for @closePreflight.
+  ///
+  /// In en, this message translates to:
+  /// **'Close readiness'**
+  String get closePreflight;
+
+  /// No description provided for @closePreflightRun.
+  ///
+  /// In en, this message translates to:
+  /// **'Run close checks'**
+  String get closePreflightRun;
+
+  /// No description provided for @closePreflightReady.
+  ///
+  /// In en, this message translates to:
+  /// **'No blocking issues were found. You can continue closing this period.'**
+  String get closePreflightReady;
+
+  /// No description provided for @closePreflightBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocking issues must be resolved before this period can be closed.'**
+  String get closePreflightBlocked;
+
+  /// No description provided for @closePreflightFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Close readiness checks could not be loaded.'**
+  String get closePreflightFailed;
+
+  /// No description provided for @closePreflightPendingApprovals.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending approvals'**
+  String get closePreflightPendingApprovals;
+
+  /// No description provided for @closePreflightDraftJournals.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft journals'**
+  String get closePreflightDraftJournals;
+
+  /// No description provided for @closePreflightUnpostedSettlements.
+  ///
+  /// In en, this message translates to:
+  /// **'Unposted settlements'**
+  String get closePreflightUnpostedSettlements;
+
+  /// No description provided for @closePreflightDocumentAnomalies.
+  ///
+  /// In en, this message translates to:
+  /// **'Open document anomalies'**
+  String get closePreflightDocumentAnomalies;
+
+  /// No description provided for @closePreflightLeadingBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Active leading book'**
+  String get closePreflightLeadingBook;
 
   /// No description provided for @periodClosed.
   ///

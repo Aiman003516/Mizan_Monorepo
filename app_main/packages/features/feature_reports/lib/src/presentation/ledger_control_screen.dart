@@ -61,8 +61,83 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
     await _loadFuture;
   }
 
+  Future<bool> _runClosePreflight(AccountingPeriod period) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final checks = await ref
+          .read(closePreflightRepositoryProvider)
+          .run(period.id);
+      final blocked = checks.any((check) => check.blocking);
+      if (!mounted) return false;
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.closePreflight),
+          content: SizedBox(
+            width: 520,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: checks
+                    .map(
+                      (check) => ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          check.blocking
+                              ? Icons.error_outline
+                              : Icons.check_circle_outline,
+                          color: check.blocking
+                              ? Theme.of(context).colorScheme.error
+                              : Theme.of(context).colorScheme.primary,
+                        ),
+                        title: Text(switch (check.checkCode) {
+                          'pending_approvals' =>
+                            l10n.closePreflightPendingApprovals,
+                          'draft_journals' => l10n.closePreflightDraftJournals,
+                          'unposted_settlements' =>
+                            l10n.closePreflightUnpostedSettlements,
+                          'open_document_anomalies' =>
+                            l10n.closePreflightDocumentAnomalies,
+                          'active_leading_book' =>
+                            l10n.closePreflightLeadingBook,
+                          _ => check.checkCode,
+                        }),
+                        subtitle: Text(
+                          '${check.issueCount} · ${check.message}',
+                        ),
+                      ),
+                    )
+                    .toList(growable: false),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
+            ),
+            if (!blocked)
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(l10n.closePeriod),
+              ),
+          ],
+        ),
+      );
+      return proceed == true && !blocked;
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.closePreflightFailed)));
+      }
+      return false;
+    }
+  }
+
   Future<void> _closePeriod(AccountingPeriod period) async {
     final l10n = AppLocalizations.of(context)!;
+    if (!await _runClosePreflight(period) || !mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -152,12 +227,23 @@ class _LedgerControlScreenState extends ConsumerState<LedgerControlScreen> {
                                   ? Icons.lock_outline
                                   : Icons.lock_open_outlined,
                             ),
-                            trailing: period.status == 'open'
-                                ? TextButton(
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  onPressed: () => _runClosePreflight(period),
+                                  tooltip: l10n.closePreflightRun,
+                                  icon: const Icon(Icons.fact_check_outlined),
+                                ),
+                                if (period.status == 'open')
+                                  TextButton(
                                     onPressed: () => _closePeriod(period),
                                     child: Text(l10n.closePeriod),
                                   )
-                                : Chip(label: Text(period.status)),
+                                else
+                                  Chip(label: Text(period.status)),
+                              ],
+                            ),
                           ),
                       ],
               ),

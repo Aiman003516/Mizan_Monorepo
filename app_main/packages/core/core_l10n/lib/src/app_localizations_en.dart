@@ -1063,7 +1063,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noTaxCodes => 'No active tax codes are configured.';
 
   @override
-  String get closePeriod => 'Close period';
+  String get closePeriod => 'Close Period';
+
+  @override
+  String get closePreflight => 'Close readiness';
+
+  @override
+  String get closePreflightRun => 'Run close checks';
+
+  @override
+  String get closePreflightReady =>
+      'No blocking issues were found. You can continue closing this period.';
+
+  @override
+  String get closePreflightBlocked =>
+      'Blocking issues must be resolved before this period can be closed.';
+
+  @override
+  String get closePreflightFailed =>
+      'Close readiness checks could not be loaded.';
+
+  @override
+  String get closePreflightPendingApprovals => 'Pending approvals';
+
+  @override
+  String get closePreflightDraftJournals => 'Draft journals';
+
+  @override
+  String get closePreflightUnpostedSettlements => 'Unposted settlements';
+
+  @override
+  String get closePreflightDocumentAnomalies => 'Open document anomalies';
+
+  @override
+  String get closePreflightLeadingBook => 'Active leading book';
 
   @override
   String get periodClosed => 'Accounting period closed.';

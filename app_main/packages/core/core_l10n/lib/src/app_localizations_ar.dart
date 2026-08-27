@@ -1065,6 +1065,37 @@ class AppLocalizationsAr extends AppLocalizations {
   String get closePeriod => 'إغلاق الفترة';
 
   @override
+  String get closePreflight => 'جاهزية الإغلاق';
+
+  @override
+  String get closePreflightRun => 'تشغيل فحوصات الإغلاق';
+
+  @override
+  String get closePreflightReady =>
+      'لم يتم العثور على عوائق. يمكنك متابعة إغلاق هذه الفترة.';
+
+  @override
+  String get closePreflightBlocked => 'يجب حل العوائق قبل إغلاق هذه الفترة.';
+
+  @override
+  String get closePreflightFailed => 'تعذر تحميل فحوصات جاهزية الإغلاق.';
+
+  @override
+  String get closePreflightPendingApprovals => 'الموافقات المعلقة';
+
+  @override
+  String get closePreflightDraftJournals => 'قيود اليومية غير المرحلة';
+
+  @override
+  String get closePreflightUnpostedSettlements => 'التسويات غير المرحلة';
+
+  @override
+  String get closePreflightDocumentAnomalies => 'شذوذات المستندات المفتوحة';
+
+  @override
+  String get closePreflightLeadingBook => 'الدفتر الرئيسي النشط';
+
+  @override
   String get periodClosed => 'تم إغلاق الفترة المحاسبية.';
 
   @override
