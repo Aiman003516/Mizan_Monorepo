@@ -269,15 +269,12 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               CircleAvatar(
                 radius: 36,
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                backgroundImage: (imagePath != null && imagePath.isNotEmpty)
+                backgroundImage: imagePath != null && imagePath.isNotEmpty
                     ? FileImage(File(imagePath))
-                    : null,
-                child: (imagePath == null || imagePath.isEmpty)
-                    ? Icon(
-                        Icons.business,
-                        size: 36,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      )
+                    : const AssetImage('assets/images/mizan_full.png'),
+                onBackgroundImageError:
+                    imagePath != null && imagePath.isNotEmpty
+                    ? (_, __) {}
                     : null,
               ),
               // Cloud Status Icon

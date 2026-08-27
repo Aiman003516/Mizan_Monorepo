@@ -6,12 +6,14 @@ class ImagePickerWidget extends StatelessWidget {
   final String? imagePath;
   final VoidCallback onPickImage;
   final VoidCallback onRemoveImage;
+  final String? placeholderAsset;
 
   const ImagePickerWidget({
     super.key,
     required this.imagePath,
     required this.onPickImage,
     required this.onRemoveImage,
+    this.placeholderAsset,
   });
 
   @override
@@ -46,10 +48,25 @@ class ImagePickerWidget extends StatelessWidget {
                     },
                   ),
                 )
-              : Icon(
+              : placeholderAsset == null
+              ? Icon(
                   Icons.image_not_supported,
                   color: Colors.grey.shade500,
                   size: 48,
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Image.asset(
+                    placeholderAsset!,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey.shade500,
+                        size: 48,
+                      );
+                    },
+                  ),
                 ),
         ),
         const SizedBox(height: 16),
@@ -60,20 +77,20 @@ class ImagePickerWidget extends StatelessWidget {
           children: [
             if (hasImage)
               TextButton.icon(
-                icon: Icon(Icons.delete_outline,
-                    color: Theme.of(context).colorScheme.error),
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 label: Text(
                   l10n.removeImage,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.error),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
                 onPressed: onRemoveImage,
               ),
             const SizedBox(width: 16),
             FilledButton.icon(
               icon: const Icon(Icons.upload_file),
-              label: Text(
-                  hasImage ? l10n.changeImage : l10n.uploadImage),
+              label: Text(hasImage ? l10n.changeImage : l10n.uploadImage),
               onPressed: onPickImage,
             ),
           ],

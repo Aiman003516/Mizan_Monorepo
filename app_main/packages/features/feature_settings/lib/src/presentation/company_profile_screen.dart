@@ -39,8 +39,6 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     _addressController.text = profile.companyAddress;
     _taxIDController.text = profile.taxID;
 
-    // Attempt to load existing image path if your model supports it
-    // Update `.imagePath` to your exact property name if it differs
     _selectedImagePath = profile.imagePath;
   }
 
@@ -94,8 +92,6 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     });
 
     try {
-      // Update this call to include `imagePath: _selectedImagePath`
-      // if your companyProfileProvider supports it.
       await ref
           .read(companyProfileProvider.notifier)
           .saveProfile(
@@ -155,9 +151,9 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Utilizing your existing custom ImagePickerWidget
               ImagePickerWidget(
                 imagePath: _selectedImagePath,
+                placeholderAsset: 'assets/images/mizan_full.png',
                 onPickImage: _handlePickImage,
                 onRemoveImage: _handleRemoveImage,
               ),
