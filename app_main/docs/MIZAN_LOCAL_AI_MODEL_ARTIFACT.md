@@ -27,6 +27,13 @@ From the repository root, run:
 ./scripts/prepare_qwen3_local_model.sh
 ```
 
+On Windows PowerShell, run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\prepare_qwen3_local_model.ps1
+```
+
 The script downloads the artifact into the ignored `.local_ai_model_cache/` directory, verifies the exact SHA-256 checksum, and copies it to:
 
 ```text
