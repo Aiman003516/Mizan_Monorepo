@@ -100,19 +100,26 @@ class ArApSettlementRepository {
     required String entryNumber,
   }) async {
     await _requireTenant();
+    final normalizedDate = (settlementDate ?? DateTime.now())
+        .toIso8601String()
+        .substring(0, 10);
+    final normalizedCurrency = currencyCode.trim().toUpperCase();
+    final normalizedMethod = paymentMethod.trim();
+    final normalizedReference = reference?.trim() ?? '';
+    final idempotencyKey =
+        'settlement:${direction.trim()}:${invoiceId ?? billId}:$amountMinor:$normalizedCurrency:$normalizedDate:$normalizedMethod:$normalizedReference';
     final response = await _supabase.rpc(
-      'create_settlement_draft',
+      'create_settlement_draft_idempotent',
       params: {
+        'p_idempotency_key': idempotencyKey,
         'p_direction': direction,
         'p_invoice_id': invoiceId,
         'p_bill_id': billId,
         'p_amount_minor': amountMinor,
-        'p_currency_code': currencyCode.trim().toUpperCase(),
-        'p_settlement_date': (settlementDate ?? DateTime.now())
-            .toIso8601String()
-            .substring(0, 10),
-        'p_payment_method': paymentMethod.trim(),
-        'p_reference': reference?.trim(),
+        'p_currency_code': normalizedCurrency,
+        'p_settlement_date': normalizedDate,
+        'p_payment_method': normalizedMethod,
+        'p_reference': normalizedReference,
         'p_cash_account_id': cashAccountId,
         'p_counterparty_account_id': counterpartyAccountId,
         'p_entry_number': entryNumber.trim(),

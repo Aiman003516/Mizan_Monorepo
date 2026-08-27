@@ -117,3 +117,9 @@ Run `tests/20260828020000_party_statements.sql` in staging after the AR/AP settl
 Migration `migrations/20260828030000_close_preflight.sql` adds the tenant-scoped `public.accounting_close_preflight(uuid)` read RPC. It checks period status, pending approvals, draft journals, unposted settlements, open document anomalies, and the active leading accounting book. The result is evidence-oriented and returns severity, blocking status, issue count, and a message for each check.
 
 Run `tests/20260828030000_close_preflight.sql` in staging after the accounting, approval, settlement, document-anomaly, and party-statement migrations. The preflight is a readiness check, not an automatic period-close command; a separate owner-authorized close action must remain server-enforced.
+
+## Retry-safe settlement drafts
+
+Migration `migrations/20260828040000_settlement_idempotency.sql` adds a tenant-scoped idempotency key to `ar_ap_settlements` and the `public.create_settlement_draft_idempotent(...)` RPC. The RPC serializes retries with a transaction advisory lock, returns the existing draft for a repeated key, and delegates new drafts to the canonical settlement command.
+
+Run `tests/20260828040000_settlement_idempotency.sql` in staging and verify that repeated client retries return the same settlement identifier and journal draft rather than creating duplicate financial effects. No production grant or migration application is implied by this repository change.

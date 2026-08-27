@@ -37,6 +37,7 @@ This registry is the canonical human-readable dependency map for the additive Su
 | `20260828010000_approval_balance_adjustment_gate.sql` | Governance / AR | One-time approved balance-adjustment execution and execution audit | Approval enforcement Phase 3, manual balance adjustment workflow |
 | `20260828020000_party_statements.sql` | AR/AP / Reporting | Tenant-safe customer/vendor statements with opening, activity, and running balance | AR/AP settlement and balance-adjustment workflows |
 | `20260828030000_close_preflight.sql` | Accounting / Governance | Tenant-scoped month-end close readiness checks | Accounting periods, approvals, settlements, document anomalies, accounting books |
+| `20260828040000_settlement_idempotency.sql` | AR/AP / Sync | Retry-safe settlement draft creation with tenant-scoped idempotency | AR/AP settlement, ledger drafts, tenant permissions |
 
 ## Required migration header
 
