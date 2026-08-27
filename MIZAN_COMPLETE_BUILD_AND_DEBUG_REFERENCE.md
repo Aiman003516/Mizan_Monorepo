@@ -32,15 +32,16 @@
 
 ## 2. Latest pushed commits
 
-The latest synchronized GitHub `main` commit containing the Windows llama.cpp runtime integration is:
+The latest synchronized GitHub `main` commit containing the Android and Windows local llama.cpp runtime integration is:
 
 ```text
-c944a58 docs: update Windows runtime reference
+89de628 feat: enable Android local llama.cpp model runtime
 ```
 
-The runtime implementation was introduced by:
+The preceding runtime and preparation commits are:
 
 ```text
+2a7d918 fix: prepare llama.cpp locally for Windows builds
 8e463e6 feat: add Windows llama.cpp local AI runtime
 ```
 
