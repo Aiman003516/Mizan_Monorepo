@@ -35,6 +35,7 @@ class LocalAiEngineResult {
     this.proposal,
     this.message,
     this.code,
+    this.fallbackCode,
   });
 
   const LocalAiEngineResult.unavailable({
@@ -46,8 +47,14 @@ class LocalAiEngineResult {
          code: code,
        );
 
-  const LocalAiEngineResult.ready(LocalAiProposal proposal)
-    : this._(status: LocalAiEngineStatus.ready, proposal: proposal);
+  const LocalAiEngineResult.ready(
+    LocalAiProposal proposal, {
+    LocalAiDiagnosticCode? fallbackCode,
+  }) : this._(
+         status: LocalAiEngineStatus.ready,
+         proposal: proposal,
+         fallbackCode: fallbackCode,
+       );
 
   const LocalAiEngineResult.failed(
     String message, {
@@ -58,6 +65,19 @@ class LocalAiEngineResult {
   final LocalAiProposal? proposal;
   final String? message;
   final LocalAiDiagnosticCode? code;
+  final LocalAiDiagnosticCode? fallbackCode;
+
+  bool get usedSafeFallback => fallbackCode != null;
+
+  LocalAiEngineResult markSafeFallback(LocalAiDiagnosticCode reason) {
+    return LocalAiEngineResult._(
+      status: status,
+      proposal: proposal,
+      message: message,
+      code: code,
+      fallbackCode: reason,
+    );
+  }
 
   String localizedMessage(AppLocalizations l10n) {
     return switch (code) {

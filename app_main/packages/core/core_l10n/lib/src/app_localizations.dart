@@ -10592,6 +10592,12 @@ abstract class AppLocalizations {
   /// **'Local assistance is unavailable for this request.'**
   String get aiLocalUnavailable;
 
+  /// No description provided for @aiLocalFallbackWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'The on-device model was unavailable, so Mizan used its safe rule-based fallback. Nothing was changed.'**
+  String get aiLocalFallbackWarning;
+
   /// No description provided for @aiAssistantError.
   ///
   /// In en, this message translates to:

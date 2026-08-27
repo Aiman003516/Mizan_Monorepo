@@ -5597,6 +5597,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aiLocalUnavailable => 'المساعدة المحلية غير متاحة لهذا الطلب.';
 
   @override
+  String get aiLocalFallbackWarning =>
+      'النموذج الموجود على الجهاز غير متاح، لذلك استخدم ميزان البديل الآمن القائم على القواعد. لم يتم تغيير أي شيء.';
+
+  @override
   String get aiAssistantError => 'تعذر على المساعد الذكي إكمال الطلب.';
 
   @override

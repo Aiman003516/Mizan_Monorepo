@@ -44,7 +44,7 @@ The model binary is intentionally not committed to GitHub. The Flutter applicati
 
 ## Safety boundary
 
-The pinned artifact is not yet enabled in the default provider. Until the Android llama.cpp bridge is implemented and tested, Mizan continues using the deterministic local engine and rule-based fallback. The future native adapter must return only proposal JSON, and the Dart validator must reject malformed, unknown, unsafe, or semantically invalid proposals.
+The pinned artifact is not yet enabled in the default provider. Until the Android llama.cpp bridge is implemented and tested, Mizan continues using the deterministic local engine and rule-based fallback. If the model tier is disabled, unavailable, or fails, the orchestrator preserves the deterministic result and the UI displays a localized warning that no record was changed. The future native adapter must return only proposal JSON, and the Dart validator must reject malformed, unknown, unsafe, or semantically invalid proposals.
 
 The local model must not receive Supabase credentials, direct database handles, tenant records, journal data, authentication tokens, or arbitrary tool definitions. Local inference cannot post journals, edit records, delete records, send messages, or modify application files. Authenticated accounting actions remain server-authoritative and confirmation-gated.
 

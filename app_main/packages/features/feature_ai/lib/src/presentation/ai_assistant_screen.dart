@@ -34,6 +34,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   bool _isCreatingDraft = false;
   LocalAiProposal? _localProposal;
   LocalAiNavigationTarget? _localNavigationTarget;
+  String? _localFallbackWarning;
 
   @override
   void dispose() {
@@ -473,6 +474,29 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
     return l10n.aiLocalUnavailable;
   }
 
+  Widget _buildLocalFallbackBanner() {
+    final warning = _localFallbackWarning;
+    if (warning == null) return const SizedBox.shrink();
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.amber.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.amber.shade700),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, color: Colors.amber.shade900),
+          const SizedBox(width: 8),
+          Expanded(child: Text(warning)),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLocalNavigationCard(
     BuildContext context,
     AppLocalizations l10n,
@@ -513,6 +537,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
     setState(() {
       _localProposal = null;
       _localNavigationTarget = null;
+      _localFallbackWarning = null;
       _messages.add(AiChatMessage(role: 'user', content: text));
       _isSending = true;
     });
@@ -537,6 +562,9 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
           setState(() {
             _localProposal = proposal;
             _localNavigationTarget = target;
+            _localFallbackWarning = result.usedSafeFallback
+                ? l10n.aiLocalFallbackWarning
+                : null;
             _messages.add(
               AiChatMessage(
                 role: 'assistant',
@@ -673,6 +701,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
           children: [
             _buildHeader(context, l10n, isCloudMode),
             if (_actionDraft != null) _buildActionDraftCard(context, l10n),
+            if (_localFallbackWarning != null) _buildLocalFallbackBanner(),
             if (_localProposal?.intent == LocalAiIntent.navigate)
               _buildLocalNavigationCard(context, l10n),
             Expanded(

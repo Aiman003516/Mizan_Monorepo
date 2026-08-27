@@ -2493,6 +2493,7 @@
   "aiLocalProposalNotExecuted": "A local proposal was prepared for review. It was not executed and did not change any record.",
   "aiLocalNeedDetails": "Please provide more details. The local assistant will not guess accounting or record values.",
   "aiLocalUnavailable": "Local assistance is unavailable for this request.",
+  "aiLocalFallbackWarning": "The on-device model was unavailable, so Mizan used its safe rule-based fallback. Nothing was changed.",
   "aiAssistantError": "The AI assistant could not complete this request.",
   "aiAssistantNoData": "No matching tenant data was found.",
   "aiAssistantMutationBlocked": "This pilot can analyze data but cannot modify records or send messages.",

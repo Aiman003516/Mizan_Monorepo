@@ -29,22 +29,29 @@ class LocalAiOrchestrator implements LocalAiEngine {
   Future<LocalAiEngineResult> propose(LocalAiRequest request) async {
     final deterministic = await ruleEngine.propose(request);
     final deterministicProposal = deterministic.proposal;
-    final shouldTryModel =
-        modelEngine.status == LocalAiEngineStatus.ready &&
-        (deterministic.status != LocalAiEngineStatus.ready ||
-            deterministicProposal == null ||
-            deterministicProposal.intent ==
-                LocalAiIntent.requestMissingInformation);
+    final needsModelHelp =
+        deterministic.status != LocalAiEngineStatus.ready ||
+        deterministicProposal == null ||
+        deterministicProposal.intent == LocalAiIntent.requestMissingInformation;
+    if (!needsModelHelp) return deterministic;
 
-    if (!shouldTryModel) return deterministic;
+    if (modelEngine.status != LocalAiEngineStatus.ready) {
+      return deterministic.markSafeFallback(
+        modelEngine.engineId == 'disabled'
+            ? LocalAiDiagnosticCode.disabled
+            : LocalAiDiagnosticCode.modelUnavailable,
+      );
+    }
 
     final modelResult = await modelEngine.propose(request);
     if (modelResult.status == LocalAiEngineStatus.ready) return modelResult;
 
     // The deterministic result is safer and more useful than exposing a model
-    // failure. If it was unavailable too, preserve the model diagnostic.
-    if (deterministic.status != LocalAiEngineStatus.unavailable) {
-      return deterministic;
+    // failure. Preserve it, but retain a typed diagnostic for the UI.
+    if (deterministic.proposal != null) {
+      return deterministic.markSafeFallback(
+        modelResult.code ?? LocalAiDiagnosticCode.modelUnavailable,
+      );
     }
     return modelResult;
   }

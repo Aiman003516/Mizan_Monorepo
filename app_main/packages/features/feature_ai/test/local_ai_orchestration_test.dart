@@ -80,6 +80,21 @@ void main() {
       expect(result.proposal?.route, 'customers');
     });
 
+    test('marks the safe fallback when the model is disabled', () async {
+      final orchestrator = LocalAiOrchestrator(
+        ruleEngine: const RuleBasedLocalAiEngine(),
+        modelEngine: const DisabledLocalAiEngine(),
+      );
+
+      final result = await orchestrator.propose(
+        const LocalAiRequest(text: 'Edit a customer', locale: 'en'),
+      );
+
+      expect(result.proposal?.intent, LocalAiIntent.requestMissingInformation);
+      expect(result.usedSafeFallback, isTrue);
+      expect(result.fallbackCode, LocalAiDiagnosticCode.disabled);
+    });
+
     test('uses a ready model only when rules need more information', () async {
       final orchestrator = LocalAiOrchestrator(
         ruleEngine: const RuleBasedLocalAiEngine(),

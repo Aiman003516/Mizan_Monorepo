@@ -5619,6 +5619,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Local assistance is unavailable for this request.';
 
   @override
+  String get aiLocalFallbackWarning =>
+      'The on-device model was unavailable, so Mizan used its safe rule-based fallback. Nothing was changed.';
+
+  @override
   String get aiAssistantError =>
       'The AI assistant could not complete this request.';
 
