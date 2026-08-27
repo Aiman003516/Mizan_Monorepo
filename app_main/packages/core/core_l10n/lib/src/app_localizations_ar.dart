@@ -4323,6 +4323,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get permManageSettings => 'إعدادات النظام';
 
   @override
+  String get permManageBranches => 'إدارة الفروع';
+
+  @override
+  String get permApproveRequests => 'الموافقة على الطلبات';
+
+  @override
   String get permManageCrm => 'إدارة إدارة علاقات العملاء';
 
   @override
@@ -5903,6 +5909,43 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get approvalRequestDemo =>
       'لا يتم إنشاء طلب موافقة إنتاجي في وضع الضيف.';
+
+  @override
+  String get approvalServerOnly =>
+      'تتحقق الخوادم من قرارات الموافقة وتسجلها للتدقيق.';
+
+  @override
+  String get approvalLoadError => 'تعذر تحميل طلبات الموافقة.';
+
+  @override
+  String get approvalDecisionFailed => 'تعذر حفظ قرار الموافقة.';
+
+  @override
+  String get approvalDecisionSaved => 'تم حفظ قرار الموافقة.';
+
+  @override
+  String get approvalRequestTypeExpense => 'مصروف';
+
+  @override
+  String get approvalRequestTypeInvoice => 'فاتورة مبيعات';
+
+  @override
+  String get approvalRequestTypeBill => 'فاتورة مشتريات';
+
+  @override
+  String get approvalRequestTypeJournal => 'قيد يومية';
+
+  @override
+  String get approvalRequestTypeBalanceAdjustment => 'تسوية رصيد';
+
+  @override
+  String get approvalRequestTypeRefund => 'استرداد';
+
+  @override
+  String get approvalRequestTypeDiscount => 'خصم';
+
+  @override
+  String get approvalRequestTypePeriodReopen => 'إعادة فتح الفترة';
 
   @override
   String get cashPayment => 'نقداً';

@@ -164,3 +164,13 @@ class OwnerApprovalController
     state = await _repository.decide(id, status);
   }
 }
+
+/// Server-backed approval requests for authenticated cloud mode.
+///
+/// The legacy repository above remains available for guest/local previews, but
+/// it must never be used to authorize accounting or CRM mutations.
+final serverApprovalRequestsProvider =
+    FutureProvider.autoDispose<List<ApprovalRequest>>((ref) async {
+      if (!ref.watch(cloudDataModeProvider)) return const [];
+      return ref.watch(approvalRepositoryProvider).fetchRequests();
+    });

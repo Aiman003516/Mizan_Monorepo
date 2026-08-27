@@ -8228,6 +8228,18 @@ abstract class AppLocalizations {
   /// **'System Settings'**
   String get permManageSettings;
 
+  /// No description provided for @permManageBranches.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Branches'**
+  String get permManageBranches;
+
+  /// No description provided for @permApproveRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve Requests'**
+  String get permApproveRequests;
+
   /// No description provided for @permManageCrm.
   ///
   /// In en, this message translates to:
@@ -11195,6 +11207,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No production approval request is created in guest mode.'**
   String get approvalRequestDemo;
+
+  /// No description provided for @approvalServerOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval decisions are validated and audited by the server.'**
+  String get approvalServerOnly;
+
+  /// No description provided for @approvalLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval requests could not be loaded.'**
+  String get approvalLoadError;
+
+  /// No description provided for @approvalDecisionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The approval decision could not be saved.'**
+  String get approvalDecisionFailed;
+
+  /// No description provided for @approvalDecisionSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval decision saved.'**
+  String get approvalDecisionSaved;
+
+  /// No description provided for @approvalRequestTypeExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get approvalRequestTypeExpense;
+
+  /// No description provided for @approvalRequestTypeInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice'**
+  String get approvalRequestTypeInvoice;
+
+  /// No description provided for @approvalRequestTypeBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill'**
+  String get approvalRequestTypeBill;
+
+  /// No description provided for @approvalRequestTypeJournal.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal'**
+  String get approvalRequestTypeJournal;
+
+  /// No description provided for @approvalRequestTypeBalanceAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance adjustment'**
+  String get approvalRequestTypeBalanceAdjustment;
+
+  /// No description provided for @approvalRequestTypeRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund'**
+  String get approvalRequestTypeRefund;
+
+  /// No description provided for @approvalRequestTypeDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get approvalRequestTypeDiscount;
+
+  /// No description provided for @approvalRequestTypePeriodReopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Period reopen'**
+  String get approvalRequestTypePeriodReopen;
 
   /// No description provided for @cashPayment.
   ///

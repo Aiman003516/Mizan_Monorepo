@@ -4329,6 +4329,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get permManageSettings => 'System Settings';
 
   @override
+  String get permManageBranches => 'Manage Branches';
+
+  @override
+  String get permApproveRequests => 'Approve Requests';
+
+  @override
   String get permManageCrm => 'Manage CRM';
 
   @override
@@ -5920,6 +5926,44 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get approvalRequestDemo =>
       'No production approval request is created in guest mode.';
+
+  @override
+  String get approvalServerOnly =>
+      'Approval decisions are validated and audited by the server.';
+
+  @override
+  String get approvalLoadError => 'Approval requests could not be loaded.';
+
+  @override
+  String get approvalDecisionFailed =>
+      'The approval decision could not be saved.';
+
+  @override
+  String get approvalDecisionSaved => 'Approval decision saved.';
+
+  @override
+  String get approvalRequestTypeExpense => 'Expense';
+
+  @override
+  String get approvalRequestTypeInvoice => 'Invoice';
+
+  @override
+  String get approvalRequestTypeBill => 'Bill';
+
+  @override
+  String get approvalRequestTypeJournal => 'Journal';
+
+  @override
+  String get approvalRequestTypeBalanceAdjustment => 'Balance adjustment';
+
+  @override
+  String get approvalRequestTypeRefund => 'Refund';
+
+  @override
+  String get approvalRequestTypeDiscount => 'Discount';
+
+  @override
+  String get approvalRequestTypePeriodReopen => 'Period reopen';
 
   @override
   String get cashPayment => 'Cash';

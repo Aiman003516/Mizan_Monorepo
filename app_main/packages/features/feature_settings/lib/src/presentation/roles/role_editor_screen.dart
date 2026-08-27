@@ -63,6 +63,10 @@ class _RoleEditorScreenState extends ConsumerState<RoleEditorScreen> {
         return l10n.permManageStaff;
       case AppPermission.manageSettings:
         return l10n.permManageSettings;
+      case AppPermission.manageBranches:
+        return l10n.permManageBranches;
+      case AppPermission.approveRequests:
+        return l10n.permApproveRequests;
       case AppPermission.manageCrm:
         return l10n.permManageCrm;
       case AppPermission.manageCustomers:

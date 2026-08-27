@@ -31,10 +31,12 @@ class OwnerControlCenterScreen extends ConsumerWidget {
     final roleAsync = ref.watch(userRoleProvider);
     final isGuest = roleAsync.valueOrNull?.id == 'guest';
     final settings = ref.watch(ownerControlSettingsProvider);
-    final pendingApprovals = ref
-        .watch(ownerApprovalRequestsProvider)
-        .where((request) => request.status == 'pending')
-        .length;
+    final approvalRequestsAsync = ref.watch(serverApprovalRequestsProvider);
+    final pendingApprovals =
+        approvalRequestsAsync.valueOrNull
+            ?.where((request) => request.status == ApprovalStatus.pending)
+            .length ??
+        0;
     final branchValues = settings.section(
       OwnerSettingSections.branches,
     )['branch_records'];
