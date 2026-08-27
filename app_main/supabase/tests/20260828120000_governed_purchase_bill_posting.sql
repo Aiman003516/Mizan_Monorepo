@@ -1,0 +1,11 @@
+begin;
+select plan(7);
+select has_column('public','bills','journal_entry_id','bills retain journal linkage');
+select has_function('public','post_purchase_bill',array['uuid','uuid','uuid','text','date'],'governed purchase-bill posting RPC exists');
+select ok(pg_get_functiondef('public.post_purchase_bill(uuid,uuid,uuid,text,date)'::regprocedure) like '%assert_purchase_bill_posting_eligibility%', 'posting calls server-side match eligibility');
+select ok(pg_get_functiondef('public.post_purchase_bill(uuid,uuid,uuid,text,date)'::regprocedure) like '%post_journal_entry%', 'posting delegates to governed journal posting');
+select ok(pg_get_functiondef('public.post_purchase_bill(uuid,uuid,uuid,text,date)'::regprocedure) like '%journal_entry_id%', 'posting is retry-safe through journal linkage');
+select ok(pg_get_functiondef('public.post_purchase_bill(uuid,uuid,uuid,text,date)'::regprocedure) like '%approval_branch_access%', 'posting enforces branch scope');
+select ok(not exists (select 1 from information_schema.role_routine_grants where routine_schema='public' and routine_name='post_purchase_bill' and grantee in ('anon','public') and privilege_type='EXECUTE'), 'anonymous/public roles cannot execute purchase-bill posting');
+select * from finish();
+rollback;

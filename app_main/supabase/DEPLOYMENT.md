@@ -157,3 +157,7 @@ Migration `migrations/20260828090000_sync_health_snapshot.sql` adds `get_sync_he
 ## Inventory reservations
 
 Migration `migrations/20260828100000_inventory_reservations.sql` adds idempotent reserve/release commands layered over authoritative inventory balances. In staging, verify concurrent reservations cannot oversubscribe a balance, retrying the same key returns the original reservation, expired reservations do not reduce availability, only active reservations can be released, and tenant/permission/RLS/anonymous-denial checks hold. Reservation commands do not post stock or journals. Production application requires explicit approval and a recorded staging result.
+
+## Governed purchase-bill posting
+
+Migration `migrations/20260828120000_governed_purchase_bill_posting.sql` adds `post_purchase_bill(uuid, uuid, uuid, text, date)`. It derives tenant scope from the session, checks branch access and accounting permissions, calls the exception-aware match eligibility gate, creates a source-linked journal, and posts it through the existing governed journal command. A retry returns the existing posted linkage. In staging, verify fully matched bills, approved exceptions, blocked bills, locked periods, invalid account types, branch isolation, concurrent retry behavior, and audit/source links. No production SQL is applied automatically; production use requires explicit approval and a recorded staging result.
