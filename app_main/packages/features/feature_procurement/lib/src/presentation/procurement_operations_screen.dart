@@ -35,6 +35,9 @@ class _ProcurementOperationsScreenState
   final _warehouseIdController = TextEditingController(text: 'default');
   final _receiptQuantityController = TextEditingController(text: '1');
   final _receiptUnitCostController = TextEditingController(text: '0');
+  final _receiptInventoryAccountIdController = TextEditingController();
+  final _receiptPayableAccountIdController = TextEditingController();
+  final _receiptEntryPrefixController = TextEditingController(text: 'PUR-REC');
 
   final _returnNumberController = TextEditingController();
   final _returnPurchaseOrderIdController = TextEditingController();
@@ -43,6 +46,9 @@ class _ProcurementOperationsScreenState
   final _returnReasonController = TextEditingController();
   final _returnQuantityController = TextEditingController(text: '1');
   final _returnUnitCostController = TextEditingController(text: '0');
+  final _returnInventoryAccountIdController = TextEditingController();
+  final _returnPayableAccountIdController = TextEditingController();
+  final _returnEntryPrefixController = TextEditingController(text: 'PUR-RET');
 
   String? _purchaseOrderId;
   String? _receiptId;
@@ -65,6 +71,9 @@ class _ProcurementOperationsScreenState
       _warehouseIdController,
       _receiptQuantityController,
       _receiptUnitCostController,
+      _receiptInventoryAccountIdController,
+      _receiptPayableAccountIdController,
+      _receiptEntryPrefixController,
       _returnNumberController,
       _returnPurchaseOrderIdController,
       _returnReceiptIdController,
@@ -72,6 +81,9 @@ class _ProcurementOperationsScreenState
       _returnReasonController,
       _returnQuantityController,
       _returnUnitCostController,
+      _returnInventoryAccountIdController,
+      _returnPayableAccountIdController,
+      _returnEntryPrefixController,
     ]) {
       controller.dispose();
     }
@@ -212,6 +224,32 @@ class _ProcurementOperationsScreenState
     );
   }
 
+  Future<void> _linkReceiptToInventory() async {
+    final id = _receiptId;
+    if (id == null) return;
+    if (!_receiptInventoryAccountIdIsValid() ||
+        !_receiptPayableAccountIdIsValid())
+      return;
+    await _runAction(
+      () => ref
+          .read(procurementRepositoryProvider)
+          .linkReceiptToInventory(
+            purchaseReceiptId: id,
+            inventoryAccountId: _receiptInventoryAccountIdController.text,
+            payableAccountId: _receiptPayableAccountIdController.text,
+            entryNumberPrefix: _receiptEntryPrefixController.text,
+          ),
+      AppLocalizations.of(context)!.inventoryAdapterFailed,
+      successMessage: AppLocalizations.of(context)!.inventoryAdapterCompleted,
+    );
+  }
+
+  bool _receiptInventoryAccountIdIsValid() =>
+      _uuidPattern.hasMatch(_receiptInventoryAccountIdController.text.trim());
+
+  bool _receiptPayableAccountIdIsValid() =>
+      _uuidPattern.hasMatch(_receiptPayableAccountIdController.text.trim());
+
   Future<void> _createReturn() async {
     if (!_returnFormKey.currentState!.validate()) return;
     final quantity = double.tryParse(_returnQuantityController.text.trim());
@@ -254,15 +292,46 @@ class _ProcurementOperationsScreenState
     );
   }
 
+  Future<void> _linkReturnToInventory() async {
+    final id = _returnId;
+    if (id == null) return;
+    if (!_returnInventoryAccountIdIsValid() ||
+        !_returnPayableAccountIdIsValid())
+      return;
+    await _runAction(
+      () => ref
+          .read(procurementRepositoryProvider)
+          .linkReturnToInventory(
+            purchaseReturnId: id,
+            inventoryAccountId: _returnInventoryAccountIdController.text,
+            payableAccountId: _returnPayableAccountIdController.text,
+            entryNumberPrefix: _returnEntryPrefixController.text,
+          ),
+      AppLocalizations.of(context)!.inventoryAdapterFailed,
+      successMessage: AppLocalizations.of(context)!.inventoryAdapterCompleted,
+    );
+  }
+
+  bool _returnInventoryAccountIdIsValid() =>
+      _uuidPattern.hasMatch(_returnInventoryAccountIdController.text.trim());
+
+  bool _returnPayableAccountIdIsValid() =>
+      _uuidPattern.hasMatch(_returnPayableAccountIdController.text.trim());
+
   Future<void> _runAction(
     Future<Map<String, dynamic>> Function() action,
-    String failureMessage,
-  ) async {
+    String failureMessage, {
+    String? successMessage,
+  }) async {
     setState(() => _saving = true);
     try {
       await action();
-      if (mounted)
-        _message(AppLocalizations.of(context)!.procurementActionCompleted);
+      if (mounted) {
+        _message(
+          successMessage ??
+              AppLocalizations.of(context)!.procurementActionCompleted,
+        );
+      }
     } catch (_) {
       if (mounted) _message(failureMessage);
     } finally {
@@ -458,6 +527,24 @@ class _ProcurementOperationsScreenState
                   validator: _amount,
                 ),
               ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _receiptInventoryAccountIdController,
+                decoration: _decoration(l10n.inventoryAccountId),
+                validator: _identifier,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _receiptPayableAccountIdController,
+                decoration: _decoration(l10n.payableAccountId),
+                validator: _identifier,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _receiptEntryPrefixController,
+                decoration: _decoration(l10n.entryNumberPrefix),
+                validator: _required,
+              ),
               const SizedBox(height: 14),
               FilledButton.icon(
                 onPressed: _saving ? null : _createReceipt,
@@ -470,6 +557,12 @@ class _ProcurementOperationsScreenState
                   onPressed: _saving ? null : _postReceipt,
                   icon: const Icon(Icons.post_add),
                   label: Text(l10n.postReceipt),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: _saving ? null : _linkReceiptToInventory,
+                  icon: const Icon(Icons.account_balance),
+                  label: Text(l10n.postToInventory),
                 ),
               ],
             ],
@@ -540,6 +633,24 @@ class _ProcurementOperationsScreenState
                   validator: _amount,
                 ),
               ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _returnInventoryAccountIdController,
+                decoration: _decoration(l10n.inventoryAccountId),
+                validator: _identifier,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _returnPayableAccountIdController,
+                decoration: _decoration(l10n.payableAccountId),
+                validator: _identifier,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _returnEntryPrefixController,
+                decoration: _decoration(l10n.entryNumberPrefix),
+                validator: _required,
+              ),
               const SizedBox(height: 14),
               FilledButton.icon(
                 onPressed: _saving ? null : _createReturn,
@@ -552,6 +663,12 @@ class _ProcurementOperationsScreenState
                   onPressed: _saving ? null : _postReturn,
                   icon: const Icon(Icons.post_add),
                   label: Text(l10n.postReturn),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: _saving ? null : _linkReturnToInventory,
+                  icon: const Icon(Icons.account_balance),
+                  label: Text(l10n.postToInventory),
                 ),
               ],
             ],

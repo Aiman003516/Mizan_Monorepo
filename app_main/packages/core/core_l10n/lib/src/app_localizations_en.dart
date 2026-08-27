@@ -1250,6 +1250,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get procurementActionCompleted => 'Procurement action completed.';
 
   @override
+  String get postToInventory => 'Create inventory journal drafts';
+
+  @override
+  String get inventoryAdapterCompleted =>
+      'Inventory journal drafts created; post them through accounting to update stock.';
+
+  @override
+  String get inventoryAdapterFailed =>
+      'Could not create inventory journal drafts.';
+
+  @override
+  String get inventoryAccountId => 'Inventory account ID';
+
+  @override
+  String get payableAccountId => 'Payable account ID';
+
+  @override
+  String get entryNumberPrefix => 'Journal entry prefix';
+
+  @override
   String get threeWayMatching => 'Three-way matching';
 
   @override

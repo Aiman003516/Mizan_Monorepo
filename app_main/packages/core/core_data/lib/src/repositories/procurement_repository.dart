@@ -207,6 +207,62 @@ class ProcurementRepository {
     );
   }
 
+  Future<Map<String, dynamic>> linkReceiptToInventory({
+    required String purchaseReceiptId,
+    required String inventoryAccountId,
+    required String payableAccountId,
+    required String entryNumberPrefix,
+  }) async {
+    await _requireTenant();
+    ProcurementValidation.id(purchaseReceiptId, 'purchaseReceiptId');
+    ProcurementValidation.id(inventoryAccountId, 'inventoryAccountId');
+    ProcurementValidation.id(payableAccountId, 'payableAccountId');
+    ProcurementValidation.documentNumber(
+      entryNumberPrefix,
+      'entryNumberPrefix',
+    );
+    return _requireMap(
+      await _supabase.rpc(
+        'post_purchase_receipt_to_inventory',
+        params: {
+          'p_purchase_receipt_id': purchaseReceiptId,
+          'p_inventory_account_id': inventoryAccountId,
+          'p_payable_account_id': payableAccountId,
+          'p_entry_number_prefix': entryNumberPrefix.trim(),
+        },
+      ),
+      'MIZAN_PROCUREMENT_RECEIPT_INVENTORY_INVALID_RESPONSE',
+    );
+  }
+
+  Future<Map<String, dynamic>> linkReturnToInventory({
+    required String purchaseReturnId,
+    required String inventoryAccountId,
+    required String payableAccountId,
+    required String entryNumberPrefix,
+  }) async {
+    await _requireTenant();
+    ProcurementValidation.id(purchaseReturnId, 'purchaseReturnId');
+    ProcurementValidation.id(inventoryAccountId, 'inventoryAccountId');
+    ProcurementValidation.id(payableAccountId, 'payableAccountId');
+    ProcurementValidation.documentNumber(
+      entryNumberPrefix,
+      'entryNumberPrefix',
+    );
+    return _requireMap(
+      await _supabase.rpc(
+        'post_purchase_return_to_inventory',
+        params: {
+          'p_purchase_return_id': purchaseReturnId,
+          'p_inventory_account_id': inventoryAccountId,
+          'p_payable_account_id': payableAccountId,
+          'p_entry_number_prefix': entryNumberPrefix.trim(),
+        },
+      ),
+      'MIZAN_PROCUREMENT_RETURN_INVENTORY_INVALID_RESPONSE',
+    );
+  }
+
   Future<List<ThreeWayMatchResult>> matchBill(String billId) async {
     await _requireTenant();
     ProcurementValidation.id(billId, 'billId');

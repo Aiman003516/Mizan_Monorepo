@@ -2474,6 +2474,42 @@ abstract class AppLocalizations {
   /// **'Procurement action completed.'**
   String get procurementActionCompleted;
 
+  /// No description provided for @postToInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Create inventory journal drafts'**
+  String get postToInventory;
+
+  /// No description provided for @inventoryAdapterCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory journal drafts created; post them through accounting to update stock.'**
+  String get inventoryAdapterCompleted;
+
+  /// No description provided for @inventoryAdapterFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create inventory journal drafts.'**
+  String get inventoryAdapterFailed;
+
+  /// No description provided for @inventoryAccountId.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory account ID'**
+  String get inventoryAccountId;
+
+  /// No description provided for @payableAccountId.
+  ///
+  /// In en, this message translates to:
+  /// **'Payable account ID'**
+  String get payableAccountId;
+
+  /// No description provided for @entryNumberPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal entry prefix'**
+  String get entryNumberPrefix;
+
   /// No description provided for @threeWayMatching.
   ///
   /// In en, this message translates to:

@@ -1242,6 +1242,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get procurementActionCompleted => 'اكتملت عملية المشتريات.';
 
   @override
+  String get postToInventory => 'إنشاء مسودات قيود المخزون';
+
+  @override
+  String get inventoryAdapterCompleted =>
+      'تم إنشاء مسودات قيود المخزون؛ رحّلها عبر المحاسبة لتحديث المخزون.';
+
+  @override
+  String get inventoryAdapterFailed => 'تعذر إنشاء مسودات قيود المخزون.';
+
+  @override
+  String get inventoryAccountId => 'معرّف حساب المخزون';
+
+  @override
+  String get payableAccountId => 'معرّف حساب الدائنين';
+
+  @override
+  String get entryNumberPrefix => 'بادئة رقم قيد اليومية';
+
+  @override
   String get threeWayMatching => 'المطابقة الثلاثية';
 
   @override
