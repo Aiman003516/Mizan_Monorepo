@@ -319,6 +319,90 @@ class BankReconciliationRepository {
       );
     });
   }
+
+  /// Legacy transaction-facing contract retained in core_data while the
+  /// feature package migrates away from its duplicate repository.
+  Future<List<TransactionEntry>> getUnreconciledEntries({
+    required String accountId,
+    required DateTime statementDate,
+  }) async {
+    final reconciledIds = await _db
+        .select(_db.reconciledTransactions)
+        .map((row) => row.transactionId)
+        .get();
+    final query =
+        _db.select(_db.transactionEntries).join([
+            innerJoin(
+              _db.transactions,
+              _db.transactions.id.equalsExp(
+                _db.transactionEntries.transactionId,
+              ),
+            ),
+          ])
+          ..where(
+            _db.transactionEntries.accountId.equals(accountId) &
+                _db.transactions.transactionDate.isSmallerOrEqualValue(
+                  statementDate,
+                ) &
+                _db.transactionEntries.transactionId.isNotIn(reconciledIds),
+          )
+          ..orderBy([OrderingTerm.asc(_db.transactions.transactionDate)]);
+    final rows = await query.get();
+    return rows.map((row) => row.readTable(_db.transactionEntries)).toList();
+  }
+
+  Future<int> getReconciledBalance(String accountId) async {
+    final reconciledIds = await _db
+        .select(_db.reconciledTransactions)
+        .map((row) => row.transactionId)
+        .get();
+    final rows =
+        await (_db.select(_db.transactionEntries)..where(
+              (table) =>
+                  table.accountId.equals(accountId) &
+                  table.transactionId.isIn(reconciledIds),
+            ))
+            .get();
+    return rows.fold<int>(0, (sum, row) => sum + row.amount);
+  }
+
+  Future<void> finalizeReconciliation({
+    required String accountId,
+    required DateTime statementDate,
+    required int statementEndingBalance,
+    required List<String> selectedTransactionIds,
+  }) async {
+    return _db.transaction(() async {
+      final now = DateTime.now();
+      final reconciliationId = _uuid.v4();
+      await _db
+          .into(_db.bankReconciliations)
+          .insert(
+            BankReconciliationsCompanion.insert(
+              id: Value(reconciliationId),
+              accountId: accountId,
+              statementDate: statementDate,
+              statementEndingBalance: statementEndingBalance,
+              status: const Value('finalized'),
+              createdAt: Value(now),
+              lastUpdated: Value(now),
+            ),
+          );
+      for (final transactionId in selectedTransactionIds) {
+        await _db
+            .into(_db.reconciledTransactions)
+            .insert(
+              ReconciledTransactionsCompanion.insert(
+                id: Value(_uuid.v4()),
+                reconciliationId: reconciliationId,
+                transactionId: transactionId,
+                createdAt: Value(now),
+                lastUpdated: Value(now),
+              ),
+            );
+      }
+    });
+  }
 }
 
 final bankReconciliationRepositoryProvider =

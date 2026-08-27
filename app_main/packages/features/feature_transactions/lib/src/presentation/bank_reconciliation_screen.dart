@@ -4,11 +4,8 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 // Assuming localization exists
-import 'package:core_data/core_data.dart'
-    hide bankReconciliationRepositoryProvider;
+import 'package:core_data/core_data.dart';
 import 'package:shared_ui/shared_ui.dart'; // CurrencyFormatter
-
-import '../data/bank_reconciliation_repository.dart';
 
 class BankReconciliationScreen extends ConsumerStatefulWidget {
   const BankReconciliationScreen({super.key});
