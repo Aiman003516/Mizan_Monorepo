@@ -5446,6 +5446,51 @@ class AppLocalizationsAr extends AppLocalizations {
   String get crmPipeline => 'مسار المبيعات';
 
   @override
+  String get crm360Title => 'إدارة علاقات العملاء 360';
+
+  @override
+  String get crm360History => 'سجل التفاعلات';
+
+  @override
+  String get crm360NoInteractions => 'لا توجد تفاعلات مسجلة.';
+
+  @override
+  String get crm360HistoryFailed => 'تعذر تحميل سجل التفاعلات.';
+
+  @override
+  String get crm360LoadFailed => 'تعذر تحميل إدارة علاقات العملاء 360.';
+
+  @override
+  String get crm360Empty => 'لا توجد ملفات عملاء متاحة.';
+
+  @override
+  String get crm360Outstanding => 'المستحق';
+
+  @override
+  String get crm360OpenOpportunities => 'الفرص المفتوحة';
+
+  @override
+  String get crm360Health => 'الحالة';
+
+  @override
+  String get crm360NotCalculated => 'لم يتم الحساب';
+
+  @override
+  String get crmQuoteApproval => 'إرسال عرض السعر للاعتماد';
+
+  @override
+  String get crmQuoteId => 'معرّف عرض السعر';
+
+  @override
+  String get crmApprovalReason => 'سبب الاعتماد';
+
+  @override
+  String get crmQuoteApprovalSubmitted => 'تم إرسال عرض السعر للاعتماد.';
+
+  @override
+  String get crmQuoteApprovalFailed => 'تعذر إرسال عرض السعر للاعتماد.';
+
+  @override
   String get crmPipelineIntro =>
       'تابع العملاء المحتملين والفرص والإجراءات التالية وتقدم المراحل في مكان واحد.';
 

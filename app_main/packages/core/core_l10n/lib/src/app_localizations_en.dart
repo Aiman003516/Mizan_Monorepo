@@ -5465,6 +5465,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get crmPipeline => 'Sales Pipeline';
 
   @override
+  String get crm360Title => 'CRM 360';
+
+  @override
+  String get crm360History => 'Interaction history';
+
+  @override
+  String get crm360NoInteractions => 'No interactions recorded.';
+
+  @override
+  String get crm360HistoryFailed => 'Could not load interaction history.';
+
+  @override
+  String get crm360LoadFailed => 'Could not load CRM 360.';
+
+  @override
+  String get crm360Empty => 'No customer profiles are available.';
+
+  @override
+  String get crm360Outstanding => 'Outstanding';
+
+  @override
+  String get crm360OpenOpportunities => 'Open opportunities';
+
+  @override
+  String get crm360Health => 'Health';
+
+  @override
+  String get crm360NotCalculated => 'Not calculated';
+
+  @override
+  String get crmQuoteApproval => 'Submit quote for approval';
+
+  @override
+  String get crmQuoteId => 'Quote ID';
+
+  @override
+  String get crmApprovalReason => 'Approval reason';
+
+  @override
+  String get crmQuoteApprovalSubmitted => 'Quote submitted for approval.';
+
+  @override
+  String get crmQuoteApprovalFailed =>
+      'Could not submit the quote for approval.';
+
+  @override
   String get crmPipelineIntro =>
       'Track leads, opportunities, next actions, and stage progress in one place.';
 

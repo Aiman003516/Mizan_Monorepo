@@ -140,6 +140,8 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         return Text(l10n.vendorsAp);
       case MainPage.crmPipeline:
         return Text(l10n.crmPipeline);
+      case MainPage.crm360:
+        return Text(l10n.crm360Title);
       case MainPage.procurement:
         return Text(l10n.procurement);
     }
@@ -464,6 +466,14 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
             ),
 
             ListTile(
+              leading: const Icon(Icons.insights_outlined),
+              title: Text(l10n.crm360Title),
+              onTap: () {
+                Navigator.pop(context);
+                ref.read(mainNavProvider.notifier).state = MainPage.crm360;
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.shopping_cart_checkout),
               title: Text(l10n.procurement),
               onTap: () {
@@ -658,6 +668,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         MainPage.customers => const CustomersTableScreen(),
         MainPage.vendors => const VendorsTableScreen(),
         MainPage.crmPipeline => const CrmPipelineScreen(),
+        MainPage.crm360 => const Crm360Screen(),
         MainPage.procurement => const ProcurementHubScreen(),
       },
     );

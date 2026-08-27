@@ -10310,6 +10310,96 @@ abstract class AppLocalizations {
   /// **'Sales Pipeline'**
   String get crmPipeline;
 
+  /// No description provided for @crm360Title.
+  ///
+  /// In en, this message translates to:
+  /// **'CRM 360'**
+  String get crm360Title;
+
+  /// No description provided for @crm360History.
+  ///
+  /// In en, this message translates to:
+  /// **'Interaction history'**
+  String get crm360History;
+
+  /// No description provided for @crm360NoInteractions.
+  ///
+  /// In en, this message translates to:
+  /// **'No interactions recorded.'**
+  String get crm360NoInteractions;
+
+  /// No description provided for @crm360HistoryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load interaction history.'**
+  String get crm360HistoryFailed;
+
+  /// No description provided for @crm360LoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load CRM 360.'**
+  String get crm360LoadFailed;
+
+  /// No description provided for @crm360Empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No customer profiles are available.'**
+  String get crm360Empty;
+
+  /// No description provided for @crm360Outstanding.
+  ///
+  /// In en, this message translates to:
+  /// **'Outstanding'**
+  String get crm360Outstanding;
+
+  /// No description provided for @crm360OpenOpportunities.
+  ///
+  /// In en, this message translates to:
+  /// **'Open opportunities'**
+  String get crm360OpenOpportunities;
+
+  /// No description provided for @crm360Health.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get crm360Health;
+
+  /// No description provided for @crm360NotCalculated.
+  ///
+  /// In en, this message translates to:
+  /// **'Not calculated'**
+  String get crm360NotCalculated;
+
+  /// No description provided for @crmQuoteApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit quote for approval'**
+  String get crmQuoteApproval;
+
+  /// No description provided for @crmQuoteId.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote ID'**
+  String get crmQuoteId;
+
+  /// No description provided for @crmApprovalReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval reason'**
+  String get crmApprovalReason;
+
+  /// No description provided for @crmQuoteApprovalSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Quote submitted for approval.'**
+  String get crmQuoteApprovalSubmitted;
+
+  /// No description provided for @crmQuoteApprovalFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not submit the quote for approval.'**
+  String get crmQuoteApprovalFailed;
+
   /// No description provided for @crmPipelineIntro.
   ///
   /// In en, this message translates to:

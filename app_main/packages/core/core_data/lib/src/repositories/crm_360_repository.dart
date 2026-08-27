@@ -67,6 +67,32 @@ class CrmCustomer360 {
   }
 }
 
+class CrmInteractionSummary {
+  const CrmInteractionSummary({
+    required this.id,
+    required this.channel,
+    required this.direction,
+    required this.summary,
+    required this.occurredAt,
+  });
+  final String id;
+  final String channel;
+  final String direction;
+  final String summary;
+  final DateTime occurredAt;
+
+  factory CrmInteractionSummary.fromJson(Map<String, dynamic> json) =>
+      CrmInteractionSummary(
+        id: json['id']?.toString() ?? '',
+        channel: json['channel']?.toString() ?? 'other',
+        direction: json['direction']?.toString() ?? 'internal',
+        summary: json['summary']?.toString() ?? '',
+        occurredAt:
+            DateTime.tryParse(json['occurred_at']?.toString() ?? '') ??
+            DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+      );
+}
+
 class Crm360Repository {
   Crm360Repository(this._supabase, this._tenantContext);
 
@@ -88,6 +114,51 @@ class Crm360Repository {
         .whereType<Map>()
         .map((row) => CrmCustomer360.fromJson(Map<String, dynamic>.from(row)))
         .toList(growable: false);
+  }
+
+  Future<List<CrmInteractionSummary>> listInteractions({
+    required String entityType,
+    required String entityId,
+  }) async {
+    await _tenantId();
+    final response = await _supabase.rpc(
+      'list_crm_interactions',
+      params: {'p_entity_type': entityType, 'p_entity_id': entityId},
+    );
+    if (response is! List)
+      throw const PostgrestException(
+        message: 'Interaction history returned no result.',
+        code: 'MIZAN_CRM_INTERACTIONS_INVALID_RESPONSE',
+      );
+    return response
+        .whereType<Map>()
+        .map(
+          (row) =>
+              CrmInteractionSummary.fromJson(Map<String, dynamic>.from(row)),
+        )
+        .toList(growable: false);
+  }
+
+  Future<Map<String, dynamic>> submitQuoteForApproval({
+    required String quoteId,
+    String? reason,
+  }) async {
+    await _tenantId();
+    if (quoteId.trim().isEmpty)
+      throw const PostgrestException(
+        message: 'Quote identifier is required.',
+        code: 'MIZAN_CRM_QUOTE_ID_REQUIRED',
+      );
+    final response = await _supabase.rpc(
+      'submit_crm_quote_for_approval',
+      params: {'p_quote_id': quoteId.trim(), 'p_reason': reason?.trim()},
+    );
+    if (response is! Map)
+      throw const PostgrestException(
+        message: 'Quote approval returned no result.',
+        code: 'MIZAN_CRM_QUOTE_APPROVAL_INVALID_RESPONSE',
+      );
+    return Map<String, dynamic>.from(response);
   }
 
   Future<Map<String, dynamic>> calculateCustomerHealth(

@@ -12,3 +12,4 @@ export 'src/presentation/vendors/vendor_detail_screen.dart';
 export 'src/presentation/vendors/bill_form_screen.dart';
 export 'src/presentation/vendors/ap_aging_report_screen.dart';
 export 'src/presentation/crm/crm_pipeline_screen.dart';
+export 'src/presentation/crm/crm_360_screen.dart';

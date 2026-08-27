@@ -18,6 +18,7 @@ enum MainPage {
   customers, // 🟢 NEW
   vendors, // 🟢 NEW
   crmPipeline,
+  crm360,
   procurement,
 }
 
