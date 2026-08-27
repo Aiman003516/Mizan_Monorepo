@@ -2,6 +2,9 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_ui/shared_ui.dart';
 
+/// JavaScript can represent integers exactly only through 2^53 - 1.
+const _maxSafeInteger = 9007199254740991;
+
 /// Shared submit contract used by customer and supplier adjustment flows.
 typedef BalanceAdjustmentSubmit =
     Future<void> Function({
@@ -57,7 +60,7 @@ class _BalanceAdjustmentDialogState extends State<BalanceAdjustmentDialog> {
     final value = double.tryParse(_amountController.text.trim());
     if (value == null || !value.isFinite || value <= 0) return null;
     final minor = value * 100;
-    if (minor > 9223372036854775807 || minor.round() <= 0) return null;
+    if (minor > _maxSafeInteger || minor.round() <= 0) return null;
     return minor.round();
   }
 

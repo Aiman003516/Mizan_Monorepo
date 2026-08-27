@@ -11,18 +11,45 @@ class Crm360Screen extends ConsumerStatefulWidget {
 }
 
 class _Crm360ScreenState extends ConsumerState<Crm360Screen> {
+  bool _tenantUnavailable = false;
+  bool _schemaUnavailable = false;
   late Future<List<CrmCustomer360>> _future;
+
+  bool get _isCloudConfigured =>
+      EnvConfig.supabaseUrl.isNotEmpty && EnvConfig.supabaseAnonKey.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
-    _future = ref.read(crm360RepositoryProvider).listCustomer360();
+    _future = _load();
+  }
+
+  Future<List<CrmCustomer360>> _load() async {
+    if (!_isCloudConfigured) return const <CrmCustomer360>[];
+    final repository = ref.read(crm360RepositoryProvider);
+    if (!repository.hasAuthenticatedUser) return const <CrmCustomer360>[];
+    try {
+      await ref.read(tenantContextProvider).currentTenantId();
+    } catch (_) {
+      if (mounted) setState(() => _tenantUnavailable = true);
+      return const <CrmCustomer360>[];
+    }
+    try {
+      return await repository.listCustomer360();
+    } catch (error) {
+      if (isCrmSchemaUnavailableError(error) && mounted) {
+        setState(() => _schemaUnavailable = true);
+      }
+      rethrow;
+    }
   }
 
   Future<void> _refresh() async {
-    setState(
-      () => _future = ref.read(crm360RepositoryProvider).listCustomer360(),
-    );
+    setState(() {
+      _tenantUnavailable = false;
+      _schemaUnavailable = false;
+      _future = _load();
+    });
     await _future;
   }
 
@@ -130,9 +157,85 @@ class _Crm360ScreenState extends ConsumerState<Crm360Screen> {
     }
   }
 
+  Widget _buildSchemaUnavailable(AppLocalizations l10n) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Card(
+          margin: const EdgeInsets.all(24),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.integration_instructions_outlined,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.crmSchemaUnavailableTitle,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.crmSchemaUnavailableHint,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                FilledButton.tonalIcon(
+                  onPressed: _refresh,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(l10n.retry),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMembershipRequired(AppLocalizations l10n) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Card(
+          margin: const EdgeInsets.all(24),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.groups_outlined,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.crmMembershipRequired,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(l10n.crmMembershipHint, textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    if (_schemaUnavailable) return _buildSchemaUnavailable(l10n);
+    if (_tenantUnavailable) return _buildMembershipRequired(l10n);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.crm360Title),

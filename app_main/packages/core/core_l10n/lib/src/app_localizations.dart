@@ -10454,11 +10454,59 @@ abstract class AppLocalizations {
   /// **'Your local records remain available offline. Sign in to load CRM pipeline data and sync changes.'**
   String get crmPipelineSignInHint;
 
+  /// No description provided for @crmPipelineMembershipRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Join an organization to view its cloud sales pipeline.'**
+  String get crmPipelineMembershipRequired;
+
+  /// No description provided for @crmPipelineMembershipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is authenticated but is not an active member of a Mizan organization yet.'**
+  String get crmPipelineMembershipHint;
+
+  /// No description provided for @crmMembershipRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Join an organization to access cloud CRM data.'**
+  String get crmMembershipRequired;
+
+  /// No description provided for @crmMembershipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is authenticated but is not an active member of a Mizan organization yet.'**
+  String get crmMembershipHint;
+
   /// No description provided for @crmPipelineLoadFailed.
   ///
   /// In en, this message translates to:
   /// **'Could not load the CRM pipeline.'**
   String get crmPipelineLoadFailed;
+
+  /// No description provided for @crmSchemaUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CRM is not set up in this cloud workspace.'**
+  String get crmSchemaUnavailableTitle;
+
+  /// No description provided for @crmSchemaUnavailableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply the Mizan CRM database migrations, then retry. Local records remain available offline.'**
+  String get crmSchemaUnavailableHint;
+
+  /// No description provided for @accountingReportsSchemaUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounting reports are not set up in this cloud workspace.'**
+  String get accountingReportsSchemaUnavailableTitle;
+
+  /// No description provided for @accountingReportsSchemaUnavailableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply the Mizan accounting-report migrations, then retry. Local report data remains available offline.'**
+  String get accountingReportsSchemaUnavailableHint;
 
   /// No description provided for @crmPipelineEmpty.
   ///

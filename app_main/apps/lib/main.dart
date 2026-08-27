@@ -124,7 +124,10 @@ class _PendingInvitationStartupRouterState
   Future<void> _maybeOpenInvitation() async {
     if (_didOfferInvitation || !mounted) return;
     final pending = ref.read(pendingInvitationProvider);
-    if (pending == null || Supabase.instance.client.auth.currentUser == null) {
+    if (pending == null ||
+        EnvConfig.supabaseUrl.isEmpty ||
+        EnvConfig.supabaseAnonKey.isEmpty ||
+        Supabase.instance.client.auth.currentUser == null) {
       return;
     }
     _didOfferInvitation = true;
@@ -145,8 +148,12 @@ class MyApp extends ConsumerWidget {
     final themeMode = ref.watch(themeControllerProvider);
     final locale = ref.watch(localeControllerProvider);
 
-    // Watch Sync Service
-    final _ = ref.watch(cloudSyncServiceProvider);
+    // Cloud sync is opt-in. In an unconfigured build, keep the app fully
+    // usable in guest/local mode without touching Supabase.instance.
+    if (EnvConfig.supabaseUrl.isNotEmpty &&
+        EnvConfig.supabaseAnonKey.isNotEmpty) {
+      ref.watch(cloudSyncServiceProvider);
+    }
 
     // 🟢 GATEKEEPER LOGIC
     // We check the repo directly. If the UI button updates the repo and notifies a provider,
@@ -232,14 +239,14 @@ class _AuthenticatedAppState extends ConsumerState<_AuthenticatedApp>
     WidgetsBinding.instance.addObserver(this);
     _checkInitialAuth();
     // Register as window listener on Windows
-    if (Platform.isWindows) {
+    if (!kIsWeb && Platform.isWindows) {
       windowManager.addListener(this);
     }
   }
 
   @override
   void dispose() {
-    if (Platform.isWindows) {
+    if (!kIsWeb && Platform.isWindows) {
       windowManager.removeListener(this);
     }
     WidgetsBinding.instance.removeObserver(this);
@@ -260,7 +267,7 @@ class _AuthenticatedAppState extends ConsumerState<_AuthenticatedApp>
   void onWindowUnmaximize() => _saveWindowState();
 
   Future<void> _saveWindowState() async {
-    if (!Platform.isWindows) return;
+    if (kIsWeb || !Platform.isWindows) return;
 
     final prefs = await SharedPreferences.getInstance();
     final size = await windowManager.getSize();

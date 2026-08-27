@@ -15,3 +15,6 @@ skills-lock.json
 .local_ai_model_cache/
 .local_llama_cpp_cache/
 app_main/apps/assets/local_ai/*.gguf
+
+# Sandbox-only browser master-test artifacts (may contain credentials or tokens)
+web_test_artifacts/

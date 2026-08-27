@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:core_data/core_data.dart' hide TrialBalanceLine;
+import 'report_schema_unavailable_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // UPDATED Local Imports
@@ -93,13 +95,17 @@ class TrialBalanceScreen extends ConsumerWidget {
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(
-          child: FilledButton.tonalIcon(
-            onPressed: () => ref.invalidate(trialBalanceProvider),
-            icon: const Icon(Icons.refresh),
-            label: Text(l10n.trialBalanceLoadFailed),
-          ),
-        ),
+        error: (e, s) => isAccountingReportSchemaUnavailableError(e)
+            ? ReportSchemaUnavailableState(
+                onRetry: () => ref.invalidate(trialBalanceProvider),
+              )
+            : Center(
+                child: FilledButton.tonalIcon(
+                  onPressed: () => ref.invalidate(trialBalanceProvider),
+                  icon: const Icon(Icons.refresh),
+                  label: Text(l10n.trialBalanceLoadFailed),
+                ),
+              ),
       ),
     );
   }

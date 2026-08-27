@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,6 +75,11 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
   }
 
   Future<void> _showSyncWarningMaybe() async {
+    final cloudConfigured =
+        EnvConfig.supabaseUrl.isNotEmpty &&
+        EnvConfig.supabaseAnonKey.isNotEmpty;
+    if (!cloudConfigured) return;
+
     final authState = ref.read(authControllerProvider);
     if (!_hasAuthenticatedSession(authState.status)) {
       final prefs = ref.read(preferencesRepositoryProvider);
@@ -115,10 +121,10 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
   }
 
   bool _childOwnsAppBar(MainPage page) {
-    return switch (page) {
-      MainPage.dashboard || MainPage.crmPipeline => false,
-      _ => true,
-    };
+    // Most feature screens are embedded with `isStandalone: false` and rely
+    // on this scaffold for their title. Only these screens always create their
+    // own AppBar; showing both would produce duplicate headers.
+    return page == MainPage.crm360 || page == MainPage.procurement;
   }
 
   Widget _buildAppBarTitle(MainPage currentPage, BuildContext context) {
@@ -247,6 +253,39 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     return actions;
   }
 
+  Widget _buildGuestCrmPipelineScreen() {
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Card(
+          margin: const EdgeInsets.all(24),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.cloud_off_outlined,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.crmPipelineSignInRequired,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(l10n.crmPipelineSignInHint, textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Custom Drawer Header to permanently prevent text overlap
   Widget _buildCustomDrawerHeader(AuthStatus authStatus) {
     // Watch the profile provider to get live updates for name and image
@@ -276,11 +315,13 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
               CircleAvatar(
                 radius: 36,
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                backgroundImage: imagePath != null && imagePath.isNotEmpty
+                backgroundImage:
+                    !kIsWeb && imagePath != null && imagePath.isNotEmpty
                     ? FileImage(File(imagePath))
                     : const AssetImage('assets/images/mizan_full.png'),
+
                 onBackgroundImageError:
-                    imagePath != null && imagePath.isNotEmpty
+                    !kIsWeb && imagePath != null && imagePath.isNotEmpty
                     ? (_, __) {}
                     : null,
               ),
@@ -345,10 +386,17 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authControllerProvider);
+    final cloudConfigured =
+        EnvConfig.supabaseUrl.isNotEmpty &&
+        EnvConfig.supabaseAnonKey.isNotEmpty;
+    final authState = cloudConfigured
+        ? ref.watch(authControllerProvider)
+        : AuthState(status: AuthStatus.unauthenticated);
     final authStatus = authState.status;
 
-    final syncState = ref.watch(syncControllerProvider);
+    final syncState = cloudConfigured
+        ? ref.watch(syncControllerProvider)
+        : const AsyncData<void>(null);
     final isSyncing = syncState.isLoading;
 
     final currentPage = ref.watch(mainNavProvider);
@@ -364,29 +412,31 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
       _stopSearching();
     }
 
-    ref.listen(syncControllerProvider, (previous, next) {
-      if (next.isLoading) return;
-      if (next.hasError) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.backupFailed),
-              backgroundColor: context.appColors.error,
-            ),
-          );
+    if (cloudConfigured) {
+      ref.listen(syncControllerProvider, (previous, next) {
+        if (next.isLoading) return;
+        if (next.hasError) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.backupFailed),
+                backgroundColor: context.appColors.error,
+              ),
+            );
+          }
         }
-      }
-      if (!next.hasError && (previous?.isLoading ?? false)) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.restoreSuccessful),
-              backgroundColor: context.appColors.success,
-            ),
-          );
+        if (!next.hasError && (previous?.isLoading ?? false)) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.restoreSuccessful),
+                backgroundColor: context.appColors.success,
+              ),
+            );
+          }
         }
-      }
-    });
+      });
+    }
 
     final scaffold = Scaffold(
       key: _scaffoldKey,
@@ -699,15 +749,18 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         MainPage.reportTrialBalance => const TrialBalanceScreen(),
         MainPage.customers => const CustomersTableScreen(),
         MainPage.vendors => const VendorsTableScreen(),
-        MainPage.crmPipeline => CrmPipelineScreen(
-          onSignIn: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => LoginScreen(onJoinOrganization: () {}),
-              ),
-            );
-          },
-        ),
+        MainPage.crmPipeline =>
+          cloudConfigured
+              ? CrmPipelineScreen(
+                  onSignIn: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => LoginScreen(onJoinOrganization: () {}),
+                      ),
+                    );
+                  },
+                )
+              : _buildGuestCrmPipelineScreen(),
         MainPage.crm360 => const Crm360Screen(),
         MainPage.procurement => const ProcurementHubScreen(),
       },

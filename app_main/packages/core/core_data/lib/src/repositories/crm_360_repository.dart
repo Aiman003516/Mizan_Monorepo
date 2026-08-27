@@ -99,6 +99,8 @@ class Crm360Repository {
   final SupabaseClient _supabase;
   final TenantContext _tenantContext;
 
+  bool get hasAuthenticatedUser => _supabase.auth.currentUser != null;
+
   Future<String> _tenantId() => _tenantContext.currentTenantId();
 
   Future<List<CrmCustomer360>> listCustomer360() async {

@@ -6,11 +6,15 @@ import 'package:drift/web.dart';
 
 /// Opens the browser-local Drift database used by the web guest/offline cache.
 ///
-/// The Flutter web shell loads sql.js from `web/index.html`. `readIntsAsBigInt`
-/// keeps Drift int64 values lossless for financial amounts.
+/// The Flutter web shell loads the vendored sql.js runtime from `web/index.html`.
+/// Browser financial inputs are bounded to the JavaScript safe-integer range.
 QueryExecutor openConnection() {
   return WebDatabase(
     'mizan',
-    readIntsAsBigInt: true,
+    // The web data models use Dart int fields and all browser financial inputs
+    // are bounded by the JavaScript safe-integer validation rule. Returning
+    // sql.js integers as BigInt here causes generated Drift rows to fail type
+    // conversion before account/report streams can render.
+    readIntsAsBigInt: false,
   );
 }

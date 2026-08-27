@@ -192,7 +192,9 @@ class AuthRepository {
 
   Future<auth.AuthClient?> signIn() async {
     if (kIsWeb) {
-      throw UnimplementedError('Web platform is not supported');
+      throw UnimplementedError(
+        'Use signInWithWebOAuth for browser authentication.',
+      );
     }
 
     try {
@@ -280,6 +282,19 @@ class AuthRepository {
     }
   }
 
+  /// Starts the Supabase-managed Google OAuth redirect for browser builds.
+  ///
+  /// Supabase owns the provider exchange and callback session. The browser
+  /// client never receives or stores a Google client secret.
+  Future<bool> signInWithWebOAuth() async {
+    if (!kIsWeb) return false;
+    final redirectTo = Uri.base.origin;
+    return _supabase.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: redirectTo,
+    );
+  }
+
   Future<auth.AuthClient?> signInSilently() async {
     if (_client != null) return _client;
 
@@ -360,9 +375,9 @@ class AuthRepository {
   Future<void> signOut() async {
     try {
       await _supabase.auth.signOut();
-      if (Platform.isAndroid) {
+      if (!kIsWeb && Platform.isAndroid) {
         await _googleSignIn.signOut();
-      } else if (Platform.isWindows) {
+      } else if (!kIsWeb && Platform.isWindows) {
         await _secureStorage.delete(key: _windowsRefreshTokenKey);
       }
     } catch (e) {
@@ -389,6 +404,7 @@ class AuthRepository {
 
   Future<bool> hasStoredCredentials() async {
     if (await hasActiveSupabaseSession()) return true;
+    if (kIsWeb) return false;
     if (Platform.isAndroid) {
       return await _googleSignIn.isSignedIn();
     } else if (Platform.isWindows) {

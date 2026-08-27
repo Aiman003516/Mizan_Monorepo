@@ -5521,7 +5521,39 @@ class AppLocalizationsAr extends AppLocalizations {
       'تبقى سجلاتك المحلية متاحة دون اتصال. سجّل الدخول لتحميل بيانات مسار CRM ومزامنة التغييرات.';
 
   @override
+  String get crmPipelineMembershipRequired =>
+      'انضم إلى مؤسسة لعرض مسار مبيعاتها السحابي.';
+
+  @override
+  String get crmPipelineMembershipHint =>
+      'تم توثيق هذا الحساب، لكنه ليس عضواً نشطاً في مؤسسة على نظام ميزان بعد.';
+
+  @override
+  String get crmMembershipRequired =>
+      'انضم إلى مؤسسة للوصول إلى بيانات CRM السحابية.';
+
+  @override
+  String get crmMembershipHint =>
+      'تم توثيق هذا الحساب، لكنه ليس عضواً نشطاً في مؤسسة على نظام ميزان بعد.';
+
+  @override
   String get crmPipelineLoadFailed => 'تعذر تحميل مسار CRM.';
+
+  @override
+  String get crmSchemaUnavailableTitle =>
+      'لم يتم إعداد CRM في مساحة العمل السحابية هذه.';
+
+  @override
+  String get crmSchemaUnavailableHint =>
+      'طبّق ترحيلات قاعدة بيانات CRM الخاصة بميزان، ثم أعد المحاولة. تبقى السجلات المحلية متاحة دون اتصال.';
+
+  @override
+  String get accountingReportsSchemaUnavailableTitle =>
+      'لم يتم إعداد التقارير المحاسبية في مساحة العمل السحابية هذه.';
+
+  @override
+  String get accountingReportsSchemaUnavailableHint =>
+      'طبّق ترحيلات التقارير المحاسبية الخاصة بميزان، ثم أعد المحاولة. تبقى بيانات التقارير المحلية متاحة دون اتصال.';
 
   @override
   String get crmPipelineEmpty => 'لا توجد فرص بعد.';

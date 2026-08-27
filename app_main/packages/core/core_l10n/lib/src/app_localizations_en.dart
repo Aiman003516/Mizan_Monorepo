@@ -5541,7 +5541,39 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your local records remain available offline. Sign in to load CRM pipeline data and sync changes.';
 
   @override
+  String get crmPipelineMembershipRequired =>
+      'Join an organization to view its cloud sales pipeline.';
+
+  @override
+  String get crmPipelineMembershipHint =>
+      'This account is authenticated but is not an active member of a Mizan organization yet.';
+
+  @override
+  String get crmMembershipRequired =>
+      'Join an organization to access cloud CRM data.';
+
+  @override
+  String get crmMembershipHint =>
+      'This account is authenticated but is not an active member of a Mizan organization yet.';
+
+  @override
   String get crmPipelineLoadFailed => 'Could not load the CRM pipeline.';
+
+  @override
+  String get crmSchemaUnavailableTitle =>
+      'CRM is not set up in this cloud workspace.';
+
+  @override
+  String get crmSchemaUnavailableHint =>
+      'Apply the Mizan CRM database migrations, then retry. Local records remain available offline.';
+
+  @override
+  String get accountingReportsSchemaUnavailableTitle =>
+      'Accounting reports are not set up in this cloud workspace.';
+
+  @override
+  String get accountingReportsSchemaUnavailableHint =>
+      'Apply the Mizan accounting-report migrations, then retry. Local report data remains available offline.';
 
   @override
   String get crmPipelineEmpty => 'No opportunities yet.';

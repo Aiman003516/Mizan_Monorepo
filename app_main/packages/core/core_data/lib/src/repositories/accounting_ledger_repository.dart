@@ -12,6 +12,14 @@ final accountingLedgerRepositoryProvider = Provider<AccountingLedgerRepository>(
   ),
 );
 
+bool isAccountingReportSchemaUnavailableError(Object error) {
+  if (error is! PostgrestException) return false;
+  // PGRST202 indicates an expected RPC is not deployed and PGRST205 indicates
+  // a relation is missing from the PostgREST schema cache. Neither should be
+  // presented as an empty financial report.
+  return error.code == 'PGRST202' || error.code == 'PGRST205';
+}
+
 class AccountingBook {
   const AccountingBook({
     required this.id,

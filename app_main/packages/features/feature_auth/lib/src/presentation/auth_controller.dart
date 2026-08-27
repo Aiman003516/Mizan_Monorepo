@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // UPDATED import
 import 'package:feature_auth/src/data/auth_repository.dart';
@@ -68,6 +69,19 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> signIn() async {
     state = AuthState(status: AuthStatus.loading);
     try {
+      if (kIsWeb) {
+        final started = await _authRepository.signInWithWebOAuth();
+        if (!started) {
+          state = AuthState(
+            status: AuthStatus.unauthenticated,
+            errorMessage: 'Browser sign-in is unavailable.',
+          );
+        }
+        // Supabase redirects the browser to Google and restores the session
+        // through the configured callback URL; no local token is handled here.
+        return;
+      }
+
       final client = await _authRepository.signIn();
       final hasSupabaseSession = await _authRepository
           .hasActiveSupabaseSession();

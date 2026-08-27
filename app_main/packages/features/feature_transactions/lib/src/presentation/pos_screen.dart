@@ -1,7 +1,7 @@
 // FILE: packages/features/feature_transactions/lib/src/presentation/pos_screen.dart
 
 import 'dart:convert';
-import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:flutter/services.dart';
@@ -576,7 +576,7 @@ class _PosScreenState extends ConsumerState<PosScreen> {
             },
           ),
         ),
-        floatingActionButton: (!Platform.isWindows)
+        floatingActionButton: !kIsWeb
             ? Padding(
                 padding: const EdgeInsets.only(bottom: 50),
                 child: FloatingActionButton.extended(

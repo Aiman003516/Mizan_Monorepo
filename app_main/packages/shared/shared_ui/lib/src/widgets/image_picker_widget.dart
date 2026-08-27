@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:core_l10n/app_localizations.dart'; // UPDATED import
 
@@ -32,7 +33,7 @@ class ImagePickerWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.grey.shade400),
           ),
-          child: hasImage
+          child: hasImage && !kIsWeb
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.file(

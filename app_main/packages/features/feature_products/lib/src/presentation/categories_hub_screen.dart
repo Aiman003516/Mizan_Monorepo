@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
@@ -7,7 +9,6 @@ import 'package:feature_products/src/data/categories_repository.dart';
 import 'package:feature_products/src/presentation/all_products_stream_provider.dart';
 import 'package:feature_products/src/presentation/products_hub_screen.dart';
 
-import 'dart:io';
 import 'package:shared_ui/shared_ui.dart';
 import 'package:shared_services/shared_services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -62,7 +63,7 @@ class CategoriesHubScreen extends ConsumerWidget {
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: context.appColors.primary,
-                    child: imagePath != null && imagePath.isNotEmpty
+                    child: !kIsWeb && imagePath != null && imagePath.isNotEmpty
                         ? ClipOval(
                             child: Image.file(
                               File(imagePath),

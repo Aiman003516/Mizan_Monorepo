@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
+import 'package:core_data/core_data.dart';
+import 'report_schema_unavailable_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -97,7 +99,11 @@ class BalanceSheetScreen extends ConsumerWidget {
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text(l10n.errorLoadingData)),
+        error: (e, s) => isAccountingReportSchemaUnavailableError(e)
+            ? ReportSchemaUnavailableState(
+                onRetry: () => ref.invalidate(balanceSheetProvider),
+              )
+            : Center(child: Text(l10n.errorLoadingData)),
       ),
     );
   }

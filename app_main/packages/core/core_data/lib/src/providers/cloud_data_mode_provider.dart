@@ -9,6 +9,10 @@ enum CloudDataMode { guestLocal, resolvingTenant, authenticatedTenant }
 /// sign-out. The app can therefore rebuild repository providers when a user
 /// chooses to connect or disconnect their account.
 final supabaseSessionProvider = StreamProvider<Session?>((ref) async* {
+  if (EnvConfig.supabaseUrl.isEmpty || EnvConfig.supabaseAnonKey.isEmpty) {
+    yield null;
+    return;
+  }
   final client = Supabase.instance.client;
   yield client.auth.currentSession;
   await for (final authState in client.auth.onAuthStateChange) {
@@ -23,8 +27,13 @@ final supabaseSessionProvider = StreamProvider<Session?>((ref) async* {
 /// During that interval the app stays on local Drift data rather than replacing
 /// a visible guest list with an empty or failing cloud stream.
 final cloudDataModeStateProvider = StreamProvider<CloudDataMode>((ref) async* {
+  final isConfigured =
+      EnvConfig.supabaseUrl.isNotEmpty && EnvConfig.supabaseAnonKey.isNotEmpty;
+  if (!isConfigured) {
+    yield CloudDataMode.guestLocal;
+    return;
+  }
   final client = Supabase.instance.client;
-  final isConfigured = EnvConfig.isProd || EnvConfig.supabaseUrl.isNotEmpty;
 
   Future<CloudDataMode> resolve(Session? session) async {
     if (!isConfigured || session == null) {

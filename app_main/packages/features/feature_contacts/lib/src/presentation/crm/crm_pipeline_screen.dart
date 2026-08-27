@@ -13,6 +13,9 @@ class CrmPipelineScreen extends ConsumerStatefulWidget {
 }
 
 class _CrmPipelineScreenState extends ConsumerState<CrmPipelineScreen> {
+  bool _tenantUnavailable = false;
+  bool _schemaUnavailable = false;
+
   late Future<
     ({List<CrmPipelineStage> stages, List<CrmOpportunity> opportunities})
   >
@@ -21,11 +24,25 @@ class _CrmPipelineScreenState extends ConsumerState<CrmPipelineScreen> {
   @override
   void initState() {
     super.initState();
-    _loadFuture = _load();
+    _loadFuture = _isCloudConfigured
+        ? _load()
+        : Future.value((
+            stages: const <CrmPipelineStage>[],
+            opportunities: const <CrmOpportunity>[],
+          ));
   }
+
+  bool get _isCloudConfigured =>
+      EnvConfig.supabaseUrl.isNotEmpty && EnvConfig.supabaseAnonKey.isNotEmpty;
 
   Future<({List<CrmPipelineStage> stages, List<CrmOpportunity> opportunities})>
   _load() async {
+    if (!_isCloudConfigured) {
+      return (
+        stages: const <CrmPipelineStage>[],
+        opportunities: const <CrmOpportunity>[],
+      );
+    }
     final repository = ref.read(crmPipelineRepositoryProvider);
     if (!repository.hasAuthenticatedUser) {
       return (
@@ -33,13 +50,39 @@ class _CrmPipelineScreenState extends ConsumerState<CrmPipelineScreen> {
         opportunities: const <CrmOpportunity>[],
       );
     }
-    final stages = await repository.listStages();
-    final opportunities = await repository.listOpportunities();
-    return (stages: stages, opportunities: opportunities);
+    try {
+      await ref.read(tenantContextProvider).currentTenantId();
+    } catch (_) {
+      if (mounted) setState(() => _tenantUnavailable = true);
+      return (
+        stages: const <CrmPipelineStage>[],
+        opportunities: const <CrmOpportunity>[],
+      );
+    }
+    if (!repository.hasAuthenticatedUser) {
+      return (
+        stages: const <CrmPipelineStage>[],
+        opportunities: const <CrmOpportunity>[],
+      );
+    }
+    try {
+      final stages = await repository.listStages();
+      final opportunities = await repository.listOpportunities();
+      return (stages: stages, opportunities: opportunities);
+    } catch (error) {
+      if (isCrmSchemaUnavailableError(error) && mounted) {
+        setState(() => _schemaUnavailable = true);
+      }
+      rethrow;
+    }
   }
 
   Future<void> _refresh() async {
-    setState(() => _loadFuture = _load());
+    setState(() {
+      _tenantUnavailable = false;
+      _schemaUnavailable = false;
+      _loadFuture = _load();
+    });
     await _loadFuture;
   }
 
@@ -129,7 +172,55 @@ class _CrmPipelineScreenState extends ConsumerState<CrmPipelineScreen> {
     }
   }
 
+  Widget _buildSchemaState(AppLocalizations l10n) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Card(
+          margin: const EdgeInsets.all(24),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.integration_instructions_outlined,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.crmSchemaUnavailableTitle,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.crmSchemaUnavailableHint,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                FilledButton.tonalIcon(
+                  onPressed: _refresh,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(l10n.retry),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildGuestState(AppLocalizations l10n) {
+    final title = _tenantUnavailable
+        ? l10n.crmPipelineMembershipRequired
+        : l10n.crmPipelineSignInRequired;
+    final hint = _tenantUnavailable
+        ? l10n.crmPipelineMembershipHint
+        : l10n.crmPipelineSignInHint;
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 520),
@@ -147,13 +238,13 @@ class _CrmPipelineScreenState extends ConsumerState<CrmPipelineScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  l10n.crmPipelineSignInRequired,
+                  title,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
-                Text(l10n.crmPipelineSignInHint, textAlign: TextAlign.center),
-                if (widget.onSignIn != null) ...[
+                Text(hint, textAlign: TextAlign.center),
+                if (!_tenantUnavailable && widget.onSignIn != null) ...[
                   const SizedBox(height: 20),
                   FilledButton.icon(
                     onPressed: widget.onSignIn,
@@ -181,11 +272,19 @@ class _CrmPipelineScreenState extends ConsumerState<CrmPipelineScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    if (_schemaUnavailable) return _buildSchemaState(l10n);
+    if (!_isCloudConfigured || _tenantUnavailable) {
+      return _buildGuestState(l10n);
+    }
+
     return FutureBuilder<
       ({List<CrmPipelineStage> stages, List<CrmOpportunity> opportunities})
     >(
       future: _loadFuture,
       builder: (context, snapshot) {
+        if (!_isCloudConfigured) {
+          return _buildGuestState(l10n);
+        }
         final repository = ref.read(crmPipelineRepositoryProvider);
         if (!repository.hasAuthenticatedUser) {
           return _buildGuestState(l10n);

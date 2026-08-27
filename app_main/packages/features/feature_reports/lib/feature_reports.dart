@@ -26,6 +26,7 @@ export 'src/presentation/dynamic_report_screen.dart';
 export 'src/data/report_templates_repository.dart';
 export 'src/presentation/report_marketplace_screen.dart';
 export 'src/presentation/reports_hub_screen.dart';
+export 'src/presentation/report_schema_unavailable_state.dart';
 export 'src/presentation/operations_report_screens.dart';
 
 // Phase D: Enhanced Reports

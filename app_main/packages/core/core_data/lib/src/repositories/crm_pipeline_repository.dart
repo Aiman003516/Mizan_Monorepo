@@ -1,9 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../env_config.dart';
 import '../tenant_context.dart';
 
 final crmPipelineRepositoryProvider = Provider<CrmPipelineRepository>((ref) {
+  if (EnvConfig.supabaseUrl.isEmpty || EnvConfig.supabaseAnonKey.isEmpty) {
+    return CrmPipelineRepository.guest();
+  }
   return CrmPipelineRepository(
     Supabase.instance.client,
     ref.watch(tenantContextProvider),
@@ -170,19 +174,37 @@ class CrmActivity {
   }
 }
 
+bool isCrmSchemaUnavailableError(Object error) {
+  if (error is! PostgrestException) return false;
+  // PGRST205 means a relation is absent from the PostgREST schema cache;
+  // PGRST202 means an expected CRM RPC is not deployed. Both indicate an
+  // incomplete cloud migration, not an empty tenant or an authorization
+  // failure, so the UI can give a precise setup message without weakening RLS.
+  return error.code == 'PGRST205' || error.code == 'PGRST202';
+}
+
 class CrmPipelineRepository {
   CrmPipelineRepository(this._supabase, this._tenantContext);
 
-  final SupabaseClient _supabase;
-  final TenantContext _tenantContext;
+  CrmPipelineRepository.guest() : _supabase = null, _tenantContext = null;
 
-  bool get hasAuthenticatedUser => _supabase.auth.currentUser != null;
+  final SupabaseClient? _supabase;
+  final TenantContext? _tenantContext;
 
-  Future<String> _tenantId() => _tenantContext.currentTenantId();
+  SupabaseClient get _cloud =>
+      _supabase ?? (throw StateError('CRM cloud access is not configured.'));
+
+  TenantContext get _tenant =>
+      _tenantContext ??
+      (throw StateError('CRM tenant access is not configured.'));
+
+  bool get hasAuthenticatedUser => _supabase?.auth.currentUser != null;
+
+  Future<String> _tenantId() => _tenant.currentTenantId();
 
   Future<List<CrmPipelineStage>> listStages() async {
     final tenantId = await _tenantId();
-    final rows = await _supabase
+    final rows = await _cloud
         .from('crm_pipeline_stages')
         .select()
         .eq('tenant_id', tenantId)
@@ -196,7 +218,7 @@ class CrmPipelineRepository {
 
   Future<List<CrmLead>> listLeads({String? status}) async {
     final tenantId = await _tenantId();
-    var query = _supabase
+    var query = _cloud
         .from('crm_leads')
         .select()
         .eq('tenant_id', tenantId)
@@ -211,7 +233,7 @@ class CrmPipelineRepository {
 
   Future<List<CrmOpportunity>> listOpportunities({String? status}) async {
     final tenantId = await _tenantId();
-    var query = _supabase
+    var query = _cloud
         .from('crm_opportunities')
         .select('*, crm_pipeline_stages(name)')
         .eq('tenant_id', tenantId)
@@ -230,7 +252,7 @@ class CrmPipelineRepository {
     String? customerId,
   }) async {
     final tenantId = await _tenantId();
-    var query = _supabase
+    var query = _cloud
         .from('crm_activities')
         .select()
         .eq('tenant_id', tenantId)
@@ -251,7 +273,7 @@ class CrmPipelineRepository {
     required String stageId,
     String? note,
   }) async {
-    final result = await _supabase.rpc(
+    final result = await _cloud.rpc(
       'transition_crm_opportunity',
       params: {
         'p_opportunity_id': opportunityId,
