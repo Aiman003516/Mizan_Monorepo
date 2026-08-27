@@ -1284,6 +1284,22 @@ class AppLocalizationsAr extends AppLocalizations {
       'الفاتورة غير مؤهلة للترحيل؛ راجع أدلة الحظر.';
 
   @override
+  String get exceptionReason => 'سبب الاستثناء';
+
+  @override
+  String get requestException => 'طلب اعتماد الاستثناء';
+
+  @override
+  String get exceptionRequested => 'تم إرسال طلب اعتماد الاستثناء.';
+
+  @override
+  String get exceptionRequestFailed => 'تعذر إرسال طلب اعتماد الاستثناء.';
+
+  @override
+  String get billApprovedExceptionEligible =>
+      'يغطي استثناء معتمد فرق المطابقة؛ الفاتورة مؤهلة لأمر ترحيل محكوم مستقبلي.';
+
+  @override
   String get matchPassed => 'مطابق';
 
   @override

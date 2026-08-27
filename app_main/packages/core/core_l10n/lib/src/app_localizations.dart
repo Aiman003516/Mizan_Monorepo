@@ -2552,6 +2552,36 @@ abstract class AppLocalizations {
   /// **'Bill is not eligible for posting; review the blocking evidence.'**
   String get billMatchGateFailed;
 
+  /// No description provided for @exceptionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Exception reason'**
+  String get exceptionReason;
+
+  /// No description provided for @requestException.
+  ///
+  /// In en, this message translates to:
+  /// **'Request approval for exception'**
+  String get requestException;
+
+  /// No description provided for @exceptionRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Exception approval request submitted.'**
+  String get exceptionRequested;
+
+  /// No description provided for @exceptionRequestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not submit the exception approval request.'**
+  String get exceptionRequestFailed;
+
+  /// No description provided for @billApprovedExceptionEligible.
+  ///
+  /// In en, this message translates to:
+  /// **'An approved exception covers the match variance; the bill is eligible for a future governed posting command.'**
+  String get billApprovedExceptionEligible;
+
   /// No description provided for @matchPassed.
   ///
   /// In en, this message translates to:

@@ -26,6 +26,20 @@ abstract final class ProcurementValidation {
     }
   }
 
+  static void reason(String value, String name) {
+    final normalized = value.trim();
+    if (normalized.isEmpty || normalized.length > 1000) {
+      throw ArgumentError.value(value, name);
+    }
+  }
+
+  static void idempotencyKey(String value, String name) {
+    final normalized = value.trim();
+    if (normalized.length < 8 || normalized.length > 200) {
+      throw ArgumentError.value(value, name);
+    }
+  }
+
   static void purpose(String value) {
     final normalized = value.trim();
     if (normalized.isEmpty || normalized.length > 1000) {

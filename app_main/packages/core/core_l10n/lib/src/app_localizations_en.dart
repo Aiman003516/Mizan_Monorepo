@@ -1293,6 +1293,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Bill is not eligible for posting; review the blocking evidence.';
 
   @override
+  String get exceptionReason => 'Exception reason';
+
+  @override
+  String get requestException => 'Request approval for exception';
+
+  @override
+  String get exceptionRequested => 'Exception approval request submitted.';
+
+  @override
+  String get exceptionRequestFailed =>
+      'Could not submit the exception approval request.';
+
+  @override
+  String get billApprovedExceptionEligible =>
+      'An approved exception covers the match variance; the bill is eligible for a future governed posting command.';
+
+  @override
   String get matchPassed => 'Matched';
 
   @override

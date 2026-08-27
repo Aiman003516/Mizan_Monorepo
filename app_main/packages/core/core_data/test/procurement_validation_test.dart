@@ -25,6 +25,22 @@ void main() {
       );
     });
 
+    test('validates exception reasons and idempotency keys', () {
+      ProcurementValidation.reason(
+        'Price variance approved by finance',
+        'reason',
+      );
+      ProcurementValidation.idempotencyKey('exception-123', 'idempotencyKey');
+      expect(
+        () => ProcurementValidation.reason('', 'reason'),
+        throwsA(isA<ArgumentError>()),
+      );
+      expect(
+        () => ProcurementValidation.idempotencyKey('short', 'idempotencyKey'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
     test('requires UUID-shaped identifiers', () {
       ProcurementValidation.id(validUuid, 'id');
       expect(

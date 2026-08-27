@@ -14,12 +14,14 @@ class ThreeWayMatchScreen extends ConsumerStatefulWidget {
 class _ThreeWayMatchScreenState extends ConsumerState<ThreeWayMatchScreen> {
   final _formKey = GlobalKey<FormState>();
   final _billIdController = TextEditingController();
+  final _exceptionReasonController = TextEditingController();
   AsyncValue<List<ThreeWayMatchResult>>? _result;
   AsyncValue<Map<String, dynamic>>? _gateResult;
 
   @override
   void dispose() {
     _billIdController.dispose();
+    _exceptionReasonController.dispose();
     super.dispose();
   }
 
@@ -45,10 +47,40 @@ class _ThreeWayMatchScreenState extends ConsumerState<ThreeWayMatchScreen> {
     try {
       final response = await ref
           .read(procurementRepositoryProvider)
-          .assertPurchaseBillMatch(_billIdController.text.trim());
+          .assertPurchaseBillPostingEligibility(_billIdController.text.trim());
       if (mounted) setState(() => _gateResult = AsyncData(response));
     } catch (error, stackTrace) {
       if (mounted) setState(() => _gateResult = AsyncError(error, stackTrace));
+    }
+  }
+
+  Future<void> _requestException() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_exceptionReasonController.text.trim().isEmpty) return;
+    try {
+      await ref
+          .read(procurementRepositoryProvider)
+          .requestPurchaseBillMatchException(
+            billId: _billIdController.text.trim(),
+            reason: _exceptionReasonController.text.trim(),
+            idempotencyKey:
+                'purchase-bill-exception:${_billIdController.text.trim()}',
+          );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.exceptionRequested),
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.exceptionRequestFailed),
+          ),
+        );
+      }
     }
   }
 
@@ -63,19 +95,17 @@ class _ThreeWayMatchScreenState extends ConsumerState<ThreeWayMatchScreen> {
         children: [
           Form(
             key: _formKey,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _billIdController,
-                    decoration: InputDecoration(labelText: l10n.billId),
-                    validator: (value) => value == null || value.trim().isEmpty
-                        ? l10n.fieldRequired
-                        : null,
-                  ),
+                TextFormField(
+                  controller: _billIdController,
+                  decoration: InputDecoration(labelText: l10n.billId),
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? l10n.fieldRequired
+                      : null,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(height: 12),
                 FilledButton.icon(
                   onPressed: result is AsyncLoading ? null : _runMatch,
                   icon: const Icon(Icons.fact_check_outlined),
@@ -100,10 +130,30 @@ class _ThreeWayMatchScreenState extends ConsumerState<ThreeWayMatchScreen> {
             else if (_gateResult is AsyncData<Map<String, dynamic>>)
               _Message(
                 icon: Icons.check_circle_outline,
-                text: l10n.billEligibleForPosting,
+                text:
+                    (_gateResult! as AsyncData<Map<String, dynamic>>)
+                            .value['status'] ==
+                        'approved_exception'
+                    ? l10n.billApprovedExceptionEligible
+                    : l10n.billEligibleForPosting,
               )
             else if (_gateResult is AsyncError)
               _Message(icon: Icons.block, text: l10n.billMatchGateFailed),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _exceptionReasonController,
+              decoration: InputDecoration(labelText: l10n.exceptionReason),
+              maxLines: 3,
+              validator: (value) => value == null || value.trim().isEmpty
+                  ? l10n.fieldRequired
+                  : null,
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: _requestException,
+              icon: const Icon(Icons.rule_folder_outlined),
+              label: Text(l10n.requestException),
+            ),
           ],
           if (result is AsyncLoading)
             const Center(child: CircularProgressIndicator())

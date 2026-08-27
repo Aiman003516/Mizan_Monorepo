@@ -143,3 +143,9 @@ Run `tests/20260828060000_procurement_inventory_adapter.sql` in staging after th
 Migration `migrations/20260828070000_purchase_bill_match_gate.sql` adds `assert_purchase_bill_match(uuid)`. It consumes the canonical three-way evidence and rejects any non-void bill with a blocked line; a future bill approval/posting command must call this gate server-side. The gate only returns eligibility evidence and does not post the bill, create a journal, or approve an exception.
 
 Run `tests/20260828070000_purchase_bill_match_gate.sql` in staging and verify the RPC exists, derives tenant scope from the session, rejects blocked evidence, returns `eligible_for_posting_gate` for a fully matched bill, and cannot be executed by anonymous or public roles. Production application remains subject to explicit approval and a recorded staging result.
+
+## Purchase-bill match exceptions
+
+Migration `migrations/20260828080000_purchase_bill_exception_workflow.sql` adds auditable match-variance exception requests. A blocked bill can request a reasoned `bill` approval; the approval synchronization trigger records the decision, and `assert_purchase_bill_posting_eligibility(uuid)` accepts either a fully matched bill or an approved exception. This migration does not post bills, approve requests automatically, bypass maker-checker controls, or alter the original match evidence.
+
+Run `tests/20260828080000_purchase_bill_exception_workflow.sql` in staging after the match-gate migration. Exercise blocked and matched bills, duplicate exception retries, pending-exception rejection, self-approval rejection, approved-exception eligibility, rejected-exception blocking, tenant/branch isolation, and anonymous execution denial. Production application requires explicit approval and a recorded staging result.

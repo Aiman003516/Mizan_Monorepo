@@ -41,6 +41,7 @@ This registry is the canonical human-readable dependency map for the additive Su
 | `20260828050000_procurement_foundation.sql` | Procurement / Accounting / Inventory | Purchase requisitions, approval-aware purchase orders, receipt/return evidence, vendor-bill links, and three-way matching | Approvals, branches, vendors, bills, bill lines, inventory bridge, tenant permissions |
 | `20260828060000_procurement_inventory_adapter.sql` | Procurement / Inventory / Accounting | Explicit posted receipt/return adapters to inventory journal drafts, immutable links, and return stock synchronization | Procurement foundation, inventory bridge, ledger drafts, chart of accounts, branches, tenant permissions |
 | `20260828070000_purchase_bill_match_gate.sql` | Accounting / Procurement | Server-side eligibility gate that refuses blocked purchase bills before a future posting command | Procurement foundation, three-way matching, bills, accounting permissions |
+| `20260828080000_purchase_bill_exception_workflow.sql` | Procurement / Accounting / Governance | Auditable match-variance exception requests with maker-checker approval and exception-aware eligibility | Purchase-bill match gate, approval enforcement, bills, branches, tenant permissions |
 
 ## Required migration header
 

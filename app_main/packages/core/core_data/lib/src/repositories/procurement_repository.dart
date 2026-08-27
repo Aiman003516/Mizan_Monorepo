@@ -263,6 +263,44 @@ class ProcurementRepository {
     );
   }
 
+  Future<Map<String, dynamic>> requestPurchaseBillMatchException({
+    required String billId,
+    required String reason,
+    String? idempotencyKey,
+  }) async {
+    await _requireTenant();
+    ProcurementValidation.id(billId, 'billId');
+    ProcurementValidation.reason(reason, 'reason');
+    if (idempotencyKey != null) {
+      ProcurementValidation.idempotencyKey(idempotencyKey, 'idempotencyKey');
+    }
+    return _requireMap(
+      await _supabase.rpc(
+        'request_purchase_bill_match_exception',
+        params: {
+          'p_bill_id': billId,
+          'p_reason': reason.trim(),
+          'p_idempotency_key': idempotencyKey?.trim(),
+        },
+      ),
+      'MIZAN_PURCHASE_BILL_EXCEPTION_INVALID_RESPONSE',
+    );
+  }
+
+  Future<Map<String, dynamic>> assertPurchaseBillPostingEligibility(
+    String billId,
+  ) async {
+    await _requireTenant();
+    ProcurementValidation.id(billId, 'billId');
+    return _requireMap(
+      await _supabase.rpc(
+        'assert_purchase_bill_posting_eligibility',
+        params: {'p_bill_id': billId},
+      ),
+      'MIZAN_PURCHASE_BILL_POSTING_ELIGIBILITY_INVALID_RESPONSE',
+    );
+  }
+
   Future<Map<String, dynamic>> assertPurchaseBillMatch(String billId) async {
     await _requireTenant();
     ProcurementValidation.id(billId, 'billId');
