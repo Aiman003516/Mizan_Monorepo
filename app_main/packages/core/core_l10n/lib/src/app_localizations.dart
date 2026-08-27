@@ -10550,6 +10550,48 @@ abstract class AppLocalizations {
   /// **'Mizan is analyzing…'**
   String get aiAssistantThinking;
 
+  /// No description provided for @aiLocalNoCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Local assistant mode is available offline. No cloud data is sent.'**
+  String get aiLocalNoCloud;
+
+  /// No description provided for @aiLocalNavigationSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested destination: {screen}'**
+  String aiLocalNavigationSuggestion(Object screen);
+
+  /// No description provided for @aiLocalNavigate.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get aiLocalNavigate;
+
+  /// No description provided for @aiLocalExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'This local explanation is based on Mizan workflow guidance.'**
+  String get aiLocalExplanation;
+
+  /// No description provided for @aiLocalProposalNotExecuted.
+  ///
+  /// In en, this message translates to:
+  /// **'A local proposal was prepared for review. It was not executed and did not change any record.'**
+  String get aiLocalProposalNotExecuted;
+
+  /// No description provided for @aiLocalNeedDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide more details. The local assistant will not guess accounting or record values.'**
+  String get aiLocalNeedDetails;
+
+  /// No description provided for @aiLocalUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Local assistance is unavailable for this request.'**
+  String get aiLocalUnavailable;
+
   /// No description provided for @aiAssistantError.
   ///
   /// In en, this message translates to:

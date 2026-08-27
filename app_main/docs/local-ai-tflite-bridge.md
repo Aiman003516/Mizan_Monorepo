@@ -98,6 +98,12 @@ The native runtime remains disabled until all of the following are measured on t
 
 The final proposal still passes through `LocalAiProposal.decode` and `LocalAiProposalValidator.validate`. Authenticated mutations, if ever enabled, still use the existing server-authoritative confirmation-token flow. Guest/local mode never executes cloud mutations.
 
+## Current application behavior
+
+The Flutter application now composes `LocalAiOrchestrator` by default. It prefers the deterministic Arabic/English rule engine for allowlisted navigation, bounded workflow explanations, missing-information responses, and proposal-only mutation extraction. The assistant UI can use this path in guest/offline mode without sending the prompt to the cloud. Navigation is emitted as a feature-neutral target and mapped by the application shell to the existing `MainPage` state model.
+
+The reviewed model provider remains `DisabledLocalAiEngine` until a native runtime, artifact provenance, manifest signature, memory profile, device benchmark, and no-egress test have been approved. The cloud AI repository remains a separate authenticated path for server-authoritative action drafts and confirmation tokens. Local proposals never execute mutations.
+
 ## References
 
 [1]: https://developers.google.com/edge/litert "Google LiteRT: on-device machine learning runtime"

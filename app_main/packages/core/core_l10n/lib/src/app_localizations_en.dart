@@ -5591,6 +5591,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiAssistantThinking => 'Mizan is analyzing…';
 
   @override
+  String get aiLocalNoCloud =>
+      'Local assistant mode is available offline. No cloud data is sent.';
+
+  @override
+  String aiLocalNavigationSuggestion(Object screen) {
+    return 'Suggested destination: $screen';
+  }
+
+  @override
+  String get aiLocalNavigate => 'Open';
+
+  @override
+  String get aiLocalExplanation =>
+      'This local explanation is based on Mizan workflow guidance.';
+
+  @override
+  String get aiLocalProposalNotExecuted =>
+      'A local proposal was prepared for review. It was not executed and did not change any record.';
+
+  @override
+  String get aiLocalNeedDetails =>
+      'Please provide more details. The local assistant will not guess accounting or record values.';
+
+  @override
+  String get aiLocalUnavailable =>
+      'Local assistance is unavailable for this request.';
+
+  @override
   String get aiAssistantError =>
       'The AI assistant could not complete this request.';
 

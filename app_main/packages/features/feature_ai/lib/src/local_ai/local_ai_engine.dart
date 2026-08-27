@@ -1,5 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:core_l10n/app_localizations.dart';
 
 import 'local_ai_proposal.dart';
@@ -134,9 +132,3 @@ class FixedProposalLocalAiEngine implements LocalAiEngine {
     return LocalAiEngineResult.ready(_proposal);
   }
 }
-
-/// The application default remains disabled. Product composition code may
-/// explicitly override this provider after the local-only setting is enabled.
-final localAiEngineProvider = Provider<LocalAiEngine>((ref) {
-  return const DisabledLocalAiEngine();
-});

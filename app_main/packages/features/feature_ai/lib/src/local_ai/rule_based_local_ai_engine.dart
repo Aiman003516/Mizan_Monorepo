@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'local_ai_engine.dart';
+import 'local_ai_navigation.dart';
 import 'local_ai_proposal.dart';
 import 'local_ai_validator.dart';
 
@@ -41,6 +42,8 @@ class RuleBasedLocalAiEngine implements LocalAiEngine {
   LocalAiProposal _buildProposal(String text, String locale) {
     if (text.isEmpty) return _missing(locale, const ['request']);
     if (_containsUnsafeRequest(text)) return _unsupported(locale);
+    final navigation = _detectNavigation(text, locale);
+    if (navigation != null) return _navigation(navigation, text, locale);
     if (_isExplanation(text)) return _explanation(text, locale);
     if (_isMissingInformationRequest(text)) {
       return _missing(locale, _missingFieldsFor(text));
@@ -290,6 +293,50 @@ class RuleBasedLocalAiEngine implements LocalAiEngine {
       requiresConfirmation: false,
       locale: locale,
     );
+  }
+
+  LocalAiNavigationTarget? _detectNavigation(String text, String locale) {
+    if (!_isNavigationRequest(text)) return null;
+    return LocalAiNavigationCatalog.resolve(text, locale);
+  }
+
+  LocalAiProposal _navigation(
+    LocalAiNavigationTarget target,
+    String text,
+    String locale,
+  ) {
+    return LocalAiProposal(
+      intent: LocalAiIntent.navigate,
+      actionType: LocalAiActionTypes.navigate,
+      fields: {'query': text, 'target_id': target.id},
+      entities: const [],
+      missingFields: const [],
+      confidence: 0.95,
+      requiresConfirmation: false,
+      locale: locale,
+      route: target.id,
+    );
+  }
+
+  bool _isNavigationRequest(String text) {
+    final lower = text.toLowerCase();
+    return _containsAny(lower, const [
+      'go to',
+      'open',
+      'take me',
+      'navigate',
+      'show me',
+      'how to add',
+      'how do i add',
+      'اذهب',
+      'افتح',
+      'انتقل',
+      'اعرض',
+      'كيف أضيف',
+      'كيف اضيف',
+      'أين',
+      'اين',
+    ]);
   }
 
   String? _detectAction(String text) {

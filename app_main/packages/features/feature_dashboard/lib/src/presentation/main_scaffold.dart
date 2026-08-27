@@ -40,6 +40,31 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         status == AuthStatus.authenticated_offline;
   }
 
+  void _handleLocalAiNavigation(LocalAiNavigationTarget target) {
+    final page = switch (target.id) {
+      'dashboard' => MainPage.dashboard,
+      'pos' => MainPage.pos,
+      'reportsHub' => MainPage.reportsHub,
+      'reportProfitAndLoss' => MainPage.reportProfitAndLoss,
+      'reportBalanceSheet' => MainPage.reportBalanceSheet,
+      'reportTrialBalance' => MainPage.reportTrialBalance,
+      'manageAccounts' => MainPage.manageAccounts,
+      'manageProducts' => MainPage.manageProducts,
+      'manageCategories' => MainPage.manageCategories,
+      'customers' => MainPage.customers,
+      'vendors' => MainPage.vendors,
+      'crmPipeline' => MainPage.crmPipeline,
+      'crm360' => MainPage.crm360,
+      'procurement' => MainPage.procurement,
+      'orderHistory' => MainPage.orderHistory,
+      'settings' => MainPage.settings,
+      _ => null,
+    };
+    if (page == null) return;
+    ref.read(mainNavProvider.notifier).state = page;
+    if (mounted) Navigator.of(context).pop();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -402,6 +427,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => AiAssistantScreen(
+                      onNavigate: _handleLocalAiNavigation,
                       onConnectAccount: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(

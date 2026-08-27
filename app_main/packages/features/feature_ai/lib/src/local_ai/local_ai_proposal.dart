@@ -20,6 +20,15 @@ abstract final class LocalAiActionTypes {
   static const vendorArchive = 'vendor_archive';
   static const invoiceVoid = 'invoice_void';
   static const billVoid = 'bill_void';
+  static const navigate = 'navigate';
+  static const openScreen = 'open_screen';
+  static const searchEntity = 'search_entity';
+
+  static const supportedNavigation = <String>{
+    navigate,
+    openScreen,
+    searchEntity,
+  };
 
   static const supportedMutations = <String>{
     customerUpdate,
@@ -37,6 +46,7 @@ abstract final class LocalAiActionTypes {
 
 enum LocalAiIntent {
   explain,
+  navigate,
   proposeMutation,
   requestMissingInformation,
   unsupported,
@@ -45,6 +55,7 @@ enum LocalAiIntent {
 extension LocalAiIntentCodec on LocalAiIntent {
   String get value => switch (this) {
     LocalAiIntent.explain => 'explain',
+    LocalAiIntent.navigate => 'navigate',
     LocalAiIntent.proposeMutation => 'propose_mutation',
     LocalAiIntent.requestMissingInformation => 'request_missing_information',
     LocalAiIntent.unsupported => 'unsupported',
@@ -53,6 +64,7 @@ extension LocalAiIntentCodec on LocalAiIntent {
   static LocalAiIntent parse(Object? value) {
     return switch (value) {
       'explain' => LocalAiIntent.explain,
+      'navigate' => LocalAiIntent.navigate,
       'propose_mutation' => LocalAiIntent.proposeMutation,
       'request_missing_information' => LocalAiIntent.requestMissingInformation,
       'unsupported' => LocalAiIntent.unsupported,
@@ -149,6 +161,8 @@ class LocalAiProposal {
     required this.confidence,
     required this.requiresConfirmation,
     required this.locale,
+    this.explanation,
+    this.route,
     this.source = 'local',
     this.schemaVersion = localAiProposalSchemaVersion,
   });
@@ -162,30 +176,37 @@ class LocalAiProposal {
   final double confidence;
   final bool requiresConfirmation;
   final String locale;
+  final String? explanation;
+  final String? route;
   final String source;
 
   bool get isMutation =>
       LocalAiActionTypes.supportedMutations.contains(actionType);
 
-  Map<String, Object?> toJson() => {
-    'schema_version': schemaVersion,
-    'intent': intent.value,
-    'action_type': actionType,
-    'fields': fields,
-    'entities': entities.map((entity) => entity.toJson()).toList(),
-    'missing_fields': missingFields,
-    'confidence': confidence,
-    'requires_confirmation': requiresConfirmation,
-    'locale': locale,
-    'source': source,
-  };
+  Map<String, Object?> toJson() {
+    final json = <String, Object?>{
+      'schema_version': schemaVersion,
+      'intent': intent.value,
+      'action_type': actionType,
+      'fields': fields,
+      'entities': entities.map((entity) => entity.toJson()).toList(),
+      'missing_fields': missingFields,
+      'confidence': confidence,
+      'requires_confirmation': requiresConfirmation,
+      'locale': locale,
+      'source': source,
+    };
+    if (explanation != null) json['explanation'] = explanation;
+    if (route != null) json['route'] = route;
+    return json;
+  }
 
   String encode() => jsonEncode(toJson());
 
   factory LocalAiProposal.fromJson(Object? value) {
     if (value is! Map) throw const FormatException('Invalid local AI proposal');
     final json = Map<String, Object?>.from(value);
-    const keys = {
+    const requiredKeys = {
       'schema_version',
       'intent',
       'action_type',
@@ -197,8 +218,12 @@ class LocalAiProposal {
       'locale',
       'source',
     };
+    const optionalKeys = {'explanation', 'route'};
     final actualKeys = json.keys.toSet();
-    if (actualKeys.length != keys.length || !actualKeys.containsAll(keys)) {
+    if (!actualKeys.containsAll(requiredKeys) ||
+        actualKeys.any(
+          (key) => !requiredKeys.contains(key) && !optionalKeys.contains(key),
+        )) {
       throw const FormatException('Local AI proposal keys are invalid');
     }
     final schemaVersion = json['schema_version'];
@@ -210,6 +235,8 @@ class LocalAiProposal {
     final requiresConfirmation = json['requires_confirmation'];
     final locale = json['locale'];
     final source = json['source'];
+    final explanation = json['explanation'];
+    final route = json['route'];
     if (schemaVersion != localAiProposalSchemaVersion ||
         actionType is! String ||
         fields is! Map ||
@@ -218,7 +245,9 @@ class LocalAiProposal {
         confidence is! num ||
         requiresConfirmation is! bool ||
         locale is! String ||
-        source is! String) {
+        source is! String ||
+        (explanation != null && explanation is! String) ||
+        (route != null && route is! String)) {
       throw const FormatException('Local AI proposal fields are invalid');
     }
     final confidenceValue = confidence.toDouble();
@@ -239,6 +268,8 @@ class LocalAiProposal {
       confidence: confidenceValue,
       requiresConfirmation: requiresConfirmation,
       locale: locale,
+      explanation: explanation as String?,
+      route: route as String?,
       source: source,
     );
   }

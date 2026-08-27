@@ -1,3 +1,4 @@
+import 'local_ai_navigation.dart';
 import 'local_ai_proposal.dart';
 
 class LocalAiValidationResult {
@@ -62,6 +63,9 @@ abstract final class LocalAiProposalValidator {
     }
 
     final isMutation = proposal.isMutation;
+    final isNavigation = LocalAiActionTypes.supportedNavigation.contains(
+      proposal.actionType,
+    );
     if (isMutation && proposal.confidence < _minimumMutationConfidence) {
       errors.add('mutation confidence is below the local safety threshold');
     }
@@ -77,6 +81,13 @@ abstract final class LocalAiProposalValidator {
     }
     if (proposal.intent != LocalAiIntent.proposeMutation && isMutation) {
       errors.add('supported mutations require propose_mutation intent');
+    }
+    if (isNavigation) _validateNavigation(proposal, errors);
+    if (proposal.intent == LocalAiIntent.navigate && !isNavigation) {
+      errors.add('navigate intent requires a supported navigation action');
+    }
+    if (proposal.intent != LocalAiIntent.navigate && isNavigation) {
+      errors.add('navigation actions require navigate intent');
     }
 
     switch (proposal.actionType) {
@@ -99,6 +110,23 @@ abstract final class LocalAiProposalValidator {
         _validateArchiveOrVoid(proposal.fields, errors);
     }
     return LocalAiValidationResult(List.unmodifiable(errors));
+  }
+
+  static void _validateNavigation(
+    LocalAiProposal proposal,
+    List<String> errors,
+  ) {
+    if (proposal.requiresConfirmation) {
+      errors.add('navigation never requires mutation confirmation');
+    }
+    final route = proposal.route;
+    if (route == null || !LocalAiNavigationCatalog.isAllowed(route)) {
+      errors.add('navigation route is not allowlisted');
+    }
+    if (proposal.actionType == LocalAiActionTypes.searchEntity &&
+        proposal.fields['query'] is! String) {
+      errors.add('entity search requires a query');
+    }
   }
 
   static void _validatePartyUpdate(

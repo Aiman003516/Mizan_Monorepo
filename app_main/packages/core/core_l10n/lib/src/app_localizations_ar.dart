@@ -5570,6 +5570,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aiAssistantThinking => 'ميزان يحلل…';
 
   @override
+  String get aiLocalNoCloud =>
+      'يتوفر المساعد المحلي دون اتصال بالإنترنت، ولا يتم إرسال بيانات إلى السحابة.';
+
+  @override
+  String aiLocalNavigationSuggestion(Object screen) {
+    return 'الوجهة المقترحة: $screen';
+  }
+
+  @override
+  String get aiLocalNavigate => 'فتح';
+
+  @override
+  String get aiLocalExplanation =>
+      'يعتمد هذا الشرح المحلي على إرشادات سير العمل في ميزان.';
+
+  @override
+  String get aiLocalProposalNotExecuted =>
+      'تم إعداد اقتراح محلي للمراجعة. لم يتم تنفيذه ولم يغيّر أي سجل.';
+
+  @override
+  String get aiLocalNeedDetails =>
+      'يرجى تقديم مزيد من التفاصيل. لن يخمّن المساعد المحلي قيم السجلات أو المحاسبة.';
+
+  @override
+  String get aiLocalUnavailable => 'المساعدة المحلية غير متاحة لهذا الطلب.';
+
+  @override
   String get aiAssistantError => 'تعذر على المساعد الذكي إكمال الطلب.';
 
   @override

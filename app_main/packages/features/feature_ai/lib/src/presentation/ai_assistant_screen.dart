@@ -6,11 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/ai_agent_repository.dart';
+import '../local_ai/local_ai_engine.dart';
+import '../local_ai/local_ai_knowledge_base.dart';
+import '../local_ai/local_ai_navigation.dart';
+import '../local_ai/local_ai_proposal.dart';
+import '../local_ai/local_ai_provider.dart';
 
 class AiAssistantScreen extends ConsumerStatefulWidget {
-  const AiAssistantScreen({super.key, this.onConnectAccount});
+  const AiAssistantScreen({super.key, this.onConnectAccount, this.onNavigate});
 
   final VoidCallback? onConnectAccount;
+  final ValueChanged<LocalAiNavigationTarget>? onNavigate;
 
   @override
   ConsumerState<AiAssistantScreen> createState() => _AiAssistantScreenState();
@@ -26,6 +32,8 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   String? _confirmationToken;
   bool _isSending = false;
   bool _isCreatingDraft = false;
+  LocalAiProposal? _localProposal;
+  LocalAiNavigationTarget? _localNavigationTarget;
 
   @override
   void dispose() {
@@ -432,6 +440,67 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
     );
   }
 
+  String _localResponse(
+    LocalAiProposal proposal,
+    String locale,
+    AppLocalizations l10n,
+  ) {
+    if (proposal.intent == LocalAiIntent.navigate && proposal.route != null) {
+      final target = LocalAiNavigationCatalog.destinations.firstWhere(
+        (item) => item.id == proposal.route,
+      );
+      return l10n.aiLocalNavigationSuggestion(target.labelFor(locale));
+    }
+    if (proposal.intent == LocalAiIntent.explain) {
+      final query = proposal.fields['query'];
+      final chunks = LocalAiKnowledgeBase.search(
+        query is String ? query : '',
+        locale: locale,
+      );
+      if (chunks.isNotEmpty) {
+        return chunks
+            .map(
+              (chunk) => '${chunk.titleFor(locale)}: ${chunk.bodyFor(locale)}',
+            )
+            .join('\n\n');
+      }
+      return l10n.aiLocalExplanation;
+    }
+    if (proposal.isMutation) return l10n.aiLocalProposalNotExecuted;
+    if (proposal.intent == LocalAiIntent.requestMissingInformation) {
+      return l10n.aiLocalNeedDetails;
+    }
+    return l10n.aiLocalUnavailable;
+  }
+
+  Widget _buildLocalNavigationCard(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    final target = _localNavigationTarget;
+    if (target == null) return const SizedBox.shrink();
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      child: ListTile(
+        leading: const Icon(Icons.open_in_new),
+        title: Text(
+          l10n.aiLocalNavigationSuggestion(
+            target.labelFor(Localizations.localeOf(context).languageCode),
+          ),
+        ),
+        trailing: FilledButton.tonal(
+          onPressed: widget.onNavigate == null
+              ? null
+              : () {
+                  widget.onNavigate!(target);
+                  if (mounted) setState(() => _localNavigationTarget = null);
+                },
+          child: Text(l10n.aiLocalNavigate),
+        ),
+      ),
+    );
+  }
+
   Future<void> _send() async {
     final text = _composerController.text.trim();
     if (text.isEmpty || _isSending) return;
@@ -439,19 +508,71 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
     final locale = Localizations.localeOf(context).languageCode;
     final l10n = AppLocalizations.of(context)!;
     final isCloudMode = ref.read(cloudDataModeProvider);
-    if (!isCloudMode) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.aiAssistantGuestMode)));
-      return;
-    }
 
     _composerController.clear();
     setState(() {
+      _localProposal = null;
+      _localNavigationTarget = null;
       _messages.add(AiChatMessage(role: 'user', content: text));
       _isSending = true;
     });
     _scrollToEnd();
+
+    if (!isCloudMode) {
+      try {
+        final result = await ref
+            .read(localAiEngineProvider)
+            .propose(LocalAiRequest(text: text, locale: locale));
+        if (!mounted) return;
+        if (result.isReady) {
+          final proposal = result.proposal!;
+          final target = proposal.route == null
+              ? null
+              : LocalAiNavigationCatalog.destinations
+                    .cast<LocalAiNavigationTarget?>()
+                    .firstWhere(
+                      (item) => item?.id == proposal.route,
+                      orElse: () => null,
+                    );
+          setState(() {
+            _localProposal = proposal;
+            _localNavigationTarget = target;
+            _messages.add(
+              AiChatMessage(
+                role: 'assistant',
+                content: _localResponse(proposal, locale, l10n),
+              ),
+            );
+          });
+        } else {
+          setState(() {
+            _messages.add(
+              AiChatMessage(
+                role: 'assistant',
+                content: result.localizedMessage(l10n),
+              ),
+            );
+          });
+        }
+      } catch (_) {
+        if (mounted) {
+          setState(() {
+            _messages.add(
+              AiChatMessage(
+                role: 'assistant',
+                content: l10n.aiLocalUnavailable,
+              ),
+            );
+          });
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isSending = false);
+          _scrollToEnd();
+        }
+      }
+      return;
+    }
 
     try {
       final response = await ref
@@ -552,6 +673,8 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
           children: [
             _buildHeader(context, l10n, isCloudMode),
             if (_actionDraft != null) _buildActionDraftCard(context, l10n),
+            if (_localProposal?.intent == LocalAiIntent.navigate)
+              _buildLocalNavigationCard(context, l10n),
             Expanded(
               child: _messages.isEmpty
                   ? _buildEmptyState(context, l10n, isCloudMode)
@@ -643,9 +766,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Text(
-          isCloudMode
-              ? l10n.aiAssistantInputHint
-              : l10n.aiAssistantSignInRequired,
+          isCloudMode ? l10n.aiAssistantInputHint : l10n.aiLocalNoCloud,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
@@ -671,7 +792,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
                 controller: _composerController,
                 minLines: 1,
                 maxLines: 5,
-                enabled: isCloudMode && !_isSending,
+                enabled: !_isSending,
                 textInputAction: TextInputAction.newline,
                 decoration: InputDecoration(
                   hintText: l10n.aiAssistantInputHint,
@@ -683,7 +804,7 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
             const SizedBox(width: 8),
             IconButton.filled(
               tooltip: l10n.aiAssistantSend,
-              onPressed: isCloudMode && !_isSending ? _send : null,
+              onPressed: !_isSending ? _send : null,
               icon: const Icon(Icons.send),
             ),
           ],
