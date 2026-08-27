@@ -73,6 +73,8 @@ enum AppPermission {
   // --- CRM & Admin ---
   manageStaff, // Invite users, change roles
   manageSettings, // Change currency, tax, company info
+  manageBranches, // Manage branch records and staff branch assignments
+  approveRequests, // Decide governed approval requests
   manageCrm,
   manageCustomers,
   manageVendors,
