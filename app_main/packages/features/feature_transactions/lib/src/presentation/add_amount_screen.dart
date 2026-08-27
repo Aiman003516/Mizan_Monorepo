@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:drift/drift.dart' as d;
 import 'package:core_l10n/app_localizations.dart';
 import 'package:core_data/core_data.dart';
-import 'package:feature_accounts/feature_accounts.dart';
 import 'package:feature_reports/feature_reports.dart';
 import 'package:feature_transactions/src/data/transactions_repository.dart';
 

@@ -5,9 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core_data/core_data.dart'; // Preferences
 import 'package:uuid/uuid.dart';
 
-// We need Feature Accounts to find Inventory/COGS accounts
-// ignore: undefined_hidden_name
-import 'package:feature_accounts/feature_accounts.dart' hide databaseProvider;
 import 'package:feature_transactions/src/data/database_provider.dart';
 import 'package:feature_transactions/src/presentation/pos_receipt_provider.dart';
 import 'package:feature_auth/feature_auth.dart';

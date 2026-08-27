@@ -1,13 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core_database/core_database.dart';
-import 'package:feature_accounts/src/data/accounts_repository.dart';
-
-final accountsStreamProvider = StreamProvider<List<Account>>((ref) {
-  final accountsRepository = ref.watch(accountsRepositoryProvider);
-  return accountsRepository.watchAccounts();
-});
-
-final allAccountsStreamProvider = StreamProvider<List<Account>>((ref) {
-  final accountsRepository = ref.watch(accountsRepositoryProvider);
-  return accountsRepository.watchAllAccounts();
-});
+/// Compatibility export for account list providers.
+///
+/// Account query providers are owned by core_data so other bounded contexts can
+/// consume the public account contract without depending on feature_accounts.
+export 'package:core_data/core_data.dart'
+    show accountsStreamProvider, allAccountsStreamProvider;

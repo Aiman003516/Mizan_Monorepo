@@ -20,7 +20,6 @@ import 'package:shared_ui/shared_ui.dart';
 // Feature Imports
 import 'package:feature_products/feature_products.dart'
     hide accountsRepositoryProvider, databaseProvider;
-import 'package:feature_accounts/feature_accounts.dart';
 
 // Local Feature Imports
 import 'package:feature_transactions/src/data/transactions_repository.dart';

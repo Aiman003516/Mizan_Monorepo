@@ -3,9 +3,8 @@ import 'package:core_ui/core_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:core_l10n/app_localizations.dart';
-import 'package:feature_accounts/feature_accounts.dart';
 import 'package:feature_transactions/src/data/transactions_repository.dart';
-import 'package:core_data/core_data.dart'; // For prefs
+import 'package:core_data/core_data.dart';
 
 class PeriodEndWizardScreen extends ConsumerStatefulWidget {
   const PeriodEndWizardScreen({super.key});

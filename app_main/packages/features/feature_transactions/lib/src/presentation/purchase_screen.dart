@@ -7,11 +7,10 @@ import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart' as d;
 
 // Core Imports
-import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
 
-// Feature Imports
-import 'package:feature_accounts/feature_accounts.dart';
+// Core account contract
+import 'package:core_data/core_data.dart';
 import 'package:feature_products/feature_products.dart'
     hide accountsRepositoryProvider;
 

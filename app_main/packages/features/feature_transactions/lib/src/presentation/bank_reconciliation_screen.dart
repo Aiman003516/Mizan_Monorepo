@@ -4,9 +4,9 @@ import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 // Assuming localization exists
-import 'package:core_database/core_database.dart';
+import 'package:core_data/core_data.dart'
+    hide bankReconciliationRepositoryProvider;
 import 'package:shared_ui/shared_ui.dart'; // CurrencyFormatter
-import 'package:feature_accounts/feature_accounts.dart'; // Account selection
 
 import '../data/bank_reconciliation_repository.dart';
 

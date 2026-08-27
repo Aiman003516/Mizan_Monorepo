@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'package:core_database/core_database.dart';
+import 'package:core_data/core_data.dart';
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:core_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_ui/shared_ui.dart'; // CurrencyFormatter
 import '../data/adjusting_entries_repository.dart';
-import 'package:feature_accounts/feature_accounts.dart'; // To select accounts
 
 // ⭐️ IMPORT THE WIZARD SCREEN
 import 'period_end_wizard_screen.dart';

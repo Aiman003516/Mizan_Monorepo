@@ -7,11 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 // Core Imports
-import 'package:core_database/core_database.dart';
 import 'package:core_l10n/app_localizations.dart';
 
-// Feature Imports
-import 'package:feature_accounts/feature_accounts.dart';
+// Core account contract
+import 'package:core_data/core_data.dart';
 import 'package:feature_transactions/src/data/transactions_repository.dart';
 
 class MakePaymentScreen extends ConsumerStatefulWidget {

@@ -10,8 +10,6 @@ import 'package:drift/drift.dart' as d;
 import 'package:core_data/core_data.dart';
 import 'package:core_l10n/app_localizations.dart';
 
-// Feature Imports
-import 'package:feature_accounts/feature_accounts.dart';
 import 'package:feature_transactions/src/data/transactions_repository.dart';
 
 class JournalEntryLine {
