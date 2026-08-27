@@ -111,3 +111,9 @@ This migration is an additive contract for the next client workflow. Do not revo
 Migration `migrations/20260828020000_party_statements.sql` adds the tenant-safe `public.party_statement(text, uuid, date, date)` read RPC. It combines non-void invoices or bills, posted settlements, and posted balance adjustments into a reproducible statement with opening balance, debit, credit, balance delta, currency, and running balance fields. The function is read-only, derives the tenant from the authenticated context, and is not executable by anonymous or public roles.
 
 Run `tests/20260828020000_party_statements.sql` in staging after the AR/AP settlement and balance-adjustment migrations. Verify that the statement totals agree with the source documents, posted settlement journals, and adjustment register for each tested tenant, branch, period, and currency. No production SQL is implied by the presence of this file.
+
+## Month-end close preflight
+
+Migration `migrations/20260828030000_close_preflight.sql` adds the tenant-scoped `public.accounting_close_preflight(uuid)` read RPC. It checks period status, pending approvals, draft journals, unposted settlements, open document anomalies, and the active leading accounting book. The result is evidence-oriented and returns severity, blocking status, issue count, and a message for each check.
+
+Run `tests/20260828030000_close_preflight.sql` in staging after the accounting, approval, settlement, document-anomaly, and party-statement migrations. The preflight is a readiness check, not an automatic period-close command; a separate owner-authorized close action must remain server-enforced.
