@@ -1,0 +1,11 @@
+begin;
+select plan(7);
+select has_table('public','warehouse_transfers','warehouse transfer table exists');
+select has_table('public','warehouse_transfer_lines','warehouse transfer lines table exists');
+select has_function('public','post_warehouse_transfer',array['text','text','text','text','text','jsonb','text'],'warehouse transfer RPC exists');
+select ok(pg_get_functiondef('public.post_warehouse_transfer(text,text,text,text,text,jsonb,text)'::regprocedure) like '%for update%','transfer locks source/destination balances');
+select ok(pg_get_functiondef('public.post_warehouse_transfer(text,text,text,text,text,jsonb,text)'::regprocedure) like '%Insufficient source inventory%','transfer rejects insufficient source inventory');
+select ok(pg_get_functiondef('public.post_warehouse_transfer(text,text,text,text,text,jsonb,text)'::regprocedure) like '%idempotency_key%','transfer is retry-safe');
+select ok(not exists(select 1 from information_schema.role_routine_grants where routine_schema='public' and routine_name='post_warehouse_transfer' and grantee in('anon','public') and privilege_type='EXECUTE'),'anonymous/public roles cannot execute transfer');
+select * from finish();
+rollback;
