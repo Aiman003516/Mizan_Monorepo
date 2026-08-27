@@ -12,6 +12,7 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        localAiChannel?.close()
         localAiChannel = null
         super.cleanUpFlutterEngine(flutterEngine)
     }

@@ -2,7 +2,7 @@
 
 ## Scope
 
-This document defines the Android integration boundary for a future small on-device model. Step 2 ships the deterministic Dart engine and a fail-closed method-channel scaffold. It does **not** ship a model binary, add a native inference dependency, or enable model inference in production.
+This document defines the Android integration boundary for the reviewed Qwen3 GGUF on-device model. The Android runner now builds a pinned CPU-only llama.cpp runtime from a separately prepared local source archive and exposes proposal-only inference through a narrow method channel. Native inference still requires device-level validation before being treated as production-ready.
 
 > The native runtime may return a typed local proposal only. It must never receive or expose SQL, HTTP, credentials, filesystem commands, arbitrary method names, or direct accounting and CRM mutation authority.
 
@@ -22,13 +22,23 @@ The allowed methods are deliberately finite:
 | `infer` | `text`, `locale` | proposal JSON or failure status | The runtime receives only current user text and locale; output is parsed as the versioned proposal contract and deterministically validated again in Dart |
 | `unload_model` | none | null | Releases native resources; it cannot mutate application data |
 
-The Android scaffold currently returns `unavailable` for model operations. This is intentional: adding a channel is not equivalent to enabling a model. A future implementation should keep the actual interpreter behind a private Kotlin class such as `VerifiedLocalAiRuntime`, with no public API other than the three methods above.
+The Android implementation verifies the packaged GGUF asset, copies it to the app-private no-backup directory, loads the native `mizan_local_ai` JNI library asynchronously, and runs llama.cpp on a single worker executor. The JNI class has no public surface beyond the three methods above. Native output is returned as a candidate proposal only; Dart performs the authoritative schema and semantic validation.
 
 The existing cloud AI route remains separate. Local-only mode must not silently call the cloud gateway if the Android model is missing, invalid, incompatible, or out of memory.
 
-## Proposed native implementation sequence
+## Android llama.cpp implementation
 
-The first native runtime candidate is LiteRT/TensorFlow Lite for Android, subject to the project’s final dependency review and device benchmark. The dependency version must be pinned rather than resolved dynamically. The runtime should be initialized lazily on the first explicitly allowed local inference request and released on lifecycle/background or memory-pressure events.
+The Android runtime uses the same pinned llama.cpp revision as the Windows runner:
+
+| Field | Value |
+|---|---|
+| Revision | `47c786924ad1ab7e91da2cdc72fcdb563780c2bd` |
+| Source archive | `https://github.com/ggml-org/llama.cpp/archive/47c786924ad1ab7e91da2cdc72fcdb563780c2bd.zip` |
+| Archive SHA-256 | `9416d95607230f8a4e4379e1b86604e127c7c0eafa5e5c8c76605e43805b8c88` |
+| Runtime | CPU-only llama.cpp through Android NDK/JNI |
+| Model | `Qwen_Qwen3-0.6B-Q4_K_M.gguf` |
+
+Run `scripts/prepare_llama_cpp_windows.ps1` once from the repository root. The extracted source is ignored by Git and is consumed by Android CMake without a build-time network clone. The runtime is initialized lazily on the first model-tier request and released when the Flutter engine is detached.
 
 The native implementation should perform the following checks before inference:
 
@@ -46,17 +56,13 @@ The native implementation should not accept arbitrary tensor names, file paths, 
 
 ## Asset layout
 
-No model asset is currently packaged. When a reviewed model is approved, the recommended Android-only layout is:
+The reviewed GGUF remains a Flutter asset so the same verified artifact can be packaged for the platform runners:
 
 ```text
-apps/android/app/src/main/assets/local_ai/
-  proposal_extractor_v1/
-    model.tflite
-    manifest.json
-    manifest.sig
+apps/assets/local_ai/Qwen_Qwen3-0.6B-Q4_K_M.gguf
 ```
 
-The Flutter package should not declare the model as a web asset. The model is intentionally Android-specific until equivalent privacy and runtime behavior is implemented on other platforms. A future iOS or desktop implementation must use the same proposal schema and validation boundary rather than sharing an Android binary.
+At runtime, Android copies the asset into the app-private no-backup directory, verifies SHA-256 during the copy, and passes only that private path to JNI. The Flutter package does not expose the GGUF as a web asset. Android and Windows use the same proposal schema and validation boundary while compiling platform-specific native runtimes.
 
 The manifest template is stored at `docs/local-ai-model-manifest.example.json`. It records:
 
@@ -94,7 +100,7 @@ A future remote configuration may disable a model identifier, but it must not be
 
 ## Verification gates before enabling a real model
 
-The native runtime remains disabled until all of the following are measured on the Samsung Note9 target and representative Android API levels: cold and warm latency, peak memory, model size, crash/recovery behavior, battery and thermal impact, Arabic and English structured-output validity, malformed-output rejection, unsafe-request refusal, and network-capture evidence showing no AI data egress in local-only mode.
+The native runtime is now enabled for Android and Windows behind the rule-first orchestrator, but it remains a release gate until all of the following are measured on the Samsung Note9 target and representative Android API levels: cold and warm latency, peak memory, model size, crash/recovery behavior, battery and thermal impact, Arabic and English structured-output validity, malformed-output rejection, unsafe-request refusal, and network-capture evidence showing no AI data egress in local-only mode.
 
 The final proposal still passes through `LocalAiProposal.decode` and `LocalAiProposalValidator.validate`. Authenticated mutations, if ever enabled, still use the existing server-authoritative confirmation-token flow. Guest/local mode never executes cloud mutations.
 
@@ -102,7 +108,7 @@ The final proposal still passes through `LocalAiProposal.decode` and `LocalAiPro
 
 The Flutter application now composes `LocalAiOrchestrator` by default. It prefers the deterministic Arabic/English rule engine for allowlisted navigation, bounded workflow explanations, missing-information responses, and proposal-only mutation extraction. The assistant UI can use this path in guest/offline mode without sending the prompt to the cloud. Navigation is emitted as a feature-neutral target and mapped by the application shell to the existing `MainPage` state model.
 
-The reviewed model provider remains `DisabledLocalAiEngine` until a native runtime, artifact provenance, manifest signature, memory profile, device benchmark, and no-egress test have been approved. The cloud AI repository remains a separate authenticated path for server-authoritative action drafts and confirmation tokens. Local proposals never execute mutations.
+The reviewed model provider selects `NativeGgufLocalAiEngine` on Android and Windows and remains deterministic-first through `LocalAiOrchestrator`. The cloud AI repository remains a separate authenticated path for server-authoritative action drafts and confirmation tokens. Local proposals never execute mutations. If the native library, model asset, or proposal output fails, the orchestrator uses the localized safe fallback and never silently calls a cloud model.
 
 ## References
 

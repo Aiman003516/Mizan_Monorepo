@@ -7,11 +7,13 @@ import 'local_ai_native_bridge.dart';
 import 'local_ai_orchestrator.dart';
 import 'rule_based_local_ai_engine.dart';
 
-/// The reviewed GGUF tier is enabled only on Windows, where the llama.cpp
-/// native runner is packaged by the Windows CMake project. Other platforms
-/// remain rule-first until their native runtimes pass platform verification.
+/// The reviewed GGUF tier is enabled on Android and Windows, where the
+/// platform runners package the pinned llama.cpp runtime. The orchestrator
+/// remains rule-first, and the model is only queried when deterministic local
+/// handling cannot resolve the request.
 final localAiModelEngineProvider = Provider<LocalAiEngine>((ref) {
-  if (defaultTargetPlatform != TargetPlatform.windows) {
+  if (defaultTargetPlatform != TargetPlatform.android &&
+      defaultTargetPlatform != TargetPlatform.windows) {
     return const DisabledLocalAiEngine();
   }
   return NativeGgufLocalAiEngine(
@@ -20,7 +22,7 @@ final localAiModelEngineProvider = Provider<LocalAiEngine>((ref) {
   );
 });
 
-/// Guest/offline assistance remains rule-first. The Windows model is only a
+/// Guest/offline assistance remains rule-first. The native model is only a
 /// fallback for requests that the deterministic tier cannot resolve, and all
 /// model output still passes the proposal validator before reaching the UI.
 final localAiEngineProvider = Provider<LocalAiEngine>((ref) {

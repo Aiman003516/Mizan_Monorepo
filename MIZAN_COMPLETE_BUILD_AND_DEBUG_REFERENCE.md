@@ -262,15 +262,16 @@ cd D:\mizan_monorepo
 git pull --tags origin main
 Set-ExecutionPolicy -Scope Process Bypass
 .\scripts\prepare_qwen3_local_model.ps1
+.\scripts\prepare_llama_cpp_windows.ps1
 cd app_main
 flutter pub get
 flutter gen-l10n
 cd apps
 flutter analyze
-flutter build apk --debug
+flutter build apk --debug --target-platform android-arm64
 ```
 
-The current implementation’s real native llama.cpp runtime is Windows-targeted in the latest integration slice. Android remains on the deterministic local assistant until its Android native runtime is built and tested separately. Do not claim Android model inference solely from the presence of the GGUF asset.
+The Android runner now builds the pinned CPU-only llama.cpp JNI runtime and packages the exact GGUF asset. The sandbox verified an arm64-capable debug APK containing `libmizan_local_ai.so`, `libllama.so`, and the exact model SHA-256. Physical-device inference, latency, memory, thermal, and no-egress verification still must be performed on the Samsung Note9. Do not claim that the model produced a valid Mizan proposal solely from APK packaging; Dart schema and semantic validation remain authoritative.
 
 ## 11. Flutter dependency, localization, analysis, and test commands
 
@@ -438,8 +439,10 @@ If `git pull` reports local changes, preserve the message and do not use `git re
 | Build succeeds but model does not answer | Asset packaging does not guarantee runtime inference | Inspect the local-AI channel/runtime status and fallback warning. |
 | Model checksum mismatch | Incomplete, altered, or wrong artifact | Delete the cache/asset and rerun the pinned preparation script. |
 | Model load fails | Missing asset, insufficient memory, or native runtime problem | Keep fallback enabled, preserve logs, and do not bypass validation. |
-| Android model unavailable | Android native runtime is not enabled in the current slice | Use the deterministic local assistant until Android runtime work is completed. |
+| Android model unavailable | Android native runtime or bundled GGUF failed to load/infer | Confirm the model checksum, native library packaging, device ABI, and logcat; keep the localized safe fallback enabled. |
 | Windows model unavailable | Windows llama.cpp integration did not compile/load/infer | The UI should display the safe fallback warning; no record is changed. |
+| Android native build fails with `vld1q_f16` or `vld1_f16` | llamafile ARM kernels were selected | Ensure the latest CMake includes `-DGGML_LLAMAFILE=OFF`, then remove `android\\app\\.cxx` and rebuild. |
+| Android APK builds but model is unavailable | Asset/runtime packaging does not guarantee inference | Confirm the GGUF SHA-256, install the arm64 APK on the device, and inspect the local-AI fallback warning/logcat. |
 | Supabase migration error | Schema/order/signature mismatch | Stop, do not rewrite applied migrations, and create an additive forward fix after staging diagnosis. |
 
 ## 16. Production and safety boundaries

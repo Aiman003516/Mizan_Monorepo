@@ -36,6 +36,24 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        externalNativeBuild {
+            cmake {
+                arguments += listOf(
+                    "-DGGML_OPENMP=OFF",
+                    "-DGGML_NATIVE=OFF",
+                    "-DGGML_CPU_REPACK=OFF",
+                    "-DGGML_LLAMAFILE=OFF",
+                )
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 
     // 2. Signing Configs
