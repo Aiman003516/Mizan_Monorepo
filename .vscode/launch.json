@@ -20,7 +20,7 @@
       "deviceId": "chrome",
       "program": "${workspaceFolder}/app_main/apps/lib/main.dart",
       "cwd": "${workspaceFolder}/app_main/apps",
-      "args": [
+      "toolArgs": [
         "--dart-define=SUPABASE_URL=",
         "--dart-define=SUPABASE_ANON_KEY="
       ]
