@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Mizan Web: Build and Run in Chrome",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "chrome",
+      "program": "${workspaceFolder}/app_main/apps/lib/main.dart",
+      "cwd": "${workspaceFolder}/app_main/apps",
+      "toolArgs": [
+        "--dart-define=SUPABASE_URL=${env:SUPABASE_URL}",
+        "--dart-define=SUPABASE_ANON_KEY=${env:SUPABASE_KEY}"
+      ]
+    },
+    {
+      "name": "Mizan Web: Guest Mode in Chrome",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "chrome",
+      "program": "${workspaceFolder}/app_main/apps/lib/main.dart",
+      "cwd": "${workspaceFolder}/app_main/apps",
+      "args": [
+        "--dart-define=SUPABASE_URL=",
+        "--dart-define=SUPABASE_ANON_KEY="
+      ]
+    }
+  ]
+}
